@@ -1,29 +1,48 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { Button } from "@/components/ui/Button";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Stack, useRouter } from "expo-router";
+import { SafeAreaView } from "react-native";
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+
+// const Theme = ({ name, children }: { name: string, children: React.ReactNode }) => {
+//   const { colorScheme } = useColorScheme();
+
+//   return (
+//     <View style={Colors[name][colorScheme]}>
+//       {children}
+//     </View>
+//   )
+// }
+
+const queryClient = new QueryClient({});
+
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
 
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
-  }
+
+  const router = useRouter();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <SafeAreaView style={{ flex: 1, paddingVertical: 10 }}>
+      <QueryClientProvider client={queryClient}>
+        <Stack initialRouteName="index">
+          <Stack.Screen name="index" options={{
+            headerShown: true,
+            headerRight: () => (
+              <Button
+                title="Ajouter"
+                className="bg-blue-200"
+                onPress={() => router.push("/trips/new")}
+              />
+            ),
+            title: "Mes projets",
+          }} />
+          <Stack.Screen name="trips" options={{
+            title: "Mes projets",
+            headerShown: false
+          }} />
+        </Stack>
+      </QueryClientProvider>
+    </SafeAreaView>
   );
 }
