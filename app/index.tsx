@@ -1,6 +1,6 @@
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useRouter } from "expo-router";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import '../global.css';
 
@@ -35,19 +35,18 @@ export default function HomePage() {
       marginHorizontal: 10,
     }}>
       <Animated.View>
-        {mockData.map((project) => (
-          <TouchableOpacity key={project.id} onPress={() => router.push(`/trips/${project.id}`)}>
-            <View
-              className={`${project.color} p-4 rounded-lg shadow-md flex-row flex justify-between items-center m-2`}>
-              <View className="flex flex-col">
-                <Text className="text-black text-lg font-bold">{project.name}</Text>
-                <Text className="text-black font-italic">{project.description}</Text>
-              </View>
-              <View>
-                <IconSymbol name="chevron.right" size={24} color="black" />
-              </View>
+        {mockData.map((project, index) => (
+          <Pressable key={project.id}
+            onPress={() => router.push(`/trips/${project.id}`)}
+            className={`${index % 2 === 0 ? "bg-blue-200" : "bg-white"} p-4 rounded-lg flex-row flex justify-between items-center m-2 py-5`}>
+            <View className="flex flex-col">
+              <Text className="text-black text-lg font-bold">{project.name}</Text>
+              <Text className="text-black font-italic">{project.description}</Text>
             </View>
-          </TouchableOpacity>
+            <View>
+              <IconSymbol name="chevron.right" size={24} color="black" />
+            </View>
+          </Pressable>
         ))}
       </Animated.View>
     </Animated.ScrollView >

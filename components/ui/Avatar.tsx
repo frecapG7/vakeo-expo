@@ -12,6 +12,7 @@ export const Avatar = ({ name, size = 24, color }: {
                 width: size,
                 height: size,
                 borderRadius: "50%",
+                backgroundColor: color,
             }}>
             <Text className="text-lg font-bold text-white">{name?.charAt(0).toUpperCase()}</Text>
         </View >

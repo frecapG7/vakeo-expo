@@ -1,3 +1,4 @@
+import axios from "@/lib/axios";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 const postTrip = async (trip) => {
@@ -22,32 +23,35 @@ export const usePostTrip = () => {
 };
 
 const getTrip = async (tripId) => {
-  return new Promise((resolve) =>
-    setTimeout(() => {
-      console.log("Trip fetched:", tripId);
-      resolve({
-        id: tripId,
-        name: "Luberon V3",
-        startDate: "2023-10-01",
-        endDate: "2023-10-10",
-        users: [
-          {
-            id: 1,
-            name: "Moi",
-          },
-          {
-            id: 2,
-            name: "Willy",
-          },
-          {
-            id: 3,
-            name: "Mélanie",
-          },
-        ],
-        author: 1,
-      });
-    }, 3000)
-  );
+  // return new Promise((resolve) =>
+  //   setTimeout(() => {
+  //     console.log("Trip fetched:", tripId);
+  //     resolve({
+  //       id: tripId,
+  //       name: "Luberon V3",
+  //       startDate: "2023-10-01",
+  //       endDate: "2023-10-10",
+  //       users: [
+  //         {
+  //           id: 1,
+  //           name: "Moi",
+  //         },
+  //         {
+  //           id: 2,
+  //           name: "Willy",
+  //         },
+  //         {
+  //           id: 3,
+  //           name: "Mélanie",
+  //         },
+  //       ],
+  //       author: 1,
+  //     });
+  //   }, 3000)
+  // );
+
+  const response = await axios.get(`/trips/${tripId}`);
+  return response.data;
 };
 
 export const useGetTrip = (tripId) => {

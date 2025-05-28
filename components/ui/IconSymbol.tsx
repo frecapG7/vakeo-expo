@@ -30,6 +30,11 @@ const MAPPING = {
   "bed.double": "bed",
   "ellipsis.circle": "more-horiz",
   "flame": "local-fire-department",
+  "arrow.left": "arrow-back",
+  "cart": "shopping-cart",
+  "link": "insert-link",
+  "trash": "delete"
+  // "drop.triangle": "restaurant-outline"
 } as IconMapping;
 
 /**
