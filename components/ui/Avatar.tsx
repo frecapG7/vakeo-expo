@@ -1,20 +1,25 @@
+import { Image } from "expo-image";
 import { Text, View } from "react-native";
 
-
-export const Avatar = ({ name, size = 24, color }: {
-    name: string,
+export const Avatar = ({ name, size = 24, color, alt, src }: {
+    name?: string,
     size?: number,
-    color?: string
+    color?: string,
+    alt?: string,
+    src?: string
 }) => {
     return (
-        <View className="justify-center items-center bg-gray-200 p-2"
+        <View className="justify-center items-center bg-primary-200 p-2 ring-2"
             style={{
                 width: size,
                 height: size,
                 borderRadius: "50%",
-                backgroundColor: color,
             }}>
-            <Text className="text-lg font-bold text-white">{name?.charAt(0).toUpperCase()}</Text>
+            {src ?
+                <Image source={`@assets/avatars/${src}`} className="flex flex-grow" />
+                :
+                <Text className="font-bold text-secondary text-ellipsis">{alt}</Text>
+            }
         </View >
 
     )

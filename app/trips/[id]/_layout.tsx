@@ -1,8 +1,9 @@
-import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { useGetTrip } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useStyles } from "@/hooks/styles/useStyles";
+import { Tabs, useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { Pressable, Text, TouchableOpacity, View } from "react-native";
 
 
@@ -18,54 +19,118 @@ export default function ItemDetailsLayout() {
 
     const { formatDate } = useI18nTime();
 
+
+    const { header } = useStyles();
+
+
+    const navigation = useNavigation();
+    navigation.setOptions({
+        // headerLeft: () => <Pressable onPress={() => router.dismissTo("/")}>
+        //     <IconSymbol name="chevron.left" size={24} />
+        // </Pressable>,
+        headerBackVisible: false,
+        headerRight: () => (
+            <View className="flex flex-row gap-2 justify-end items-center mx-5">
+                <Pressable onPress={() => router.push({ pathname: "/trips/[id]/pick-user", params: { id } })} className="flex flex-row gap-1 items-center ring-1 ring-secondary  rounded-full px-2 py-1 bg-primary-800">
+                    <IconSymbol name="person.circle" size={20} color="#000" />
+                    <Text className="text-secondary text-sm">{trip?.users?.length}</Text>
+                </Pressable>
+                <IconSymbol name="ellipsis.circle" size={25} color="#000" />
+            </View>
+        )
+    });
+
+
     return (
-        <Stack screenOptions={{
-            header: ({ options, route, back }) => (
-                <View className="flex flex-row justify-between items-center px-5 bg-blue-200 h-20">
-                    <View className="flex flex-row gap-2 justify-start items-center">
-                        <Pressable onPress={() => router.back()}>
-                            <IconSymbol name="arrow.left" size={25} color="#000" />
-                        </Pressable>
-                        <View>
-                            <Text className="text-2xl font-bold">{trip?.name} {options?.title ? `- ${options?.title}` : ''}</Text>
-                            <Text>
+
+        <Tabs screenOptions={{
+
+            tabBarActiveTintColor: header?.tintColor,
+            tabBarInactiveTintColor: header?.tintColor,
+            tabBarLabelPosition: "below-icon",
+            tabBarStyle: {
+                backgroundColor: header?.backgroundColor,
+                borderTopWidth: 0,
+            },
+            headerStyle: {
+                backgroundColor: header?.backgroundColor,
+            },
+            headerTintColor: header.tintColor,
+
+
+        }}>
+
+            <Tabs.Screen name="index" options={{
+                title: trip?.name || "Détails du voyage",
+                tabBarIcon: ({ color, size }) => (
+                    <IconSymbol name="list.dash" size={size} color="black" />
+                ),
+                headerTitle: () => <View className="flex flex-row gap-2 justify-start items-center ml-5">
+                    {trip &&
+                        <View className="flex flex-col justify-center items-start">
+                            <Text className="text-lg font-bold text-secondary">{trip?.name}</Text>
+                            <Text className="text-xs text-secondary italic">
                                 {formatDate(trip?.startDate)} - {formatDate(trip?.endDate)}
                             </Text>
                         </View>
-
-
-                    </View>
-
-                    <IconSymbol name="ellipsis.circle" size={25} color="#000" />
-
-                </View>
-            )
-        }} >
-            <Stack.Screen name="index" options={{
+                    }
+                    {!trip &&
+                        <View className="flex flex-col justify-center items-start">
+                            <Skeleton width={250} height={30} />
+                        </View>}
+                </View>,
 
             }} />
-            <Stack.Screen name="dates" options={{
-                headerShown: true,
-                presentation: "modal",
-                title: "Sélectionner les dates",
-                headerTitle: "Date de séjour",
-                headerLeft(props) {
-                    return (
-                        <TouchableOpacity onPress={() => router.back()}>
-                            <IconSymbol name="xmark.circle" size={20} color="#000" style={{ marginLeft: 10 }} />
-                        </TouchableOpacity>
-                    )
-                },
-                headerRight: () => (
-                    <Button title="Appliquer" />
-                )
-            }} />
-            <Stack.Screen name="activities" />
-            <Stack.Screen name="links" options={{
-                headerShown: false
-            }} />
+            <Tabs.Screen
+                name="dates"
+                options={{
+                    headerShown: true,
+                    // presentation: "modal",
+                    title: "Sélectionner les dates",
+                    headerTitle: "Date de séjour",
+                    headerLeft(props) {
+                        return (
+                            <TouchableOpacity onPress={() => router.back()}>
+                                <IconSymbol name="xmark.circle" size={20} color="#000" style={{ marginLeft: 10 }} />
+                            </TouchableOpacity>
+                        )
+                    },
+                    href: null
+                }}
+            />
+            <Tabs.Screen
+                name="activities"
+                options={{
+                    href: null,
+                    headerShown: false,
+                }}
+            />
+            <Tabs.Screen name="links"
+                options={{
+                    href: null
+                }} />
+            <Tabs.Screen name="meals"
+                options={{
+                    href: null,
+                    headerShown: false,
+                    title: "Les menus",
+                }} />
+            <Tabs.Screen name="calendar"
+                options={{
+                    href: { pathname: "/trips/[id]/calendar", params: { id } },
+                    tabBarIcon: ({ color, size }) => (
+                        <IconSymbol name="calendar" size={24} color="black" />
+                    ),
+                    title: "Calendrier",
+                }} />
+            <Tabs.Screen name="pick-user"
+                options={{
+                    href: null,
+                    headerShown: false,
+                }} />
+        </Tabs >
 
-        </Stack >
+
 
     );
 }

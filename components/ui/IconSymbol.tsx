@@ -2,6 +2,7 @@
 
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { SymbolViewProps, SymbolWeight } from 'expo-symbols';
+import { useColorScheme } from 'nativewind';
 import { ComponentProps } from 'react';
 import { OpaqueColorValue, type StyleProp, type TextStyle } from 'react-native';
 
@@ -23,6 +24,7 @@ const MAPPING = {
   'pencil': 'edit',
   "person.circle": "person",
   "plus.circle": "add-circle-outline",
+  "plus": "add",
   "checkmark.circle": "check-circle",
   "checkmark.circle.fill": "check-circle",
   "calendar": "calendar-month",
@@ -33,8 +35,16 @@ const MAPPING = {
   "arrow.left": "arrow-back",
   "cart": "shopping-cart",
   "link": "insert-link",
-  "trash": "delete"
-  // "drop.triangle": "restaurant-outline"
+  "trash": "delete",
+  "suit.spade": "fastfood",
+  "list.dash": "format-list-bulleted",
+  "clock": "access-time",
+  "exclamationmark.triangle": "warning",
+  "magnifyingglass": "restaurant-menu",
+  "star": "star-border",
+  "star.fill": "star",
+  "circle": "radio-button-off",
+  "circle.fill": "radio-button-checked",
 } as IconMapping;
 
 /**
@@ -45,14 +55,15 @@ const MAPPING = {
 export function IconSymbol({
   name,
   size = 24,
-  color,
+  color = 'black',
   style,
 }: {
   name: IconSymbolName;
   size?: number;
-  color: string | OpaqueColorValue;
+  color?: string | OpaqueColorValue;
   style?: StyleProp<TextStyle>;
   weight?: SymbolWeight;
 }) {
-  return <MaterialIcons color={color} size={size} name={MAPPING[name]} style={style} />;
+  const { colorScheme } = useColorScheme();
+  return <MaterialIcons color={colorScheme === "dark" ? "white" : color} size={size} name={MAPPING[name]} style={style} />;
 }

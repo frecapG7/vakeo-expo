@@ -1,4 +1,4 @@
-import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
+import { ActivityIndicator, Pressable, Text } from "react-native";
 
 
 export const Button = ({ title, onPress, className, disabled, isLoading }: {
@@ -9,13 +9,13 @@ export const Button = ({ title, onPress, className, disabled, isLoading }: {
     isLoading?: boolean
 }) => {
     return (
-        <TouchableOpacity
+        <Pressable
             onPress={onPress}
-            className={`border rounded-lg p-2 ${disabled ? 'bg-neutral-200' : ''} ${className}`}
+            className={`rounded-lg p-2 ring-secondary ${disabled ? 'bg-neutral-200' : ''} ${className}`}
             disabled={disabled || isLoading}
         >
             {isLoading && <ActivityIndicator size="large" />}
-            {!isLoading && <Text className="text-sm font-bold text-center">{title}</Text>}
-        </TouchableOpacity >
+            {!isLoading && <Text className="text-sm font-bold text-center text-secondary " >{title}</Text>}
+        </Pressable >
     )
 }

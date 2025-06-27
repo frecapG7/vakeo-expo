@@ -44,15 +44,14 @@ export const FormText = ({ control, name, label, placeholder, rules, endAdornmen
 
     return (
         <View className={`flex flex-col ${className}`}>
-            <Text className="text-sm font-bold mx-2 ">{label}</Text>
-            <Animated.View style={animatedStyle} className="relative">
+            <Text className="text-sm font-bold mx-2 text-secondary">{label}</Text>
+            <Animated.View style={animatedStyle} >
                 <TextInput
                     onChangeText={onChange}
                     value={value}
-                    className={`bg-gray-200 rounded-lg p-2 ${error ? "border border-red-600" : ""}`}
+                    className={`flex bg-gray-200 rounded-lg p-2 ${error ? "border border-red-600" : ""}`}
                     ref={ref}
                     placeholder={placeholder}
-
                 />
                 {endAdornment && <View className="absolute right-0 top-0 bottom-0 flex items-center justify-center b">
                     {endAdornment}

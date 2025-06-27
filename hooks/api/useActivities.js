@@ -58,11 +58,12 @@ export const usePutActivity = (tripId, activityId) => {
   return useMutation({
     mutationFn: (data) => putActivity(tripId, activityId, data),
     onSuccess: (data) => {
-      queryClient.setQueryData({
-        queryKey: ["trips", tripId, "activities", activityId],
-        data: (oldData) => ({ ...oldData, ...data }),
-      });
-      queryClient.invalidateQueries({ queryKey: ["activities", tripId] });
+      queryClient.invalidateQueries({ queryKey: ["trips", tripId] }).then(() =>
+        queryClient.setQueryData({
+          queryKey: ["trips", tripId, "activities", activityId],
+          data,
+        })
+      );
     },
   });
 };

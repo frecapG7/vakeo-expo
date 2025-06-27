@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/Button";
 import { usePostActivity } from "@/hooks/api/useActivities";
 import { useGetTrip } from "@/hooks/api/useTrips";
+import { useStyles } from "@/hooks/styles/useStyles";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { View } from "react-native";
 import Animated from "react-native-reanimated";
 import { ActivityForm } from "./components/ActivityForm";
 
@@ -51,11 +53,14 @@ export default function NewActivity() {
             })));
     }, [trip, setValue]);
 
-
+    const { container } = useStyles();
 
     return (
-        <Animated.ScrollView>
-            <ActivityForm control={control} />
+        <Animated.ScrollView style={container}>
+            <View className="px-10">
+                <ActivityForm control={control} />
+            </View>
+
         </Animated.ScrollView>
     );
 }

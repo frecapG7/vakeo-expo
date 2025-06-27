@@ -1,5 +1,5 @@
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { useGetActivity } from "@/hooks/api/useActivities";
+import { useStyles } from "@/hooks/styles/useStyles";
 import { Stack, useRouter } from "expo-router";
 import { useLocalSearchParams } from "expo-router/build/hooks";
 import { Pressable } from "react-native";
@@ -8,9 +8,9 @@ import { Pressable } from "react-native";
 export default function TripActivitiesLayout() {
 
     const router = useRouter();
-    const { id, activityId } = useLocalSearchParams();
+    const { id } = useLocalSearchParams();
 
-    const { data: activity } = useGetActivity(String(id), String(activityId));
+    const { header } = useStyles();
 
     return (
         <Stack screenOptions={{
@@ -19,6 +19,14 @@ export default function TripActivitiesLayout() {
             headerRight: () => <Pressable onPress={() => router.push(`/trips/${id}/activities/new`)}>
                 <IconSymbol name="plus.circle" size={24} color="black" />
             </Pressable>,
+            headerStyle: {
+                backgroundColor: header.backgroundColor
+            },
+            // backgroundColor: '#f4511e',
+            headerTintColor: header.tintColor,
+            headerTitleStyle: {
+                fontWeight: 'bold',
+            },
 
         }}>
             <Stack.Screen

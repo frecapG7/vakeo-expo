@@ -1,5 +1,6 @@
 import { useController } from "react-hook-form";
-import { Pressable, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
+
 import AnimatedCheckbox from 'react-native-checkbox-reanimated';
 
 export const FormCheckbox = ({
@@ -33,6 +34,8 @@ export const FormCheckbox = ({
                     boxOutlineColor="#4444ff"
                 />
             </Pressable>
+            <Text>{name}</Text>
+            <Text>{JSON.stringify(value)}</Text>
         </View>
     )
 }
