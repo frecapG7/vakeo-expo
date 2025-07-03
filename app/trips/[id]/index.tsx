@@ -49,7 +49,7 @@ export default function ItemDetails() {
                     <IconSymbol name="chevron.right" size={25} color="#000" />
                 </Pressable>
 
-                <Pressable onPress={() => router.push(`/trips/${id}/housing`)}
+                <Pressable onPress={() => router.push(`/trips/${id}/groceries`)}
                     className="flex flex-row justify-between align-center p-5 rounded-lg bg-primary-400 ring-secondary ring-2">
                     <View className="items-center flex flex-row gap-2 justify-start">
                         <IconSymbol name="cart" size={25} color="#000" />

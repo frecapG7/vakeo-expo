@@ -115,6 +115,15 @@ export default function ItemDetailsLayout() {
                     headerShown: false,
                     title: "Les menus",
                 }} />
+            <Tabs.Screen name="groceries"
+                options={{
+                    href: null,
+                    headerShown: true,
+                    headerLeft: () => <Pressable onPress={() => router.navigate(`/trips/${id}`)}>
+                        <IconSymbol name="arrow.left"/>
+                    </Pressable>,
+                    title: "Les courses",
+                }} />
             <Tabs.Screen name="calendar"
                 options={{
                     href: { pathname: "/trips/[id]/calendar", params: { id } },
