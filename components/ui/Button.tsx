@@ -11,7 +11,7 @@ export const Button = ({ title, onPress, className, disabled, isLoading }: {
     return (
         <Pressable
             onPress={onPress}
-            className={`rounded-lg p-2 ring-secondary ${disabled ? 'bg-neutral-200' : ''} ${className}`}
+            className={`rounded-lg p-4 ring-secondary ${disabled ? 'bg-neutral-200' : 'bg-blue-400'} ${className}`}
             disabled={disabled || isLoading}
         >
             {isLoading && <ActivityIndicator size="large" />}
