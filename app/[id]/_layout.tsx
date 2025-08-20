@@ -1,7 +1,5 @@
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useGetTrip } from "@/hooks/api/useTrips";
-import useI18nTime from "@/hooks/i18n/useI18nTime";
-import { useStyles } from "@/hooks/styles/useStyles";
 import { Tabs, useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useEffect } from "react";
 import { Pressable, Text, TouchableOpacity, View } from "react-native";
@@ -17,19 +15,10 @@ export default function ItemDetailsLayout() {
 
     const { data: trip } = useGetTrip(String(id));
 
-    const { formatDate } = useI18nTime();
-
-
-    const { header } = useStyles();
-
-
     const navigation = useNavigation();
 
     useEffect(() => {
         navigation.setOptions({
-            // headerLeft: () => <Pressable onPress={() => router.dismissTo("/")}>
-            //     <IconSymbol name="chevron.left" size={24} />
-            // </Pressable>,
             title: trip?.name,
             headerRight: () => (
                 <View className="flex flex-row gap-2 justify-end items-center mx-5">
