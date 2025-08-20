@@ -40,11 +40,12 @@ const MAPPING = {
   "list.dash": "format-list-bulleted",
   "clock": "access-time",
   "exclamationmark.triangle": "warning",
-  "magnifyingglass": "restaurant-menu",
+  "magnifyingglass": "search",
   "star": "star-border",
   "star.fill": "star",
   "circle": "radio-button-off",
   "circle.fill": "radio-button-checked",
+  "message": "chat-bubble-outline"
 } as IconMapping;
 
 /**
@@ -55,7 +56,7 @@ const MAPPING = {
 export function IconSymbol({
   name,
   size = 24,
-  color = 'black',
+  color,
   style,
 }: {
   name: IconSymbolName;
@@ -65,5 +66,5 @@ export function IconSymbol({
   weight?: SymbolWeight;
 }) {
   const { colorScheme } = useColorScheme();
-  return <MaterialIcons color={colorScheme === "dark" ? "white" : color} size={size} name={MAPPING[name]} style={style} />;
+  return <MaterialIcons color={color ? color : colorScheme === "dark" ? "dark" : "white"} size={size} name={MAPPING[name]} style={style} />;
 }

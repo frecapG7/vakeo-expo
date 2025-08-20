@@ -6,7 +6,6 @@ import { useStyles } from "@/hooks/styles/useStyles";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
-import Animated from "react-native-reanimated";
 
 
 
@@ -19,7 +18,7 @@ export default function TripActivities() {
     const { data: activities } = useGetActivities(String(id));
 
 
-    const { formatDate, formatHour } = useI18nTime();
+    const { formatDate, formatHour, formatDay } = useI18nTime();
 
     const router = useRouter();
 
@@ -33,14 +32,14 @@ export default function TripActivities() {
     }, {}), [activities]);
 
     return (
-        <Animated.ScrollView style={container}>
+        <View>
             {groupedActivities &&
                 <View className="flex flex-col gap-2 divide-y divide-solid divide-secondary p-2">
                     {Object.keys(groupedActivities)?.map((day) => (
                         <View className="flex gap-2" key={day}>
                             <View className="flex flex-row gap-1">
-                                <IconSymbol name="calendar" size={24} />
-                                <Text className="text-lg text-secondary">{day !== "NaN" ? day : ""}</Text>
+                                <IconSymbol name="calendar" size={24} color="blue" />
+                                <Text className="text-xl font-bold text-blue-600">{day !== "NaN" ? formatDay(day) : ""}</Text>
                             </View>
                             <View className="px-2 flex gap-5">
                                 {groupedActivities[day]?.map((activity) =>
@@ -50,7 +49,8 @@ export default function TripActivities() {
                                                 {formatHour(activity.startDate)} - {formatHour(activity.endDate)}
                                             </Text>
                                         </View>
-                                        <Pressable className="flex flex-row flex-grow p-2 justify-between align-center rounded-lg bg-primary-400 ring-secondary ring-2 " onPress={() => router.push(`/trips/${id}/activities/${activity.id}`)}>
+                                        <Pressable className="flex flex-row flex-grow p-2 justify-between align-center rounded-lg bg-gray-200 ring-secondary ring-2 "
+                                            onPress={() => router.push({ pathname: "/[id]/activities/[activityId]", params: { id: String(id), activityId: activity.id } })}>
                                             <Text className="text-md font-bold text-secondary">{activity.name}</Text>
 
                                             <AvatarsList users={activity.users} />
@@ -66,6 +66,6 @@ export default function TripActivities() {
             }
 
 
-        </Animated.ScrollView >
+        </View >
     )
 }

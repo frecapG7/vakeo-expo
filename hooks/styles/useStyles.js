@@ -1,6 +1,14 @@
 import { useColorScheme } from "nativewind";
 import { StyleSheet } from "react-native";
 
+// V2 - No colors here
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 5
+  }
+})
+
 const lightStyles = StyleSheet.create({
   container: {
     flex: 1,

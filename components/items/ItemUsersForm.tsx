@@ -43,7 +43,7 @@ export const ItemUsersForm = ({ control }: {
                 </Animated.View>
             ))}
 
-            <Text className="text-sm text-blue-500 p-2" onPress={() => {
+            <Text className="text-md font-bold text-blue-500 p-2" onPress={() => {
                 append({ name: "" });
             }}>
                 Ajouter un participant

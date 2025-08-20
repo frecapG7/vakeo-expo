@@ -1,9 +1,7 @@
-import { Button } from "@/components/ui/Button";
-import { ThemeProvider } from "@/components/ui/ThemeProvider";
-import { useStyles } from "@/hooks/styles/useStyles";
+import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Stack, useRouter } from "expo-router";
-import { SafeAreaView } from "react-native";
+import { Stack } from "expo-router";
+import { useColorScheme } from "nativewind";
 import '../global.css';
 
 
@@ -13,32 +11,49 @@ const queryClient = new QueryClient({});
 export default function RootLayout() {
 
 
-  const router = useRouter();
-  const { container } = useStyles();
+  const { colorScheme = "light" } = useColorScheme();
 
   return (
-    <SafeAreaView style={container}>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <Stack initialRouteName="index">
-            <Stack.Screen name="index" options={{
-              headerShown: true,
-              headerRight: () => (
-                <Button
-                  title="Ajouter"
-                  className="bg-blue-200"
-                  onPress={() => router.push("/trips/new")}
-                />
-              ),
-              title: "Mes projets",
-            }} />
-            <Stack.Screen name="trips" options={{
-              title: "Mes projets",
-              headerShown: false
-            }} />
-          </Stack>
-        </ThemeProvider>
-      </QueryClientProvider>
-    </SafeAreaView>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider value={colorScheme === "light" ? LightTheme : DarkTheme}>
+          <RootNav />
+      </ThemeProvider>
+    </QueryClientProvider>
   );
+}
+
+
+const RootNav = () => {
+
+
+  return (
+    <Stack initialRouteName="index">
+      <Stack.Screen name="index" options={{
+        headerShown: true,
+        title: "Mes projets",
+      }} />
+      <Stack.Screen name="new" options={{
+        presentation: "modal",
+        title: "Nouveau voyage"
+      }}/>
+      <Stack.Screen name="join" options={{
+        presentation: "modal",
+        title: "Rejoins un voyage"
+      }}/>
+      <Stack.Screen name="[id]" options={{
+        title: "Mon voyage",
+        headerShown: true
+      }} />
+    </Stack>
+  );
+}
+
+
+const LightTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: 'rgba(196, 235, 187, 1)',
+    primary: 'rgba(25, 23, 107, 1)',
+  }
 }
