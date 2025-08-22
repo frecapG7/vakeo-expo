@@ -2,6 +2,7 @@ import { FormText } from "@/components/form/FormText";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { usePostTrip } from "@/hooks/api/useTrips";
+import { useAddStorageTrip } from "@/hooks/storage/useStorageTrips";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -108,16 +109,23 @@ export default function NewTripPage() {
         name: "img",
     })
 
+
+
+    const addStorageTrip = useAddStorageTrip();
+
     const onSubmit = async (data: any) => {
-        const resutlt = await postTrip.mutateAsync(data);
-        router.replace(`./${resutlt.id}`);
+        const result = await postTrip.mutateAsync(data);
+        await addStorageTrip.mutateAsync({
+            id: result.id,
+            name: data.name,
+            img: data.img.uri,
+            me
+        });
+        router.replace(`./${result.id}`);
     }
 
     return (
         <GestureHandlerRootView style={styles.container}>
-
-
-
             <Text className="text-xl font-bold ml-5 dark:text-white">Titre</Text>
             <View className="flex flex-row gap-1">
                 <Pressable onPress={() => bottomSheetRef.current?.expand()}
@@ -129,19 +137,29 @@ export default function NewTripPage() {
                     }}
                         contentFit="cover" />
                 </Pressable>
-                <FormText control={control} name="name" className="flex-grow" rules={{ required: true }} />
+                <FormText control={control}
+                    name="name"
+                    className="flex-grow"
+                    rules={{
+                        required: true,
+                        maxLength: 50
+                    }}
+                />
             </View>
             <View className="rounded-lg my-5">
                 <Text className="text-xl font-bold ml-5 dark:text-white">Participants</Text>
                 <Animated.FlatList
                     data={users}
-                    contentContainerClassName="gap-0 bg-gray-200 rounded-t-full"
+                    contentContainerClassName="gap-0 bg-gray-200 p-1 rounded-t-lg"
                     renderItem={({ item, index, separators }) =>
                         <View className="flex-row justify-between">
                             <FormText
                                 control={control}
                                 name={`users.${index}.name`}
-                                rules={{ required: true }}
+                                rules={{
+                                    required: true,
+                                    maxLength: 25
+                                }}
                                 className="flex-grow"
                             />
                             <Pressable
@@ -159,7 +177,7 @@ export default function NewTripPage() {
                 />
                 {users?.length < MAX_USERS_LENGTH &&
                     <Animated.View entering={FadeInDown} exiting={FadeInDown}>
-                        <Pressable className="bg-gray-200"
+                        <Pressable className="bg-gray-200 rounded-b-lg"
                             onPress={() => {
                                 append({ name: "" });
                             }}>
@@ -180,6 +198,12 @@ export default function NewTripPage() {
                 enableDynamicSizing={false}
                 snapPoints={snapPoints}
                 enablePanDownToClose={true}
+                handleStyle={{
+                    backgroundColor: "primary"
+                }}
+                backgroundStyle={{
+                    backgroundColor: "primary"
+                }}
             >
 
                 <BottomSheetScrollView>
