@@ -45,7 +45,8 @@ const MAPPING = {
   "star.fill": "star",
   "circle": "radio-button-off",
   "circle.fill": "radio-button-checked",
-  "message": "chat-bubble-outline"
+  "message": "chat-bubble-outline",
+  "doc.on.doc": "content-copy"
 } as IconMapping;
 
 /**

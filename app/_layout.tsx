@@ -1,7 +1,8 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Stack } from "expo-router";
+import { SplashScreen, Stack } from "expo-router";
 import { useColorScheme } from "nativewind";
+import { useEffect, useState } from "react";
 import '../global.css';
 
 
@@ -12,6 +13,22 @@ export default function RootLayout() {
 
 
   const { colorScheme = "light" } = useColorScheme();
+
+
+  const [loaded, setLoaded] = useState(false);
+
+
+  // TODO: setLoaded to true when font or else are all loaded
+  useEffect(() => {
+    setTimeout(() => setLoaded(true), 3000);
+  }, [setLoaded]);
+
+
+  useEffect(() => {
+    if(loaded)
+      SplashScreen.hide();
+  }, [loaded]);
+
 
   return (
     <QueryClientProvider client={queryClient}>

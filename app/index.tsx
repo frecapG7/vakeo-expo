@@ -1,6 +1,7 @@
 import { FormText } from "@/components/form/FormText";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { useGetStorageTrips } from "@/hooks/storage/useStorageTrips";
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Image } from "expo-image";
 import { useNavigation, useRouter } from "expo-router";
@@ -12,7 +13,7 @@ import Animated, { LinearTransition } from "react-native-reanimated";
 
 
 
-const mockData = [
+const trips = [
   {
     id: "454435643645",
     name: "Road trip à Aix-en-Provence",
@@ -66,6 +67,10 @@ export default function HomePage() {
   const navigation = useNavigation();
 
 
+
+  const {data: storageTrips} = useGetStorageTrips();
+
+
   useEffect(() => {
     navigation.setOptions({
       headerRight: () =>
@@ -84,7 +89,7 @@ export default function HomePage() {
       </View>
       <View className="mx-2">
         <Animated.FlatList
-          data={mockData.filter(item => !search || item.name.toLowerCase().includes(search))}
+          data={storageTrips?.filter(item => !search || item.name.toLowerCase().includes(search))}
           keyExtractor={(item) => item.id}
           renderItem={({ item, separators }) =>
             <View>
@@ -117,8 +122,6 @@ export default function HomePage() {
           itemLayoutAnimation={LinearTransition}
         />
       </View>
-
-
 
 
       <BottomSheet ref={bottomSheetRef} index={-1}
