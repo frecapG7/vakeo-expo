@@ -24,7 +24,11 @@ export default function ItemDetailsLayout() {
             title: trip?.name,
             headerRight: () => (
                 <View className="flex flex-row gap-2 justify-end items-center mx-5">
-                    <Pressable onPress={() => router.push("./pick-user")} className="flex flex-row gap-1 items-center ring-1 rounded-full p-3 py-1 bg-blue-200">
+                    <Pressable onPress={() => router.push({
+                        pathname: "./[id]/messages",
+                        params: { id: id }
+                    }
+                    )} className="flex flex-row gap-1 items-center ring-1 rounded-full p-3 py-1 bg-blue-200">
                         <IconSymbol name="message" size={20} color="#000" />
                         <Text className="text-secondary text-sm">{trip?.users?.length}</Text>
                     </Pressable>
@@ -110,7 +114,13 @@ export default function ItemDetailsLayout() {
                     </Pressable>,
                     title: "Les courses",
                 }} />
-           
+
+            <Tabs.Screen name="messages"
+                options={{
+                    href: null,
+                    headerShown: false
+                }} />
+
         </Tabs >
 
 

@@ -1,11 +1,16 @@
 import { storage } from "@/storage";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+
+interface StorageTripUser {
+    _id: string,
+}
+
 interface StorageTrip {
-    id: string,
+    _id: string,
     name: string,
-    img: string,
-    me: string
+    image: string,
+    user: StorageTripUser
 }
 
 
@@ -45,7 +50,7 @@ export const useGetStorageTrip = (id: string) => {
 const addTripStorage = (trip: StorageTrip): Promise<void> => {
     return new Promise((resolve, reject) => {
         try {
-            storage.set(`trips.${trip.id}`, JSON.stringify(trip));
+            storage.set(`trips.${trip._id}`, JSON.stringify(trip));
             resolve();
         } catch (err) {
             console.error(err);
@@ -64,9 +69,9 @@ export const useAddStorageTrip = () => {
     })
 }
 
-const updateStorageTrip = (trip: StorageTrip): Promise<StorageTrip> => {
+const updateStorageTrip = (id: string, trip: StorageTrip): Promise<StorageTrip> => {
     return new Promise((resolve) => {
-        storage.set(`trips.${trip.id}`, JSON.stringify(trip));
+        storage.set(`trips.${id}`, JSON.stringify(trip));
         resolve(trip);
     }
     );
@@ -79,7 +84,7 @@ export const useUpdateStorageTrip = (id: string) => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (trip: StorageTrip) => updateStorageTrip(trip),
+        mutationFn: (trip: StorageTrip) => updateStorageTrip(id, trip),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["storage", "trips"] })
     })
 }

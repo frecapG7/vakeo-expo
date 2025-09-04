@@ -81,18 +81,20 @@ export default function NewTripPage() {
             }, {
                 name: "",
             }],
-            img: data[0]
+            image: data[0]
         }
     });
     const { fields: users, append, remove } = useFieldArray({
         control,
         name: "users",
+        keyName: "key",
         rules: {
             minLength: 1,
-            maxLength: 5
+            maxLength: MAX_USERS_LENGTH
         }
     });
-    const [me, setMe] = useState(users[0]?.id);
+ 
+    const [me, setMe] = useState(0)
 
 
     const postTrip = usePostTrip();
@@ -102,11 +104,9 @@ export default function NewTripPage() {
     const bottomSheetRef = useRef<BottomSheet>(null);
     const snapPoints = useMemo(() => ["25%", "50%"], []);
 
-
-
     const { field: { value, onChange } } = useController({
         control,
-        name: "img",
+        name: "image",
     })
 
 
@@ -115,13 +115,16 @@ export default function NewTripPage() {
 
     const onSubmit = async (data: any) => {
         const result = await postTrip.mutateAsync(data);
+        console.log(JSON.stringify(result));
         await addStorageTrip.mutateAsync({
-            id: result.id,
-            name: data.name,
-            img: data.img.uri,
-            me
+            _id: result._id,
+            name: result.name,
+            image: data.image.uri, //TODO
+            user: {
+                _id: result.users[me]
+            }
         });
-        router.replace(`./${result.id}`);
+        router.replace(`./${result._id}`);
     }
 
     return (
@@ -164,8 +167,8 @@ export default function NewTripPage() {
                             />
                             <Pressable
                                 className="mx-2"
-                                onPress={() => me === item.id ? console.log("todo edit Me") : remove(index)}>
-                                {me === item.id ?
+                                onPress={() => me !== index && remove(index)}>
+                                {me === index ?
                                     <Text className="font-bold bg-blue-600 p-1 text-white">Moi</Text> :
                                     <IconSymbol name="xmark.circle" size={24} color="black" />}
                             </Pressable>

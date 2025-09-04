@@ -90,24 +90,28 @@ export default function HomePage() {
       <View className="mx-2">
         <Animated.FlatList
           data={storageTrips?.filter(item => !search || item.name.toLowerCase().includes(search))}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item._id}
           renderItem={({ item, separators }) =>
             <View>
               <Pressable style={{ flex: 1 }}
                 className="flex flex-row justify-between items-center bg-orange-100 dark:bg-gray-100 px-2 py-5 rounded-lg"
-                onPress={() => router.push(`./${item.id}`)}
+                onPress={() => router.push(`./${item._id}`)}
                 onLongPress={() => separators.highlight}>
                 <View className="flex flex-row gap-1 items-center">
                   <Image
                     style={styles.image}
-                    source={item.img}
+                    source={item.image}
                     // placeholder={{ blurhash }}
                     contentFit="cover"
                     transition={1000}
                   />
                   <View className="flex flex-col">
                     <Text className="text-lg font-bold">{item.name}</Text>
-                    <Text className="font-italic">{item.description}</Text>
+                    <View className="rounded flex-row bg-blue-200 items-center justify-center flex-grow">
+                      <Text>4 </Text>
+                      <IconSymbol name="person.circle" color="black"/>
+                      </View>
+                    {/* <Text className="font-italic">{JSON.stringify(item)}</Text> */}
                   </View>
                 </View>
                 <View>

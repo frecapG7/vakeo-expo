@@ -22,12 +22,8 @@ export default function ItemDetails() {
 
 
     const { data: storageTrip } = useGetStorageTrip(String(id));
-    const me = useMemo(() => {
-        if (!trip)
-            return;
-        return trip.users.find((user) => user.id === storageTrip?.me);
-    }, [trip, storageTrip]);
-    const {mutateAsync: updateTrip} = useUpdateStorageTrip(String(id));
+    const me = useMemo(() => storageTrip?.user, [storageTrip]);
+    const updateStorageTrip = useUpdateStorageTrip(String(id));
 
 
     const [showUserPicker, setShowUserPicker] = useState(false);
@@ -71,6 +67,9 @@ export default function ItemDetails() {
                 </View>
             </View>
 
+<Text>
+    {JSON.stringify(storageTrip)}
+</Text>
 
             <View className="mt-10">
                 <Text className="text-2xl ">A venir</Text>
@@ -96,12 +95,12 @@ export default function ItemDetails() {
             </View>
 
 
-            <Modal visible={showUserPicker || (!me && !isLoading)}
+            <Modal visible={showUserPicker || (!me?._id && !isLoading)}
                 animationType="slide"
                 style={{
                     backgroundColor: "background"
                 }}>
-                <Pressable className="p-2" onPress={() => !!me ? setShowUserPicker(false) : router.dismissAll()}>
+                <Pressable className="p-2" onPress={() => me?._id ? setShowUserPicker(false) : router.dismissAll()}>
                     <Text className="text-secondary">Annuler</Text>
                 </Pressable>
 
@@ -112,9 +111,12 @@ export default function ItemDetails() {
                     renderItem={({ item }) =>
                         <Pressable className="flex flex-row justify-between items-center p-2"
                             onPress={async() => {
-                                await updateTrip({
-                                    ...storageTrip,
-                                    me: item.id
+                                await updateStorageTrip.mutateAsync({
+                                    _id: storageTrip?._id,
+                                    name: storageTrip?.name,
+                                    user: {
+                                        _id: item._id
+                                    }
                                 });
                                 setShowUserPicker(false);
                             }}>
@@ -122,7 +124,7 @@ export default function ItemDetails() {
                                 <Avatar alt={item.name.charAt(0)} size={40} color="blue" />
                                 <Text className="text-lg ">{item.name}</Text>
                             </View>
-                            {item.id === me?.id && <IconSymbol name="checkmark.circle.fill" size={35} color="blue" />}
+                            {item._id === me?._id && <IconSymbol name="checkmark.circle.fill" size={35} color="blue" />}
                         </Pressable>
                     }
                     keyExtractor={(item) => item.id}
