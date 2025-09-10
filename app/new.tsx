@@ -11,6 +11,7 @@ import { useController, useFieldArray, useForm } from "react-hook-form";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { FadeInDown, LinearTransition } from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 
 
@@ -67,7 +68,7 @@ const data = [
 
 
 
-const MAX_USERS_LENGTH = 5;
+const MAX_USERS_LENGTH = 20;
 
 export default function NewTripPage() {
 
@@ -93,7 +94,7 @@ export default function NewTripPage() {
             maxLength: MAX_USERS_LENGTH
         }
     });
- 
+
     const [me, setMe] = useState(0)
 
 
@@ -120,120 +121,121 @@ export default function NewTripPage() {
             _id: result._id,
             name: result.name,
             image: data.image.uri, //TODO
-            user: {
-                _id: result.users[me]
-            }
+            user: result.users[me]
         });
         router.replace(`./${result._id}`);
     }
 
     return (
-        <GestureHandlerRootView style={styles.container}>
-            <Text className="text-xl font-bold ml-5 dark:text-white">Titre</Text>
-            <View className="flex flex-row gap-1">
-                <Pressable onPress={() => bottomSheetRef.current?.expand()}
-                    className="bg-gray-200 p-1">
-                    <Image source={value?.uri} style={{
-                        flex: 1,
-                        width: 40,
-                        height: 20,
-                    }}
-                        contentFit="cover" />
-                </Pressable>
-                <FormText control={control}
-                    name="name"
-                    className="flex-grow"
-                    rules={{
-                        required: true,
-                        maxLength: 50
-                    }}
-                />
-            </View>
-            <View className="rounded-lg my-5">
-                <Text className="text-xl font-bold ml-5 dark:text-white">Participants</Text>
-                <Animated.FlatList
-                    data={users}
-                    contentContainerClassName="gap-0 bg-gray-200 p-1 rounded-t-lg"
-                    renderItem={({ item, index, separators }) =>
-                        <View className="flex-row justify-between">
-                            <FormText
-                                control={control}
-                                name={`users.${index}.name`}
-                                rules={{
-                                    required: true,
-                                    maxLength: 25
-                                }}
-                                className="flex-grow"
-                            />
-                            <Pressable
-                                className="mx-2"
-                                onPress={() => me !== index && remove(index)}>
-                                {me === index ?
-                                    <Text className="font-bold bg-blue-600 p-1 text-white">Moi</Text> :
-                                    <IconSymbol name="xmark.circle" size={24} color="black" />}
-                            </Pressable>
-                        </View>
-                    }
-                    keyExtractor={(item) => item.id}
-                    ItemSeparatorComponent={() => <View className="h-0.2 bg-gray-600" />}
-                    itemLayoutAnimation={LinearTransition}
-                />
-                {users?.length < MAX_USERS_LENGTH &&
-                    <Animated.View entering={FadeInDown} exiting={FadeInDown}>
-                        <Pressable className="bg-gray-200 rounded-b-lg"
-                            onPress={() => {
-                                append({ name: "" });
-                            }}>
-                            <Text className="text-md font-bold text-blue-500 p-2">
-                                Ajouter un participant
-                            </Text>
-                        </Pressable>
-                    </Animated.View>}
-            </View>
-            <View className="flex items-center justify-center mt-10">
-                <Button title="Continuer" onPress={handleSubmit(onSubmit)} isLoading={postTrip.isPending} />
-            </View>
+        <SafeAreaView style={styles.container}>
 
-
-
-            <BottomSheet ref={bottomSheetRef}
-                index={-1}
-                enableDynamicSizing={false}
-                snapPoints={snapPoints}
-                enablePanDownToClose={true}
-                handleStyle={{
-                    backgroundColor: "primary"
-                }}
-                backgroundStyle={{
-                    backgroundColor: "primary"
-                }}
-            >
-
-                <BottomSheetScrollView>
-                    <View className="flex flex-row flex-wrap gap-2 justify-center px-2">
-                        {data.map((item) => (
-                            <Pressable key={item.name} onPress={() => {
-                                onChange(item);
-                                bottomSheetRef.current?.close();
-                            }}>
-                                <Image
-                                    style={{
-                                        flex: 1,
-                                        width: 100,
-                                        height: 100
+            <GestureHandlerRootView>
+                <Text className="text-xl font-bold ml-5 dark:text-white">Titre</Text>
+                <View className="flex flex-row gap-1">
+                    <Pressable onPress={() => bottomSheetRef.current?.expand()}
+                        className="bg-gray-200 p-1">
+                        <Image source={value?.uri} style={{
+                            flex: 1,
+                            width: 40,
+                            height: 20,
+                        }}
+                            contentFit="cover" />
+                    </Pressable>
+                    <FormText control={control}
+                        name="name"
+                        className="flex-grow"
+                        rules={{
+                            required: true,
+                            maxLength: 50
+                        }}
+                    />
+                </View>
+                <View className="rounded-lg my-5">
+                    <Text className="text-xl font-bold ml-5 dark:text-white">Participants</Text>
+                    <Animated.FlatList
+                        data={users}
+                        contentContainerClassName="gap-0 bg-gray-200 p-1 rounded-t-lg"
+                        renderItem={({ item, index, separators }) =>
+                            <View className="flex-row justify-between">
+                                <FormText
+                                    control={control}
+                                    name={`users.${index}.name`}
+                                    rules={{
+                                        required: true,
+                                        maxLength: 25
                                     }}
-                                    source={item.uri}
-                                    contentFit="cover"
-                                    transition={1000} />
-                                <Text className="text-lg">
-                                    {item.name}
+                                    className="flex-grow"
+                                />
+                                <Pressable
+                                    className="mx-2"
+                                    onPress={() => me !== index && remove(index)}>
+                                    {me === index ?
+                                        <Text className="font-bold bg-blue-600 p-1 text-white">Moi</Text> :
+                                        <IconSymbol name="xmark.circle" size={24} color="black" />}
+                                </Pressable>
+                            </View>
+                        }
+                        keyExtractor={(item) => item.key}
+                        ItemSeparatorComponent={() => <View className="h-0.2 bg-gray-600" />}
+                        itemLayoutAnimation={LinearTransition}
+                    />
+                    {users?.length < MAX_USERS_LENGTH &&
+                        <Animated.View entering={FadeInDown} exiting={FadeInDown}>
+                            <Pressable className="bg-gray-200 rounded-b-lg"
+                                onPress={() => {
+                                    append({ name: "" });
+                                }}>
+                                <Text className="text-md font-bold text-blue-500 p-2">
+                                    Ajouter un participant
                                 </Text>
                             </Pressable>
-                        ))}
-                    </View>
-                </BottomSheetScrollView>
-            </BottomSheet>
-        </GestureHandlerRootView>
+                        </Animated.View>}
+                </View>
+                <View className="flex items-center justify-center mt-10">
+                    <Button title="Continuer" onPress={handleSubmit(onSubmit)} isLoading={postTrip.isPending} />
+                </View>
+
+
+
+                <BottomSheet ref={bottomSheetRef}
+                    index={-1}
+                    enableDynamicSizing={false}
+                    snapPoints={snapPoints}
+                    enablePanDownToClose={true}
+                    handleStyle={{
+                        backgroundColor: "primary"
+                    }}
+                    backgroundStyle={{
+                        backgroundColor: "primary"
+                    }}
+                >
+
+                    <BottomSheetScrollView>
+                        <View className="flex flex-row flex-wrap gap-2 justify-center px-2">
+                            {data.map((item) => (
+                                <Pressable key={item.name} onPress={() => {
+                                    onChange(item);
+                                    bottomSheetRef.current?.close();
+                                }}>
+                                    <Image
+                                        style={{
+                                            flex: 1,
+                                            width: 100,
+                                            height: 100
+                                        }}
+                                        source={item.uri}
+                                        contentFit="cover"
+                                        transition={1000} />
+                                    <Text className="text-lg">
+                                        {item.name}
+                                    </Text>
+                                </Pressable>
+                            ))}
+                        </View>
+                    </BottomSheetScrollView>
+                </BottomSheet>
+            </GestureHandlerRootView>
+        </SafeAreaView>
     )
 }
 
@@ -241,7 +243,6 @@ export default function NewTripPage() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingHorizontal: 20,
-        paddingVertical: 10
+        padding: 5
     }
 })

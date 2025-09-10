@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SplashScreen, Stack } from "expo-router";
 import { useColorScheme } from "nativewind";
 import { useEffect, useState } from "react";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import '../global.css';
 
 
@@ -25,7 +26,7 @@ export default function RootLayout() {
 
 
   useEffect(() => {
-    if(loaded)
+    if (loaded)
       SplashScreen.hide();
   }, [loaded]);
 
@@ -33,7 +34,9 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider value={colorScheme === "light" ? LightTheme : DarkTheme}>
-          <RootNav />
+        <SafeAreaProvider>
+            <RootNav />
+        </SafeAreaProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );
@@ -52,11 +55,11 @@ const RootNav = () => {
       <Stack.Screen name="new" options={{
         presentation: "modal",
         title: "Nouveau voyage"
-      }}/>
+      }} />
       <Stack.Screen name="join" options={{
         presentation: "modal",
         title: "Rejoins un voyage"
-      }}/>
+      }} />
       <Stack.Screen name="[id]" options={{
         title: "Mon voyage",
         headerShown: true

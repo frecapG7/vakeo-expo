@@ -2,22 +2,18 @@ import { storage } from "@/storage";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 
-interface StorageTripUser {
-    _id: string,
-}
+
 
 interface StorageTrip {
     _id: string,
     name: string,
     image: string,
-    user: StorageTripUser
+    user: string
 }
 
 
 
 const getStorageTrips = (): Array<StorageTrip> => {
-
-    console.log(storage.size);
     return storage.getAllKeys()
         .filter(key => key.startsWith("trips."))
         .map(key => storage.getString(key))

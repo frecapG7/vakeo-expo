@@ -1,5 +1,5 @@
 import axios from "@/lib/axios";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const postTrip = async (trip) => {
   const response = await axios.post("/trips", trip);
@@ -24,3 +24,36 @@ export const useGetTrip = (tripId) => {
     enabled: !!tripId,
   });
 };
+
+
+const getTripUser = async (tripId, userId) => {
+  const response = await axios.get(`/trips/${tripId}/users/${userId}`);
+  return response.data;
+}
+
+export const useGetTripUser = (tripId, userId, options) => {
+  return useQuery({
+    queryKey: ["trips", tripId, "users", userId],
+    queryFn: () => getTripUser(tripId, userId),
+    ...options
+  });
+}
+
+const updateTripUser = async (tripId, userId, data) => {
+  const response = await axios.put(`/trips/${tripId}/users/${userId}`, data);
+  return response.data;
+}
+
+export const useUpdateTripUser = (tripId, userId) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data) => updateTripUser(tripId, userId, data),
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({ queryKey: ["trips", tripId] });
+      await queryClient.setQueryData({
+        queryKey: ["trips", tripId, "users", userId],
+        data
+      })
+    }
+  })
+}

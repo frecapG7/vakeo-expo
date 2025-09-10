@@ -2,11 +2,11 @@ import { Avatar } from "@/components/ui/Avatar";
 import { CalendarDayView } from "@/components/ui/CalendarDayView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { AvatarsList } from "@/components/users/AvatarsList";
-import { useGetTrip } from "@/hooks/api/useTrips";
+import { useGetTrip, useGetTripUser } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import { useGetStorageTrip, useUpdateStorageTrip } from "@/hooks/storage/useStorageTrips";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 
@@ -22,7 +22,11 @@ export default function ItemDetails() {
 
 
     const { data: storageTrip } = useGetStorageTrip(String(id));
-    const me = useMemo(() => storageTrip?.user, [storageTrip]);
+
+
+    const {data: me} = useGetTripUser(storageTrip?._id, storageTrip?.user, {
+        enabled: !!storageTrip
+    });
     const updateStorageTrip = useUpdateStorageTrip(String(id));
 
 
@@ -68,7 +72,8 @@ export default function ItemDetails() {
             </View>
 
 <Text>
-    {JSON.stringify(storageTrip)}
+    {JSON.stringify(storageTrip, null, 2)}
+    {JSON.stringify(me, null, 2)}
 </Text>
 
             <View className="mt-10">
@@ -114,9 +119,7 @@ export default function ItemDetails() {
                                 await updateStorageTrip.mutateAsync({
                                     _id: storageTrip?._id,
                                     name: storageTrip?.name,
-                                    user: {
-                                        _id: item._id
-                                    }
+                                    user: item._id
                                 });
                                 setShowUserPicker(false);
                             }}>
@@ -127,7 +130,7 @@ export default function ItemDetails() {
                             {item._id === me?._id && <IconSymbol name="checkmark.circle.fill" size={35} color="blue" />}
                         </Pressable>
                     }
-                    keyExtractor={(item) => item.id}
+                    keyExtractor={(item) => item._id}
                     contentContainerClassName="mx-5 bg-orange-100 dark:bg-gray-100 rounded-lg"
                     ItemSeparatorComponent={() => <View className="h-0.5 bg-black dark:bg-white" />}
                 />
