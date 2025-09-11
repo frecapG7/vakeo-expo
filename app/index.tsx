@@ -60,7 +60,6 @@ export default function HomePage() {
             data={storageTrips?.filter(item => !search || item.name.toLowerCase().includes(search))}
             keyExtractor={(item) => item._id}
             renderItem={({ item, separators }) =>
-              <View>
                 <Pressable style={{ flex: 1 }}
                   className="flex flex-row justify-between items-center bg-orange-100 dark:bg-gray-100 px-2 py-5 rounded-lg"
                   onPress={() => router.push(`./${item._id}`)}
@@ -84,8 +83,6 @@ export default function HomePage() {
                     <IconSymbol name="chevron.right" size={24} color="black" />
                   </View>
                 </Pressable>
-
-              </View>
             }
             ItemSeparatorComponent={() => <View className="h-5" />}
             keyboardDismissMode="on-drag"
