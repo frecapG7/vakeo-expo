@@ -46,7 +46,7 @@ export default function PickTripUserPage() {
                         <Pressable className="flex flex-row justify-between items-center p-2"
                             onPress={async() => await onPress(item)}>
                             <View className="flex flex-row gap-2 items-center">
-                                <Avatar alt={item.name.charAt(0)} size={40} color="blue" />
+                                <Avatar alt={item.name.charAt(0)} size2="sm" src={item.avatar} />
                                 <Text className="text-lg ">{item.name}</Text>
                             </View>
                             {item._id === me?._id && <IconSymbol name="checkmark.circle.fill" size={35} color="blue" />}

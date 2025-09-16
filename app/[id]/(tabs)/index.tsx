@@ -1,11 +1,13 @@
+import { Avatar } from "@/components/ui/Avatar";
 import { CalendarDayView } from "@/components/ui/CalendarDayView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { AvatarsList } from "@/components/users/AvatarsList";
-import { useGetTrip, useGetTripUser } from "@/hooks/api/useTrips";
+import { TripContext } from "@/context/TripContext";
+import { useGetTrip } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
-import { useGetStorageTrip, useUpdateStorageTrip } from "@/hooks/storage/useStorageTrips";
+import { useGetStorageTrip } from "@/hooks/storage/useStorageTrips";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import { useContext } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 
@@ -15,27 +17,13 @@ export default function ItemDetails() {
     const { id } = useLocalSearchParams();
     const { data: trip, isLoading } = useGetTrip(String(id));
 
-
     const router = useRouter();
-
-
 
     const { data: storageTrip } = useGetStorageTrip(String(id));
 
-
-    const { data: me } = useGetTripUser(storageTrip?._id, storageTrip?.user, {
-        enabled: !!storageTrip
-    });
-    const updateStorageTrip = useUpdateStorageTrip(String(id));
-
-
-    const [showUserPicker, setShowUserPicker] = useState(false);
-
+    const { me } = useContext(TripContext);
 
     const { formatDate } = useI18nTime();
-
-
-
 
     return (
         <View style={styles.container}>
@@ -67,18 +55,15 @@ export default function ItemDetails() {
 
                 </CalendarDayView>
 
-                <View className="flex flex-col justify-between gap-2 bg-orange-200 p-5 rounded-lg">
-                    <View className="bg-gray-200 p-2 rounded-xl">
-                        <Text className="text-xl">En cours</Text>
-                    </View>
-                    <Pressable className="rounded-2xl px-2 flex flex-row circled-white"
-                        onPress={() => router.push("./pick-user")}>
-                        <Text className="text-2xl font-bold text-white">
-                            {trip?.users?.length}
-                        </Text>
-                        <IconSymbol name="person.circle" />
-                    </Pressable>
-                </View>
+
+                <Pressable
+                    className="flex items-center"
+                    onPress={() => router.push("./edit-user")}
+                    onLongPress={() => router.push("./pick-user")}
+                >
+                    <Avatar src={me?.avatar} alt={me?.name?.charAt(0)} size2="md" />
+                    <Text className="font-bold text-lg">{me?.name}</Text>
+                </Pressable>
             </View>
 
             <View className="mt-10">

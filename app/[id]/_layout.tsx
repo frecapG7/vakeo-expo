@@ -1,19 +1,29 @@
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { useGetTrip } from "@/hooks/api/useTrips";
+import { TripContext } from "@/context/TripContext";
+import { useGetTrip, useGetTripUser } from "@/hooks/api/useTrips";
+import { useGetStorageTrip } from "@/hooks/storage/useStorageTrips";
 import { Stack, useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useEffect } from "react";
 import { Pressable, Text, View } from "react-native";
 
 
 
-export default function ItemDetailsLayout() {
+export default function TripDetailsLayout() {
 
 
 
     const router = useRouter();
     const { id } = useLocalSearchParams();
 
+
+
+    const { data: storageTrip } = useGetStorageTrip(String(id));
     const { data: trip } = useGetTrip(String(id));
+
+
+    const { data: me } = useGetTripUser(id, storageTrip?.user, {
+        enabled: !!storageTrip?.user
+    });
 
     const navigation = useNavigation();
 
@@ -38,32 +48,46 @@ export default function ItemDetailsLayout() {
 
 
     return (
-        <Stack>
-            <Stack.Screen name="(tabs)" options={{
-                headerShown: false
-            }} />
-            <Stack.Screen name="pick-user" options={{
-                presentation: "modal",
-                title: "Choisis qui tu es",
-                 headerStyle: {
-                    backgroundColor: "primary",
-                },
-            }} />
-            <Stack.Screen name="messages" options={{
-                presentation: "modal",
-                title: "Messagerie",
-                headerStyle: {
-                    backgroundColor: "background",
-                },
-                headerTitleStyle: {
-                    fontWeight: 'bold',
-                },
-            }} />
-            <Stack.Screen name="dates"
-                options={{
-                    presentation: "modal"
+        <TripContext.Provider value={{
+            me: {
+                _id: me?._id,
+                avatar: me?.avatar,
+                name: me?.name
+            }
+        }}>
+            <Stack>
+                <Stack.Screen name="(tabs)" options={{
+                    headerShown: false
                 }} />
-        </Stack>
+                <Stack.Screen name="pick-user" options={{
+                    presentation: "modal",
+                    title: "Choisis qui tu es",
+                    headerStyle: {
+                        backgroundColor: "primary",
+                    },
+                }} />
+                <Stack.Screen name="edit-user" options={{
+                    presentation: "modal",
+                    title: "Modifier mon utilisateur",
+                    headerBackTitle: "Annuler"
+                }} />
+                <Stack.Screen name="messages" options={{
+                    presentation: "modal",
+                    title: "Messagerie",
+                    headerStyle: {
+                        backgroundColor: "background",
+                    },
+                    headerTitleStyle: {
+                        fontWeight: 'bold',
+                    },
+                }} />
+                <Stack.Screen name="dates"
+                    options={{
+                        presentation: "modal"
+                    }} />
+            </Stack>
+        </TripContext.Provider>
+
     )
 
 }
