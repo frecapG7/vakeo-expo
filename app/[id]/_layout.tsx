@@ -62,9 +62,7 @@ export default function TripDetailsLayout() {
                 <Stack.Screen name="pick-user" options={{
                     presentation: "modal",
                     title: "Choisis qui tu es",
-                    headerStyle: {
-                        backgroundColor: "primary",
-                    },
+                
                 }} />
                 <Stack.Screen name="edit-user" options={{
                     presentation: "modal",
@@ -74,9 +72,7 @@ export default function TripDetailsLayout() {
                 <Stack.Screen name="messages" options={{
                     presentation: "modal",
                     title: "Messagerie",
-                    headerStyle: {
-                        backgroundColor: "background",
-                    },
+                    
                     headerTitleStyle: {
                         fontWeight: 'bold',
                     },

@@ -57,7 +57,7 @@ export default function ItemDetails() {
 
 
                 <Pressable
-                    className="flex items-center"
+                    className="flex items-center justify-center"
                     onPress={() => router.push("./edit-user")}
                     onLongPress={() => router.push("./pick-user")}
                 >

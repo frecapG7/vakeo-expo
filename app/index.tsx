@@ -2,6 +2,7 @@ import { FormText } from "@/components/form/FormText";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useGetStorageTrips } from "@/hooks/storage/useStorageTrips";
+import { useStyles } from "@/hooks/styles/useStyles";
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Image } from "expo-image";
 import { useNavigation, useRouter } from "expo-router";
@@ -45,6 +46,8 @@ export default function HomePage() {
           className="flex flex-row justify-center items-center p-2 rounded-lg" />
     })
   }, [navigation]);
+
+  const {colors} = useStyles();
 
 
   return (
@@ -93,23 +96,23 @@ export default function HomePage() {
 
         <BottomSheet ref={bottomSheetRef} index={-1}
           handleStyle={{
-            backgroundColor: "primary"
+            backgroundColor: colors.background
           }}
           backgroundStyle={{
-            backgroundColor: "primary"
+            backgroundColor: colors.background,
           }}>
-          <BottomSheetView >
+          <BottomSheetView style={styles.bottomContainer}>
             <View className="flex flex-col gap-2 m-2 pb-5">
               <Pressable onPress={() => bottomSheetRef.current?.close()}>
                 <IconSymbol name="xmark.circle" color="primary" />
               </Pressable>
-              <Pressable className="bg-purple-200 dark:bg-gray-200 p-2 rounded-lg flex-row items-center gap-2" onPress={() => {
+              <Pressable className="flex bg-purple-200 dark:bg-gray-200 p-2 rounded-lg flex-row items-center gap-2" onPress={() => {
                 router.push("./new");
                 bottomSheetRef.current?.close();
               }}>
                 <IconSymbol name="plus.circle" size={50} color="primary" />
                 <View>
-                  <Text className="text-2xl font-bold dark:text-gray-600">
+                  <Text className="text-2xl font-bold dark:text-gray-600 text-wrap">
                     Créer un nouveau voyage
                   </Text>
                   <Text>
@@ -117,7 +120,7 @@ export default function HomePage() {
                   </Text>
                 </View>
               </Pressable>
-              <Pressable className="bg-blue-200 p-2 rounded-lg flex-row items-center gap-2" onPress={() => {
+              <Pressable className="bg-blue-200 p-2 rounded-lg flex-row items-center gap-2 " onPress={() => {
                 router.push("./join");
                 bottomSheetRef.current?.close()
               }}>
@@ -127,7 +130,7 @@ export default function HomePage() {
                     Rejoins un voyage existant
                   </Text>
                   <Text>
-                    Utilise un lien d'invitation pour rejoindre
+                    Utilise un lien d'invitation pour rejoindre dddddddd sss
                   </Text>
                 </View>
               </Pressable>
@@ -149,6 +152,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10
+  },
+  bottomContainer: {
+    flex: 1,
+    // padding: 10,
+    // alignItems: 'center',
   },
   image: {
     flex: 1,
