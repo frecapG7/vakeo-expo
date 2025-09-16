@@ -1,8 +1,10 @@
 import { Avatar } from "@/components/ui/Avatar";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { useGetTrip, useGetTripUser } from "@/hooks/api/useTrips";
-import { useGetStorageTrip, useUpdateStorageTrip } from "@/hooks/storage/useStorageTrips";
+import { TripContext } from "@/context/TripContext";
+import { useGetTrip } from "@/hooks/api/useTrips";
+import { useUpdateStorageTrip } from "@/hooks/storage/useStorageTrips";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useContext } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -12,28 +14,22 @@ export default function PickTripUserPage() {
 
 
     const { id } = useLocalSearchParams();
-    const { data: trip, isLoading } = useGetTrip(String(id));
+    const { data: trip } = useGetTrip(String(id));
 
+    const {me} = useContext(TripContext);
 
     const router = useRouter();
 
-
-
-    const { data: storageTrip } = useGetStorageTrip(String(id));
-
-
-    const { data: me } = useGetTripUser(storageTrip?._id, storageTrip?.user, {
-        enabled: !!storageTrip
-    });
     const updateStorageTrip = useUpdateStorageTrip(String(id));
 
 
     const onPress = async (item) => {
         await updateStorageTrip.mutateAsync({
-            _id: storageTrip?._id,
-            name: storageTrip?.name,
+            _id: trip?._id,
+            name: trip?.name,
             user: item._id
         });
+        //TODO: save img
         router.back();
     }
 

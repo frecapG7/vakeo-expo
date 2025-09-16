@@ -81,7 +81,10 @@ export const useUpdateStorageTrip = (id: string) => {
 
     return useMutation({
         mutationFn: (trip: StorageTrip) => updateStorageTrip(id, trip),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["storage", "trips"] })
+        onSuccess: () => Promise.all([
+            queryClient.invalidateQueries({ queryKey: ["storage", "trips"] }),
+            queryClient.invalidateQueries({ queryKey: ["trips", id] })
+        ])
     })
 }
 
