@@ -1,55 +1,18 @@
 import axios from "@/lib/axios";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const postTrip = async (trip) => {
-  return new Promise((resolve) =>
-    setTimeout(() => {
-      console.log("Trip posted:", JSON.stringify(trip));
-      resolve({
-        ...trip,
-        id: Math.floor(Math.random() * 1000), // Simulate an ID for the new trip
-      });
-    }, 3000)
-  );
+  const response = await axios.post("/trips", trip);
+  return response.data;
 };
 
 export const usePostTrip = () => {
   return useMutation({
     mutationFn: postTrip,
-    onSuccess: (data) => {
-      console.log("Trip posted successfully:", data);
-    },
   });
 };
 
 const getTrip = async (tripId) => {
-  // return new Promise((resolve) =>
-  //   setTimeout(() => {
-  //     console.log("Trip fetched:", tripId);
-  //     resolve({
-  //       id: tripId,
-  //       name: "Luberon V3",
-  //       startDate: "2023-10-01",
-  //       endDate: "2023-10-10",
-  //       users: [
-  //         {
-  //           id: 1,
-  //           name: "Moi",
-  //         },
-  //         {
-  //           id: 2,
-  //           name: "Willy",
-  //         },
-  //         {
-  //           id: 3,
-  //           name: "Mélanie",
-  //         },
-  //       ],
-  //       author: 1,
-  //     });
-  //   }, 3000)
-  // );
-
   const response = await axios.get(`/trips/${tripId}`);
   return response.data;
 };
@@ -61,3 +24,36 @@ export const useGetTrip = (tripId) => {
     enabled: !!tripId,
   });
 };
+
+
+const getTripUser = async (tripId, userId) => {
+  const response = await axios.get(`/trips/${tripId}/users/${userId}`);
+  return response.data;
+}
+
+export const useGetTripUser = (tripId, userId, options) => {
+  return useQuery({
+    queryKey: ["trips", tripId, "users", userId],
+    queryFn: () => getTripUser(tripId, userId),
+    ...options
+  });
+}
+
+const updateTripUser = async (tripId, userId, data) => {
+  const response = await axios.put(`/trips/${tripId}/users/${userId}`, data);
+  return response.data;
+}
+
+export const useUpdateTripUser = (tripId, userId) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data) => updateTripUser(tripId, userId, data),
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({ queryKey: ["trips", tripId] });
+      await queryClient.setQueryData({
+        queryKey: ["trips", tripId, "users", userId],
+        data
+      })
+    }
+  })
+}
