@@ -1,4 +1,4 @@
-import { useStyles } from "@/hooks/styles/useStyles";
+import useColors from "@/hooks/styles/useColors";
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SplashScreen, Stack } from "expo-router";
@@ -12,7 +12,7 @@ const queryClient = new QueryClient({});
 
 export default function RootLayout() {
 
-  const { colors } = useStyles();
+  const colors  = useColors();
 
 
   const [loaded, setLoaded] = useState(false);
