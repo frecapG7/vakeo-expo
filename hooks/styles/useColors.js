@@ -9,14 +9,16 @@ const lightColor = {
   text: 'rgb(28, 28, 30)',
   border: 'rgb(216, 216, 216)',
   notification: 'rgb(255, 59, 48)',
+  neutral: "#658a6eff"
 };
 const darkColor = {
   background: "#1a1a1a",
-  primary: "#1a1a1a",
+  primary: "#087223ff",
   card: "#1a1a1a",
   text: "#ffffff",
   border: "#ffffff",
-  notification: "#ffffff"
+  notification: "#ffffff",
+  neutral: "#658a6eff"
 }
 
 const useColors = () => {

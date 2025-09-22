@@ -1,10 +1,17 @@
 import { Button } from "@/components/ui/Button";
-import { eachDayOfInterval, parseISO } from "date-fns";
+import styles from "@/constants/Styles";
+import { useGetTrip, useUpdateTrip } from "@/hooks/api/useTrips";
+import useI18nTime from "@/hooks/i18n/useI18nTime";
+import useColors from "@/hooks/styles/useColors";
+import { getDatesBetween } from "@/lib/utils";
+import dayjs from "dayjs";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
+import { useController, useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
-import { Calendar, LocaleConfig } from 'react-native-calendars';
+import { CalendarList, LocaleConfig } from 'react-native-calendars';
 import Animated, { FadeIn, SlideInUp, SlideOutDown } from "react-native-reanimated";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 
 LocaleConfig.locales['fr'] = {
     monthNames: [
@@ -29,95 +36,160 @@ LocaleConfig.locales['fr'] = {
 LocaleConfig.defaultLocale = 'fr';
 
 
-export default function DatesEdit() {
+export default function EditTripDatePage() {
 
 
-    const now = new Date();
-
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
     const [selectingStartDate, setSelectingStartDate] = useState(true);
 
+    const { control, reset, handleSubmit } = useForm();
+    const { field: { value: startDate, onChange: setStartDate } } = useController({
+        control,
+        name: "startDate"
+    });
+    const { field: { value: endDate, onChange: setEndDate } } = useController({
+        control,
+        name: "endDate",
+        // rules: {
+        //     validate: (v) => 
+        // }
+    });
 
+
+    const { formatDate } = useI18nTime();
     useEffect(() => {
         setSelectingStartDate(!Boolean(startDate))
     }, [selectingStartDate, startDate])
 
+    const colors = useColors();
 
+
+    const router = useRouter();
+    const { id } = useLocalSearchParams();
+    const { data: trip } = useGetTrip(String(id));
+    const updateTrip = useUpdateTrip(String(id));
+
+    useEffect(() => {
+        if (trip)
+            reset(trip)
+    }, [reset, trip])
+
+    const navigation = useNavigation();
+
+    useEffect(() => {
+        navigation.setOptions({
+            headerRight: () => <Button title="Appliquer" isLoading={updateTrip.isPending} onPress={handleSubmit(onSubmit)}/>
+        })
+    },[navigation]);
+
+
+    const onSubmit = async (data) => {
+        await updateTrip.mutateAsync(data);
+        router.replace("..");
+    }
 
     return (
-        <Animated.ScrollView style={{
-            flex: 1,
-            marginHorizontal: 20,
-        }}>
+        <SafeAreaView style={styles.container}>
 
-
-            <View className="flex flex-row gap-1justify-around items-center mt-4 mb-2">
+            <View className="flex flex-row gap-1 justify-around items-center mt-4 mb-2 bg-white">
                 <Pressable className={`flex flex-grow ${selectingStartDate && "bg-gray-200"} p-2`} onPress={() => {
-                    setEndDate('')
-                    setStartDate('')
+                    setStartDate(null);
+                    setEndDate(null);
                 }}>
                     <Text className="text-md font-bold">Date de début</Text>
                     {startDate && (
                         <Animated.View entering={FadeIn} exiting={SlideOutDown}>
-                            <Text className="text-sm text-gray-500">{startDate}</Text>
+                            <Text className="text-sm text-gray-500">{formatDate(startDate)}</Text>
                         </Animated.View>
                     )}
                 </Pressable>
                 <Pressable className={`flex flex-grow ${!selectingStartDate && "bg-gray-200"} p-2`} onPress={() => {
-                    setEndDate('')
                     setStartDate('')
+                    setEndDate('')
                 }}>
                     <Text className="text-md font-bold">Date de fin</Text>
                     {endDate && (
                         <Animated.View entering={SlideInUp} exiting={SlideOutDown}>
                             <Text className="text-sm text-gray-500" onPress={() => {
                                 setEndDate('')
-                            }}>{endDate}</Text>
+                            }}>
+                                {formatDate(endDate)}
+                            </Text>
                         </Animated.View>
                     )}
                 </Pressable>
 
             </View>
-            <Calendar
-                style={{
-                    // backgroundColor: "inherit",
-                    // borderWidth: 1,
-                    // height: 350
+            <CalendarList
+                theme={{
+                    backgroundColor: colors.background,
+                    calendarBackground: colors.background,
+                    textSectionTitleColor: "#ffff",
+                    dayTextColor: "#ffff",
+                    textSectionTitleDisabledColor: '#d9e1e8',
+                    selectedDayBackgroundColor: '#00adf5',
+                    selectedDayTextColor: '#ffffff',
+                    todayTextColor: '#00adf5',
+                    textDisabledColor: '#4a85b9ff',
+                    dotColor: '#00adf5',
+                    selectedDotColor: '#ffffff',
+                    arrowColor: 'orange',
+                    disabledArrowColor: '#d9e1e8',
+                    monthTextColor: colors.text,
+                    indicatorColor: colors.text,
                 }}
-                onDayPress={day => {
+                onDayPress={({ dateString }) => {
                     if (selectingStartDate)
-                        setStartDate(day.dateString)
+                        setStartDate(dayjs(dateString));
                     else
-                        setEndDate(day.dateString)
+                        setEndDate(dayjs(dateString));
                 }}
                 markingType="period"
                 markedDates={{
-                    [startDate]: {
-                        startingDay: true, color: 'blue', textColor: 'white', selected: true, disableTouchEvent: true
+                    [dayjs(startDate)?.format("YYYY-MM-DD")]: {
+                        startingDay: true,
+                        color: colors.primary,
+                        textColor: colors.text,
+                        selected: true,
+                        disableTouchEvent: true
                     },
-                    [endDate]: {
-                        endingDay: true, color: 'blue', textColor: 'white', selected: true, disableTouchEvent: true
+                    [dayjs(endDate)?.format("YYYY-MM-DD")]: {
+                        endingDay: true,
+                        color: colors.primary,
+                        textColor: colors.text,
+                        selected: true,
+                        disableTouchEvent: true
                     },
-                    ...eachDayOfInterval({
-                        start: parseISO(startDate),
-                        end: parseISO(endDate)
-                    }).reduce((acc: Record<string, any>, date) => {
-                        acc[date.toISOString().split('T')[0]] = {
-                            color: 'blue',
-                            textColor: 'white',
-                            selected: true,
-                            disableTouchEvent: true
-                        }
-                        return acc;
-                    }, {} as Record<string, any>)
+                    ...getDatesBetween(startDate, endDate)
+                        .map(date => date?.format('YYYY-MM-DD'))
+                        .reduce((acc: Record<string, any>, date) => {
+                            acc[date] = {
+                                color: colors.neutral,
+                                textColor: colors.text,
+                                selected: true,
+                                disableTouchEvent: true
+                            }
+                            return acc;
+                        }, {} as Record<string, any>)
                 }}
-                minDate={startDate ? startDate : now.toISOString().split('T')[0]} />
+                // minDate={start ? start : now.toISOString()}
+                // Max amount of months allowed to scroll to the past. Default = 50
+                pastScrollRange={1}
+                // Max amount of months allowed to scroll to the future. Default = 50
+                futureScrollRange={6}
+                // Enable or disable scrolling of calendar list
+                scrollEnabled={true}
+                // Enable or disable vertical scroll indicator. Default = false
+                showScrollIndicator={true} />
 
 
-            <Button title="Organiser un vote" className="mt-5 bg-blue-300" onPress={() => console.log("toto")} />
+            <Button title="Modifier"
+                className="m-10 bg-blue-300"
+                onPress={onSubmit}
+                isLoading={updateTrip.isPending} />
 
 
-        </Animated.ScrollView>
+
+
+        </SafeAreaView>
     );
 }

@@ -1,7 +1,7 @@
 import axios from "@/lib/axios";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-const getMessages = async (tripId, cursor, limit = 10,) => {
+const getMessages = async (tripId, cursor, limit = 25) => {
     const response = await axios.get(`/trips/${tripId}/messages`, {
         params: {
             limit,

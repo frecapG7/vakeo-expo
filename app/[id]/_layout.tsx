@@ -62,7 +62,7 @@ export default function TripDetailsLayout() {
                 <Stack.Screen name="pick-user" options={{
                     presentation: "modal",
                     title: "Choisis qui tu es",
-                
+
                 }} />
                 <Stack.Screen name="edit-user" options={{
                     presentation: "modal",
@@ -72,14 +72,15 @@ export default function TripDetailsLayout() {
                 <Stack.Screen name="messages" options={{
                     presentation: "modal",
                     title: "Messagerie",
-                    
+
                     headerTitleStyle: {
                         fontWeight: 'bold',
                     },
                 }} />
                 <Stack.Screen name="dates"
                     options={{
-                        presentation: "modal"
+                        presentation: "modal",
+                        title: "Dates du séjour"
                     }} />
             </Stack>
         </TripContext.Provider>

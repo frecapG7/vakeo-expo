@@ -1,6 +1,7 @@
 import { FormText } from "@/components/form/FormText";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import styles from "@/constants/Styles";
 import { usePostTrip } from "@/hooks/api/useTrips";
 import { useAddStorageTrip } from "@/hooks/storage/useStorageTrips";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
@@ -8,7 +9,7 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useMemo, useRef, useState } from "react";
 import { useController, useFieldArray, useForm } from "react-hook-form";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { FadeInDown, LinearTransition } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -115,12 +116,16 @@ export default function NewTripPage() {
     const addStorageTrip = useAddStorageTrip();
 
     const onSubmit = async (data: any) => {
-        const result = await postTrip.mutateAsync(data);
+        const result = await postTrip.mutateAsync({
+            name: data.name,
+            image: data.image.uri,
+            users
+        });
         console.log(JSON.stringify(result));
         await addStorageTrip.mutateAsync({
             _id: result._id,
             name: result.name,
-            image: data.image.uri, //TODO
+            image: result.image, //TODO
             user: result.users[me]
         });
         router.replace(`./${result._id}`);
@@ -128,7 +133,6 @@ export default function NewTripPage() {
 
     return (
         <SafeAreaView style={styles.container}>
-
             <GestureHandlerRootView>
                 <Text className="text-xl font-bold ml-5 dark:text-white">Titre</Text>
                 <View className="flex flex-row gap-1">
@@ -238,11 +242,3 @@ export default function NewTripPage() {
         </SafeAreaView>
     )
 }
-
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 5
-    }
-})

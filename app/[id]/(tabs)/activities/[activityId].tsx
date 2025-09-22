@@ -4,7 +4,6 @@ import { UsersList } from "@/components/users/UsersList";
 import { useGetActivity } from "@/hooks/api/useActivities";
 import { useGetTrip } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
-import { useStyles } from "@/hooks/styles/useStyles";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useState } from "react";
 import { Text, View } from "react-native";
@@ -13,8 +12,6 @@ import { EditActivity } from "./components/EditActivity";
 
 
 export default function TripActivityDetails() {
-
-    const { container } = useStyles();
 
 
     const { id, activityId } = useLocalSearchParams();

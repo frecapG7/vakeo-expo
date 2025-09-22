@@ -14,43 +14,10 @@ export default function TripMessages() {
 
 
     const { id } = useLocalSearchParams();
-    // const [messages, setMessages] = useState([
-    //     {
-    //         _id: 1,
-    //         text: 'Hello developer',
-    //         createdAt: new Date(),
-    //         user: {
-    //             _id: 1,
-    //             name: 'React Native',
-    //             avatar: 'https://avatar.iran.liara.run/public/50',
-    //         },
-    //     },
-    //     {
-    //         _id: 2,
-    //         text: 'Wassup mate',
-    //         createdAt: new Date(),
-    //         user: {
-    //             _id: 1,
-    //             name: 'React Native',
-    //             avatar: 'https://avatar.iran.liara.run/public/50',
-    //         },
-    //     },
-    //     {
-    //         _id: 3,
-    //         text: "Ca dit quoi",
-    //         createdAt: new Date(),
-    //         user: {
-    //             _id: "68c198a42571fc43fcbfe989",
-    //             avatar: "https://avatar.iran.liara.run/public/90",
-    //             name: "Toma"
-    //         }
-    //     }
-    // ])
-
 
     const { me } = useContext(TripContext);
 
-    const { data } = useGetMessages(String(id));
+    const { data, fetchNextPage, hasNextPage } = useGetMessages(String(id));
     const postMessage = usePostMessage(String(id));
     
     const messages = useMemo(() => data?.pages.flatMap((page) => page.messages), [data]);
@@ -92,6 +59,8 @@ export default function TripMessages() {
                     keyboardShouldPersistTaps="never"
                     placeholder="Aa"
                     maxInputLength={250}
+                    loadEarlier={hasNextPage}
+                    onLoadEarlier={fetchNextPage}
                 />
             </View>
         </SafeAreaView>
