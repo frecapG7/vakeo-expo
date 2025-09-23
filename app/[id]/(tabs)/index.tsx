@@ -5,7 +5,6 @@ import { AvatarsList } from "@/components/users/AvatarsList";
 import { TripContext } from "@/context/TripContext";
 import { useGetTrip } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
-import { useGetStorageTrip } from "@/hooks/storage/useStorageTrips";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -15,11 +14,9 @@ import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 export default function ItemDetails() {
 
     const { id } = useLocalSearchParams();
-    const { data: trip, isLoading } = useGetTrip(String(id));
+    const { data: trip } = useGetTrip(String(id));
 
     const router = useRouter();
-
-    const { data: storageTrip } = useGetStorageTrip(String(id));
 
     const { me } = useContext(TripContext);
 
@@ -28,32 +25,34 @@ export default function ItemDetails() {
     return (
         <View style={styles.container}>
             <View className="flex flex-row justify-between items-center px-5 my-5">
-                <CalendarDayView>
-                    {!!trip?.startDate ? (
-                        <View className="px-5 pb-2 flex items-center">
-                            <Text className="text-2xl">
-                                {formatDate(trip?.startDate, {
-                                    day: "numeric",
-                                    month: "long"
-                                })}
-                            </Text>
-                            <Text className="text-xl font-bold">-</Text>
-                            <Text className="text-2xl">
-                                {formatDate(trip?.endDate, {
-                                    day: "numeric",
-                                    month: "long"
-                                })}
-                            </Text>
-                        </View>) :
-                        (<Animated.View entering={ZoomIn} exiting={ZoomOut} >
-                            <Pressable onPress={() => router.push("./dates")} className="flex items-center m-1">
-                                <IconSymbol name="pencil" size={24} color="dark" />
-                                <Text className="text-sm">Ajouter des dates</Text>
-                            </Pressable>
-                        </Animated.View>)
-                    }
+                <Pressable onPress={() => router.push("./dates")} >
+                    <CalendarDayView>
+                        {!!trip?.startDate ? (
+                            <View className="px-5 pb-2 flex items-center">
+                                <Text className="text-2xl">
+                                    {formatDate(trip?.startDate, {
+                                        day: "numeric",
+                                        month: "long",
+                                    })}
+                                </Text>
+                                <Text className="text-xl font-bold">-</Text>
+                                <Text className="text-2xl">
+                                    {formatDate(trip?.endDate, {
+                                        day: "numeric",
+                                        month: "long"
+                                    })}
+                                </Text>
+                            </View>) :
+                            (<Animated.View entering={ZoomIn} exiting={ZoomOut} >
+                                <View className="flex items-center m-1">
+                                    <IconSymbol name="pencil" size={24} color="dark" />
+                                    <Text className="text-sm">Ajouter des dates</Text>
+                                </View>
+                            </Animated.View>)
+                        }
 
-                </CalendarDayView>
+                    </CalendarDayView>
+                </Pressable>
 
 
                 <Pressable
@@ -61,8 +60,8 @@ export default function ItemDetails() {
                     onPress={() => router.push("./edit-user")}
                     onLongPress={() => router.push("./pick-user")}
                 >
-                    <Avatar src={me?.avatar} alt={me?.name?.charAt(0)} size2="md" />
-                    <Text className="font-bold text-lg">{me?.name}</Text>
+                    <Avatar src={me?.avatar} alt={me?.name?.charAt(0)} size2="lg" />
+                    <Text className="font-bold text-lg dark:text-white">{me?.name}</Text>
                 </Pressable>
             </View>
 

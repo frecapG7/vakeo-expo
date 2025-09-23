@@ -3,12 +3,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const postTrip = async (trip) => {
   const response = await axios.post("/trips", trip);
-  return response.data;
+  return response?.data;
 };
 
 export const usePostTrip = () => {
   return useMutation({
-    mutationFn: postTrip,
+    mutationFn: (data) => postTrip(data),
   });
 };
 
@@ -24,6 +24,23 @@ export const useGetTrip = (tripId) => {
     enabled: !!tripId,
   });
 };
+
+
+const updateTrip = async (tripId, data) => {
+  const response = await axios.put(`/trips/${tripId}`, data);
+  return response.data;
+}
+
+export const useUpdateTrip = (tripId) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data) => updateTrip(tripId, data),
+    onSuccess: (data) => queryClient.setQueryData({
+      queryKey: ['trips', tripId],
+      data
+    })
+  })
+}
 
 
 const getTripUser = async (tripId, userId) => {
