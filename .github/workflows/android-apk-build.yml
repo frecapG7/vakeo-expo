@@ -1,7 +1,6 @@
-name: VAkeo App APK Build
+name: Vakeo App APK Build
 
-on:
-  # Specify when you want the build to run here
+on: workflow_dispatch
 
 jobs:
   build:
