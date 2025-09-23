@@ -49,9 +49,6 @@ export default function EditTripDatePage() {
     const { field: { value: endDate, onChange: setEndDate } } = useController({
         control,
         name: "endDate",
-        // rules: {
-        //     validate: (v) => 
-        // }
     });
 
 
@@ -77,9 +74,9 @@ export default function EditTripDatePage() {
 
     useEffect(() => {
         navigation.setOptions({
-            headerRight: () => <Button title="Appliquer" isLoading={updateTrip.isPending} onPress={handleSubmit(onSubmit)}/>
+            headerRight: () => <Button title="Appliquer" isLoading={updateTrip.isPending} onPress={handleSubmit(onSubmit)} />
         })
-    },[navigation]);
+    }, [navigation]);
 
 
     const onSubmit = async (data) => {
@@ -92,8 +89,8 @@ export default function EditTripDatePage() {
 
             <View className="flex flex-row gap-1 justify-around items-center mt-4 mb-2 bg-white">
                 <Pressable className={`flex flex-grow ${selectingStartDate && "bg-gray-200"} p-2`} onPress={() => {
-                    setStartDate(null);
-                    setEndDate(null);
+                    setStartDate('');
+                    setEndDate('');
                 }}>
                     <Text className="text-md font-bold">Date de début</Text>
                     {startDate && (
@@ -123,12 +120,13 @@ export default function EditTripDatePage() {
                 theme={{
                     backgroundColor: colors.background,
                     calendarBackground: colors.background,
-                    textSectionTitleColor: "#ffff",
-                    dayTextColor: "#ffff",
+                    textSectionTitleColor: colors.text,
+                    dayTextColor: colors.text,
                     textSectionTitleDisabledColor: '#d9e1e8',
                     selectedDayBackgroundColor: '#00adf5',
                     selectedDayTextColor: '#ffffff',
                     todayTextColor: '#00adf5',
+                    todayBackgroundColor: '#a2daf1ff',
                     textDisabledColor: '#4a85b9ff',
                     dotColor: '#00adf5',
                     selectedDotColor: '#ffffff',
@@ -179,16 +177,8 @@ export default function EditTripDatePage() {
                 // Enable or disable scrolling of calendar list
                 scrollEnabled={true}
                 // Enable or disable vertical scroll indicator. Default = false
-                showScrollIndicator={true} />
-
-
-            <Button title="Modifier"
-                className="m-10 bg-blue-300"
-                onPress={onSubmit}
-                isLoading={updateTrip.isPending} />
-
-
-
+                showScrollIndicator={true}
+            />
 
         </SafeAreaView>
     );

@@ -27,7 +27,7 @@ export const FormText = ({ control, name, label, placeholder, rules, endAdornmen
         return {
             transform: [
                 {
-                    translateX: shakeAnimation.value
+                    translateX: shakeAnimation?.value
                 }
             ]
         }

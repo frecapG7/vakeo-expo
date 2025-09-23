@@ -3,7 +3,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const postTrip = async (trip) => {
   const response = await axios.post("/trips", trip);
-  debugger
   return response?.data;
 };
 
