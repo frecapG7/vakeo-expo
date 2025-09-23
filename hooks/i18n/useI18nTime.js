@@ -1,9 +1,9 @@
 const formatDate = (
   date,
   options = {
-    // weekday: "long", // Affiche le jour de la semaine en entier
+    day: "numeric",
     year: "numeric", // Affiche l'année
-    month: "long", // Affiche le mois en entier
+    month: "numeric", // Affiche le mois en entier
   }
 ) => {
   if (!date) {

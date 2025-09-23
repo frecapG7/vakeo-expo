@@ -1,13 +1,14 @@
 import { FormText } from "@/components/form/FormText";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
+import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useUpdateTripUser } from "@/hooks/api/useTrips";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext, useEffect, useMemo, useRef } from "react";
 import { useController, useForm, useWatch } from "react-hook-form";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 import { GestureHandlerRootView, Pressable } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -68,7 +69,7 @@ export default function EditUserPage() {
     return (
         <SafeAreaView style={styles.container}>
             <GestureHandlerRootView >
-                <View className="flex h-full justify-center items-center gap-5">
+                <View className="flex h-lg justify-center items-center gap-5">
                     <View className="flex items-center justify-center gap-2">
                         <Pressable onPress={() => bottomSheetRef.current?.expand()}>
                             <Avatar
@@ -123,14 +124,6 @@ export default function EditUserPage() {
 }
 
 
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 5,
-
-    }
-})
 
 
 
