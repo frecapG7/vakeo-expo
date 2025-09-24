@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build iOS app
+      - name: 🚀 Build iOS app
         run: eas build --platform ios --local --non-interactive --output ${{ github.workspace }}/app-release.ipa
 
       - name: Upload IPA artifact
