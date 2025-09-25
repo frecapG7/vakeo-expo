@@ -3,9 +3,9 @@ name: iOS App Release Build
 on: workflow_dispatch
 
 # Build the app with .env
-env:
-  EXPO_PUBLIC_API_KEY: ${{secrets.EXPO_PUBLIC_API_KEY}}
-  EXPO_PUBLIC_API_URL: ${{secrets.EXPO_PUBLIC_API_URL}}
+# env:
+#  EXPO_PUBLIC_API_KEY: ${{secrets.EXPO_PUBLIC_API_KEY}}
+#  EXPO_PUBLIC_API_URL: ${{secrets.EXPO_PUBLIC_API_URL}}
 
 jobs:
   build:
@@ -37,4 +37,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: ${{ github.workspace }}/app-release.ipa
+          path: ${{ github.workspace }}/vakeo-app-release.ipa
