@@ -1,32 +1,40 @@
-import { Animated, View } from "react-native";
-import { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
+import { useEffect } from "react";
+import { View } from "react-native";
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 
 
 
-export const Skeleton = ({ width, height }: { width: number, height: number }) => {
 
+export const Skeleton = ({ width = '100%', height = 20 }: {
+    width: number | string,
+    height: number | string
+}) => {
 
-    const opacity = useSharedValue(1);
+    const shimmerPosition = useSharedValue(-1);
+
     const animatedStyle = useAnimatedStyle(() => ({
-        opacity: opacity.value,
-        width: width,
-        height: height,
-    }))
+        transform: [{ translateX: shimmerPosition?.value * 200 }],
+    }));
 
-    opacity.value = withRepeat(
-        withTiming(0.5, {
-            duration: 1000,
-            easing: Easing.inOut(Easing.ease),
-        }),
-        -1, // Repeat indefinitely
-        true // Reverse the animation on each repeat
-    )
+    useEffect(() => {
+        shimmerPosition.value = withRepeat(
+            withTiming(1, {
+                duration: 1000,
+                easing: Easing.linear,
+            }),
+            -1,
+            false,
+        );
+    }, []);
     return (
-        <View className="bg-gray-200 dark:bg-gray-700 rounded-lg w-full" style={{
-            width,
-            height,
-        }} >
-            <Animated.View style={animatedStyle} />
+        <View className={`rounded-lg bg-gray-200 w-full h-${height}`} >
+            <Animated.View style={[
+                {
+                    width: '100%',
+                    height: '100%',
+                },
+                animatedStyle,
+            ]} />
         </View>
     )
 }

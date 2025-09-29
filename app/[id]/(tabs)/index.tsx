@@ -1,6 +1,7 @@
 import { Avatar } from "@/components/ui/Avatar";
 import { CalendarDayView } from "@/components/ui/CalendarDayView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { AvatarsList } from "@/components/users/AvatarsList";
 import { TripContext } from "@/context/TripContext";
 import { useGetTrip } from "@/hooks/api/useTrips";
@@ -25,34 +26,41 @@ export default function ItemDetails() {
     return (
         <View style={styles.container}>
             <View className="flex flex-row justify-between items-center px-5 my-5">
-                <Pressable onPress={() => router.push("./dates")} >
-                    <CalendarDayView>
-                        {!!trip?.startDate ? (
-                            <View className="px-5 pb-2 flex items-center">
-                                <Text className="text-2xl">
-                                    {formatDate(trip?.startDate, {
-                                        day: "numeric",
-                                        month: "long",
-                                    })}
-                                </Text>
-                                <Text className="text-xl font-bold">-</Text>
-                                <Text className="text-2xl">
-                                    {formatDate(trip?.endDate, {
-                                        day: "numeric",
-                                        month: "long"
-                                    })}
-                                </Text>
-                            </View>) :
-                            (<Animated.View entering={ZoomIn} exiting={ZoomOut} >
-                                <View className="flex items-center m-1">
-                                    <IconSymbol name="pencil" size={24} color="dark" />
-                                    <Text className="text-sm">Ajouter des dates</Text>
-                                </View>
-                            </Animated.View>)
-                        }
 
-                    </CalendarDayView>
-                </Pressable>
+                {trip ?
+
+                    <Pressable onPress={() => router.push("./dates")} >
+                        <CalendarDayView>
+                            {!!trip?.startDate ? (
+                                <View className="px-5 pb-2 flex items-center">
+                                    <Text className="text-2xl">
+                                        {formatDate(trip?.startDate, {
+                                            day: "numeric",
+                                            month: "long",
+                                        })}
+                                    </Text>
+                                    <Text className="text-xl font-bold">-</Text>
+                                    <Text className="text-2xl">
+                                        {formatDate(trip?.endDate, {
+                                            day: "numeric",
+                                            month: "long"
+                                        })}
+                                    </Text>
+                                </View>) :
+                                (<Animated.View entering={ZoomIn} exiting={ZoomOut} >
+                                    <View className="flex items-center m-1">
+                                        <IconSymbol name="pencil" size={24} color="dark" />
+                                        <Text className="text-sm">Ajouter des dates</Text>
+                                    </View>
+                                </Animated.View>)
+                            }
+
+                        </CalendarDayView>
+                    </Pressable>
+                    :
+                    <Skeleton height={10}  />
+                }
+
 
 
                 <Pressable

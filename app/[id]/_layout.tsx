@@ -38,7 +38,7 @@ export default function TripDetailsLayout() {
             <Stack>
                 <Stack.Screen name="(tabs)" options={{
                     headerShown: true,
-                    title: trip?.name,
+                    title: trip?.name || "Mon voyage",
                     headerRight: () => (
                         <View className="flex flex-row gap-2 justify-end items-center mx-5">
                             <Pressable onPress={() => router.push('./messages')}

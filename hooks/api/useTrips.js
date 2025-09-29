@@ -74,3 +74,18 @@ export const useUpdateTripUser = (tripId, userId) => {
     }
   })
 }
+
+
+const getExternal = async (token) => {
+  const response = await axios.get(`/external/token/${token}`);
+  return response.data;
+}
+
+
+export const useGetExternalToken = (token, options) => {
+  return useQuery({
+    queryKey: ["external", "token", token],
+    queryFn: () => getExternal(token),
+    ...options
+  })
+}
