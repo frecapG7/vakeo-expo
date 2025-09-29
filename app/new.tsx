@@ -196,7 +196,13 @@ export default function NewTripPage() {
                         </Animated.View>}
                 </View>
                 <View className="flex items-center justify-center mt-10">
-                    <Button title="Continuer" onPress={handleSubmit(onSubmit)} isLoading={postTrip.isPending} />
+                    <Button 
+                        title="Continuer"
+                        variant="contained"
+                        onPress={handleSubmit(onSubmit)} 
+                        isLoading={postTrip.isPending} 
+                        className="w-lg"
+                        />
                 </View>
 
 

@@ -76,10 +76,6 @@ export default function HomePage() {
                     />
                     <View className="flex flex-col">
                       <Text className="text-lg font-bold">{item.name}</Text>
-                      {/* <View className="rounded flex-row bg-blue-200 items-center justify-center flex-grow">
-                        <Text>4 </Text>
-                        <IconSymbol name="person.circle" color="black" />
-                      </View> */}
                     </View>
                   </View>
                   <View>
@@ -104,7 +100,7 @@ export default function HomePage() {
           <BottomSheetView style={styles.bottomContainer}>
             <View className="flex flex-col gap-2 m-2 pb-5">
               <Pressable onPress={() => bottomSheetRef.current?.close()}>
-                <IconSymbol name="xmark.circle" color="primary" />
+                <IconSymbol name="xmark.circle" color="white" />
               </Pressable>
               <Pressable className="flex bg-purple-200 dark:bg-gray-200 p-2 rounded-lg flex-row items-center gap-2" onPress={() => {
                 router.push("./new");
@@ -130,7 +126,7 @@ export default function HomePage() {
                     Rejoins un voyage existant
                   </Text>
                   <Text>
-                    Utilise un lien d'invitation pour rejoindre dddddddd sss
+                    Utilise un lien d'invitation pour rejoindre tes amis
                   </Text>
                 </View>
               </Pressable>

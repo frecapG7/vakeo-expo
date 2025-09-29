@@ -2,8 +2,7 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { TripContext } from "@/context/TripContext";
 import { useGetTrip, useGetTripUser } from "@/hooks/api/useTrips";
 import { useGetStorageTrip } from "@/hooks/storage/useStorageTrips";
-import { Stack, useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import { useEffect } from "react";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 
 
@@ -25,25 +24,6 @@ export default function TripDetailsLayout() {
         enabled: !!storageTrip?.user
     });
 
-    const navigation = useNavigation();
-
-
-
-    useEffect(() => {
-        navigation.setOptions({
-            title: trip?.name,
-            headerRight: () => (
-                <View className="flex flex-row gap-2 justify-end items-center mx-5">
-                    <Pressable onPress={() => router.push('./messages')}
-                        className="flex flex-row gap-1 items-center ring-1 rounded-full p-3 py-1 bg-blue-200">
-                        <IconSymbol name="message" size={20} color="#000" />
-                        <Text className="text-secondary text-sm">{trip?.users?.length}</Text>
-                    </Pressable>
-                    <IconSymbol name="ellipsis.circle" size={25} color="#000" />
-                </View>
-            )
-        });
-    }, [navigation, trip])
 
 
 
@@ -57,7 +37,18 @@ export default function TripDetailsLayout() {
         }}>
             <Stack>
                 <Stack.Screen name="(tabs)" options={{
-                    headerShown: false
+                    headerShown: true,
+                    title: trip?.name,
+                    headerRight: () => (
+                        <View className="flex flex-row gap-2 justify-end items-center mx-5">
+                            <Pressable onPress={() => router.push('./messages')}
+                                className="flex flex-row gap-1 items-center ring-1 rounded-full p-3 py-1 bg-blue-200">
+                                <IconSymbol name="message" size={20} color="#000" />
+                                <Text className="text-secondary text-sm">{trip?.users?.length}</Text>
+                            </Pressable>
+                            <IconSymbol name="ellipsis.circle" size={25} color="#000" />
+                        </View>
+                    )
                 }} />
                 <Stack.Screen name="pick-user" options={{
                     presentation: "modal",
@@ -70,9 +61,7 @@ export default function TripDetailsLayout() {
                     headerBackTitle: "Annuler"
                 }} />
                 <Stack.Screen name="messages" options={{
-                    presentation: "modal",
                     title: "Messagerie",
-
                     headerTitleStyle: {
                         fontWeight: 'bold',
                     },

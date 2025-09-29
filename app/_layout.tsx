@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import Toast from 'react-native-toast-message';
 import '../global.css';
 
 
@@ -39,6 +40,7 @@ export default function RootLayout() {
       }}>
         <SafeAreaProvider>
           <RootNav />
+          <Toast visibilityTime={2000}/>
         </SafeAreaProvider>
       </ThemeProvider>
     </QueryClientProvider>
@@ -56,27 +58,19 @@ const RootNav = () => {
         title: "Mes projets",
       }} />
       <Stack.Screen name="new" options={{
-        presentation: "modal",
-        title: "Nouveau voyage"
+        title: "Nouveau voyage",
+        headerBackTitle: "Annuler"
       }} />
       <Stack.Screen name="join" options={{
-        presentation: "modal",
-        title: "Rejoins un voyage"
+        title: "Rejoins un voyage",
+        headerBackTitle: "Annuler"
       }} />
       <Stack.Screen name="[id]" options={{
         title: "Mon voyage",
-        headerShown: true
+        headerShown: false
       }} />
     </Stack>
   );
 }
 
 
-const LightTheme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    background: 'rgba(196, 235, 187, 1)',
-    primary: 'rgba(25, 23, 107, 1)',
-  }
-}
