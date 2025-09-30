@@ -1,5 +1,6 @@
 import Styles from '@/constants/Styles';
 import { useGetToken } from '@/hooks/api/useTokens';
+import { useAddStorageTrip } from '@/hooks/storage/useStorageTrips';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
@@ -9,22 +10,26 @@ export default function TokenRedirectionPage() {
 
 
 
-    const {token} = useLocalSearchParams();
-    const {data: trip} = useGetToken(String(token));
+    const { token } = useLocalSearchParams();
+    const { data: trip } = useGetToken(String(token));
+    const { mutate: addStorageTrip } = useAddStorageTrip();
 
     const router = useRouter();
 
     useEffect(() => {
-        if(!trip)
+        if (!trip)
             return;
-        
-        router.dismissTo({
-            pathname: "/[id]",
-            params: {
-                id: String(trip._id)
-            }
-        })
-    },[trip, router]);
+
+        addStorageTrip(trip, {
+            onSuccess: () => router.dismissTo({
+                pathname: "/[id]",
+                params: {
+                    id: String(trip._id)
+                }
+            })
+        });
+
+    }, [trip, router, addStorageTrip]);
 
     return (
         <SafeAreaView style={Styles.container}>

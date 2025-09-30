@@ -112,7 +112,6 @@ export default function NewTripPage() {
     })
 
 
-
     const addStorageTrip = useAddStorageTrip();
 
     const onSubmit = async (data: any) => {

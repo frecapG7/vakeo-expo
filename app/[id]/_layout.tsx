@@ -7,7 +7,7 @@ import { useGetStorageTrip } from "@/hooks/storage/useStorageTrips";
 import useColors from "@/hooks/styles/useColors";
 import * as Clipboard from 'expo-clipboard';
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import Toast from "react-native-toast-message";
@@ -44,6 +44,12 @@ export default function TripDetailsLayout() {
         setOpenMenu(false);
     }
 
+
+
+    useEffect(() => {
+        if (!!storageTrip && !storageTrip.user)
+            router.navigate('./pick-user');
+    }, [router, storageTrip]);
 
     return (
         <TripContext.Provider value={{

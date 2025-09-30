@@ -125,6 +125,7 @@ export default function ItemDetails() {
                     className="bg-orange-100 dark:bg-gray-100 rounded-lg p-2"
                 />
             </View>
+            
             {/* 
             <View className="mt-10">
                 <Text className="text-2xl ">A venir</Text>
