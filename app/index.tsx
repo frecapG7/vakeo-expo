@@ -105,7 +105,7 @@ export default function HomePage() {
               }}>
                 <IconSymbol name="plus.circle" size={50} color="primary" />
                 <View>
-                  <Text className="text-2xl font-bold dark:text-gray-600 text-wrap">
+                  <Text className="text-2xl font-bold text-wrap">
                     Créer un nouveau voyage
                   </Text>
                   <Text>

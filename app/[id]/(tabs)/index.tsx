@@ -95,7 +95,7 @@ export default function ItemDetails() {
 
             <View className="mt-5 px-2">
                 <View className="flex flex-row justify-between px-2">
-                    <Text className="text-2xl">Activité à venir</Text>
+                    <Text className="text-2xl dark:text-white font-bold">Prochaine activité</Text>
                     <Button onPress={() => console.log("todo")}>
                         <IconSymbol name="plus.circle" size={30} color={colors.text} />
                     </Button>
@@ -107,7 +107,7 @@ export default function ItemDetails() {
 
             <View className="mt-5 px-2">
                 <View className="flex flex-row justify-between px-2">
-                    <Text className="text-2xl">Courses</Text>
+                    <Text className="text-2xl dark:text-white font-bold">Courses</Text>
                     <Button onPress={() => console.log("todo")}>
                         <IconSymbol name="plus.circle" size={30} color={colors.text} />
                     </Button>

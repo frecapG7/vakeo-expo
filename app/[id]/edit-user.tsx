@@ -68,7 +68,7 @@ export default function EditUserPage() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <GestureHandlerRootView >
+            <GestureHandlerRootView style={styles.container}>
                 <View className="flex h-lg justify-center items-center gap-5">
                     <View className="flex items-center justify-center gap-2">
                         <Pressable onPress={() => bottomSheetRef.current?.expand()}>
@@ -86,7 +86,8 @@ export default function EditUserPage() {
                         <Button disabled={!isDirty}
                             title="Modifier"
                             onPress={handleSubmit(onSubmit)}
-                            isLoading={updateTripUser.isPending} />
+                            isLoading={updateTripUser.isPending} 
+                            variant="contained"/>
                     </View>
 
 
@@ -104,14 +105,14 @@ export default function EditUserPage() {
                         backgroundColor: "primary"
                     }}
                 >
-                    <BottomSheetScrollView>
-                        <View className="flex flex-row flex-wrap gap-2 justify-center px-2">
+                    <BottomSheetScrollView contentContainerStyle={styles.bottomSheet}>
+                        <View className="flex flex-row flex-wrap gap-5 justify-center">
                             {avatars.map((v, index) =>
                                 <Pressable key={index} onPress={() => {
                                     onChange(v);
                                     bottomSheetRef.current?.close()
                                 }}>
-                                    <Avatar src={v} size2="lg" />
+                                    <Avatar src={v} size2="xl" />
                                 </Pressable>
                             )}
                         </View>
