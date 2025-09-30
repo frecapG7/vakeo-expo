@@ -11,17 +11,46 @@ const variantToClassMap = {
     'outlined': 'ring-blue-400 rounded-lg'
 }
 
-export const Button = ({ title, onPress, className, disabled, isLoading, variant = "none" }: {
-    title: string,
+
+const ButtonTitle = ({ title, isLoading }: { title: string, isLoading: boolean }) => {
+    if (isLoading)
+        return
+    <Animated.View entering={ZoomIn} exiting={ZoomOut} className="p-4">
+        <ActivityIndicator size="large" />
+    </Animated.View>
+
+    return (
+        <Animated.View entering={ZoomIn} exiting={ZoomOut} className="p-4">
+            <Text className="text-sm font-bold text-center dark:text-white" >{title}</Text>
+        </Animated.View>
+    );
+
+}
+
+export const Button = ({ title,
+    onPress,
+    onLongPress,
+    className,
+    disabled,
+    isLoading = false,
+    variant = "none",
+    children,
+    ...props
+}: {
+    title?: string,
     onPress: () => void,
+    onLongPress?: () => void,
     className?: string,
     disabled?: boolean,
     isLoading?: boolean,
-    variant?: ButtonVariant
+    variant?: ButtonVariant,
+    children?: React.ReactNode
 }) => {
 
 
     const variantClass = variantToClassMap[variant];
+
+    const disableClass = (disabled || isLoading) ? "opacity-75" : ""
 
 
 
@@ -29,19 +58,12 @@ export const Button = ({ title, onPress, className, disabled, isLoading, variant
     return (
         <Pressable
             onPress={onPress}
-            className={`p-4 ${variantClass} active:opacity-75 ${className}`}
+            className={`${variantClass} active:opacity-75 ${className} ${disableClass}`}
             disabled={disabled || isLoading}
+            {...props}
         >
-            {isLoading &&
-                <Animated.View entering={ZoomIn} exiting={ZoomOut}>
-                    <ActivityIndicator size="large" />
-                </Animated.View>
-            }
-            {!isLoading &&
-                <Animated.View entering={ZoomIn} exiting={ZoomOut}>
-                    <Text className="text-sm font-bold text-center dark:text-white " >{title}</Text>
-                </Animated.View>
-            }
+            {title && <ButtonTitle title={title} isLoading={isLoading} />}
+            {children}
         </Pressable >
     )
 }

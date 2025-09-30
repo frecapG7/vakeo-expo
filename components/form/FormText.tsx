@@ -44,11 +44,11 @@ export const FormText = ({ control, name, label, placeholder, rules, endAdornmen
 
     return (
         <View className={className}>
-            <Animated.View style={animatedStyle} >
+            <Animated.View style={animatedStyle}>
                 <TextInput
                     onChangeText={onChange}
                     value={value}
-                    className="flex bg-gray-200 rounded-lg p-2 w-full"
+                    className="flex bg-gray-200 rounded-lg p-2 w-full "
                     ref={ref}
                     placeholder={placeholder}
                 />

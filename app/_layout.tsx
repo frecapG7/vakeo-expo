@@ -15,7 +15,6 @@ export default function RootLayout() {
 
   const colors  = useColors();
 
-
   const [loaded, setLoaded] = useState(false);
 
 
@@ -40,7 +39,7 @@ export default function RootLayout() {
       }}>
         <SafeAreaProvider>
           <RootNav />
-          <Toast visibilityTime={2000}/>
+          <Toast />
         </SafeAreaProvider>
       </ThemeProvider>
     </QueryClientProvider>
@@ -69,6 +68,7 @@ const RootNav = () => {
         title: "Mon voyage",
         headerShown: false
       }} />
+      <Stack.Screen name="token" options={{headerShown: false}}/>
     </Stack>
   );
 }
