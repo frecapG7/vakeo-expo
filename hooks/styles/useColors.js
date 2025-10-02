@@ -3,7 +3,7 @@ import { useColorScheme } from "nativewind";
 
 const lightColor = {
 //   background: "rgba(196, 235, 187, 1)",
-  background: "rgba(234, 248, 231, 1)",
+  background: "rgba(238, 247, 236, 1)",
   primary: "#25b349ff",
   card: 'rgba(177, 230, 165, 1)',
   text: 'rgb(28, 28, 30)',

@@ -38,7 +38,7 @@ export default function HomePage() {
       headerRight: () =>
         <Button title="Ajouter"
           onPress={() => bottomSheetRef.current?.expand()}
-          className="flex flex-row justify-center items-center p-2 rounded-lg" />
+          className="flex flex-grow" />
     })
   }, [navigation]);
 
