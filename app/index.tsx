@@ -15,6 +15,10 @@ import Animated, { LinearTransition } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 
+//TODO: remove
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+
+
 
 export default function HomePage() {
 
@@ -46,9 +50,7 @@ export default function HomePage() {
 
 
   return (
-
     <SafeAreaView style={{ flex: 1 }}>
-
       <GestureHandlerRootView style={Styles.container}>
         <View className="mx-5 mb-5">
           <Text className="dark:text-white ml-5">Rechercher</Text>
@@ -82,6 +84,10 @@ export default function HomePage() {
             keyboardDismissMode="on-drag"
             itemLayoutAnimation={LinearTransition}
           />
+        </View>
+
+        <View className="align-baseline">
+          <Text className="text-xl">{apiUrl}</Text>
         </View>
 
 
