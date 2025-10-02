@@ -1,8 +1,7 @@
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { UsersList } from "@/components/users/UsersList";
-import { useGetTrip } from "@/hooks/api/useTrips";
-import { useStyles } from "@/hooks/styles/useStyles";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import styles from "@/constants/Styles";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Text, View } from "react-native";
 import { CalendarProvider, ExpandableCalendar, TimelineList } from "react-native-calendars";
@@ -26,9 +25,6 @@ export default function TripCalendar() {
 
 
 
-
-    const { id } = useLocalSearchParams();
-    const { data: trip } = useGetTrip(String(id));
 
 
 
@@ -96,15 +92,12 @@ export default function TripCalendar() {
     });
 
 
-
-    const { container, calendar } = useStyles()
-
     const router = useRouter();
 
 
 
     return (
-        <Animated.ScrollView style={container}>
+        <Animated.ScrollView style={styles.container}>
             <Text className="text-secondary">{currentDate}</Text>
             <CalendarProvider
                 date={currentDate}
@@ -118,7 +111,7 @@ export default function TripCalendar() {
                 numberOfDays={1}
             >
                 <ExpandableCalendar
-                    theme={calendar}
+                    // theme={calendar}
                     allowShadow={true}
                     initialPosition={ExpandableCalendar.positions.CLOSED}
                 />

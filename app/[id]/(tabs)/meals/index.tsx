@@ -1,20 +1,18 @@
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { AvatarsList } from "@/components/users/AvatarsList";
+import styles from "@/constants/Styles";
 import { useGetMeals } from "@/hooks/api/useMeals";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
-import { useStyles } from "@/hooks/styles/useStyles";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
-
 export default function TripMeals() {
 
 
 
     const router = useRouter();
 
-    const { container } = useStyles();
 
     const { id } = useLocalSearchParams();
     const { data: meals } = useGetMeals(id);
@@ -36,7 +34,7 @@ export default function TripMeals() {
 
 
     return (
-        <Animated.ScrollView style={container}>
+        <Animated.ScrollView style={styles.container}>
             {groupedMeals &&
                 <View className="flex flex-col gap-2 divide-y divide-solid divide-secondary p-2">
                     {Object.keys(groupedMeals)?.map((day) => (

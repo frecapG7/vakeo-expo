@@ -2,8 +2,8 @@ import axios from "@/lib/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const getActivities = async (id) => {
-  const response = await axios.get(`/trips/${id}/activities`);
-  return response.data;
+  console.log("Get Activites");
+  return [];
 };
 
 export const useGetActivities = (tripId) => {

@@ -41,6 +41,8 @@ export default function TripDetailsLayout() {
         Toast.show({
             type: "success",
             text1: "Lien copié dans le presse-papier",
+            autoHide: true,
+            visibilityTime: 2000
         });
         setOpenMenu(false);
     }
