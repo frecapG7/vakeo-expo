@@ -2,7 +2,6 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { AvatarsList } from "@/components/users/AvatarsList";
 import { useGetActivities } from "@/hooks/api/useActivities";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
-import { useStyles } from "@/hooks/styles/useStyles";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
@@ -12,7 +11,6 @@ import { Pressable, Text, View } from "react-native";
 export default function TripActivities() {
 
 
-    const { container } = useStyles();
 
     const { id } = useLocalSearchParams();
     const { data: activities } = useGetActivities(String(id));

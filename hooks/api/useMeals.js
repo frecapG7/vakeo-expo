@@ -2,8 +2,10 @@ import axios from "@/lib/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const getMeals = async (tripId) => {
-  const response = await axios.get(`/trips/${tripId}/meals`);
-  return response.data;
+  // const response = await axios.get(`/trips/${tripId}/meals`);
+  // return response.data;
+
+  return [];
 };
 
 export const useGetMeals = (tripId) => {

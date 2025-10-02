@@ -20,7 +20,8 @@
       "credentialsSource": "remote"
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "environment": "production"
     }
   },
   "submit": {

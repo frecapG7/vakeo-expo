@@ -3,13 +3,13 @@ import { useColorScheme } from "nativewind";
 
 const lightColor = {
 //   background: "rgba(196, 235, 187, 1)",
-  background: "rgba(234, 248, 231, 1)",
+  background: "rgba(238, 247, 236, 1)",
   primary: "#25b349ff",
   card: 'rgba(177, 230, 165, 1)',
   text: 'rgb(28, 28, 30)',
   border: 'rgb(216, 216, 216)',
   notification: 'rgb(255, 59, 48)',
-  neutral: "#658a6eff"
+  neutral: "#90cfa0ff"
 };
 const darkColor = {
   background: "#1a1a1a",
@@ -18,7 +18,7 @@ const darkColor = {
   text: "#ffffff",
   border: "#ffffff",
   notification: "#ffffff",
-  neutral: "#658a6eff"
+  neutral: "#3c3d3cff"
 }
 
 const useColors = () => {

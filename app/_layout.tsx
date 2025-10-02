@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 import '../global.css';
 
 
@@ -12,8 +13,7 @@ const queryClient = new QueryClient({});
 
 export default function RootLayout() {
 
-  const colors  = useColors();
-
+  const colors = useColors();
 
   const [loaded, setLoaded] = useState(false);
 
@@ -31,17 +31,20 @@ export default function RootLayout() {
 
 
   return (
-    <QueryClientProvider client={queryClient}>
-      {/* <ThemeProvider value={colorScheme === "light" ? LightTheme : DarkTheme}> */}
-      <ThemeProvider value={{
-        ...DefaultTheme,
-        colors
-      }}>
-        <SafeAreaProvider>
-          <RootNav />
-        </SafeAreaProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <>
+      <QueryClientProvider client={queryClient}>
+        {/* <ThemeProvider value={colorScheme === "light" ? LightTheme : DarkTheme}> */}
+        <ThemeProvider value={{
+          ...DefaultTheme,
+          colors
+        }}>
+          <SafeAreaProvider>
+            <RootNav />
+          </SafeAreaProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+      <Toast />
+    </>
   );
 }
 
@@ -56,27 +59,20 @@ const RootNav = () => {
         title: "Mes projets",
       }} />
       <Stack.Screen name="new" options={{
-        presentation: "modal",
-        title: "Nouveau voyage"
+        title: "Nouveau voyage",
+        headerBackTitle: "Annuler"
       }} />
       <Stack.Screen name="join" options={{
-        presentation: "modal",
-        title: "Rejoins un voyage"
+        title: "Rejoins un voyage",
+        headerBackTitle: "Annuler"
       }} />
       <Stack.Screen name="[id]" options={{
         title: "Mon voyage",
-        headerShown: true
+        headerShown: false
       }} />
+      <Stack.Screen name="token" options={{ headerShown: false }} />
     </Stack>
   );
 }
 
 
-const LightTheme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    background: 'rgba(196, 235, 187, 1)',
-    primary: 'rgba(25, 23, 107, 1)',
-  }
-}

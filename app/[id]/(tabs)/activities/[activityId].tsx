@@ -14,6 +14,7 @@ import { EditActivity } from "./components/EditActivity";
 export default function TripActivityDetails() {
 
 
+
     const { id, activityId } = useLocalSearchParams();
     const { data: trip } = useGetTrip(String(id));
     const { data: activity } = useGetActivity(String(id), String(activityId));

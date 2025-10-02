@@ -74,3 +74,15 @@ export const useUpdateTripUser = (tripId, userId) => {
     }
   })
 }
+
+const shareTrip = async (id) => {
+  const response = await axios.post(`/trips/${id}/share`);
+  return response.data;
+}
+
+
+export const useShareTrip = (id) => {
+  return useMutation({
+    mutationFn: () => shareTrip(id)
+  });
+}

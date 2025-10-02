@@ -35,7 +35,7 @@ const MAPPING = {
   "arrow.left": "arrow-back",
   "cart": "shopping-cart",
   "link": "insert-link",
-  "trash": "delete",
+  "trash": "delete-outline",
   "suit.spade": "fastfood",
   "list.dash": "format-list-bulleted",
   "clock": "access-time",
