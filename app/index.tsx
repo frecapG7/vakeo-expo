@@ -40,9 +40,12 @@ export default function HomePage() {
   useEffect(() => {
     navigation.setOptions({
       headerRight: () =>
-        <Button title="Ajouter"
-          onPress={() => bottomSheetRef.current?.expand()}
-          className="flex flex-grow" />
+        <Button
+        className="flex flex-row items-center gap-2"
+          onPress={() => bottomSheetRef.current?.expand()}>
+          <Text className="text-md font-bold">Ajouter</Text>
+          <IconSymbol name="plus.circle" color={colors.text} size={15}/>
+        </Button>
     })
   }, [navigation]);
 
