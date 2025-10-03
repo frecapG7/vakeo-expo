@@ -27,6 +27,7 @@ export default function PickTripUserPage() {
         await updateStorageTrip.mutateAsync({
             _id: trip?._id,
             name: trip?.name,
+            image: trip?.image,
             user: item._id
         });
         //TODO: save img

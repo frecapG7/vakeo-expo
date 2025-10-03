@@ -17,7 +17,6 @@ export default function RootLayout() {
 
   const [loaded, setLoaded] = useState(false);
 
-
   // TODO: setLoaded to true when font or else are all loaded
   useEffect(() => {
     setTimeout(() => setLoaded(true), 3000);
@@ -43,7 +42,7 @@ export default function RootLayout() {
           </SafeAreaProvider>
         </ThemeProvider>
       </QueryClientProvider>
-      <Toast />
+      <Toast/>
     </>
   );
 }

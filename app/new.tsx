@@ -1,10 +1,12 @@
 import { FormText } from "@/components/form/FormText";
+import BottomSheet from "@/components/ui/BottomSheet";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
 import { usePostTrip } from "@/hooks/api/useTrips";
 import { useAddStorageTrip } from "@/hooks/storage/useStorageTrips";
-import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import useColors from "@/hooks/styles/useColors";
+import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useMemo, useRef, useState } from "react";
@@ -13,7 +15,6 @@ import { Pressable, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { FadeInDown, LinearTransition } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 
 
 const data = [
@@ -74,6 +75,7 @@ const MAX_USERS_LENGTH = 20;
 export default function NewTripPage() {
 
 
+    const colors = useColors();
     const { control, handleSubmit } = useForm({
         defaultValues: {
             name: "",
@@ -83,7 +85,7 @@ export default function NewTripPage() {
             }, {
                 name: "",
             }],
-            image: data[0]
+            image: data[0].uri
         }
     });
     const { fields: users, append, remove } = useFieldArray({
@@ -115,16 +117,11 @@ export default function NewTripPage() {
     const addStorageTrip = useAddStorageTrip();
 
     const onSubmit = async (data: any) => {
-        const result = await postTrip.mutateAsync({
-            name: data.name,
-            image: data.image.uri,
-            users
-        });
-        console.log(JSON.stringify(result));
+        const result = await postTrip.mutateAsync(data);
         await addStorageTrip.mutateAsync({
             _id: result._id,
             name: result.name,
-            image: result.image, //TODO
+            image: result.image,
             user: result.users[me]
         });
         router.replace(`./${result._id}`);
@@ -135,15 +132,17 @@ export default function NewTripPage() {
             <GestureHandlerRootView>
                 <Text className="text-xl font-bold ml-5 dark:text-white">Titre</Text>
                 <View className="flex flex-row gap-1">
-                    <Pressable onPress={() => bottomSheetRef.current?.expand()}
+                    <Button
+                        onPress={() => bottomSheetRef.current?.expand()}
                         className="bg-gray-200 p-1">
-                        <Image source={value?.uri} style={{
-                            flex: 1,
-                            width: 40,
-                            height: 20,
-                        }}
+                        <Image source={value}
+                            style={{
+                                flex: 1,
+                                width: 40,
+                                height: 40,
+                            }}
                             contentFit="cover" />
-                    </Pressable>
+                    </Button>
                     <FormText control={control}
                         name="name"
                         className="flex-grow"
@@ -195,37 +194,28 @@ export default function NewTripPage() {
                         </Animated.View>}
                 </View>
                 <View className="flex items-center justify-center mt-10">
-                    <Button 
+                    <Button
                         title="Continuer"
                         variant="contained"
-                        onPress={handleSubmit(onSubmit)} 
-                        isLoading={postTrip.isPending} 
+                        onPress={handleSubmit(onSubmit)}
+                        isLoading={postTrip.isPending}
                         className="w-lg"
-                        />
+                    />
                 </View>
 
 
 
-                <BottomSheet ref={bottomSheetRef}
-                    index={-1}
-                    enableDynamicSizing={false}
-                    snapPoints={snapPoints}
-                    enablePanDownToClose={true}
-                    handleStyle={{
-                        backgroundColor: "primary"
-                    }}
-                    backgroundStyle={{
-                        backgroundColor: "primary"
-                    }}
-                >
-
+                <BottomSheet bottomSheetRef={bottomSheetRef}>
                     <BottomSheetScrollView>
                         <View className="flex flex-row flex-wrap gap-2 justify-center px-2">
-                            {data.map((item) => (
-                                <Pressable key={item.name} onPress={() => {
-                                    onChange(item);
-                                    bottomSheetRef.current?.close();
-                                }}>
+                            {data.map((item, index) => (
+                                <Pressable
+                                    key={index}
+                                    onPress={() => {
+                                        onChange(item.uri);
+                                        bottomSheetRef.current?.close();
+                                    }}
+                                >   
                                     <Image
                                         style={{
                                             flex: 1,
@@ -235,9 +225,6 @@ export default function NewTripPage() {
                                         source={item.uri}
                                         contentFit="cover"
                                         transition={1000} />
-                                    <Text className="text-lg">
-                                        {item.name}
-                                    </Text>
                                 </Pressable>
                             ))}
                         </View>

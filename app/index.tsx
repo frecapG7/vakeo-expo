@@ -37,10 +37,10 @@ export default function HomePage() {
     navigation.setOptions({
       headerRight: () =>
         <Button
-        className="flex flex-row items-center gap-2"
+          className="flex flex-row items-center gap-2"
           onPress={() => bottomSheetRef.current?.expand()}>
-          <Text className="text-md font-bold">Ajouter</Text>
-          <IconSymbol name="plus.circle" color={colors.text} size={15}/>
+          <Text className="text-md font-bold dark:text-white">Ajouter</Text>
+          <IconSymbol name="plus.circle" color={colors.text} size={15} />
         </Button>
     })
   }, [navigation]);
@@ -86,12 +86,13 @@ export default function HomePage() {
         </View>
 
         <View className="align-baseline">
-            <Text className="text-xl">Ici : {apiKey}</Text>
+          <Text className="text-xl">Ici : {apiKey}</Text>
         </View>
 
-        <BottomSheet ref={bottomSheetRef} index={-1}
+        <BottomSheet ref={bottomSheetRef}
+          index={-1}
           handleStyle={{
-            // color: colors.text
+            
           }}
           backgroundStyle={{
             backgroundColor: colors.background,
@@ -112,7 +113,7 @@ export default function HomePage() {
                   <Text className="text-2xl font-bold text-wrap">
                     Créer un nouveau voyage
                   </Text>
-                  <Text>
+                  <Text className="text-sm text-pretty">
                     Commence un nouveau projet de voyage de zéro
                   </Text>
                 </View>
@@ -126,7 +127,7 @@ export default function HomePage() {
                   <Text className="text-2xl font-bold">
                     Rejoins un voyage existant
                   </Text>
-                  <Text>
+                  <Text className="text-sm">
                     Utilise un lien d'invitation pour rejoindre tes amis
                   </Text>
                 </View>
