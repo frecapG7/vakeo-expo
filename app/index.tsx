@@ -14,6 +14,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+const apiURL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function HomePage() {
 
@@ -82,6 +83,8 @@ export default function HomePage() {
             itemLayoutAnimation={LinearTransition}
           />
         </View>
+
+        <Text className="dark:text-white">ICI: {apiURL}</Text>
 
         <BottomSheet ref={bottomSheetRef}
           index={-1}

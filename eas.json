@@ -21,7 +21,8 @@
     },
     "production": {
       "autoIncrement": true,
-      "environment": "production"
+      "environment": "production",
+      "credentialsSource": "remote"
     }
   },
   "submit": {
