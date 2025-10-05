@@ -14,8 +14,6 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-//TODO: remove
-const apiKey = process.env.API_KEY || process.env.EXPO_PUBLIC_API_KEY;
 
 export default function HomePage() {
 
@@ -83,10 +81,6 @@ export default function HomePage() {
             keyboardDismissMode="on-drag"
             itemLayoutAnimation={LinearTransition}
           />
-        </View>
-
-        <View className="align-baseline">
-          <Text className="text-xl">Ici : {apiKey}</Text>
         </View>
 
         <BottomSheet ref={bottomSheetRef}
