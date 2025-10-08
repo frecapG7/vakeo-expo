@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/Button";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useUpdateTripUser } from "@/hooks/api/useTrips";
+import useColors from "@/hooks/styles/useColors";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useContext, useEffect, useMemo, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { useController, useForm, useWatch } from "react-hook-form";
 import { View } from "react-native";
 import { GestureHandlerRootView, Pressable } from "react-native-gesture-handler";
@@ -57,8 +58,8 @@ export default function EditUserPage() {
     }, [me, reset]);
 
     const bottomSheetRef = useRef<BottomSheet>(null);
-    const snapPoints = useMemo(() => ["25%", "50%"], []);
 
+    const colors = useColors();
     const router = useRouter();
     const onSubmit = async (data) => {
         updateTripUser.mutateAsync(data);
@@ -69,7 +70,7 @@ export default function EditUserPage() {
     return (
         <SafeAreaView style={styles.container}>
             <GestureHandlerRootView style={styles.container}>
-                <View className="flex h-lg justify-center items-center gap-5">
+                <View className="flex justify-center items-center gap-5">
                     <View className="flex items-center justify-center gap-2">
                         <Pressable onPress={() => bottomSheetRef.current?.expand()}>
                             <Avatar
@@ -77,17 +78,17 @@ export default function EditUserPage() {
                                 alt={name?.charAt(0)}
                                 size2="xl"
                             />
-
-
                         </Pressable>
-                        <FormText control={control} name="name" rules={{ required: true }} />
+                        <View className="flex-row">
+                            <FormText control={control} name="name" rules={{ required: true }} />
+                        </View>
                     </View>
                     <View className="my-5">
                         <Button disabled={!isDirty}
                             title="Modifier"
                             onPress={handleSubmit(onSubmit)}
-                            isLoading={updateTripUser.isPending} 
-                            variant="contained"/>
+                            isLoading={updateTripUser.isPending}
+                            variant="contained" />
                     </View>
 
 
@@ -95,15 +96,15 @@ export default function EditUserPage() {
 
                 <BottomSheet ref={bottomSheetRef}
                     index={-1}
-                    enableDynamicSizing={false}
-                    snapPoints={snapPoints}
-                    enablePanDownToClose={true}
                     handleStyle={{
-                        backgroundColor: "primary"
+
                     }}
                     backgroundStyle={{
-                        backgroundColor: "primary"
+                        backgroundColor: colors.background,
+                        ...styles.bottomSheet
                     }}
+                    enablePanDownToClose={true}
+                    onChange={() => console.log("What to do?")}
                 >
                     <BottomSheetScrollView contentContainerStyle={styles.bottomSheet}>
                         <View className="flex flex-row flex-wrap gap-5 justify-center">

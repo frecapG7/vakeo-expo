@@ -49,7 +49,7 @@ export default function HomePage() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <GestureHandlerRootView style={Styles.container}>
-        <View className="mx-5 mb-5">
+        <View className="h-20 mx-5 mb-5">
           <Text className="dark:text-white ml-5">Rechercher</Text>
           <FormText label="Rechercher"
             control={control}
@@ -103,7 +103,6 @@ export default function HomePage() {
           backgroundStyle={{
             backgroundColor: colors.background,
             ...Styles.bottomSheet
-
           }}>
           <BottomSheetView style={styles.bottomContainer}>
             <View className="flex flex-col gap-2 m-2 pb-5">

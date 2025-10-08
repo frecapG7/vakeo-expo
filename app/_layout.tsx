@@ -17,12 +17,12 @@ Sentry.init({
 
   // Enable Logs
   enableLogs: true,
-  
+
   // Configure Session Replay
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1,
   integrations: [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
-  
+
   // uncomment the line below to enable Spotlight (https://spotlightjs.com)
   // spotlight: __DEV__,
 
@@ -53,20 +53,18 @@ export default Sentry.wrap(function RootLayout() {
 
 
   return (
-    <>
-      <QueryClientProvider client={queryClient}>
-        {/* <ThemeProvider value={colorScheme === "light" ? LightTheme : DarkTheme}> */}
-        <ThemeProvider value={{
-          ...DefaultTheme,
-          colors
-        }}>
-          <SafeAreaProvider>
-            <RootNav />
-          </SafeAreaProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
-      <Toast/>
-    </>
+    <QueryClientProvider client={queryClient}>
+      {/* <ThemeProvider value={colorScheme === "light" ? LightTheme : DarkTheme}> */}
+      <ThemeProvider value={{
+        ...DefaultTheme,
+        colors
+      }}>
+        <SafeAreaProvider>
+          <RootNav />
+          <Toast />
+        </SafeAreaProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 });
 

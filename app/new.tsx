@@ -1,12 +1,11 @@
 import { FormText } from "@/components/form/FormText";
-import BottomSheet from "@/components/ui/BottomSheet";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
 import { usePostTrip } from "@/hooks/api/useTrips";
 import { useAddStorageTrip } from "@/hooks/storage/useStorageTrips";
 import useColors from "@/hooks/styles/useColors";
-import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useMemo, useRef, useState } from "react";
@@ -128,24 +127,21 @@ export default function NewTripPage() {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
-            <GestureHandlerRootView>
+        <SafeAreaView style={{ flex: 1 }}>
+            <GestureHandlerRootView style={styles.container}>
                 <Text className="text-xl font-bold ml-5 dark:text-white">Titre</Text>
                 <View className="flex flex-row gap-1">
                     <Button
                         onPress={() => bottomSheetRef.current?.expand()}
-                        className="bg-gray-200 p-1">
+                        className="flex bg-gray-200 p-1 rounded-lg w-20 h-20">
                         <Image source={value}
                             style={{
                                 flex: 1,
-                                width: 40,
-                                height: 40,
                             }}
                             contentFit="cover" />
                     </Button>
                     <FormText control={control}
                         name="name"
-                        className="flex-grow"
                         rules={{
                             required: true,
                             maxLength: 50
@@ -158,24 +154,22 @@ export default function NewTripPage() {
                         data={users}
                         contentContainerClassName="gap-0 bg-gray-200 p-1 rounded-t-lg"
                         renderItem={({ item, index, separators }) =>
-                            <View className="flex-row justify-between">
-                                <FormText
-                                    control={control}
-                                    name={`users.${index}.name`}
-                                    rules={{
-                                        required: true,
-                                        maxLength: 25
-                                    }}
-                                    className="flex-grow"
-                                />
-                                <Pressable
-                                    className="mx-2"
-                                    onPress={() => me !== index && remove(index)}>
-                                    {me === index ?
-                                        <Text className="font-bold bg-blue-600 p-1 text-white">Moi</Text> :
-                                        <IconSymbol name="xmark.circle" size={24} color="black" />}
-                                </Pressable>
-                            </View>
+                            <FormText
+                                control={control}
+                                name={`users.${index}.name`}
+                                rules={{
+                                    required: true,
+                                    maxLength: 25
+                                }}
+                                endAdornment={
+                                    <Pressable
+                                        className="mx-2"
+                                        onPress={() => me !== index && remove(index)}>
+                                        {me === index ?
+                                            <Text className="font-bold bg-blue-600 p-1 text-white">Moi</Text> :
+                                            <IconSymbol name="xmark.circle" size={24} color="black" />}
+                                    </Pressable>}
+                            />
                         }
                         keyExtractor={(item) => item.key}
                         ItemSeparatorComponent={() => <View className="h-0.2 bg-gray-600" />}
@@ -205,7 +199,18 @@ export default function NewTripPage() {
 
 
 
-                <BottomSheet bottomSheetRef={bottomSheetRef}>
+                <BottomSheet ref={bottomSheetRef}
+                    index={-1}
+                    handleStyle={{
+
+                    }}
+                    backgroundStyle={{
+                        backgroundColor: colors.background,
+                        ...styles.bottomSheet
+                    }}
+                    enablePanDownToClose={true}
+                    onChange={() => console.log("What to do?")}
+                >
                     <BottomSheetScrollView>
                         <View className="flex flex-row flex-wrap gap-2 justify-center px-2">
                             {data.map((item, index) => (
@@ -215,7 +220,8 @@ export default function NewTripPage() {
                                         onChange(item.uri);
                                         bottomSheetRef.current?.close();
                                     }}
-                                >   
+                                    className={`p-1 rounded-lg  ${item.uri === value ? "bg-blue-400" : ""}`}
+                                >
                                     <Image
                                         style={{
                                             flex: 1,

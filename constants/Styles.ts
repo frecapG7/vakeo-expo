@@ -10,8 +10,8 @@ const styles = StyleSheet.create({
     },
     bottomSheet: {
         flex: 1,
-        padding: 36,
-        alignItems: 'center'
+        // padding: 36,
+        // alignItems: 'center'
     }
 });
 
