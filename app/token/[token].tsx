@@ -11,10 +11,15 @@ export default function TokenRedirectionPage() {
 
 
     const { token } = useLocalSearchParams();
-    const { data: trip } = useGetToken(String(token));
+    const { data: trip, isError } = useGetToken(String(token));
     const { mutate: addStorageTrip } = useAddStorageTrip();
 
     const router = useRouter();
+
+    useEffect(() => {
+        if (isError)
+            router.dismissAll();
+    }, [isError, router])
 
     useEffect(() => {
         if (!trip)
