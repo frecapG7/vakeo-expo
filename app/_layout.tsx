@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import Toast from "react-native-toast-message";
+import ToastManager from "toastify-react-native";
 import '../global.css';
 
 Sentry.init({
@@ -16,7 +16,7 @@ Sentry.init({
   sendDefaultPii: true,
 
   // Enable Logs
-  enableLogs: true,
+  // enableLogs: true,
 
   // Configure Session Replay
   replaysSessionSampleRate: 0.1,
@@ -25,9 +25,8 @@ Sentry.init({
 
   // uncomment the line below to enable Spotlight (https://spotlightjs.com)
   // spotlight: __DEV__,
-
   // base this on env
-  enabled: false,
+  enabled: !__DEV__,
 });
 
 
@@ -61,7 +60,7 @@ export default Sentry.wrap(function RootLayout() {
       }}>
         <SafeAreaProvider>
           <RootNav />
-          <Toast />
+          <ToastManager/>
         </SafeAreaProvider>
       </ThemeProvider>
     </QueryClientProvider>

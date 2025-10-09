@@ -26,7 +26,7 @@ export default function JoinTrip() {
         const token = parts[parts.length - 1];
         const response = await verifyToken.mutateAsync(token);
 
-        if (!response?.valid) {
+        if (response?.valid) {
             router.push({
                 pathname: '/token/[token]',
                 params: {
