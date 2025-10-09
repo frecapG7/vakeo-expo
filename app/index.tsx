@@ -9,16 +9,15 @@ import { Image } from "expo-image";
 import { useNavigation, useRouter } from "expo-router";
 import { useEffect, useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import Animated, { LinearTransition } from "react-native-reanimated";
+import Animated, { LinearTransition, ZoomIn } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const apiURL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function HomePage() {
 
-  const { control } = useForm();
+  const { control, setValue } = useForm();
   const router = useRouter();
 
   const search = useWatch({
@@ -50,9 +49,21 @@ export default function HomePage() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <GestureHandlerRootView style={Styles.container}>
-        <View className="mx-5 mb-5">
+        <View className="h-20 mx-5 mb-5">
           <Text className="dark:text-white ml-5">Rechercher</Text>
-          <FormText label="Rechercher" control={control} name="search" endAdornment={<IconSymbol name="magnifyingglass" />} />
+          <FormText label="Rechercher"
+            control={control}
+            name="search"
+            endAdornment={<View className="flex flex-row gap-1 items-center">
+              {!!search &&
+                <Animated.View entering={ZoomIn}>
+                  <Pressable onPress={() => setValue("search", "")}>
+                    <IconSymbol name="xmark.circle" />
+                  </Pressable>
+                </Animated.View>
+              }
+              <IconSymbol name="magnifyingglass" />
+            </View>} />
         </View>
         <View>
           <Animated.FlatList
@@ -84,17 +95,14 @@ export default function HomePage() {
           />
         </View>
 
-        <Text className="dark:text-white">ICI: {apiURL}</Text>
-
         <BottomSheet ref={bottomSheetRef}
           index={-1}
           handleStyle={{
-            
+
           }}
           backgroundStyle={{
             backgroundColor: colors.background,
             ...Styles.bottomSheet
-
           }}>
           <BottomSheetView style={styles.bottomContainer}>
             <View className="flex flex-col gap-2 m-2 pb-5">

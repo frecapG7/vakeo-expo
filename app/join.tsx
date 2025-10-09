@@ -5,10 +5,10 @@ import styles from "@/constants/Styles";
 import { useVerifyToken } from "@/hooks/api/useTokens";
 import * as Clipboard from 'expo-clipboard';
 import { useRouter } from "expo-router";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Toast } from "toastify-react-native";
 
 
 const urlRegex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
@@ -19,15 +19,14 @@ export default function JoinTrip() {
 
     const router = useRouter();
 
-    const [errorMessage, setErrorMessage] = useState<String>();
 
     const verifyToken = useVerifyToken()
     const onSubmit = async (data) => {
-        try{
-            const parts = data?.value?.split("/");
-            const token = parts[parts.length -1];
-            const response = await verifyToken.mutateAsync(token);
-            setErrorMessage(''); 
+        const parts = data?.value?.split("/");
+        const token = parts[parts.length - 1];
+        const response = await verifyToken.mutateAsync(token);
+
+        if (response?.valid) {
             router.push({
                 pathname: '/token/[token]',
                 params: {
@@ -35,9 +34,8 @@ export default function JoinTrip() {
                 }
             });
             reset();
-        }catch(error){
-            setErrorMessage("Ce lien n'est plus valide")
-            
+        } else {
+            Toast.warn("Ce lien n'est plus valide");
         }
     }
 
@@ -60,18 +58,23 @@ export default function JoinTrip() {
                 <View className="flex flex-row flex-grow px-5 items-center gap-2 mt-5 p-2">
                     <FormText control={control}
                         name="value"
-                        className="flex-grow"
                         rules={{
                             required: true,
                             pattern: urlRegex
-                        }} />
-                    <Button onPress={async () => {
-                        const text = await Clipboard.getStringAsync();
-                        if (urlRegex.test(text))
-                            setValue("value", text);
-                    }} >
-                        <IconSymbol name="doc.on.doc" color="blue" />
-                    </Button>
+                        }}
+                        endAdornment={
+                            <View>
+                                <Button onPress={async () => {
+                                    const text = await Clipboard.getStringAsync();
+                                    if (urlRegex.test(text))
+                                        setValue("value", text);
+                                }} >
+                                    <IconSymbol name="doc.on.doc" color="blue" />
+                                </Button>
+                            </View>
+                        } />
+
+
                 </View>
 
 

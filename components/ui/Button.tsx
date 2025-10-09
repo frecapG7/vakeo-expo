@@ -54,7 +54,7 @@ export const Button = ({ title,
 
     const variantClass = variantToClassMap[variant];
 
-    const disableClass = (disabled || isLoading) ? "opacity-75" : ""
+    const disableClass = (disabled || isLoading) ? "opacity-50 bg-gray-600" : ""
 
 
 

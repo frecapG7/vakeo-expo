@@ -74,7 +74,12 @@ export default function EditTripDatePage() {
 
     useEffect(() => {
         navigation.setOptions({
-            headerRight: () => <Button title="Appliquer" isLoading={updateTrip.isPending} onPress={handleSubmit(onSubmit)} />
+            headerRight: () =>
+                <Button
+                    isLoading={updateTrip.isPending}
+                    onPress={handleSubmit(onSubmit)}>
+                    <Text className="font-bold dark:text-white">Appliquer</Text>
+                </Button>
         })
     }, [navigation]);
 

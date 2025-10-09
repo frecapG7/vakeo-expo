@@ -20,8 +20,6 @@ export const FormText = ({ control, name, label, placeholder, rules, endAdornmen
             rules
         });
 
-
-
     const shakeAnimation = useSharedValue(0);
     const animatedStyle = useAnimatedStyle(() => {
         return {
@@ -43,20 +41,21 @@ export const FormText = ({ control, name, label, placeholder, rules, endAdornmen
     }, [error, shakeAnimation]);
 
     return (
-        <View className={className}>
-            <Animated.View style={animatedStyle}>
-                <TextInput
-                    onChangeText={onChange}
-                    value={value}
-                    className="flex bg-gray-200 rounded-lg p-2 w-full "
-                    ref={ref}
-                    placeholder={placeholder}
-                />
-                {endAdornment && <View className="absolute right-0 top-0 bottom-0 flex items-center justify-center">
+        <Animated.View style={animatedStyle} className="flex-1 flex-row items-center bg-gray-200 p-2 focus:border focus:border-blue-500 rounded-lg">
+            <TextInput
+                onChangeText={onChange}
+                value={value}
+                className="text-md flex-1 text-dark"
+                ref={ref}
+                placeholder={placeholder}
+            />
+            {endAdornment &&
+                <View
+                    className="flex"
+                >
                     {endAdornment}
                 </View>
-                }
-            </Animated.View>
-        </View>
+            }
+        </Animated.View>
     )
 }

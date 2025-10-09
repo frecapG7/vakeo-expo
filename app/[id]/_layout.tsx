@@ -7,11 +7,11 @@ import useColors from "@/hooks/styles/useColors";
 import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from "@gorhom/bottom-sheet";
 import * as Clipboard from 'expo-clipboard';
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-import Toast from "react-native-toast-message";
+import { Toast } from "toastify-react-native";
 
 
 
@@ -26,34 +26,21 @@ export default function TripDetailsLayout() {
     const { data: me } = useGetTripUser(id, storageTrip?.user, {
         enabled: !!storageTrip?.user
     });
-    const buttonRef = useRef(null);
 
     const shareTrip = useShareTrip(String(id));
 
     const colors = useColors();
 
 
-    const [openMenu, setOpenMenu] = useState(false);
 
-    const handleShare = async () => {
-        const { value } = await shareTrip.mutateAsync();
-        await Clipboard.setStringAsync(`https://todo.com/token/${value}`);
-        Toast.show({
-            type: "success",
-            text1: "Lien copié dans le presse-papier",
-            autoHide: true,
-            visibilityTime: 2000
-        });
-        setOpenMenu(false);
-    }
-
-
-
+    
+    
+    
     useEffect(() => {
         if (!!storageTrip && !storageTrip.user)
             router.navigate('./pick-user');
     }, [router, storageTrip]);
-
+    
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
     // callbacks
@@ -63,7 +50,13 @@ export default function TripDetailsLayout() {
     const handleSheetChanges = useCallback((index: number) => {
         console.log('handleSheetChanges', index);
     }, []);
-
+    
+    const handleShare = async () => {
+        const { value } = await shareTrip.mutateAsync();
+        await Clipboard.setStringAsync(`https://todo.com/token/${value}`);
+        Toast.info("Lien copié dans le presse papier");
+        bottomSheetModalRef.current?.close();
+    }
     return (
         <TripContext.Provider value={{
             me: {
@@ -117,11 +110,11 @@ export default function TripDetailsLayout() {
                         ref={bottomSheetModalRef}
                         onChange={handleSheetChanges}
                         backgroundStyle={{
-                            backgroundColor: colors.neutral
+                            backgroundColor: colors.background
                         }}
                     >
                         <BottomSheetView style={{ flex: 1, padding: 10, minHeight: 150 }}>
-                            <View className="flex flex-grow gap-3 p-1 divide-y divide-solid dark:divide-white">
+                            <View className="flex flex-grow gap-5 p-1 divide-y-5 divide-solid dark:divide-white">
                                 <Button onPress={handleShare} className="flex flex-row gap-5 items-center" isLoading={shareTrip.isPending}>
                                     <View className="bg-gray-200 rounded-full p-2">
                                         {shareTrip.isPending ?
