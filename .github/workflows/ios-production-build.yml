@@ -24,16 +24,12 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-      
-      - name: Create .env file
-        run: |
-          touch .env
-          echo EXPO_PUBLIC_API_URL=${{secrets.EXPO_PUBLIC_API_URL}} >> .env
-          echo EXPO_PUBLIC_API_KEY=${{secrets.EXPO_PUBLIC_API_KEY}} >> .env
-          echo SENTRY_AUTH_TOKEN=${{secrets.SENTRY_AUTH_TOKEN}} >> .env
-          cat .env
 
       - name: 🚀 Build iOS app
+        env:
+          EXPO_PUBLIC_API_URL=${{secrets.EXPO_PUBLIC_API_URL}}
+          EXPO_PUBLIC_API_KEY=${{secrets.EXPO_PUBLIC_API_KEY}}
+          SENTRY_AUTH_TOKEN=${{secrets.SENTRY_AUTH_TOKEN}}
         run: eas build --platform ios --profile production --local --non-interactive --output ${{ github.workspace }}/vakeo-app-release.ipa
 
       - name: Upload IPA artifact
