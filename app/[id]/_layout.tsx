@@ -31,10 +31,6 @@ export default function TripDetailsLayout() {
 
     const colors = useColors();
 
-
-
-    
-    
     
     useEffect(() => {
         if (!!storageTrip && !storageTrip.user)

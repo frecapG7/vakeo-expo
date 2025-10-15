@@ -83,7 +83,7 @@ export const EventForm = ({ control, }: {
                 </View>
                 <View className="flex gap-5 bg-gray-400 rounded-lg py-2">
                     {attendees?.map((attendee, index) => (
-                        <Button key={attendee.id} className="flex flex-row items-center justify-between px-5" onPress={() => update(index, {
+                        <Button key={attendee._id} className="flex flex-row items-center justify-between px-5" onPress={() => update(index, {
                             ...attendee,
                             checked: !attendee.checked
                         })}>

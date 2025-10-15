@@ -1,12 +1,21 @@
 import { Stack } from "expo-router";
 
 
-export default function TripActivitiesLayout() {
+
+
+export default function TripEventsLayout() {
 
 
     return (
-        <Stack screenOptions={{
-            headerShown: false
-        }}/>
-    );
+        <Stack >
+            <Stack.Screen name="index" options={{headerShown: false}} />
+            <Stack.Screen name="new" options={{
+                title: "Nouvelle activité",
+                headerBackTitle: "Annuler",
+                presentation: "modal"
+            }} 
+            />
+            <Stack.Screen name="[activityId]" options={{ headerShown: false}}/>
+        </Stack>
+    )
 }
