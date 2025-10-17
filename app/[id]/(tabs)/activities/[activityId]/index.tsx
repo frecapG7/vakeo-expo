@@ -38,7 +38,7 @@ export default function TripActivityDetails() {
 
 
 
-                <Pressable className="flex  max-w-50 items-center justify-center gap-2 p-2" onPress={() => setOpenOwners(true)}>
+                <Pressable className="flex max-w-50 items-center justify-center gap-2 p-2" onPress={() => setOpenOwners(true)}>
                     <View className="flex-row items-center ">
                         {activity?.owners.map((owner) =>
                             <View key={owner._id} className="flex -ml-7 ">
@@ -61,7 +61,7 @@ export default function TripActivityDetails() {
                 <Text className="font-bold text-xl dark:text-white ml-2">
                     Participants
                 </Text>
-                <View className="rounded-lg bg-orange-300 dark:bg-gray-400 gap-2 p-2">
+                <View className="rounded-lg bg-orange-100 dark:bg-gray-400 gap-2 px-2 py-4">
                     {activity?.attendees.map((attendee) =>
                         <View key={attendee._id} className="flex flex-row gap-2 items-center">
                             <Avatar alt={attendee.name.charAt(0)} size2="sm" src={attendee.avatar} />

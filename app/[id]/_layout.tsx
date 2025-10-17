@@ -63,9 +63,12 @@ export default function TripDetailsLayout() {
         }}>
             <GestureHandlerRootView>
                 <BottomSheetModalProvider>
-                    <Stack>
+                    <Stack screenOptions={{
+                        headerBackVisible: false
+                    }}>
                         <Stack.Screen name="(tabs)" options={{
                             headerShown: true,
+                            headerBackVisible: true,
                             title: trip?.name || "Mon voyage",
                             headerRight: () => (
                                 <View className="flex flex-row gap-2 justify-end items-center mx-5">

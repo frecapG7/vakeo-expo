@@ -47,7 +47,7 @@ export const EventForm = ({ control, }: {
                     </Text>
 
                 </View>
-                <View className="flex gap-5 bg-gray-400 rounded-lg py-2 ">
+                <View className="flex gap-5 bg-gray-200 rounded-lg py-2 ">
                     {owners?.map((owner, index) => (
                         <View key={owner._id} className="flex flex-row items-center justify-between px-5" onPress={() => updateOwner(index, {
                             ...owner,
@@ -56,8 +56,8 @@ export const EventForm = ({ control, }: {
                                 <Avatar src={owner.avatar} alt={owner.name.charAt(0)} size2="sm" />
                                 <Text className="text-lg font-bold">{owner.name}</Text>
                             </View>
-                            <Button onPress={() => remove(index)} className="bg-gray-700 rounded-full p-2">
-                                <IconSymbol name="trash" color="white" />
+                            <Button onPress={() => remove(index)} className="bg-red-500 dark:bg-gray-700 rounded-full p-2">
+                                <IconSymbol name="trash" size={20} color="white" />
                             </Button>
                         </View>
                     ))}
@@ -68,9 +68,9 @@ export const EventForm = ({ control, }: {
                 </View>
             </View>
 
-            <View className="flex-1 mt-5 gap-2">
+            <View className="flex-1 mt-5 ">
                 <View className="flex flex-row justify-between" >
-                    <Text className="text-lg font-bold  italic ml-5 dark:text-white">
+                    <Text className="text-lg font-bold italic ml-5 dark:text-white">
                         Participants
                     </Text>
                     <Button
@@ -78,10 +78,10 @@ export const EventForm = ({ control, }: {
                             ...f,
                             checked: true
                         }))}>
-                        <Text className="p-2 underline text-blue-400 font-bold">Sélectionner tous</Text>
+                        <Text className="underline text-blue-400 font-bold">Sélectionner tous</Text>
                     </Button>
                 </View>
-                <View className="flex gap-5 bg-gray-400 rounded-lg py-2">
+                <View className="flex gap-5 bg-gray-200 rounded-lg py-2">
                     {attendees?.map((attendee, index) => (
                         <Button key={attendee._id} className="flex flex-row items-center justify-between px-5" onPress={() => update(index, {
                             ...attendee,
