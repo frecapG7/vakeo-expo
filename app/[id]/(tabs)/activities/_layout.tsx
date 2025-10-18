@@ -26,7 +26,7 @@ export default function TripEventsLayout() {
             <Stack.Screen name="index" options={{
                 headerLeft: () => (<View className="flex-row items-center justify-center gap-1">
                     <Text className="text-2xl font-bold dark:text-white">Activités</Text>
-                    <View className="rounded-full bg-orange-400 p-2">
+                    <View className="rounded-full bg-orange-400 dark:bg-gray-400 p-2">
                         <IconSymbol name="flame" size={20} color="black" />
                     </View>
                 </View>),
