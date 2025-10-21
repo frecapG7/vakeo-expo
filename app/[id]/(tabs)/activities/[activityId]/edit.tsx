@@ -22,12 +22,9 @@ export default function EditTripActivity() {
 
     const router = useRouter();
 
-
     const { control, reset, handleSubmit } = useForm();
 
-
     const navigation = useNavigation();
-
 
     const updateEvent = useUpdateEvent(id, activityId);
 
@@ -44,7 +41,7 @@ export default function EditTripActivity() {
     useEffect(() => {
         navigation.setOptions({
             headerRight: () =>
-                <Button onPress={handleSubmit(onSubmit)}>
+                <Button onPress={handleSubmit(onSubmit)} isLoading={updateEvent.isPending}>
                     <Text className="text-md font-bold dark:text-white">Appliquer</Text>
                 </Button>
         })
@@ -54,7 +51,7 @@ export default function EditTripActivity() {
         if (activity)
             reset({
                 ...activity,
-                attendees: trip.users.map((user) => ({
+                attendees: trip?.users.map((user) => ({
                     ...user,
                     checked: activity?.attendees.map(o => o._id).includes(user._id)
                 }))
@@ -63,10 +60,7 @@ export default function EditTripActivity() {
 
     return (
         <SafeAreaView style={styles.container}>
-
-
             <EventForm control={control} />
-
         </SafeAreaView>
     )
 }

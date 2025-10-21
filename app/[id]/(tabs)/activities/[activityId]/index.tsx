@@ -4,36 +4,41 @@ import { CalendarDayView } from "@/components/ui/CalendarDayView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
 import { useGetEvent } from "@/hooks/api/useEvents";
+import useI18nTime from "@/hooks/i18n/useI18nTime";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
+import Animated, { FadeIn } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 
 
 export default function TripActivityDetails() {
 
-
-
     const { id, activityId } = useLocalSearchParams();
-
 
     const { data: activity } = useGetEvent(id, activityId);
 
     const [openOwners, setOpenOwners] = useState(false);
 
+    const {getDayNumber, getMonthName} = useI18nTime();
 
 
     return (
         <SafeAreaView style={styles.container}>
-
-
             <View className="flex-row justify-between px-5">
                 <CalendarDayView>
+                    {!!activity?.startDate ? (
+                        <Animated.View entering={FadeIn} className="flex flex-1 items-center px-5">
+                            <Text className="text-lg">{getDayNumber(activity.startDate)}</Text>
+                            <Text className="capitalize text-xl font-bold">{getMonthName(activity.startDate)}</Text>
+                        </Animated.View>
+                    ) : 
                     <View className="flex items-center m-1">
                         <IconSymbol name="pencil" size={24} color="dark" />
                         <Text className="text-sm">Ajouter des dates</Text>
                     </View>
+                    }
                 </CalendarDayView>
 
 
@@ -42,7 +47,7 @@ export default function TripActivityDetails() {
                     <View className="flex-row items-center ">
                         {activity?.owners.map((owner) =>
                             <View key={owner._id} className="flex -ml-7 ">
-                                <Avatar src={owner.src} size2="md" alt={owner.name.charAt(0)} />
+                                <Avatar src={owner.avatar} size2="md" alt={owner.name?.charAt(0)} />
                             </View>)}
                     </View>
                     <View className="max-w-40 -ml-7">
@@ -64,7 +69,7 @@ export default function TripActivityDetails() {
                 <View className="rounded-lg bg-orange-100 dark:bg-gray-400 gap-2 px-2 py-4">
                     {activity?.attendees.map((attendee) =>
                         <View key={attendee._id} className="flex flex-row gap-2 items-center">
-                            <Avatar alt={attendee.name.charAt(0)} size2="sm" src={attendee.avatar} />
+                            <Avatar alt={attendee.name?.charAt(0)} size2="sm" src={attendee.avatar} />
                             <Text className="text-lg ">{attendee.name}</Text>
                         </View>)}
                 </View>

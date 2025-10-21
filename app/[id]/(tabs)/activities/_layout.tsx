@@ -10,7 +10,7 @@ import { Text, View } from "react-native";
 export default function TripEventsLayout() {
 
 
-    const {id} = useLocalSearchParams();
+    const { id } = useLocalSearchParams();
 
     const colors = useColors();
     const router = useRouter();
@@ -24,12 +24,13 @@ export default function TripEventsLayout() {
             headerShadowVisible: false
         }}>
             <Stack.Screen name="index" options={{
-                headerLeft: () => (<View className="flex-row items-center justify-center gap-1">
-                    <Text className="text-2xl font-bold dark:text-white">Activités</Text>
-                    <View className="rounded-full bg-orange-400 dark:bg-gray-400 p-2">
-                        <IconSymbol name="flame" size={20} color="black" />
-                    </View>
-                </View>),
+                headerLeft: () => (
+                    <View className="flex-row items-center justify-center gap-1">
+                        <Text className="text-2xl font-bold dark:text-white">Activités</Text>
+                        <View className="rounded-full bg-orange-400 dark:bg-gray-400 p-2">
+                            <IconSymbol name="flame" size={20} color="black" />
+                        </View>
+                    </View>),
                 headerRight: () => (
                     <Button variant="contained"
                         className="p-2 rounded-full ringed"
@@ -51,9 +52,9 @@ export default function TripEventsLayout() {
             }}
             />
             <Stack.Screen name="[activityId]" options={{
-                headerShown: true,
+                headerShown: false,
                 headerStyle: {
-                    backgroundColor: colors.background
+                    backgroundColor: colors.background,
                 }
 
             }} />

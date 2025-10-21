@@ -11,6 +11,15 @@ const formatDate = (
   }
   return Intl.DateTimeFormat("fr-FR", options).format(new Date(date));
 };
+const formatDate2 = (
+  date,
+  options
+) => {
+  if (!date) {
+    return "";
+  }
+  return Intl.DateTimeFormat("fr-FR", options).format(new Date(date));
+};
 
 const formatHour = (date, format) => {
   if (!date) return "";
@@ -31,11 +40,44 @@ const formatDay = (date) => {
   }).format(new Date(date));
 };
 
+
+
+const getDayName = (date) => {
+  return formatDate2(date, {
+    weekday: "long"
+  });
+}
+
+const getDayNumber = (date) => {
+  return formatDate2(date, {
+    day: "2-digit"
+  });
+}
+
+const getMonthName = (date) => {
+  return formatDate2(date, {
+    month: "long"
+  });
+}
+
+const getTime = (date) => {
+  return formatDate2(date, {
+    hour: "2-digit",
+    minute: "2-digit"
+  })
+}
+
+
+
 export default () => {
   //TODO: use locale
   return {
     formatDate,
     formatHour,
     formatDay,
+    getDayName,
+    getDayNumber,
+    getMonthName,
+    getTime
   };
 };
