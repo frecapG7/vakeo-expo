@@ -22,8 +22,6 @@ export default function NewTripActivity() {
 
     const postEvent = usePostEvent(String(id));
 
-
-
     const { me } = useContext(TripContext);
 
     const { control, setValue, handleSubmit } = useForm({
@@ -44,22 +42,6 @@ export default function NewTripActivity() {
             checked: true
         })));
     }, [trip, setValue]);
-
-
-    // useEffect(() => {
-    //     const v = [];
-    //     v.push({
-    //         _id: me._id,
-    //         name: me?.name,
-    //         avatar: me?.avatar
-    //     });
-    //     setValue("owners", v);
-    //     // setValue("owners", [{
-    //     //     _id: me?._id,
-    //     //     name: me._name
-    //     // }]);
-    // }, [me, setValue]);
-
 
     const onSubmit = async (data) => {
         await postEvent.mutateAsync({

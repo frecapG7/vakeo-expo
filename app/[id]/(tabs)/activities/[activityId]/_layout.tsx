@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useGetEvent } from "@/hooks/api/useEvents";
-import useColors from "@/hooks/styles/useColors";
-import { Stack, useLocalSearchParams, useNavigation, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { View } from "react-native";
 
 
@@ -17,21 +16,6 @@ export default function TripActivityDetailLayout() {
     const { data: activity } = useGetEvent(id, activityId);
 
     const router = useRouter();
-
-
-    const colors = useColors();
-
-    const navigation = useNavigation();
-
-
-    // useEffect(() => {
-
-    //     navigation.setOptions({
-    //         title: activity?.name,
-
-    //     })
-    // }, [navigation, activity]);
-
 
     return (
         <Stack screenOptions={{ headerShown: true }}>

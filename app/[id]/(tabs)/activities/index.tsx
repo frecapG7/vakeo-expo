@@ -1,4 +1,5 @@
 import { EventListItem } from "@/components/events/EventListItem";
+import { Button } from "@/components/ui/Button";
 import { CalendarDayView } from "@/components/ui/CalendarDayView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
@@ -18,15 +19,13 @@ const DayItem = ({ date, trip }: { date: Date, trip: any }) => {
 
     const { formatDate, getDayName, getDayNumber, getMonthName } = useI18nTime();
 
-
-    const { data } = useGetEvents(trip._id, {
+    const { data, hasNextPage, fetchNextPage } = useGetEvents(trip._id, {
         type: "ACTIVITY",
-        startDate: date,
-        endDate: dayjs(date).endOf("day")
+        startDate: dayjs(date).toISOString(),
+        endDate: dayjs(date).endOf("day").toISOString()
     })
 
 
-    // TODO: handle pagination if there 
     const events = useMemo(() => data?.pages.flatMap((page) => page.events), [data]);
 
     return (
@@ -48,28 +47,31 @@ const DayItem = ({ date, trip }: { date: Date, trip: any }) => {
             </View>
             <View className="flex flex-1">
                 {events?.length === 0 &&
-
                     <Animated.View className="flex-1 items-center">
                         <View className="bg-dark dark:bg-gray-200 h-10 w-md"></View>
                         <Text>rien</Text>
                     </Animated.View>
-
                 }
+                {events?.map((event, index) => (
+                    <View key={event?._id}>
+                        <EventListItem event={event} />
+                    </View>
+                ))}
+                {hasNextPage &&
+                    <View className="flex-1 justify-center">
+                        <Button onPress={() => fetchNextPage()} title="Voir plus" variant="contained" />
+                    </View>}
             </View>
         </View>
 
     )
 }
 
-
-
-
-
 export default function TripActivities() {
 
     const { id } = useLocalSearchParams();
     const { data: trip } = useGetTrip(id);
-    const { data } = useGetEvents(id, {
+    const { data, hasNextPage, fetchNextPage } = useGetEvents(id, {
         type: "ACTIVITY"
     });
 
@@ -96,30 +98,36 @@ export default function TripActivities() {
             </View>
 
             {listStyle === "" &&
-                <Animated.FlatList
-                    data={events}
-                    renderItem={({ item }) =>
-                        <EventListItem event={item} onPress={() => router.navigate({
-                            pathname: "/[id]/(tabs)/activities/[activityId]",
-                            params: { id: String(id), activityId: item._id }
-                        })} />
-                    }
-                    keyExtractor={(item) => item?._id}
-                    contentContainerClassName="flex rounded-lg p-2"
-                    ListEmptyComponent={
-                        <View className="my-5 flex-1 flex-grow justify-center">
-                            <Text className="text-2xl dark:text-white">
-                                Aucune activité
-                            </Text>
-                        </View>
-                    }
-                />
+                <Animated.View entering={SlideInUp} exiting={SlideInDown}>
+                    <Animated.FlatList
+                        data={events || []}
+                        renderItem={({ item }) =>
+                            <EventListItem event={item} onPress={() => router.navigate({
+                                pathname: "/[id]/(tabs)/activities/[activityId]",
+                                params: { id: String(id), activityId: item._id }
+                            })} />
+                        }
+                        keyExtractor={(item) => item?._id}
+                        contentContainerClassName="flex rounded-lg p-2"
+                        ListEmptyComponent={
+                            <View className="my-5 flex-1 flex-grow justify-center">
+                                <Text className="text-2xl dark:text-white">
+                                    Aucune activité
+                                </Text>
+                            </View>
+                        }
+                        onEndReached={() => {
+                            if (hasNextPage)
+                                fetchNextPage();
+                        }}
+                    />
+                </Animated.View>
             }
 
 
             {listStyle === "perDay" &&
                 <Animated.View entering={SlideInUp} exiting={SlideInDown}>
-                    <Animated.FlatList data={getDatesBetween(trip.startDate, trip.endDate, true)}
+                    <Animated.FlatList data={trip ? getDatesBetween(trip.startDate, trip.endDate, true) : []}
                         keyExtractor={(item) => item}
                         renderItem={({ item, index }) =>
                             <DayItem date={item} trip={trip} />

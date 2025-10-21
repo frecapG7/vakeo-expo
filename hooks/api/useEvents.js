@@ -12,11 +12,11 @@ const search = async (tripId, params) => {
 export const useGetEvents = (tripId, params) => {
 
     return useInfiniteQuery({
-        queryKey: ["trips", tripId, "events"],
+        queryKey: ["trips", tripId, "events", params],
         queryFn: ({ pageParam }) => search(tripId, {
             cursor: pageParam,
-            limit: 25,
-            ...pageParam
+            limit: 5,
+            ...params
         }),
         getNextPageParam: (lastPage) => lastPage?.nextCursor,
         enabled: !!tripId

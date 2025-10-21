@@ -116,8 +116,6 @@ export const EventForm = ({ control, }: {
                 </Text>
                 <FormText control={control} name="name" rules={{ required: true }} />
             </View>
-
-
             <View className="my-2">
                 <Text className="text-lg font-bold italic ml-5 dark:text-white">
                     Dates
@@ -137,7 +135,6 @@ export const EventForm = ({ control, }: {
                         <Text>{endDate ? getTime(endDate) : "-"}</Text>
                     </Pressable>
                 </View>
-                {/* <FormDateTimePicker control={control} name="startDate" rules={{ required: false }} /> */}
             </View>
 
             <View className="flex-1 mt-1 gap-2">

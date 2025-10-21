@@ -52,7 +52,7 @@ export const EventListItem = ({ event,
 
             <View className="flex w-24">
                 <View className="flex-row items-center justify-start gap-1">
-                    <IconSymbol name="calendar" size={16}/>
+                    <IconSymbol name="calendar" size={16} color="black"/>
                     <Text className="text-sm">{event.startDate ? formatDate(event.startDate, {
                         day: "2-digit",
                         month: "2-digit",
@@ -60,11 +60,11 @@ export const EventListItem = ({ event,
                     }) : ""}</Text>
                 </View>
                 <View className="flex-row items-center justify-start gap-1">
-                    <IconSymbol name="clock" size={16}/>
+                    <IconSymbol name="clock" size={16} color="black"/>
                     <Text className="text-sm">{event.startDate ? `${getTime(event.startDate)}-${getTime(event.endDate)}` : "" }</Text>
                 </View>
                 <View className="flex-row items-center justify-start gap-1">
-                    <IconSymbol name="person" size={16}/>
+                    <IconSymbol name="person" size={16} color="black"/>
                     <Text className="text-sm">{event.attendees.length}</Text>
                 </View>
             </View>
