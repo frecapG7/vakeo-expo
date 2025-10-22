@@ -13,8 +13,6 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
 
-
-
 export default function TripDetailsLayout() {
 
     const router = useRouter();
@@ -31,10 +29,6 @@ export default function TripDetailsLayout() {
 
     const colors = useColors();
 
-
-
-    
-    
     
     useEffect(() => {
         if (!!storageTrip && !storageTrip.user)
@@ -67,10 +61,15 @@ export default function TripDetailsLayout() {
         }}>
             <GestureHandlerRootView>
                 <BottomSheetModalProvider>
-                    <Stack>
+                    <Stack >
                         <Stack.Screen name="(tabs)" options={{
                             headerShown: true,
                             title: trip?.name || "Mon voyage",
+                            headerLeft: () => (
+                                <Button onPress={() => router.dismissTo("/")} className="rounded-full bg-blue-200 p-2 mr-2">
+                                    <Text>Vakeo</Text>
+                                </Button>
+                            ),
                             headerRight: () => (
                                 <View className="flex flex-row gap-2 justify-end items-center mx-5">
                                     <Pressable onPress={() => router.push('./messages')}

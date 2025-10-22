@@ -1,13 +1,22 @@
 import { FormText } from "@/components/form/FormText"
 import { Button } from "@/components/ui/Button"
-import { useState } from "react"
-import { useFieldArray } from "react-hook-form"
-import { Text, View } from "react-native"
+import useI18nTime from "@/hooks/i18n/useI18nTime"
+import DateTimePicker from "@react-native-community/datetimepicker"
+import dayjs from "dayjs"
+import { useMemo, useState } from "react"
+import { useController, useFieldArray } from "react-hook-form"
+import { Pressable, Text, View } from "react-native"
 import AnimatedCheckbox from "react-native-checkbox-reanimated"
 import Animated from "react-native-reanimated"
 import { PickUsersModal } from "../modals/PickUsersModal"
 import { Avatar } from "../ui/Avatar"
 import { IconSymbol } from "../ui/IconSymbol"
+
+const buildDateTime = (date, time) => {
+    return new Date(date.toISOString().split("T")[0] + "T" + time.toISOString().split("T")[1]);
+}
+
+
 
 export const EventForm = ({ control, }: {
     control: any,
@@ -29,6 +38,76 @@ export const EventForm = ({ control, }: {
 
     const [editOwners, setEditOwners] = useState(false);
 
+    const { formatDate, getTime } = useI18nTime();
+
+
+    const [pickDateTime, setPickDateTime] = useState<string>("");
+    const { field: { value: startDate, onChange: setStartDate },
+        fieldState: { error: startDateError } }
+        = useController({
+            control,
+            name: "startDate",
+            defaultValue: "",
+            rules: {
+                validate: (v) => {
+                    if(!v && !!endDate)
+                        return "La date de début est obligatoire"
+                    if (v > endDate)
+                        return "La date de début est postérieure à la date de fin"
+                }
+            }
+        });
+    const { field: { value: endDate, onChange: setEndDate },
+        fieldState: { error: endDateError } } = useController({
+            control,
+            name: "endDate",
+            rules: {
+                validate: (v) => {
+                    if(!v && !!startDate)
+                        return "La date de fin est obligatoire"
+                    if (v < startDate)
+                        return "La date de fin est antérieure à la date de début"
+                },
+
+            }
+        });
+
+    const [mode, setMode] = useState("date");
+
+
+    const handleDismiss = () => {
+        if (mode === "time")
+            setMode("date")
+        else if (mode === "date")
+            setPickDateTime("");
+    }
+
+    const handleSet = (date) => {
+        let v;
+        if (mode === "date")
+            v = date;
+        else if (mode === "time")
+            if (pickDateTime === "startDate")
+                v = buildDateTime(startDate, date);
+            else
+                v = buildDateTime(endDate || startDate, date);
+
+        if (pickDateTime === "startDate")
+            setStartDate(v)
+        else
+            setEndDate(v);
+    }
+
+    const value = useMemo(() => {
+        let v;
+        if(pickDateTime === "startDate")
+            v = startDate;
+        else if (pickDateTime === "endDate")
+            v = endDate;
+
+        return dayjs(v).toDate() || new Date();
+    }, [startDate, endDate, pickDateTime])
+
     return (
         <Animated.ScrollView style={{ flex: 1 }} className="flex flex-grow">
             <View className="flex ">
@@ -37,17 +116,35 @@ export const EventForm = ({ control, }: {
                 </Text>
                 <FormText control={control} name="name" rules={{ required: true }} />
             </View>
+            <View className="my-2">
+                <Text className="text-lg font-bold italic ml-5 dark:text-white">
+                    Dates
+                </Text>
+                <View className={`flex-row grow bg-gray-200 rounded-lg ${(startDateError || endDateError) && "border border-red-400"}`}>
+                    <Pressable className="grow items-center active:opacity-75 py-0.5" onPress={() => {
+                        setMode("date");
+                        setPickDateTime("startDate");
 
+                    }}>
+                        <Text>{startDate ? formatDate(startDate) : "Début"}</Text>
+                        <Text>{startDate ? getTime(startDate) : "-"}</Text>
+                    </Pressable>
+                    <View className="w-0.5 my-1 bg-black" />
+                    <Pressable className="grow items-center active:opacity-75 py-0.5" onPress={() => setPickDateTime("endDate")}>
+                        <Text>{endDate ? formatDate(endDate) : "Fin"}</Text>
+                        <Text>{endDate ? getTime(endDate) : "-"}</Text>
+                    </Pressable>
+                </View>
+            </View>
 
-
-            <View className="flex-1 mt-5 gap-2">
+            <View className="flex-1 mt-1 gap-2">
                 <View className="flex flex-row justify-between" >
                     <Text className="text-lg font-bold  italic ml-5 dark:text-white">
                         Responsables
                     </Text>
 
                 </View>
-                <View className="flex gap-5 bg-gray-400 rounded-lg py-2 ">
+                <View className="flex gap-5 bg-gray-200 rounded-lg py-2 ">
                     {owners?.map((owner, index) => (
                         <View key={owner._id} className="flex flex-row items-center justify-between px-5" onPress={() => updateOwner(index, {
                             ...owner,
@@ -56,8 +153,8 @@ export const EventForm = ({ control, }: {
                                 <Avatar src={owner.avatar} alt={owner.name.charAt(0)} size2="sm" />
                                 <Text className="text-lg font-bold">{owner.name}</Text>
                             </View>
-                            <Button onPress={() => remove(index)} className="bg-gray-700 rounded-full p-2">
-                                <IconSymbol name="trash" color="white" />
+                            <Button onPress={() => remove(index)} className="bg-red-500 dark:bg-gray-700 rounded-full p-2">
+                                <IconSymbol name="trash" size={20} color="white" />
                             </Button>
                         </View>
                     ))}
@@ -68,9 +165,9 @@ export const EventForm = ({ control, }: {
                 </View>
             </View>
 
-            <View className="flex-1 mt-5 gap-2">
+            <View className="flex-1 mt-5 ">
                 <View className="flex flex-row justify-between" >
-                    <Text className="text-lg font-bold  italic ml-5 dark:text-white">
+                    <Text className="text-lg font-bold italic ml-5 dark:text-white">
                         Participants
                     </Text>
                     <Button
@@ -78,12 +175,12 @@ export const EventForm = ({ control, }: {
                             ...f,
                             checked: true
                         }))}>
-                        <Text className="p-2 underline text-blue-400 font-bold">Sélectionner tous</Text>
+                        <Text className="underline text-blue-400 font-bold">Sélectionner tous</Text>
                     </Button>
                 </View>
-                <View className="flex gap-5 bg-gray-400 rounded-lg py-2">
+                <View className="flex gap-5 bg-gray-200 rounded-lg py-2">
                     {attendees?.map((attendee, index) => (
-                        <Button key={attendee.id} className="flex flex-row items-center justify-between px-5" onPress={() => update(index, {
+                        <Button key={attendee._id} className="flex flex-row items-center justify-between px-5" onPress={() => update(index, {
                             ...attendee,
                             checked: !attendee.checked
                         })}>
@@ -119,6 +216,29 @@ export const EventForm = ({ control, }: {
                         append(user);
                 }} />
 
+            {!!pickDateTime &&
+
+                <DateTimePicker
+                    is24Hour
+                    testID="dateTimePicker"
+                    value={value}
+                    mode={mode}
+                    display="default"
+                    onChange={(event, date) => {
+                        if (event.type === "dismissed")
+                            handleDismiss()
+                        else if (event.type === "set") {
+                            handleSet(date);
+                            if (mode === "date")
+                                setMode("time")
+                            else
+                                setPickDateTime("")
+                        }
+                    }}
+                    minimumDate={dayjs().subtract(6, "month").toDate()}
+                    maximumDate={dayjs().add(6, "month").toDate()}
+                />
+            }
         </Animated.ScrollView>
     )
 }

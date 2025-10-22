@@ -96,9 +96,7 @@ export default function EditUserPage() {
 
                 <BottomSheet ref={bottomSheetRef}
                     index={-1}
-                    handleStyle={{
-
-                    }}
+                
                     backgroundStyle={{
                         backgroundColor: colors.background,
                         ...styles.bottomSheet
@@ -106,7 +104,7 @@ export default function EditUserPage() {
                     enablePanDownToClose={true}
                     onChange={() => console.log("What to do?")}
                 >
-                    <BottomSheetScrollView contentContainerStyle={styles.bottomSheet}>
+                    <BottomSheetScrollView>
                         <View className="flex flex-row flex-wrap gap-5 justify-center">
                             {avatars.map((v, index) =>
                                 <Pressable key={index} onPress={() => {

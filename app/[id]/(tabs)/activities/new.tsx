@@ -1,66 +1,76 @@
+import { EventForm } from "@/components/events/EventForm";
 import { Button } from "@/components/ui/Button";
-import { usePostActivity } from "@/hooks/api/useActivities";
+import styles from "@/constants/Styles";
+import { TripContext } from "@/context/TripContext";
+import { usePostEvent } from "@/hooks/api/useEvents";
 import { useGetTrip } from "@/hooks/api/useTrips";
-import { useStyles } from "@/hooks/styles/useStyles";
-import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import { useEffect } from "react";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
+import { useContext, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { View } from "react-native";
-import Animated from "react-native-reanimated";
-import { ActivityForm } from "./components/ActivityForm";
+import { Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Toast } from "toastify-react-native";
 
 
 
-export default function NewActivity() {
+
+export default function NewTripActivity() {
 
 
     const { id } = useLocalSearchParams();
-    const { data: trip } = useGetTrip(id)
-    const { control, handleSubmit, setValue } = useForm({
+    const { data: trip } = useGetTrip(id);
 
-    });
+    const postEvent = usePostEvent(String(id));
 
-    const navigation = useNavigation();
+    const { me } = useContext(TripContext);
 
-    const router = useRouter();
-    const postActivity = usePostActivity(id);
+    const { control, setValue, handleSubmit } = useForm({
+        defaultValues: {
+            name: "",
+            attendees: [],
+            owners: [],
+            type: "ACTIVITY"
 
-    const onSubmit = async (data: any) => {
-        postActivity.mutateAsync({
-            ...data,
-            users: data.users.filter((user: any) => user.value).map((user: any) => user.id)
-        })
-        router.navigate(`/trips/${id}/activities`);
-
-        // Here you would typically handle the form submission, e.g., send data to an API
-    }
-    navigation.setOptions({
-        headerTitle: "Nouvelle activité",
-        headerBackTitle: "Retour",
-        headerRight: () => <Button
-            onPress={handleSubmit(onSubmit)}
-            title="Terminer"
-
-        />
+        }
     });
 
     useEffect(() => {
-        if (trip)
-            setValue("users", trip.users.map(user => ({
-                id: user.id,
-                name: user.name,
-                value: true
-            })));
+        setValue("attendees", trip?.users.map(user => ({
+            _id: user._id,
+            name: user.name,
+            avatar: user.avatar,
+            checked: true
+        })));
     }, [trip, setValue]);
 
-    const { container } = useStyles();
+    const onSubmit = async (data) => {
+        await postEvent.mutateAsync({
+            ...data,
+            attendees: data.attendees.filter(attendee => attendee.checked)
+        });
+        router.back();
+        Toast.success("Nouvelle activité ajoutée");
 
+    }
+
+    const navigation = useNavigation();
+
+    useEffect(() => {
+        navigation.setOptions({
+            headerRight: () =>
+                <Button className="flex" onPress={handleSubmit(onSubmit)} isLoading={postEvent.isPending}>
+                    <Text className="text-lg dark:text-white">
+                        Ajouter
+                    </Text>
+                </Button>
+
+        })
+    })
     return (
-        <Animated.ScrollView style={container}>
-            <View className="px-10">
-                <ActivityForm control={control} />
+        <SafeAreaView style={styles.container}>
+            <View className="flex-1">
+                <EventForm control={control} />
             </View>
-
-        </Animated.ScrollView>
-    );
+        </SafeAreaView>
+    )
 }

@@ -35,10 +35,7 @@ export const useUpdateTrip = (tripId) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data) => updateTrip(tripId, data),
-    onSuccess: (data) => queryClient.setQueryData({
-      queryKey: ['trips', tripId],
-      data
-    })
+    onSuccess: async () => await queryClient.invalidateQueries(['trips', tripId])
   })
 }
 

@@ -12,7 +12,6 @@ export default function ItemDetailsLayout() {
     const { id } = useLocalSearchParams();
 
 
- 
     return (
 
         <Tabs>
@@ -32,7 +31,7 @@ export default function ItemDetailsLayout() {
             <Tabs.Screen
                 name="activities"
                 options={{
-                    href: "/[id]/activities",
+                    href: "./activities",
                     tabBarIcon: ({ color }) => <IconSymbol name="flame" color={color} />,
                     headerShown: false,
                     title: "Les activités",
@@ -58,7 +57,7 @@ export default function ItemDetailsLayout() {
                     ),
                     title: "Calendrier",
                 }} />
-          
+
             <Tabs.Screen name="links"
                 options={{
                     href: null
@@ -72,6 +71,8 @@ export default function ItemDetailsLayout() {
                     </Pressable>,
                     title: "Les courses",
                 }} />
+
+
         </Tabs >
 
 

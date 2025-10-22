@@ -30,7 +30,7 @@ export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src , ...pro
 
     if (!src)
         return (
-            <View className={`justify-center items-center rounded-full border-2 ${sizeClass} dark:border-white bg-gray-400`}>
+            <View className={`justify-center items-center rounded-full border-2 ${sizeClass} dark:border-white bg-orange-200 dark:bg-gray-400`}>
                 <Text className="font-bold uppercase ">{alt}</Text>
             </View>
         )
