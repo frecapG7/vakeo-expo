@@ -18,53 +18,33 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const data = [
     {
-        "name": "Icon 2",
-        "uri": "https://picsum.photos/seed/501/3000/1000"
+        "name": "Camping car",
+        "uri": "https://storage.googleapis.com/vakeo_dev/theme/camping%20car.png"
     },
     {
-        "name": "Icon 3",
-        "uri": "https://picsum.photos/seed/502/3000/1000"
+        "name": "Chalet",
+        "uri": "https://storage.googleapis.com/vakeo_dev/theme/chalet.png"
     },
     {
-        "name": "Icon 4",
-        "uri": "https://picsum.photos/seed/503/3000/1000"
+        "name": "Escalade",
+        "uri": "https://storage.googleapis.com/vakeo_dev/theme/escalade.png"
     },
     {
-        "name": "Icon 5",
-        "uri": "https://picsum.photos/seed/504/3000/1000"
+        "name": "Hiver",
+        "uri": "https://storage.googleapis.com/vakeo_dev/theme/hiver.png"
     },
     {
-        "name": "Icon 6",
-        "uri": "https://picsum.photos/seed/505/3000/1000"
+        "name": "Maison",
+        "uri": "https://storage.googleapis.com/vakeo_dev/theme/maison.png"
     },
     {
-        "name": "Icon 7",
-        "uri": "https://picsum.photos/seed/506/3000/1000"
+        "name": "Plage",
+        "uri": "https://storage.googleapis.com/vakeo_dev/theme/plage.png"
     },
     {
-        "name": "Icon 8",
-        "uri": "https://picsum.photos/seed/507/3000/1000"
+        "name": "Soiree",
+        "uri": "https://storage.googleapis.com/vakeo_dev/theme/soiree.png"
     },
-    {
-        "name": "Icon 9",
-        "uri": "https://picsum.photos/seed/508/3000/1000"
-    },
-    {
-        "name": "Icon 10",
-        "uri": "https://picsum.photos/seed/509/3000/1000"
-    },
-    {
-        "name": "Icon 11",
-        "uri": "https://picsum.photos/seed/510/3000/1000"
-    },
-    {
-        "name": "Icon 12",
-        "uri": "https://picsum.photos/seed/511/3000/1000"
-    },
-    {
-        "name": "Icon 13",
-        "uri": "https://picsum.photos/seed/512/3000/1000"
-    }
 ]
 
 
@@ -135,9 +115,7 @@ export default function NewTripPage() {
                         onPress={() => bottomSheetRef.current?.expand()}
                         className="flex bg-gray-200 p-1 rounded-lg w-20 h-20">
                         <Image source={value}
-                            style={{
-                                flex: 1,
-                            }}
+                            style={styles.image}
                             contentFit="cover" />
                     </Button>
                     <FormText control={control}
@@ -201,11 +179,8 @@ export default function NewTripPage() {
 
                 <BottomSheet ref={bottomSheetRef}
                     index={-1}
-                    handleStyle={{
-
-                    }}
                     backgroundStyle={{
-                        backgroundColor: colors.background,
+                        backgroundColor: colors.neutral,
                         ...styles.bottomSheet
                     }}
                     enablePanDownToClose={true}
@@ -220,13 +195,13 @@ export default function NewTripPage() {
                                         onChange(item.uri);
                                         bottomSheetRef.current?.close();
                                     }}
-                                    className={`p-1 rounded-lg  ${item.uri === value ? "bg-blue-400" : ""}`}
+                                    className={`p-1 rounded-xl ${item.uri === value ? "bg-blue-400" : ""}`}
                                 >
                                     <Image
                                         style={{
-                                            flex: 1,
+                                            ...styles.image,
                                             width: 100,
-                                            height: 100
+                                            height: 100,
                                         }}
                                         source={item.uri}
                                         contentFit="cover"

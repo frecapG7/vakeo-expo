@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useGetEvent } from "@/hooks/api/useEvents";
+import useColors from "@/hooks/styles/useColors";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { View } from "react-native";
 
@@ -17,10 +18,15 @@ export default function TripActivityDetailLayout() {
 
     const router = useRouter();
 
+    const colors = useColors();
+
     return (
         <Stack screenOptions={{ headerShown: true }}>
             <Stack.Screen name="index" options={{
                 title: activity?.name,
+                headerStyle: {
+                    backgroundColor: colors.background,
+                },
                 headerShadowVisible: false,
                 headerRight: () => (
                     <View>

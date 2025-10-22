@@ -1,7 +1,7 @@
 import { FormText } from "@/components/form/FormText";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import Styles from "@/constants/Styles";
+import { default as styles } from "@/constants/Styles";
 import { useGetStorageTrips } from "@/hooks/storage/useStorageTrips";
 import useColors from "@/hooks/styles/useColors";
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
@@ -9,11 +9,10 @@ import { Image } from "expo-image";
 import { useNavigation, useRouter } from "expo-router";
 import { useEffect, useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { LinearTransition, ZoomIn } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 
 export default function HomePage() {
 
@@ -48,7 +47,7 @@ export default function HomePage() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <GestureHandlerRootView style={Styles.container}>
+      <GestureHandlerRootView style={styles.container}>
         <View className="h-20 mx-5 mb-5">
           <Text className="dark:text-white ml-5">Rechercher</Text>
           <FormText label="Rechercher"
@@ -75,7 +74,11 @@ export default function HomePage() {
                 onPress={() => router.push(`./${item._id}`)}>
                 <View className="flex flex-row gap-1 items-center">
                   <Image
-                    style={styles.image}
+                    style={{
+                      ...styles.image,
+                      maxWidth: 75,
+                      height: 60
+                    }}
                     source={item.image}
                     contentFit="cover"
                     transition={1000}
@@ -97,19 +100,16 @@ export default function HomePage() {
 
         <BottomSheet ref={bottomSheetRef}
           index={-1}
-          handleStyle={{
-
-          }}
           backgroundStyle={{
-            backgroundColor: colors.background,
-            ...Styles.bottomSheet
+            backgroundColor: colors.neutral,
+            ...styles.bottomSheet
           }}>
-          <BottomSheetView style={styles.bottomContainer}>
+          <BottomSheetView style={{flex: 1}}>
             <View className="flex flex-col gap-2 m-2 pb-5">
               <Button onPress={() => bottomSheetRef.current?.close()}>
                 <IconSymbol name="xmark.circle" color={colors.text} />
               </Button>
-              <Button className="flex bg-purple-200 dark:bg-gray-200 p-2 rounded-lg flex-row items-center gap-2" onPress={() => {
+              <Button className="flex bg-orange-300 dark:bg-gray-200 p-2 rounded-lg flex-row items-center gap-2" onPress={() => {
                 router.push("./new");
                 bottomSheetRef.current?.close();
               }}>
@@ -146,25 +146,3 @@ export default function HomePage() {
 
 
 }
-
-
-
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 10
-  },
-  bottomContainer: {
-    flex: 1,
-    // padding: 10,
-    // alignItems: 'center',
-  },
-  image: {
-    flex: 1,
-    maxWidth: 75,
-    height: 60,
-    // width: 150,
-    backgroundColor: '#0553'
-  }
-})

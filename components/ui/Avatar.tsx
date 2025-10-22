@@ -43,6 +43,7 @@ export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src , ...pro
                     flex: 1,
                     width: "100%",
                     height: "100%",
+                    borderRadius: 100
                 }}
                 placeholder={{ blurhash }}
                 contentFit="cover"
