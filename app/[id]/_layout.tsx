@@ -1,18 +1,19 @@
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetTrip, useGetTripUser, useShareTrip } from "@/hooks/api/useTrips";
 import { useGetStorageTrip } from "@/hooks/storage/useStorageTrips";
 import useColors from "@/hooks/styles/useColors";
 import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from "@gorhom/bottom-sheet";
 import * as Clipboard from 'expo-clipboard';
+import { Image } from "expo-image";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
-
 export default function TripDetailsLayout() {
 
     const router = useRouter();
@@ -66,8 +67,14 @@ export default function TripDetailsLayout() {
                             headerShown: true,
                             title: trip?.name || "Mon voyage",
                             headerLeft: () => (
-                                <Button onPress={() => router.dismissTo("/")} className="rounded-full bg-blue-200 p-2 mr-2">
-                                    <Text>Vakeo</Text>
+                                <Button onPress={() => router.dismissTo("/")} className="rounded-full">
+                                    <Image style={{
+                                        ...styles.image,
+                                        width: 35,
+                                        height: 35,
+                                    }}
+                                    source={trip?.image}
+                                    contentFit="cover"/>
                                 </Button>
                             ),
                             headerRight: () => (
@@ -109,13 +116,13 @@ export default function TripDetailsLayout() {
                         ref={bottomSheetModalRef}
                         onChange={handleSheetChanges}
                         backgroundStyle={{
-                            backgroundColor: colors.background
+                            backgroundColor: colors.neutral
                         }}
                     >
                         <BottomSheetView style={{ flex: 1, padding: 10, minHeight: 150 }}>
                             <View className="flex flex-grow gap-5 p-1 divide-y-5 divide-solid dark:divide-white">
                                 <Button onPress={handleShare} className="flex flex-row gap-5 items-center" isLoading={shareTrip.isPending}>
-                                    <View className="bg-gray-200 rounded-full p-2">
+                                    <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
                                         {shareTrip.isPending ?
                                             (
                                                 <Animated.View entering={FadeIn} exiting={FadeOut}>
@@ -133,7 +140,7 @@ export default function TripDetailsLayout() {
                                     <Text className="text-lg dark:text-white">Partager le voyage</Text>
                                 </Button>
                                 <Button onPress={() => console.log("toto")} className="flex flex-row items-center gap-5">
-                                    <View className="bg-gray-200 rounded-full p-2">
+                                    <View className="bg-red-400 dark:bg-gray-200 rounded-full p-2">
                                         <IconSymbol name="trash" size={30} />
                                     </View>
                                     <Text className="text-lg dark:text-white">Supprimer le voyage</Text>
