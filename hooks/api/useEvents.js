@@ -15,7 +15,7 @@ export const useGetEvents = (tripId, params) => {
         queryKey: ["trips", tripId, "events", params],
         queryFn: ({ pageParam }) => search(tripId, {
             cursor: pageParam,
-            limit: 5,
+            limit: 25,
             ...params
         }),
         getNextPageParam: (lastPage) => lastPage?.nextCursor,

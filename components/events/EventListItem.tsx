@@ -34,7 +34,7 @@ export const EventListItem = ({ event,
 
 
     return (
-        <Pressable className="active:opacity-75 bg-orange-200 dark:bg-gray-200 my-5 p-2 rounded-lg flex-row justify-between gap-2"
+        <Pressable className="active:opacity-75 bg-orange-200 dark:bg-gray-200 p-2 rounded-lg flex-row justify-between gap-2"
             onPress={onPress}
             onLongPress={onLongPress}>
                 <View>

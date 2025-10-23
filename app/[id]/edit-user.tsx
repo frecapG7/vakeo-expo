@@ -5,7 +5,7 @@ import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useUpdateTripUser } from "@/hooks/api/useTrips";
 import useColors from "@/hooks/styles/useColors";
-import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext, useEffect, useRef } from "react";
 import { useController, useForm, useWatch } from "react-hook-form";
@@ -16,13 +16,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 
 const avatars = [
-    "https://avatar.iran.liara.run/public/50",
-    "https://avatar.iran.liara.run/public/18",
-    "https://avatar.iran.liara.run/public/30",
-    "https://avatar.iran.liara.run/public/55",
-    "https://avatar.iran.liara.run/public/60",
-    "https://avatar.iran.liara.run/public/90",
-    "https://avatar.iran.liara.run/public/30",
+    "https://storage.googleapis.com/vakeo_dev/avatar/chat.png",
+    "https://storage.googleapis.com/vakeo_dev/avatar/chien.png",
+    "https://storage.googleapis.com/vakeo_dev/avatar/dauphin.png",
+    "https://storage.googleapis.com/vakeo_dev/avatar/fille%20noir.png",
+    "https://storage.googleapis.com/vakeo_dev/avatar/garcon%20noir.png",
+    "https://storage.googleapis.com/vakeo_dev/avatar/fille.png",
+    "https://storage.googleapis.com/vakeo_dev/avatar/garcon.png",
+    "https://storage.googleapis.com/vakeo_dev/avatar/papie.png",
+    "https://storage.googleapis.com/vakeo_dev/avatar/famille.png",
 
 
 ];
@@ -98,24 +100,29 @@ export default function EditUserPage() {
                     index={-1}
                 
                     backgroundStyle={{
-                        backgroundColor: colors.background,
+                        backgroundColor: colors.neutral,
                         ...styles.bottomSheet
                     }}
                     enablePanDownToClose={true}
                     onChange={() => console.log("What to do?")}
                 >
-                    <BottomSheetScrollView>
-                        <View className="flex flex-row flex-wrap gap-5 justify-center">
-                            {avatars.map((v, index) =>
-                                <Pressable key={index} onPress={() => {
-                                    onChange(v);
+                    <BottomSheetFlatList
+                        data={avatars}
+                         keyExtractor={(i) => i}
+                         contentContainerStyle={{
+                            flexDirection: "row",
+                            flexWrap: "wrap",
+                            gap: 5,
+                            justifyContent:"center"
+                         }}
+                         renderItem={({item: avatar}) => (
+                             <Pressable onPress={() => {
+                                    onChange(avatar);
                                     bottomSheetRef.current?.close()
                                 }}>
-                                    <Avatar src={v} size2="xl" />
+                                    <Avatar src={avatar} size2="xl" />
                                 </Pressable>
-                            )}
-                        </View>
-                    </BottomSheetScrollView>
+                            )}/>
                 </BottomSheet>
             </GestureHandlerRootView>
         </SafeAreaView>

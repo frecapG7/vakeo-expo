@@ -12,6 +12,10 @@ const styles = StyleSheet.create({
         flex: 1,
         // padding: 36,
         // alignItems: 'center'
+    },
+    image: {
+        flex: 1,
+        borderRadius: 10
     }
 });
 
