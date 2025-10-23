@@ -22,6 +22,10 @@ const data = [
         "uri": "https://storage.googleapis.com/vakeo_dev/theme/camping%20car.png"
     },
     {
+        "name": "Bateau",
+        "uri": "https://storage.googleapis.com/vakeo_dev/theme/bateau.png"
+    },
+    {
         "name": "Chalet",
         "uri": "https://storage.googleapis.com/vakeo_dev/theme/chalet.png"
     },
@@ -30,9 +34,10 @@ const data = [
         "uri": "https://storage.googleapis.com/vakeo_dev/theme/escalade.png"
     },
     {
-        "name": "Hiver",
-        "uri": "https://storage.googleapis.com/vakeo_dev/theme/hiver.png"
+        "name": "Cafe",
+        "uri": "https://storage.googleapis.com/vakeo_dev/theme/cafe.png"
     },
+    
     {
         "name": "Maison",
         "uri": "https://storage.googleapis.com/vakeo_dev/theme/maison.png"
@@ -40,6 +45,10 @@ const data = [
     {
         "name": "Plage",
         "uri": "https://storage.googleapis.com/vakeo_dev/theme/plage.png"
+    },
+    {
+        "name": "Hiver",
+        "uri": "https://storage.googleapis.com/vakeo_dev/theme/hiver.png"
     },
     {
         "name": "Soiree",

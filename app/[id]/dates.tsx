@@ -129,7 +129,7 @@ export default function EditTripDatePage() {
                     dayTextColor: colors.text,
                     textSectionTitleDisabledColor: '#d9e1e8',
                     selectedDayBackgroundColor: '#00adf5',
-                    selectedDayTextColor: '#ffffff',
+                    selectedDayTextColor: colors.primary,
                     todayTextColor: '#00adf5',
                     todayBackgroundColor: '#a2daf1ff',
                     textDisabledColor: '#828485ff',
@@ -152,7 +152,7 @@ export default function EditTripDatePage() {
                         [dayjs(startDate)?.format("YYYY-MM-DD")]: {
                             startingDay: true,
                             color: colors.primary,
-                            textColor: colors.text,
+                            textColor: colors.neutral,
                             selected: true,
                             disableTouchEvent: true
                         }
@@ -161,7 +161,7 @@ export default function EditTripDatePage() {
                         [dayjs(endDate)?.format("YYYY-MM-DD")]: {
                             endingDay: true,
                             color: colors.primary,
-                            textColor: colors.text,
+                            textColor: colors.neutral,
                             selected: true,
                             disableTouchEvent: true
                         }

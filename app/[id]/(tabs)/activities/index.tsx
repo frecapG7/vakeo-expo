@@ -1,140 +1,96 @@
 import { EventListItem } from "@/components/events/EventListItem";
-import { Button } from "@/components/ui/Button";
-import { CalendarDayView } from "@/components/ui/CalendarDayView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
 import { useGetEvents } from "@/hooks/api/useEvents";
 import { useGetTrip } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
-import { getDatesBetween } from "@/lib/utils";
 import dayjs from "dayjs";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import Animated, { SlideInDown, SlideInUp } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 
-const DayItem = ({ date, trip }: { date: Date, trip: any }) => {
+const showDay = (previous?: any, current?: any) => {
+    if (!current?.startDate)
+        return false;
+    if (!previous?.startDate)
+        return true;
+    return !dayjs(previous.startDate).isSame(dayjs(current.startDate), 'day');
 
-    const { formatDate, getDayName, getDayNumber, getMonthName } = useI18nTime();
-
-    const { data, hasNextPage, fetchNextPage } = useGetEvents(trip._id, {
-        type: "ACTIVITY",
-        startDate: dayjs(date).toISOString(),
-        endDate: dayjs(date).endOf("day").toISOString()
-    })
-
-
-    const events = useMemo(() => data?.pages.flatMap((page) => page.events), [data]);
-
-    return (
-        <View className="my-2">
-            <View className="w-20 ">
-                <CalendarDayView>
-                    <View className="flex items-center justify-center">
-                        <Text className="text-xs uppercase">
-                            {getDayName(date)}
-                        </Text>
-                        <Text className="text-md font-bold">
-                            {getDayNumber(date)}
-                        </Text>
-                        <Text className="text-xs capitalize">
-                            {getMonthName(date)}
-                        </Text>
-                    </View>
-                </CalendarDayView>
-            </View>
-            <View className="flex flex-1">
-                {events?.length === 0 &&
-                    <Animated.View className="flex-1 items-center">
-                        <View className="bg-dark dark:bg-gray-200 h-10 w-md"></View>
-                        <Text>rien</Text>
-                    </Animated.View>
-                }
-                {events?.map((event, index) => (
-                    <View key={event?._id}>
-                        <EventListItem event={event} />
-                    </View>
-                ))}
-                {hasNextPage &&
-                    <View className="flex-1 justify-center">
-                        <Button onPress={() => fetchNextPage()} title="Voir plus" variant="contained" />
-                    </View>}
-            </View>
-        </View>
-
-    )
 }
+
 
 export default function TripActivities() {
 
     const { id } = useLocalSearchParams();
     const { data: trip } = useGetTrip(id);
+    const [sort, setSort] = useState("createdAt");
     const { data, hasNextPage, fetchNextPage } = useGetEvents(id, {
-        type: "ACTIVITY"
+        type: "ACTIVITY",
+        sort
     });
 
     const router = useRouter();
+    const { formatDate } = useI18nTime();
 
-    const events = useMemo(() => data?.pages.flatMap((page) => page.events), [data]);
-
-    const [listStyle, setListStyle] = useState("");
+    const events = useMemo(() => data?.pages.flatMap((page) => page?.events), [data]);
 
     return (
         <SafeAreaView style={styles.container}>
             <View className="flex-row w-full justify-center">
                 <View className="rounded-full flex-row border bg-orange-200 dark:bg-gray-500">
-                    <Pressable className={`${listStyle === "" && "bg-orange-400 dark:bg-gray-200"} flex rounded-l-full p-2 px-7 items-center`}
-                        onPress={() => setListStyle("")}>
+                    <Pressable className={`${sort === "createdAt" ? "bg-orange-400 dark:bg-gray-200" : ""} flex rounded-l-full p-2 px-7 items-center`}
+                        onPress={() => setSort("createdAt")}>
                         <IconSymbol name="list.bullet" size={20} color="black" />
                     </Pressable>
                     <View className="w-0.5 dark:bg-black" />
-                    <Pressable className={`${listStyle === "perDay" && "bg-orange-400 dark:bg-gray-300"} flex rounded-r-full p-2 px-7 items-center`}
-                        onPress={() => setListStyle("perDay")}>
+                    <Pressable className={`${sort === "startDate" ? "bg-orange-400 dark:bg-gray-300" : ""} flex rounded-r-full p-2 px-7 items-center`}
+                        onPress={() => setSort("startDate")}>
                         <IconSymbol name="calendar" size={20} color="black" />
                     </Pressable>
                 </View>
             </View>
 
-            {listStyle === "" &&
-                <Animated.View entering={SlideInUp} exiting={SlideInDown}>
-                    <Animated.FlatList
-                        data={events || []}
-                        renderItem={({ item }) =>
-                            <EventListItem event={item} onPress={() => router.navigate({
-                                pathname: "/[id]/(tabs)/activities/[activityId]",
-                                params: { id: String(id), activityId: item._id }
-                            })} />
-                        }
-                        keyExtractor={(item) => item?._id}
-                        contentContainerClassName="flex rounded-lg p-2"
-                        ListEmptyComponent={
-                            <View className="my-5 flex-1 flex-grow justify-center">
-                                <Text className="text-2xl dark:text-white">
-                                    Aucune activité
-                                </Text>
-                            </View>
-                        }
-                        onEndReached={() => {
-                            if (hasNextPage)
-                                fetchNextPage();
-                        }}
-                    />
-                </Animated.View>
-            }
+
+            <Animated.FlatList
+                data={events || []}
+                renderItem={({ item, index, }) =>
+                    // <Animated.View entering={SlideInUp} exiting={SlideInDown} className="flex">
+                    <View className="flex">
+                        {showDay(events[index - 1], item) &&
+                            <Text className="ml-2 font-bold dark:text-white capitalize">
+                                {formatDate(item.startDate, {
+                                    weekday: "long",
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric"
+                                })}
+                            </Text>}
+                        <EventListItem event={item} onPress={() => router.navigate({
+                            pathname: "/[id]/(tabs)/activities/[activityId]",
+                            params: { id: String(id), activityId: item._id }
+                        })} />
+                    </View>
+                }
+                keyExtractor={(item) => item?._id}
+                contentContainerClassName="flex rounded-lg p-2 gap-5"
+                ListEmptyComponent={
+                    <View className="my-5 flex-1 flex-grow justify-center">
+                        <Text className="text-2xl dark:text-white">
+                            Aucune activité
+                        </Text>
+                    </View>
+                }
+                onEndReached={() => {
+                    if (hasNextPage)
+                        fetchNextPage();
+                }}
+            />
 
 
-            {listStyle === "perDay" &&
-                <Animated.View entering={SlideInUp} exiting={SlideInDown}>
-                    <Animated.FlatList data={trip ? getDatesBetween(trip.startDate, trip.endDate, true) : []}
-                        keyExtractor={(item) => item}
-                        renderItem={({ item, index }) =>
-                            <DayItem date={item} trip={trip} />
-                        }
-                    />
-                </Animated.View>
-            }
+
         </SafeAreaView>
     )
 }

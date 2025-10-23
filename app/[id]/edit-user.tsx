@@ -23,6 +23,8 @@ const avatars = [
     "https://storage.googleapis.com/vakeo_dev/avatar/garcon%20noir.png",
     "https://storage.googleapis.com/vakeo_dev/avatar/fille.png",
     "https://storage.googleapis.com/vakeo_dev/avatar/garcon.png",
+    "https://storage.googleapis.com/vakeo_dev/avatar/papie.png",
+    "https://storage.googleapis.com/vakeo_dev/avatar/famille.png",
 
 
 ];
@@ -110,7 +112,7 @@ export default function EditUserPage() {
                          contentContainerStyle={{
                             flexDirection: "row",
                             flexWrap: "wrap",
-                            gap: 15,
+                            gap: 5,
                             justifyContent:"center"
                          }}
                          renderItem={({item: avatar}) => (
