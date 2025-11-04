@@ -53,34 +53,46 @@ export default function ItemDetails() {
     return (
         <SafeAreaView style={Styles.container}>
             <View className="flex flex-row justify-between items-center px-5 my-5">
-                <Button onPress={() => router.push("./dates")} >
-                    <CalendarDayView>
-                        {!!trip?.startDate ? (
-                            <View className="px-5 pb-2 flex items-center">
-                                <Text className="text-2xl">
-                                    {formatDate(trip?.startDate, {
-                                        day: "numeric",
-                                        month: "long",
-                                    })}
-                                </Text>
-                                <Text className="text-xl font-bold">-</Text>
-                                <Text className="text-2xl">
-                                    {formatDate(trip?.endDate, {
-                                        day: "numeric",
-                                        month: "long"
-                                    })}
-                                </Text>
-                            </View>) :
-                            (<Animated.View entering={ZoomIn} exiting={ZoomOut} >
-                                <View className="flex items-center m-1">
-                                    <IconSymbol name="pencil" size={24} color="dark" />
-                                    <Text className="text-sm">Ajouter des dates</Text>
-                                </View>
-                            </Animated.View>)
-                        }
 
-                    </CalendarDayView>
-                </Button>
+                <View className="gap-1">
+                    <Button onPress={() => router.push("./dates")} >
+                        <CalendarDayView>
+                            {!!trip?.startDate ? (
+                                <View className="px-5 pb-2 flex items-center">
+                                    <Text className="text-2xl">
+                                        {formatDate(trip?.startDate, {
+                                            day: "numeric",
+                                            month: "long",
+                                        })}
+                                    </Text>
+                                    <Text className="text-xl font-bold">-</Text>
+                                    <Text className="text-2xl">
+                                        {formatDate(trip?.endDate, {
+                                            day: "numeric",
+                                            month: "long"
+                                        })}
+                                    </Text>
+                                </View>) :
+                                (<Animated.View entering={ZoomIn} exiting={ZoomOut} >
+                                    <View className="flex items-center m-1">
+                                        <IconSymbol name="pencil" size={24} color="dark" />
+                                        <Text className="text-sm">Ajouter des dates</Text>
+                                    </View>
+                                </Animated.View>)
+                            }
+
+                        </CalendarDayView>
+                    </Button>
+
+                    <Button variant="contained"
+                     title="Voter"
+                      onPress={() => router.navigate({
+                        pathname: "/[id]/votes",
+                        params: {
+                            id
+                        }
+                      })}/>
+                </View>
 
                 <Button
                     className="flex items-center justify-center"
@@ -125,7 +137,7 @@ export default function ItemDetails() {
                     className="bg-orange-100 dark:bg-gray-100 rounded-lg p-2"
                 />
             </View>
-            
+
             {/* 
             <View className="mt-10">
                 <Text className="text-2xl ">A venir</Text>

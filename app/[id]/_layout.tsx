@@ -30,12 +30,12 @@ export default function TripDetailsLayout() {
 
     const colors = useColors();
 
-    
+
     useEffect(() => {
         if (!!storageTrip && !storageTrip.user)
             router.navigate('./pick-user');
     }, [router, storageTrip]);
-    
+
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
     // callbacks
@@ -45,7 +45,7 @@ export default function TripDetailsLayout() {
     const handleSheetChanges = useCallback((index: number) => {
         console.log('handleSheetChanges', index);
     }, []);
-    
+
     const handleShare = async () => {
         const { value } = await shareTrip.mutateAsync();
         await Clipboard.setStringAsync(`https://todo.com/token/${value}`);
@@ -65,16 +65,16 @@ export default function TripDetailsLayout() {
                     <Stack >
                         <Stack.Screen name="(tabs)" options={{
                             headerShown: true,
-                            title: trip?.name || "Mon voyage",
+                            title: trip?.name,
                             headerLeft: () => (
                                 <Button onPress={() => router.dismissTo("/")} className="rounded-full">
                                     <Image style={{
                                         ...styles.image,
-                                        width: 35,
-                                        height: 35,
+                                        width: 50,
+                                        height: 50,
                                     }}
-                                    source={trip?.image}
-                                    contentFit="cover"/>
+                                        source={trip?.image}
+                                        contentFit="cover" />
                                 </Button>
                             ),
                             headerRight: () => (
@@ -110,6 +110,10 @@ export default function TripDetailsLayout() {
                             options={{
                                 presentation: "modal",
                                 title: "Dates du séjour"
+                            }} />
+                        <Stack.Screen name="votes"
+                            options={{
+                                title: "Votes"
                             }} />
                     </Stack>
                     <BottomSheetModal
