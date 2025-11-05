@@ -2,9 +2,12 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { CalendarDayView } from "@/components/ui/CalendarDayView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { LinearProgress } from "@/components/ui/LinearProgress";
 import Styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetTrip } from "@/hooks/api/useTrips";
+import { useGetVotes } from "@/hooks/api/useVotes";
+import useI18nNumbers from "@/hooks/i18n/useI18nNumbers";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import useColors from "@/hooks/styles/useColors";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -41,13 +44,18 @@ export default function ItemDetails() {
     const { id } = useLocalSearchParams();
     const { data: trip } = useGetTrip(String(id));
 
+    const { data: votePage } = useGetVotes(id, {
+        status: "OPEN"
+    });
     const router = useRouter();
 
     const { me } = useContext(TripContext);
 
     const { formatDate } = useI18nTime();
+    const { formatPercent } = useI18nNumbers();
 
     const colors = useColors();
+
 
 
     return (
@@ -84,14 +92,17 @@ export default function ItemDetails() {
                         </CalendarDayView>
                     </Button>
 
-                    <Button variant="contained"
-                     title="Voter"
-                      onPress={() => router.navigate({
-                        pathname: "/[id]/votes",
-                        params: {
-                            id
-                        }
-                      })}/>
+                    {votePage?.totalResults === 0 &&
+
+                        <Button variant="contained"
+                            title="Voter"
+                            onPress={() => router.navigate({
+                                pathname: "/[id]/votes",
+                                params: {
+                                    id
+                                }
+                            })} />
+                    }
                 </View>
 
                 <Button
@@ -102,6 +113,39 @@ export default function ItemDetails() {
                     <Avatar src={me?.avatar} alt={me?.name?.charAt(0)} size2="lg" />
                     <Text className="font-bold text-lg dark:text-white">{me?.name}</Text>
                 </Button>
+            </View>
+
+            <View className="my-5 px-2">
+                <View className="flex-row justify-between items-end">
+                    <Text className="text-2xl dark:text-white font-bold pl-2">
+                        Vote en cours
+                    </Text>
+                </View>
+                {votePage?.votes?.filter(v => v.status === "OPEN").map((vote) => {
+
+                    const progress = trip?.users.length > 0 ? vote.voters.length / trip.users.length : 0;
+                    return (
+                        <View key={vote._id} className="rounded-lg bg-orange-200 dark:bg-gray-200 p-2 ">
+                            <View className="flex-row justify-between items-end">
+                                <Text>Depuis 2 semaine</Text>
+                                <Text className="font-bold ">{formatPercent(progress)}</Text>
+                            </View>
+                            <LinearProgress progress={progress} />
+                            <Button onPress={() => router.navigate({
+                                pathname: "/[id]/votes/[voteId]",
+                                params: {
+                                    id,
+                                    voteId: vote._id
+                                }
+                            })}
+                                className="bg-blue-400 rounded-lg items-center shadow-lg w-40 mt-1 self-center">
+                                <Text className="uppercase align-center text-white font-bold">Voter</Text>
+                            </Button>
+                        </View>
+                    );
+
+                })}
+
             </View>
 
 

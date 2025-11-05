@@ -11,11 +11,11 @@ describe("formatRange test", () => {
     });
     it("test des cas avec des plages de dates", async () => {
 
-        const { formatRange } = useI18nTime();
+        const { formatRange } = useI18nTime(); 
+        expect(formatRange("2025-11-01T00:00:00", "2026-11-10T00:00:00")).toBe("samedi 1 novembre 2025 - mardi 10 novembre 2026");
         expect(formatRange("2025-11-01T00:00:00", "2025-11-01T01:00:00")).toBe("samedi 1 novembre");
-        expect(formatRange("2025-11-01T00:00:00", "2025-11-10T00:00:00")).toBe("samedi 1 – lundi 10 novembre");
-        expect(formatRange("2025-11-01T00:00:00", "2025-12-10T00:00:00")).toBe("samedi 1 novembre – mercredi 10 décembre");
-        expect(formatRange("2025-11-01T00:00:00", "2026-11-10T00:00:00")).toBe("samedi 1 novembre 2025 – mardi 10 novembre 2026");
+        expect(formatRange("2025-11-01T00:00:00", "2025-11-10T00:00:00")).toBe("samedi 1 - lundi 10 novembre");
+        expect(formatRange("2025-11-01T00:00:00", "2025-12-10T00:00:00")).toBe("samedi 1 novembre - mercredi 10 décembre");
     });
     it("test des cas de même dates", async () => {
 

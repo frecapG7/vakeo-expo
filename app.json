@@ -14,7 +14,7 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       },
-       "icon": {
+      "icon": {
         "dark": "./assets/images/ios-dark.png",
         "light": "./assets/images/ios-light.png",
         "tinted": "./assets/images/ios-tinted.png"
@@ -41,6 +41,7 @@
           "image": "./assets/images/splash.png",
           "backgroundColor": "#7BDCB5",
           "dark": {
+            "image": "./assets/images/splash-dark.png",
             "backgroundColor": "#000000"
           },
           "imageWidth": 200

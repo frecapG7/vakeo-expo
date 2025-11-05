@@ -1,4 +1,5 @@
 import useColors from "@/hooks/styles/useColors";
+// import '@formatjs/intl-relativetimeformat/polyfill';
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import * as Sentry from '@sentry/react-native';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";

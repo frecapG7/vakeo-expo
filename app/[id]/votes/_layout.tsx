@@ -1,15 +1,16 @@
 import { Stack } from "expo-router";
 
-
-
 export default function TripVotesLayout() {
 
     return (
         <Stack screenOptions={{
-            headerShown: false
+            title: "Votes"
         }}>
-            <Stack.Screen name="index" />
-            <Stack.Screen name="[voteId]" />
+            <Stack.Screen name="index"  />
+            <Stack.Screen name="[voteId]" options={{
+                title: "Voter",
+                headerShown: false
+            }} />
         </Stack>
     )
 }

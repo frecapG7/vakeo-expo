@@ -70,21 +70,21 @@ export default function HomePage() {
             keyExtractor={(item) => item._id}
             renderItem={({ item, separators }) =>
               <Button
-                className="flex flex-row justify-between items-center bg-orange-100 dark:bg-gray-100 px-2 py-5 rounded-lg"
+                className="flex flex-row justify-between items-center bg-orange-100 dark:bg-gray-100 px-5 py-2 rounded-lg"
                 onPress={() => router.push(`./${item._id}`)}>
                 <View className="flex flex-row gap-1 items-center">
                   <Image
                     style={{
                       ...styles.image,
                       maxWidth: 75,
-                      height: 60
+                      height: 80
                     }}
                     source={item.image}
                     contentFit="cover"
                     transition={1000}
                   />
                   <View className="flex flex-col">
-                    <Text className="text-lg font-bold">{item.name}</Text>
+                    <Text className="text-2xl font-bold">{item.name}</Text>
                   </View>
                 </View>
                 <View>

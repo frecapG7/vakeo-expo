@@ -6,9 +6,9 @@ export default function VoteDetailsLayout() {
 
 
     return (
-        <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="index" />
-        </Stack>
+        <Stack screenOptions={{
+             title:"Quelles dates?"
+        }}/>
     )
 
 }

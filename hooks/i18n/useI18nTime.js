@@ -1,3 +1,8 @@
+
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
+
 const formatDate = (
   date,
   options = {
@@ -44,11 +49,56 @@ const formatDay = (date) => {
 const formatRange = (startDate, endDate, options) => {
   if (!startDate || !endDate)
     return "";
-  return Intl.DateTimeFormat("fr-FR", {
-    weekday: "long", 
-    month: "long", // Affiche le mois en entier
-    day: "numeric", // Affiche le jour du mois
-  }).formatRange(new Date(startDate), new Date(endDate));
+
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const diff = end - start;
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const months = Math.floor(diff / (1000 * 60 * 60 * 24 * 30));
+  const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
+
+
+  if (days < 1)
+    return formatDate2(start, {
+      weekday: "long",
+      day: "numeric",
+      month: "long"
+    })
+  if (months < 1)
+    return `${formatDate2(start, {
+      weekday: "long",
+      day: "numeric"
+    })} - ${formatDate2(end, {
+      weekday: "long",
+      day: "numeric",
+      month: "long"
+    })}`;
+
+  if (years < 1)
+    return `${formatDate2(start, {
+      weekday: "long",
+      day: "numeric",
+      month: "long"
+    })} - ${formatDate2(end, {
+      weekday: "long",
+      day: "numeric",
+      month: "long"
+    })}`;
+
+
+  return `${formatDate2(start, {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  })} - ${formatDate2(end, {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  })}`;
+
+
 }
 
 
@@ -78,44 +128,22 @@ const getTime = (date) => {
 }
 
 
-// Create an instance of Intl.RelativeTimeFormat
-const rtf = new Intl.RelativeTimeFormat("fr", { numeric: "auto" });
+
 
 // Helper function to calculate relative time
-export const formatDuration = (startDate, endDate = new Date() ) => {
-  if(!startDate)
+const formatDuration = (startDate, endDate = new Date()) => {
+  if (!startDate)
     return "";
-  const diff = new Date(endDate) - new Date(startDate);
 
-  const seconds = Math.floor(diff / 1000);
-  const minutes = Math.floor(diff / (1000 * 60));
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const weeks = Math.floor(diff / (1000 * 60 * 60 * 24 * 7));
-  const months = Math.floor(diff / (1000 * 60 * 60 * 24 * 30));
-  const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
-
-  if (seconds < 60) {
-    return rtf.format(-seconds, "second");
-  } else if (minutes < 60) {
-    return rtf.format(-minutes, "minute");
-  } else if (hours < 24) {
-    return rtf.format(-hours, "hour");
-  } else if (days < 7) {
-    return rtf.format(-days, "day");
-  } else if (weeks < 4) {
-    return rtf.format(-weeks, "week");
-  } else if (months < 12) {
-    return rtf.format(-months, "month");
-  } else {
-    return rtf.format(-years, "year");
-  }
+  return dayjs(startDate).from(dayjs(endDate))
 };
 
 
 
 export default () => {
   //TODO: use locale
+
+  dayjs.locale("fr");
   return {
     formatDate,
     formatHour,

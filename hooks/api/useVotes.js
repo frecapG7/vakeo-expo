@@ -101,8 +101,18 @@ const getVotes = async (tripId, params) => {
                 "updatedAt": "2025-11-03T08:55:05.306Z",
                 "__v": 1,
                 "voters": [
-                    "68cbc08aced392b9d0b86c86",
-                    "68cbc08aced392b9d0b86c87"
+                    {
+                        "_id": "68cbc08aced392b9d0b86c86",
+                        "name": "Moi",
+                        "avatar": "",
+                        "__v": 0
+                    },
+                    {
+                        "_id": "68cbc08aced392b9d0b86c87",
+                        "name": "Tome",
+                        "avatar": "",
+                        "__v": 0
+                    }
                 ]
             }
         ]
@@ -168,11 +178,24 @@ const getVote = async (tripId, voteId) => {
                         }
                     ],
                     "_id": "69086de924523241f182f187"
+                },
+                {
+                    "startDate": "2025-11-26T00:00:00.000Z",
+                    "endDate": "2025-11-29T23:59:59.999Z",
+                    "users": [
+                        {
+                            "_id": "68cbc08aced392b9d0b86c86",
+                            "name": "Moi",
+                            "avatar": "",
+                            "__v": 0
+                        }
+                    ],
+                    "_id": "690b6dbcfccf3dad033e2410"
                 }
             ],
             "createdAt": "2025-11-03T08:47:36.912Z",
-            "updatedAt": "2025-11-03T08:55:05.306Z",
-            "__v": 1,
+            "updatedAt": "2025-11-05T15:31:08.117Z",
+            "__v": 2,
             "voters": [
                 {
                     "_id": "68cbc08aced392b9d0b86c86",
