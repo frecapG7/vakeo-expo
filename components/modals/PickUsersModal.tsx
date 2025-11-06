@@ -16,14 +16,17 @@ export const PickUsersModal = ({
     onClose,
     users = [],
     onClick,
-    disabled = false }:
+    disabled = false,
+    hideCheckbox = false
+}
+    :
     {
         open: boolean,
         onClose: () => void,
         users: [],
         onClick?: (user: any, index: number) => void,
-        disabled?: boolean
-
+        disabled?: boolean,
+        hideCheckbox?: boolean
     }) => {
 
 
@@ -51,12 +54,13 @@ export const PickUsersModal = ({
                         data={users}
                         renderItem={({ item, index }) =>
                             <Pressable className="flex flex-row justify-between items-center p-2"
-                                onPress={async () => await onClick(item, index)}>
+                                onPress={async () => await onClick(item, index)}
+                                disabled={disabled}>
                                 <View className="flex flex-row gap-2 items-center">
                                     <Avatar alt={item.name.charAt(0)} size2="md" src={item.avatar} />
                                     <Text className="text-lg ">{item.name}</Text>
                                 </View>
-                                {!disabled &&
+                                {!hideCheckbox &&
 
                                     <View className="w-10 h-10">
                                         <AnimatedCheckbox checked={item.checked}

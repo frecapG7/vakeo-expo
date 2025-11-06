@@ -3,7 +3,7 @@ import useColors from "@/hooks/styles/useColors";
 import { getDatesBetween } from "@/lib/utils";
 import { getPercent } from "@/lib/voteUtils";
 import dayjs from "dayjs";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useFieldArray, useWatch } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import { CalendarList, DateData } from "react-native-calendars";
@@ -13,7 +13,17 @@ interface CustomDayProps extends DayProps {
 }
 
 
-const CustomDay: React.FC<CustomDayProps> = ({ date, marking, onPress, theme }: { date: DateData, marking?: any, onPress: (day: any) => void, theme ?: any }) => {
+const setResult = (date, prevResult, user, options) => {
+    const result = prevResult[date.format("YYYY-MM-DD")] || {
+        voters: [],
+        ...options
+    };
+    result.voters?.push(user);
+    return result;
+}
+
+
+const CustomDay: React.FC<CustomDayProps> = ({ date, marking, onPress, theme }: { date: DateData, marking?: any, onPress: (day: any) => void, theme?: any }) => {
 
     const { formatPercent } = useI18nNumbers();
 
@@ -34,13 +44,16 @@ const CustomDay: React.FC<CustomDayProps> = ({ date, marking, onPress, theme }: 
 }
 
 
-export const DatesVoteForm = ({ control, user }: { control: any, user: any }) => {
+export const DatesVoteForm = ({ control, user, disabled = false }: { control: any, user: any, disabled: boolean }) => {
 
     const colors = useColors();
 
     const { fields: votes, append } = useFieldArray({
         control,
-        name: "votes"
+        name: "votes",
+        rules: {
+            minLength: 1
+        }
     });
     const [selectedStartDate, setSelectedStartDate] = useState();
 
@@ -56,8 +69,10 @@ export const DatesVoteForm = ({ control, user }: { control: any, user: any }) =>
     }, [voters]);
 
 
+    const calendarRef = useRef();
+
     const markedDays = useMemo(() => {
-        const result = {};
+        let result = {};
 
         if (!!selectedStartDate) {
             result[selectedStartDate.format("YYYY-MM-DD")] = {
@@ -71,6 +86,18 @@ export const DatesVoteForm = ({ control, user }: { control: any, user: any }) =>
         }
 
         votes.forEach((vote) => {
+
+            // result = setResult(dayjs(vote.startDate), result, user, {
+            //     startingDay: true,
+            //     selected: true,
+            //     color: colors.primary,
+            //     textColor: colors.neutral,
+            //     disableTouchEvent: true,
+            //     nbOfVotes: vote.users.length,
+            //     percent: getPercent(vote.users.length, nbOfVoters)
+
+            // })
+            
             result[dayjs(vote.startDate)?.format("YYYY-MM-DD")] = {
                 startingDay: true,
                 selected: true,
@@ -111,9 +138,16 @@ export const DatesVoteForm = ({ control, user }: { control: any, user: any }) =>
 
 
 
+    useEffect(() => {
+        console.log("toto")
+        calendarRef.current?.scrollToDay(new Date(), 0, true);
+    }, [calendarRef, votes])
+
+
     return (
         <View>
             <CalendarList
+                ref={calendarRef}
                 theme={{
                     backgroundColor: colors.background,
                     calendarBackground: colors.background,
@@ -134,7 +168,7 @@ export const DatesVoteForm = ({ control, user }: { control: any, user: any }) =>
                 }}
                 // onDayPress={({ dateString }) => onDayPress && onDayPress(dayjs(dateString))}
                 markingType="period"
-                minDate={dayjs().toISOString()}
+                // minDate={dayjs(Math.min(votes?.map(v => v.startDate)) || "").toISOString()}
                 // minDate={start ? start : now.toISOString()}
                 // Max amount of months allowed to scroll to the past. Default = 50
                 pastScrollRange={6}
@@ -146,6 +180,8 @@ export const DatesVoteForm = ({ control, user }: { control: any, user: any }) =>
                 showScrollIndicator={true}
                 markedDates={markedDays}
                 onDayPress={({ dateString }) => {
+                    if (disabled)
+                        return;
                     if (!selectedStartDate)
                         setSelectedStartDate(dayjs(dateString).startOf("day"))
                     else {

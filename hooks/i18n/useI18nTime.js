@@ -62,7 +62,8 @@ const formatRange = (startDate, endDate, options) => {
     return formatDate2(start, {
       weekday: "long",
       day: "numeric",
-      month: "long"
+      month: "long",
+      year: "numeric"
     })
   if (months < 1)
     return `${formatDate2(start, {
@@ -71,7 +72,8 @@ const formatRange = (startDate, endDate, options) => {
     })} - ${formatDate2(end, {
       weekday: "long",
       day: "numeric",
-      month: "long"
+      month: "long",
+      year: "numeric"
     })}`;
 
   if (years < 1)
@@ -82,7 +84,8 @@ const formatRange = (startDate, endDate, options) => {
     })} - ${formatDate2(end, {
       weekday: "long",
       day: "numeric",
-      month: "long"
+      month: "long",
+      year: "numeric"
     })}`;
 
 

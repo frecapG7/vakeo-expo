@@ -79,6 +79,7 @@ export default function TripActivityDetails() {
                 onClose={() => setOpenOwners(false)}
                 users={activity?.owners}
                 disabled
+                hideCheckbox
             />
         </SafeAreaView>
     )

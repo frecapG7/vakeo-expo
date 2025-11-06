@@ -9,7 +9,11 @@ export default function TripVotesLayout() {
             <Stack.Screen name="index"  />
             <Stack.Screen name="[voteId]" options={{
                 title: "Voter",
-                headerShown: false
+                headerShown: true
+            }} />
+            <Stack.Screen name="new" options={{
+                title: "Nouveau vote",
+                headerShown: true
             }} />
         </Stack>
     )

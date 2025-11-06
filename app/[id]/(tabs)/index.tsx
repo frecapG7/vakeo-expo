@@ -2,7 +2,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { CalendarDayView } from "@/components/ui/CalendarDayView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { LinearProgress } from "@/components/ui/LinearProgress";
+import { VoteListItem } from "@/components/votes/VoteListItem";
 import Styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetTrip } from "@/hooks/api/useTrips";
@@ -13,7 +13,7 @@ import useColors from "@/hooks/styles/useColors";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext } from "react";
 import { Text, View } from "react-native";
-import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut, SlideInDown, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 
@@ -45,7 +45,8 @@ export default function ItemDetails() {
     const { data: trip } = useGetTrip(String(id));
 
     const { data: votePage } = useGetVotes(id, {
-        status: "OPEN"
+        status: "OPEN",
+        limit: 3
     });
     const router = useRouter();
 
@@ -91,18 +92,6 @@ export default function ItemDetails() {
 
                         </CalendarDayView>
                     </Button>
-
-                    {votePage?.totalResults === 0 &&
-
-                        <Button variant="contained"
-                            title="Voter"
-                            onPress={() => router.navigate({
-                                pathname: "/[id]/votes",
-                                params: {
-                                    id
-                                }
-                            })} />
-                    }
                 </View>
 
                 <Button
@@ -115,53 +104,74 @@ export default function ItemDetails() {
                 </Button>
             </View>
 
-            <View className="my-5 px-2">
-                <View className="flex-row justify-between items-end">
-                    <Text className="text-2xl dark:text-white font-bold pl-2">
-                        Vote en cours
-                    </Text>
-                </View>
-                {votePage?.votes?.filter(v => v.status === "OPEN").map((vote) => {
+            <Animated.View entering={FadeIn}
+                exiting={FadeOut}
+                className="my-5 px-2 rounded-lg p-1 pb-5">
 
-                    const progress = trip?.users.length > 0 ? vote.voters.length / trip.users.length : 0;
-                    return (
-                        <View key={vote._id} className="rounded-lg bg-orange-200 dark:bg-gray-200 p-2 ">
-                            <View className="flex-row justify-between items-end">
-                                <Text>Depuis 2 semaine</Text>
-                                <Text className="font-bold ">{formatPercent(progress)}</Text>
-                            </View>
-                            <LinearProgress progress={progress} />
-                            <Button onPress={() => router.navigate({
-                                pathname: "/[id]/votes/[voteId]",
-                                params: {
-                                    id,
-                                    voteId: vote._id
-                                }
-                            })}
-                                className="bg-blue-400 rounded-lg items-center shadow-lg w-40 mt-1 self-center">
-                                <Text className="uppercase align-center text-white font-bold">Voter</Text>
+                <View>
+                    <Text className="text-2xl dark:text-white font-bold">Votes</Text>
+                </View>
+                {votePage?.totalResults === 0 &&
+                    <Animated.View entering={SlideInDown}
+                        exiting={SlideInDown}
+                        className="flex-row items-end justify-between">
+                        <Text className="dark:text-white">Ajouter un vote ?</Text>
+                        <View className="flex-row items-center gap-2">
+                            <Button className="border bg-blue-400 rounded-full p-1"
+                                onPress={() => router.navigate({
+                                    pathname: "/[id]/votes/new?type=DATES",
+                                    params: {
+                                        id,
+                                    },
+
+                                })}>
+                                <IconSymbol name="calendar" color={colors.text} />
+                            </Button>
+                            <Button className="border bg-blue-400 rounded-full p-1"
+                                onPress={() => console.log("TODO")}>
+                                <IconSymbol name="house.fill" color={colors.text} />
                             </Button>
                         </View>
-                    );
+                    </Animated.View>
 
-                })}
+                }
 
+                {votePage?.votes?.map((vote) =>
+                    <View key={vote._id}>
+                        <VoteListItem
+                            vote={vote}
+                            trip={trip}
+                            user={me}
+                            onClick={() =>
+                                router.push({
+                                    pathname: "/[id]/votes/[voteId]",
+                                    params: {
+                                        id,
+                                        voteId: vote._id
+                                    }
+                                })
+                            } />
+                    </View>
+                )}
+
+            </Animated.View>
+
+            <View className="px-2">
+                <Text className="text-2xl dark:text-white font-bold">Maison</Text>
+                {/* <IconSymbol name="house.fill" size={34} color="white" /> */}
+                {!trip?.housing &&
+                    <Animated.View className="" >
+                        <Text className="font-bold text-md dark:text-white">
+                            Vous n'avez pas encore ajouté de maison
+                        </Text>
+                    </Animated.View>
+                }
             </View>
 
 
-            <View className="mt-5 px-2">
-                <View className="flex flex-row justify-between px-2">
-                    <Text className="text-2xl dark:text-white font-bold">Prochaine activité</Text>
-                    <Button onPress={() => console.log("todo")}>
-                        <IconSymbol name="plus.circle" size={30} color={colors.text} />
-                    </Button>
-                </View>
-                <View className="bg-orange-100 dark:bg-gray-100 rounded-lg p-2">
-                    <Text className="text-md italic">Vous n'avez aucune activité à venir</Text>
-                </View>
-            </View>
 
-            <View className="mt-5 px-2">
+
+            <View className="mt-20 px-2">
                 <View className="flex flex-row justify-between px-2">
                     <Text className="text-2xl dark:text-white font-bold">Courses</Text>
                     <Button onPress={() => console.log("todo")}>

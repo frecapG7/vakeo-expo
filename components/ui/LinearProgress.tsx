@@ -11,9 +11,9 @@ export const LinearProgress = ({ progress = 0, color = "bg-green-400" }: { progr
     return (
         <View>
             
-            <View className="w-full bg-gray-200 border rounded-lg p-1">
+            <View className="w-full bg-gray-200 rounded-lg ">
                 <View
-                    className={`h-5 bg-green-400 rounded-r-full`}
+                    className={`h-5 bg-green-400 dark:bg-gray-400 rounded-lg rounded-r-full`}
                     style={{ width: `${Math.min(progress, 1) * 100}%` }}>
                 </View>
             </View>

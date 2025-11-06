@@ -2,43 +2,41 @@ import { Button } from "@/components/ui/Button";
 import { DatesVoteForm } from "@/components/votes/dates/DatesVoteForm";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
-import { useGetVote, usePutVote } from "@/hooks/api/useVotes";
+import { usePostVote } from "@/hooks/api/useVotes";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useContext, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Text } from "react-native";
-import Animated, { ZoomIn } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Toast } from "toastify-react-native";
 
 
-export default function TripVoteEditPage() {
+export default function NewVotePage() {
 
 
-
-    const { id, voteId, disabled } = useLocalSearchParams();
-    const { data: vote } = useGetVote(id, voteId);
-    const updateVote = usePutVote(id, voteId);
-
-    const router = useRouter();
-    const { control, reset, handleSubmit } = useForm();
-
+    const { id, type } = useLocalSearchParams();
     const { me } = useContext(TripContext);
 
-    useEffect(() => {
-        reset(vote);
-    }, [vote]);
-
+    const { control, handleSubmit, reset } = useForm();
     const navigation = useNavigation();
-    const onSubmit = async (data) => {
-        await updateVote.mutateAsync(data);
-        Toast.success("Date ajoutés");
 
+
+    const router = useRouter();
+    const postVote = usePostVote(id);
+
+    const onSubmit = async (data) => {
+        if (data?.votes.length === 0) {
+            Toast.warn("STP frangin choisit au moins une date")
+            return;
+        }
+        const vote = await postVote.mutateAsync(data);
+        Toast.success("Vote créé avec succès");
         router.dismissTo({
             pathname: "/[id]/votes/[voteId]",
             params: {
                 id,
-                voteId
+                voteId: vote._id
             }
         });
     }
@@ -47,23 +45,31 @@ export default function TripVoteEditPage() {
         navigation.setOptions({
             headerRight: () =>
                 <Button className="flex"
-                    onPress={handleSubmit(onSubmit)}>
+                    onPress={handleSubmit(onSubmit)}
+                    isLoading={postVote.isPending}>
                     <Text className="text-lg dark:text-white">
                         Ajouter
                     </Text>
                 </Button>
         })
-    }, [navigation])
+    }, [navigation]);
+
+
+
+    useEffect(() => {
+        reset({
+            type,
+            createdBy: me
+        });
+    }, [type, me]);
 
     return (
         <SafeAreaView style={styles.container}>
-            {vote?.type === "DATES" &&
-                <Animated.View entering={ZoomIn} style={{ flex: 1 }}>
-                    <DatesVoteForm control={control} user={me} disabled={Boolean(disabled)} />
+            {type === "DATES" &&
+                <Animated.View entering={FadeIn}>
+                    <DatesVoteForm control={control} user={me} />
                 </Animated.View>
             }
-
         </SafeAreaView>
     )
-
 }
