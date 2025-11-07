@@ -18,7 +18,7 @@ export default function VoteDetailsLayout() {
         navigation.setOptions({
             title: vote ? getTypeLabel(vote.type) : ""
         })
-    }, [navigation]);
+    }, [navigation, vote]);
 
     return (
         <Stack screenOptions={{
