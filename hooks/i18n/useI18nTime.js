@@ -1,3 +1,8 @@
+
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
+
 const formatDate = (
   date,
   options = {
@@ -41,6 +46,64 @@ const formatDay = (date) => {
 };
 
 
+const formatRange = (startDate, endDate, options) => {
+  if (!startDate || !endDate)
+    return "";
+
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const diff = end - start;
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const months = Math.floor(diff / (1000 * 60 * 60 * 24 * 30));
+  const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
+
+
+  if (days < 1)
+    return formatDate2(start, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    })
+  if (months < 1)
+    return `${formatDate2(start, {
+      weekday: "long",
+      day: "numeric"
+    })} - ${formatDate2(end, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    })}`;
+
+  if (years < 1)
+    return `${formatDate2(start, {
+      weekday: "long",
+      day: "numeric",
+      month: "long"
+    })} - ${formatDate2(end, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    })}`;
+
+
+  return `${formatDate2(start, {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  })} - ${formatDate2(end, {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  })}`;
+
+
+}
+
 
 const getDayName = (date) => {
   return formatDate2(date, {
@@ -69,15 +132,30 @@ const getTime = (date) => {
 
 
 
+
+// Helper function to calculate relative time
+const formatDuration = (startDate, endDate = new Date()) => {
+  if (!startDate)
+    return "";
+
+  return dayjs(startDate).from(dayjs(endDate))
+};
+
+
+
 export default () => {
   //TODO: use locale
+
+  dayjs.locale("fr");
   return {
     formatDate,
     formatHour,
     formatDay,
+    formatRange,
     getDayName,
     getDayNumber,
     getMonthName,
-    getTime
+    getTime,
+    formatDuration
   };
 };

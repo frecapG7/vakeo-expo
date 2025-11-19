@@ -48,7 +48,8 @@ const MAPPING = {
   "message": "chat-bubble-outline",
   "doc.on.doc": "content-copy",
   "list.bullet" : "list" ,
-  "person": "person"
+  "person": "person",
+  "chart.bar.fill": "poll"
 } as IconMapping;
 
 /**

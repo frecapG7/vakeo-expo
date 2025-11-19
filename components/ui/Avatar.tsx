@@ -4,10 +4,11 @@ import { Text, View } from "react-native";
 const blurhash =
     '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
-type ImageSize = 'sm' | 'md' | 'lg' | 'xl';
+type ImageSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 
 const sizeToClassMap = {
+    xs: 'w-6 h-6',
     sm: 'w-8 h-8',
     md: 'w-16 h-16',
     lg: 'w-24 h-24',
@@ -15,7 +16,16 @@ const sizeToClassMap = {
 };
 
 
-export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src , ...props}: {
+const sizeToMarginMap = {
+    xs: "-mr-2",
+    sm: "-mr-5",
+    md: "-mr-6",
+    lg: "-mr-7",
+    xl: "-mr-10"
+}
+
+
+export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src, ...props }: {
     name?: string,
     size?: number,
     size2?: ImageSize
@@ -49,6 +59,33 @@ export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src , ...pro
                 contentFit="cover"
                 transition={1000}
             />
+        </View>
+    )
+}
+
+
+export const AvatarsGroup = ({ avatars = [], size2 = "sm", maxLength = 3 }: { avatars: any, size2: ImageSize, maxLength: number }) => {
+
+    const marginClass = sizeToMarginMap[size2];
+
+    return (
+        <View className="flex-row items-center">
+            {avatars?.slice(0, maxLength).map((avatar, index) =>
+                <View key={index} className={`flex ${marginClass}`}>
+                    <Avatar
+                        size2={size2}
+                        src={avatar.avatar}
+                        alt={avatar.alt}
+                    />
+                </View>
+            )}
+            {avatars?.length > maxLength && 
+            
+                <View className={`flex ${marginClass}`}>
+                    <Avatar size2={size2}
+                            alt={`+${avatars?.length - maxLength}`}/>
+                </View>
+            }
         </View>
     )
 

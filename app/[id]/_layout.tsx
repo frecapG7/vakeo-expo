@@ -14,6 +14,10 @@ import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
+
+
+
+
 export default function TripDetailsLayout() {
 
     const router = useRouter();
@@ -30,12 +34,12 @@ export default function TripDetailsLayout() {
 
     const colors = useColors();
 
-    
+
     useEffect(() => {
         if (!!storageTrip && !storageTrip.user)
             router.navigate('./pick-user');
     }, [router, storageTrip]);
-    
+
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
     // callbacks
@@ -45,7 +49,7 @@ export default function TripDetailsLayout() {
     const handleSheetChanges = useCallback((index: number) => {
         console.log('handleSheetChanges', index);
     }, []);
-    
+
     const handleShare = async () => {
         const { value } = await shareTrip.mutateAsync();
         await Clipboard.setStringAsync(`https://todo.com/token/${value}`);
@@ -62,19 +66,22 @@ export default function TripDetailsLayout() {
         }}>
             <GestureHandlerRootView>
                 <BottomSheetModalProvider>
-                    <Stack >
+                    <Stack>
                         <Stack.Screen name="(tabs)" options={{
                             headerShown: true,
-                            title: trip?.name || "Mon voyage",
+                            title: trip?.name,
+
                             headerLeft: () => (
-                                <Button onPress={() => router.dismissTo("/")} className="rounded-full">
+                                <Button onPress={() => router.dismissTo("/")}
+                                    className="">
                                     <Image style={{
                                         ...styles.image,
-                                        width: 35,
-                                        height: 35,
+                                        width: 50,
+                                        height: 50,
                                     }}
-                                    source={trip?.image}
-                                    contentFit="cover"/>
+                                        source={trip?.image}
+                                        contentFit="cover" />
+
                                 </Button>
                             ),
                             headerRight: () => (
@@ -111,6 +118,11 @@ export default function TripDetailsLayout() {
                                 presentation: "modal",
                                 title: "Dates du séjour"
                             }} />
+                        <Stack.Screen name="votes"
+                            options={{
+                                title: "Votes",
+                                headerShown: false
+                            }} />
                     </Stack>
                     <BottomSheetModal
                         ref={bottomSheetModalRef}
@@ -121,6 +133,20 @@ export default function TripDetailsLayout() {
                     >
                         <BottomSheetView style={{ flex: 1, padding: 10, minHeight: 150 }}>
                             <View className="flex flex-grow gap-5 p-1 divide-y-5 divide-solid dark:divide-white">
+                                <Button onPress={() => router.navigate({
+                                    pathname: "/[id]/votes",
+                                    params: {
+                                        id
+                                    }
+                                })}
+                                    className="flex flex-row gap-5 items-center">
+                                    <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
+                                        <IconSymbol name="chart.bar.fill" size={30} />
+                                    </View>
+                                    <Text className="text-lg dark:text-white">Voir les votes</Text>
+                                </Button>
+                                <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
+
                                 <Button onPress={handleShare} className="flex flex-row gap-5 items-center" isLoading={shareTrip.isPending}>
                                     <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
                                         {shareTrip.isPending ?
@@ -139,11 +165,12 @@ export default function TripDetailsLayout() {
                                     </View>
                                     <Text className="text-lg dark:text-white">Partager le voyage</Text>
                                 </Button>
+                                <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
                                 <Button onPress={() => console.log("toto")} className="flex flex-row items-center gap-5">
                                     <View className="bg-red-400 dark:bg-gray-200 rounded-full p-2">
                                         <IconSymbol name="trash" size={30} />
                                     </View>
-                                    <Text className="text-lg dark:text-white">Supprimer le voyage</Text>
+                                    <Text className=" text-lg dark:text-white">Supprimer le voyage</Text>
                                 </Button>
                             </View>
                         </BottomSheetView>
