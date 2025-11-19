@@ -1,6 +1,6 @@
 import { PickUsersModal } from "@/components/modals/PickUsersModal";
 import { Button } from "@/components/ui/Button";
-import { CalendarDayView } from "@/components/ui/CalendarDayView";
+import { IconSymbol } from "@/components/ui/IconSymbol";
 import { DatesVoteDetails } from "@/components/votes/dates/DatesVoteDetails";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
@@ -46,7 +46,7 @@ export default function TripVoteDetailsPage() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View className="flex-row justify-between items-center px-10">
+            <View className="flex-row justify-between items-center px-10 mb-5">
                 <View className="items-center">
                     <Text className="text-xl uppercase dark:text-white">{vote?.status === "OPEN" ? "en cours" : "terminé"}</Text>
                     <Text className="text-sm dark:text-gray-400">Depuis {formatDuration(vote?.createdAt, new Date())}</Text>
@@ -54,7 +54,8 @@ export default function TripVoteDetailsPage() {
 
                 {/* {vote?.status !== "CLOSED" && */}
                     <Animated.View entering={ZoomIn} exiting={ZoomOut}>
-                        <Button className=""
+                        <Button variant="contained"
+                        className="flex-row gap-1 items-center p-2"
                             onPress={() => router.navigate({
                                 pathname: "/[id]/votes/[voteId]/edit",
                                 params: {
@@ -62,10 +63,12 @@ export default function TripVoteDetailsPage() {
                                     voteId
                                 }
                             })}>
-                            <CalendarDayView>
+                                <IconSymbol name="calendar" color="white" />
+                                <Text className="text-white">Ouvrir le calendrier</Text>
+                            {/* <CalendarDayView>
                                 <Text className="text-sm py-5 px-1 text-center w-30"
                                     numberOfLines={2}>Ouvrir le calendrier</Text>
-                            </CalendarDayView>
+                            </CalendarDayView> */}
                         </Button>
                     </Animated.View>
 

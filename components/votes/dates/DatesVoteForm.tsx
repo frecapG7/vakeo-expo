@@ -1,6 +1,5 @@
 import useI18nNumbers from "@/hooks/i18n/useI18nNumbers";
 import useColors from "@/hooks/styles/useColors";
-import { getDatesBetween } from "@/lib/utils";
 import { getPercent } from "@/lib/voteUtils";
 import dayjs from "dayjs";
 import { useMemo, useRef, useState } from "react";
@@ -18,6 +17,7 @@ interface CustomDayProps extends DayProps {
 
 const setMarkedDay = (markedDay, previousMarkedDays) => {
 
+    debugger
     const previousMarkedDay = previousMarkedDays[markedDay?.day];
     return {
         ...previousMarkedDays,
@@ -104,71 +104,70 @@ export const DatesVoteForm = ({ control, user, disabled = false }: { control: an
 
     const calendarRef = useRef();
 
-    const markedDays = useMemo(() => {
-        let result: Record<string, any> = {};
+    // const markedDays = useMemo(() => {
+    //     let result: Record<string, any> = {};
 
-        if (!!selectedStartDate)
-            result = setMarkedDay({
-                day: selectedStartDate.format("YYYY-MM-DD"),
-                selected: true,
-                color: colors.primary,
-                textColor: colors.neutral,
-                disableTouchEvent: true,
-                nbOfVoters,
-                users: [user]
-            }, result)
-
-
-        votes.forEach((vote) => {
-            const selected = vote?.users.map(u => u._id).includes(user._id);
-
-            result = setMarkedDay({
-                day: dayjs(vote.startDate)?.format("YYYY-MM-DD"),
-                selected: selected,
-                color: colors.primary,
-                textColor: colors.neutral,
-                nbOfVoters,
-            }, result);
-
-            result = setMarkedDay({
-                day: dayjs(vote.endDate)?.format("YYYY-MM-DD"),
-                endingDay: true,
-                selected: selected,
-                color: colors.primary,
-                textColor: colors.neutral,
-                nbOfVoters,
-            }, result);
+    //     if (!!selectedStartDate)
+    //         result = setMarkedDay({
+    //             day: selectedStartDate.format("YYYY-MM-DD"),
+    //             selected: true,
+    //             color: colors.primary,
+    //             textColor: colors.neutral,
+    //             disableTouchEvent: true,
+    //             nbOfVoters,
+    //             users: [user]
+    //         }, result)
 
 
+    //     votes.forEach((vote) => {
+    //         const selected = vote?.users.map(u => u._id).includes(user._id);
 
-            getDatesBetween(vote.startDate, vote.endDate, false)
-                .filter(date => !dayjs(date).isSame(vote.startDate, "day") && !dayjs(date).isSame(vote.endDate, "day"))
-                .map(date => date?.format('YYYY-MM-DD'))
-                // .filter(v => v !== dayjs(vote.startDate).format("YYYY-MM-DD") && v !== dayjs(vote.endDate).format("YYYY-MM-DD"))
-                // .forEach(day => {
-                //     result[day] = {
-                //         color: colors.neutral,
-                //         textColor: colors.text,
-                //         selected: selected,
-                //         nbOfVoters,
-                //         users: result[day] ? [...new Set([...result[day]?.users, ...vote?.users])] : [...vote?.users]
+    //         result = setMarkedDay({
+    //             day: dayjs(vote.startDate)?.format("YYYY-MM-DD"),
+    //             selected: selected,
+    //             color: colors.primary,
+    //             textColor: colors.neutral,
+    //             nbOfVoters,
+    //         }, result);
 
-                //     }
-                // });
-                .forEach((day) => setMarkedDay({
-                    day,
-                    selected,
-                    nbOfVoters,
-                    users: vote?.users
-                }, result));
-        });
-        return result;
-    }, [votes, selectedStartDate])
+    //         result = setMarkedDay({
+    //             day: dayjs(vote.endDate)?.format("YYYY-MM-DD"),
+    //             endingDay: true,
+    //             selected: selected,
+    //             color: colors.primary,
+    //             textColor: colors.neutral,
+    //             nbOfVoters,
+    //         }, result);
 
 
+
+    //         getDatesBetween(vote.startDate, vote.endDate, false)
+    //             .filter(date => !dayjs(date).isSame(vote.startDate, "day") && !dayjs(date).isSame(vote.endDate, "day"))
+    //             .map(date => date?.format('YYYY-MM-DD'))
+    //             // .filter(v => v !== dayjs(vote.startDate).format("YYYY-MM-DD") && v !== dayjs(vote.endDate).format("YYYY-MM-DD"))
+    //             // .forEach(day => {
+    //             //     result[day] = {
+    //             //         color: colors.neutral,
+    //             //         textColor: colors.text,
+    //             //         selected: selected,
+    //             //         nbOfVoters,
+    //             //         users: result[day] ? [...new Set([...result[day]?.users, ...vote?.users])] : [...vote?.users]
+
+    //             //     }
+    //             // });
+    //             .forEach((day) => setMarkedDay({
+    //                 day,
+    //                 selected,
+    //                 nbOfVoters,
+    //                 users: vote?.users
+    //             }, result));
+    //     });
+    //     return result;
+    // }, [votes, selectedStartDate])
+
+    const markedDays = {}
     return (
         <View>
-            <Text>{nbOfVoters}</Text>
             <CalendarList
                 ref={calendarRef}
                 theme={{

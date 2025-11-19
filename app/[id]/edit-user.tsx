@@ -107,14 +107,7 @@ export default function EditUserPage() {
                     <BottomSheetFlatList
                         data={avatars}
                          keyExtractor={(i) => i}
-                         numColumns={3}
-                        //  contentContainerStyle={{
-                        //     flexDirection: "row",
-                        //     flexWrap: "wrap",
-                        //     gap: 5,
-                        //     justifyContent:"center"
-                        //  }}
-                        
+                         numColumns={3}    
                          renderItem={({item: avatar}) => (
                              <Pressable onPress={() => {
                                     onChange(avatar);
