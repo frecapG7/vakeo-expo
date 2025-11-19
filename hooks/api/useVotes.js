@@ -66,5 +66,27 @@ export const usePutVote = (tripId, voteId) => {
             .then(() =>
                 queryClient.setQueryData(["trips", tripId, "votes", voteId], data)
             )
-    })
+    });
+}
+
+
+const closeVote = async (tripId, voteId, user) => {
+    const response = await axios.put(`/trips/${tripId}/votes/${voteId}/close`,
+        {},
+        {
+            params: {
+                user
+            }
+        });
+    return response.data;
+}
+
+
+export const useCloseVote = (tripId, voteId) => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data) => closeVote(tripId, voteId, data),
+        onSuccess: () => queryClient.invalidateQueries(["trips", tripId, "votes"])
+    });
+
 }

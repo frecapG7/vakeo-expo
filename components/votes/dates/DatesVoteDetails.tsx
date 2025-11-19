@@ -47,7 +47,8 @@ export const DatesVoteDetails = ({ vote, me, onVote, onUnVote }: { vote?: IDates
                             <View className="gap-1 bg-orange-200 dark:bg-gray-200 p-2 rounded-lg" key={v._id}>
                                 <View className="flex-row gap-1">
                                     <Button onPress={() => checked ? onUnVote(v._id) : onVote(v._id)}
-                                        className="w-6 h-8">
+                                        className="w-6 h-8"
+                                        disabled={vote?.status === "CLOSED"}>
                                         <AnimatedCheckbox
                                             checked={checked}
                                             highlightColor="#4444ff"
@@ -67,7 +68,7 @@ export const DatesVoteDetails = ({ vote, me, onVote, onUnVote }: { vote?: IDates
                                             <Pressable className="flex-row items-center gap-2" onPress={() => setSelectedVote(v)}>
                                                 <AvatarsGroup avatars={v?.users.map(u => ({
                                                     avatar: u.avatar,
-                                                    alt: u?.name.charAt(0)
+                                                    alt: u?.name?.charAt(0)
                                                 }))}
                                                     size2="xs"
                                                     maxLength={3}

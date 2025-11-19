@@ -1,5 +1,5 @@
 import { useGetVote } from "@/hooks/api/useVotes";
-import { getTypeLabel } from "@/lib/voteUtils";
+import { getVoteLabel } from "@/lib/voteUtils";
 import { Stack, useLocalSearchParams, useNavigation } from "expo-router";
 import { useEffect } from "react";
 
@@ -16,7 +16,7 @@ export default function VoteDetailsLayout() {
 
     useEffect(() => {
         navigation.setOptions({
-            title: vote ? getTypeLabel(vote.type) : ""
+            title: vote ? getVoteLabel(vote) : ""
         })
     }, [navigation, vote]);
 

@@ -25,8 +25,6 @@ const avatars = [
     "https://storage.googleapis.com/vakeo_dev/avatar/garcon.png",
     "https://storage.googleapis.com/vakeo_dev/avatar/papie.png",
     "https://storage.googleapis.com/vakeo_dev/avatar/famille.png",
-
-
 ];
 
 
@@ -109,12 +107,14 @@ export default function EditUserPage() {
                     <BottomSheetFlatList
                         data={avatars}
                          keyExtractor={(i) => i}
-                         contentContainerStyle={{
-                            flexDirection: "row",
-                            flexWrap: "wrap",
-                            gap: 5,
-                            justifyContent:"center"
-                         }}
+                         numColumns={3}
+                        //  contentContainerStyle={{
+                        //     flexDirection: "row",
+                        //     flexWrap: "wrap",
+                        //     gap: 5,
+                        //     justifyContent:"center"
+                        //  }}
+                        
                          renderItem={({item: avatar}) => (
                              <Pressable onPress={() => {
                                     onChange(avatar);

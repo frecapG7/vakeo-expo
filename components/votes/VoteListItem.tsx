@@ -1,5 +1,5 @@
 import useI18nTime from "@/hooks/i18n/useI18nTime"
-import { getPercent, getTypeLabel } from "@/lib/voteUtils"
+import { getPercent, getVoteLabel } from "@/lib/voteUtils"
 import { Text, View } from "react-native"
 import { Avatar } from "../ui/Avatar"
 import { Button } from "../ui/Button"
@@ -28,8 +28,8 @@ export const VoteListItem = ({ vote, trip, user, onClick }: { vote: IVote, trip:
     return (
         <View>
             <View className="flex-row pl-2 items-end justify-between">
-                <Text className="text-xl dark:text-white">
-                    {getTypeLabel(vote.type)}
+                <Text className="text-md dark:text-white">
+                    {getVoteLabel(vote)}
                 </Text>
 
 

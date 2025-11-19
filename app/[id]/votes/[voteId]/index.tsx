@@ -5,13 +5,13 @@ import { DatesVoteDetails } from "@/components/votes/dates/DatesVoteDetails";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetTrip } from "@/hooks/api/useTrips";
-import { useGetVote, usePutVote } from "@/hooks/api/useVotes";
+import { useCloseVote, useGetVote, usePutVote } from "@/hooks/api/useVotes";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import { getTypeLabel } from "@/lib/voteUtils";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import { Text, View } from "react-native";
-import Animated, { ZoomIn } from "react-native-reanimated";
+import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 
@@ -26,6 +26,7 @@ export default function TripVoteDetailsPage() {
     const { data: trip } = useGetTrip(id);
     const { data: vote } = useGetVote(id, voteId);
     const updateVote = usePutVote(id, voteId);
+    const closeVote = useCloseVote(id, voteId);
 
     const { formatDuration } = useI18nTime();
 
@@ -45,33 +46,38 @@ export default function TripVoteDetailsPage() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View className="flex-row justify-around items-center">
-                <Button className=""
-                    onPress={() => router.navigate({
-                        pathname: "/[id]/votes/[voteId]/edit",
-                        params: {
-                            id,
-                            voteId
-                        }
-                    })}>
-                    <CalendarDayView>
-                        <Text className="text-sm py-5 px-1 text-center w-30"
-                            numberOfLines={2}>Ouvrir le calendrier</Text>
-                    </CalendarDayView>
-                </Button>
+            <View className="flex-row justify-between items-center px-10">
                 <View className="items-center">
                     <Text className="text-xl uppercase dark:text-white">{vote?.status === "OPEN" ? "en cours" : "terminé"}</Text>
                     <Text className="text-sm dark:text-gray-400">Depuis {formatDuration(vote?.createdAt, new Date())}</Text>
                 </View>
+
+                {/* {vote?.status !== "CLOSED" && */}
+                    <Animated.View entering={ZoomIn} exiting={ZoomOut}>
+                        <Button className=""
+                            onPress={() => router.navigate({
+                                pathname: "/[id]/votes/[voteId]/edit",
+                                params: {
+                                    id,
+                                    voteId
+                                }
+                            })}>
+                            <CalendarDayView>
+                                <Text className="text-sm py-5 px-1 text-center w-30"
+                                    numberOfLines={2}>Ouvrir le calendrier</Text>
+                            </CalendarDayView>
+                        </Button>
+                    </Animated.View>
+
+                {/* } */}
+
+
             </View>
 
 
 
             {vote?.type === "DATES" &&
                 <Animated.View entering={ZoomIn} className="gap-5 my-2">
-                    {/* <View className="items-end px-5 mt-5">
-                        
-                    </View> */}
                     <View className="px-2">
                         <DatesVoteDetails vote={vote}
                             me={me}
@@ -114,7 +120,11 @@ export default function TripVoteDetailsPage() {
                             <Button variant="contained"
                                 className="bg-red-400"
                                 title="Terminer le vote"
-                                onPress={() => console.log("todo")} />
+                                onPress={async () => {
+                                    await closeVote.mutateAsync(me?._id)
+                                }}
+                                isLoading={closeVote.isPending}
+                            />
                         </View>
                     }
                 </Animated.View>
