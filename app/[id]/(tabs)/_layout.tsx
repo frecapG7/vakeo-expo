@@ -37,12 +37,12 @@ export default function ItemDetailsLayout() {
                     title: "Les activités",
                 }}
             />
-            <Tabs.Screen name="meals"
+            <Tabs.Screen name="goods"
                 options={{
-                    href: "./meals",
-                    tabBarIcon: ({ color }) => <IconSymbol name="suit.spade" color={color} />,
+                    href: "./goods",
+                    tabBarIcon: ({ color }) => <IconSymbol name="cart" color={color} />,
                     headerShown: false,
-                    title: "Les menus",
+                    title: "Les courses",
                 }} />
             <Tabs.Screen name="calendar"
                 options={{

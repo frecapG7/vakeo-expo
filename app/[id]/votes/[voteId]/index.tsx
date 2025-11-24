@@ -43,7 +43,7 @@ export default function TripVoteDetailsPage() {
     const [openVoters, setOpenVoter] = useState(false);
 
     const router = useRouter();
-
+ 
     return (
         <SafeAreaView style={styles.container}>
             <View className="flex-row justify-between items-center px-10 mb-5">
@@ -53,28 +53,20 @@ export default function TripVoteDetailsPage() {
                 </View>
 
                 {/* {vote?.status !== "CLOSED" && */}
-                    <Animated.View entering={ZoomIn} exiting={ZoomOut}>
-                        <Button variant="contained"
+                <Animated.View entering={ZoomIn} exiting={ZoomOut}>
+                    <Button variant="contained"
                         className="flex-row gap-1 items-center p-2"
-                            onPress={() => router.navigate({
-                                pathname: "/[id]/votes/[voteId]/edit",
-                                params: {
-                                    id,
-                                    voteId
-                                }
-                            })}>
-                                <IconSymbol name="calendar" color="white" />
-                                <Text className="text-white">Ouvrir le calendrier</Text>
-                            {/* <CalendarDayView>
-                                <Text className="text-sm py-5 px-1 text-center w-30"
-                                    numberOfLines={2}>Ouvrir le calendrier</Text>
-                            </CalendarDayView> */}
-                        </Button>
-                    </Animated.View>
-
-                {/* } */}
-
-
+                        onPress={() => router.navigate({
+                            pathname: "/[id]/votes/[voteId]/edit",
+                            params: {
+                                id,
+                                voteId
+                            }
+                        })}>
+                        <IconSymbol name="calendar" color="white" />
+                        <Text className="text-white">Ouvrir le calendrier</Text>
+                    </Button>
+                </Animated.View>
             </View>
 
 
