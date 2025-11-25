@@ -40,7 +40,7 @@ export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src, ...prop
 
     if (!src)
         return (
-            <View className={`justify-center items-center rounded-full ${sizeClass} border bg-orange-200 dark:bg-gray-400`}>
+            <View className={`justify-center items-center rounded-full ${sizeClass} border dark:border-white bg-orange-200 dark:bg-gray-400`}>
                 <Text className="font-bold uppercase ">{alt}</Text>
             </View>
         )
@@ -79,11 +79,11 @@ export const AvatarsGroup = ({ avatars = [], size2 = "sm", maxLength = 3 }: { av
                     />
                 </View>
             )}
-            {avatars?.length > maxLength && 
-            
+            {avatars?.length > maxLength &&
+
                 <View className={`flex ${marginClass}`}>
                     <Avatar size2={size2}
-                            alt={`+${avatars?.length - maxLength}`}/>
+                        alt={`+${avatars?.length - maxLength}`} />
                 </View>
             }
         </View>
