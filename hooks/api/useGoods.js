@@ -9,15 +9,17 @@ const getGoods = async (tripId, params) => {
 }
 
 
-export const useGetGoods = (tripId) => {
+export const useGetGoods = (tripId, params, options) => {
     return useInfiniteQuery({
-        queryKey: ["trips", tripId, "goods"],
+        queryKey: ["trips", tripId, "goods", params],
         queryFn: ({ pageParam }) => getGoods(tripId, {
             cursor: pageParam,
             limit: 50,
+            ...params
         }),
         getNextPageParam: (lastPage) => lastPage?.nextCursor,
-        enabled: !!tripId
+        enabled: (!!tripId && options?.enabled),
+        ...options 
     })
 }
 

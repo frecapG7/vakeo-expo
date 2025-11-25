@@ -42,7 +42,7 @@ type SkeletonVariant = "rectangular" | "circular";
 
 
 
-export const Skeleton = ({ variant = "rectangular" }: { variant?: SkeletonVariant }) => {
+export const Skeleton = ({ variant = "rectangular", height= 10 }: { variant?: SkeletonVariant, height?: number }) => {
 
 
 
@@ -66,7 +66,7 @@ export const Skeleton = ({ variant = "rectangular" }: { variant?: SkeletonVarian
 
 
     return (
-        <Animated.View className="flex bg-gray-400 dark:bg-gray-700 h-10 rounded-lg w-full" style={animatedStyle}>
+        <Animated.View className={`flex bg-gray-400 dark:bg-gray-700 rounded-lg w-full h-${height}` } style={animatedStyle}>
         </Animated.View>
     )
 }

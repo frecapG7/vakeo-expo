@@ -49,7 +49,9 @@ const MAPPING = {
   "doc.on.doc": "content-copy",
   "list.bullet" : "list" ,
   "person": "person",
-  "chart.bar.fill": "poll"
+  "chart.bar.fill": "poll",
+  "chevron.down": "keyboard-arrow-down",
+  "chevron.up": "keyboard-arrow-up"
 } as IconMapping;
 
 /**

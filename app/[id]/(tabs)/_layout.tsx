@@ -31,7 +31,12 @@ export default function ItemDetailsLayout() {
             <Tabs.Screen
                 name="activities"
                 options={{
-                    href: "./activities",
+                    href: {
+                        pathname: "/[id]/(tabs)/activities",
+                        params: {
+                            id: String(id)
+                        }
+                    },
                     tabBarIcon: ({ color }) => <IconSymbol name="flame" color={color} />,
                     headerShown: false,
                     title: "Les activités",
@@ -39,7 +44,12 @@ export default function ItemDetailsLayout() {
             />
             <Tabs.Screen name="goods"
                 options={{
-                    href: "./goods",
+                    href: {
+                        pathname: "/[id]/(tabs)/goods",
+                        params: {
+                            id: String(id)
+                        }
+                    },
                     tabBarIcon: ({ color }) => <IconSymbol name="cart" color={color} />,
                     headerShown: false,
                     title: "Les courses",

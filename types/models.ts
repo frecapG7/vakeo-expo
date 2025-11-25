@@ -12,13 +12,14 @@ export interface TripUser {
 }
 
 
-interface Event {
+export interface Event {
     _id: string,
     startDate: Date,
     endDate: Date,
     name: string,
     attendees: TripUser[],
-    owners: TripUser[]
+    owners: TripUser[],
+    trip: string
 }
 
 
@@ -27,5 +28,6 @@ export interface Good {
     name: string,
     quantity: string,
     createdBy: TripUser,
-    event ?: Event 
+    event ?: Event,
+    checked: boolean
 }
