@@ -51,7 +51,7 @@ export default function TripActivityDetails() {
                             </View>)}
                     </View>
                     <View className="max-w-40 -ml-7">
-                        <Text className="dark:text-white tex-sm" numberOfLines={1} >
+                        <Text className="dark:text-white text-sm" numberOfLines={1} >
                             {activity?.owners.map((owner) => owner.name).join(", ")}
                         </Text>
 
