@@ -2,42 +2,22 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { CalendarDayView } from "@/components/ui/CalendarDayView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { LinearProgress } from "@/components/ui/LinearProgress";
 import { VoteListItem } from "@/components/votes/VoteListItem";
 import Styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
+import { useGetGoodsCount } from "@/hooks/api/useGoods";
 import { useGetTrip } from "@/hooks/api/useTrips";
 import { useGetVotes } from "@/hooks/api/useVotes";
 import useI18nNumbers from "@/hooks/i18n/useI18nNumbers";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import useColors from "@/hooks/styles/useColors";
+import { getPercent } from "@/lib/voteUtils";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext } from "react";
 import { Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut, SlideInDown, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-
-const mockGroceries = [
-    {
-        _id: '213413654156346465',
-        value: "William Peel",
-        author: {
-            _id: '13413135143',
-            avatar: '',
-            name: 'Tomat'
-        }
-    },
-    {
-        _id: '256344654444354',
-        value: "Sauce tomate (x2)",
-        author: {
-            _id: '13413135143',
-            avatar: '',
-            name: 'Tomat'
-        }
-    },
-
-]
 
 export default function ItemDetails() {
 
@@ -48,6 +28,7 @@ export default function ItemDetails() {
         status: "OPEN",
         limit: 3
     });
+    const { data: goodsCount } = useGetGoodsCount(id);
     const router = useRouter();
 
     const { me } = useContext(TripContext);
@@ -56,8 +37,6 @@ export default function ItemDetails() {
     const { formatPercent } = useI18nNumbers();
 
     const colors = useColors();
-
-
 
     return (
         <SafeAreaView style={Styles.container}>
@@ -171,51 +150,27 @@ export default function ItemDetails() {
 
 
 
-            <View className="mt-20 px-2">
-                <View className="flex flex-row justify-between px-2">
+            <View className="mt-5 px-2">
+                <View className="flex flex-row justify-between">
                     <Text className="text-2xl dark:text-white font-bold">Courses</Text>
-                    <Button onPress={() => console.log("todo")}>
-                        <IconSymbol name="plus.circle" size={30} color={colors.text} />
-                    </Button>
                 </View>
+                <View className="bg-orange-200 dark:bg-gray-200 p-2 rounded-lg">
+                    {goodsCount?.totalCount > 0 ?
 
-                <Animated.FlatList
-                    data={mockGroceries}
-                    renderItem={({ item }) => (
-                        <View className="flex flex-row">
-                            <Text>{item.value}</Text>
-                        </View>
-                    )}
-                    keyExtractor={(item) => item._id}
-                    keyboardDismissMode="on-drag"
-                    className="bg-orange-100 dark:bg-gray-100 rounded-lg p-2"
-                />
-            </View>
-
-            {/* 
-            <View className="mt-10">
-                <Text className="text-2xl ">A venir</Text>
-                <View className="flex flex-row justify-between bg-gray-200 py-2 rounded-lg">
-                    <View className="flex flex-row gap-2 items-center">
-                        <IconSymbol name="flame" size={35} />
                         <View>
-                            <Text className="text-lg">10h-12h</Text>
-                            <Text className="text-lg italic">Piscine</Text>
+                            <View className="items-end flex-row justify-end gap-2">
+                                 <IconSymbol name="cart" color="black"/>
+                                <Text className="text-lg font-bold">{goodsCount?.checkedCount} / {goodsCount?.totalCount}</Text>
+                            </View>
+                            <LinearProgress progress={getPercent(goodsCount?.checkedCount, goodsCount?.totalCount)} />
                         </View>
-                    </View>
-
-                    <AvatarsList users={[
-                        {
-                            id: "1",
-                            name: "Florian"
-                        }, {
-                            id: "213454",
-                            name: "Coumba"
-                        }
-                    ]} />
+                        :
+                        <Text>Vous n'avez aucune courses à faire</Text>
+                    }
                 </View>
-            </View> */}
 
+
+            </View>
         </SafeAreaView>
 
     )

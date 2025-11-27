@@ -11,13 +11,17 @@ export default function GoodsLayout() {
 
     return (
         <Stack screenOptions={{
-            title: "Les courses",
+            title: "Courses",
+        
               headerStyle: {
-                backgroundColor: colors.background,
+                // backgroundColor: colors.background,
+                // height:2
             },
             headerShadowVisible: false
         }}>
-            <Stack.Screen name="index" />
+            <Stack.Screen name="index" options={{
+                headerShown: false
+            }} />
             <Stack.Screen name="details" options={{
                 presentation: "modal",
                 headerTitleStyle: {

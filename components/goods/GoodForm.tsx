@@ -57,10 +57,6 @@ export const GoodForm = ({ control, trip }: { control: any, trip: Trip }) => {
                     className="text-md flex-1 text-dark bg-gray-200 text-right"
                 />
 
-                {/* <Button variant="contained" className="justify-center" onPress={onSubmit}> 
-                    <IconSymbol name="plus" color="white" />
-                </Button> */}
-
             </View>
         </View>
     )

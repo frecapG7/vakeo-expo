@@ -1,23 +1,22 @@
 import { GoodForm } from "@/components/goods/GoodForm";
+import { GoodListItemSkeleton } from "@/components/goods/GoodListItem";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { Skeleton } from "@/components/ui/Skeleton";
+import { Switch } from "@/components/ui/Switch";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useCheckGood, useGetGoods, usePostGood } from "@/hooks/api/useGoods";
 import useColors from "@/hooks/styles/useColors";
 import { Good } from "@/types/models";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import { useContext, useEffect, useMemo, useRef } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useContext, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import Animated, { FadeIn } from "react-native-reanimated";
+import Animated, { FadeIn, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-
 
 export default function GoodPage() {
 
@@ -25,7 +24,10 @@ export default function GoodPage() {
     const { me } = useContext(TripContext);
 
 
-    const { data, isLoading, hasNextPage, fetchNextPage } = useGetGoods(id);
+    const [unchecked, setUnchecked] = useState(false);
+    const { data, isLoading, isFetching, isFetchingNextPage, hasNextPage, fetchNextPage } = useGetGoods(id, {
+        ...(unchecked && { unchecked: true })
+    });
     const postGood = usePostGood(id);
     const checkGood = useCheckGood(id);
 
@@ -52,19 +54,6 @@ export default function GoodPage() {
     }
     const bottomSheetRef = useRef<BottomSheet>(null);
 
-
-
-    const navigation = useNavigation();
-
-    useEffect(() => {
-        navigation.setOptions({
-            headerRight: () => <Button className="rounded-full p-2 bg-blue-400"
-                onPress={() => bottomSheetRef?.current?.expand()} >
-                <IconSymbol name="plus" />
-            </Button>
-        })
-    }, [navigation]);
-
     const colors = useColors();
 
 
@@ -76,23 +65,43 @@ export default function GoodPage() {
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <GestureHandlerRootView style={styles.container}>
+                {goods?.length > 0 &&
+                    <Animated.View entering={ZoomIn} exiting={ZoomOut} className="border-b border-orange-400 mb-5">
+                        <View className="flex-row">
+                            {/* <Text>Courses</Text> */}
+                            {/* <IconSymbol name="cart" size={34} color="black"/> */}
+                        </View>
+                        
+                        <View className="flex-row items-center">
+                        <Button className="flex-row flex-1 ml-10 gap-5" onPress={() => bottomSheetRef?.current?.expand()}>
+                            <IconSymbol name="plus" color="blue" />
+                            <Text className="text-2xl font-bold text-blue-400">Ajouter</Text>
+                        </Button>
+                        <View className="items-center">
+                            <Switch value={unchecked} onSwitch={(v) => setUnchecked(!unchecked)} />
+                            <Text className="text-sm dark:text-white">Uniquement manquant</Text>
+                        </View>
+
+                        </View>
+                    </Animated.View>
+                }
                 <Animated.FlatList
-                    className="mt-5"
                     data={goods}
                     refreshing={isLoading}
                     renderItem={({ item, index }) =>
                         <View className="px-2">
                             {item?.name !== goods[index - 1]?.name &&
                                 <Animated.View entering={FadeIn} className="flex-row items-end justify-between">
-                                    <Text className="dark:text-white capitalize text-xl">{item.name}</Text>
+                                    <Text className="dark:text-white capitalize text-2xl">{item.name}</Text>
                                     <Pressable onPress={() => router.push({
                                         pathname: "/[id]/(tabs)/goods/details",
                                         params: {
                                             id,
                                             name: item.name
                                         }
-                                    })}>
-                                        <Text className="dark:text-white capitalize italic text-sm">Voir détails</Text>
+                                    })}
+                                        className="bg-gray-200 rounded-full">
+                                        <IconSymbol name="plus" color="black" />
                                     </Pressable>
                                 </Animated.View>
                             }
@@ -102,7 +111,7 @@ export default function GoodPage() {
                                         <Checkbox checked={item.checked} />
                                     </Pressable>
                                 </View>
-                                <Text className={`text-white text-lg font-bold ${item.checked ? "line-through opacity-75" : ""}`}>X {item?.quantity}</Text>
+                                <Text className={`dark:text-white text-lg font-bold ${item.checked ? "line-through opacity-50" : ""}`}>X {item?.quantity}</Text>
                             </View>
                         </View>
                     }
@@ -113,33 +122,38 @@ export default function GoodPage() {
                         </View>
                     }
                     ListEmptyComponent={() =>
-                        isLoading ?
+                        isFetching ?
                             <View className="gap-2 px-5">
-                                <Skeleton />
-                                <Skeleton />
-                                <Skeleton />
+                                <GoodListItemSkeleton />
+                                <GoodListItemSkeleton />
+                                <GoodListItemSkeleton />
                             </View>
                             :
-                            <View className="flex items-center justify-center gap-2">
+                            <View className="flex-1 items-center justify-center gap-2 mt-5">
                                 <IconSymbol name="cart" size={45} color={colors.text} />
                                 <Text className="text-2xl dark:text-white">Votre liste est vide</Text>
                                 <Text className="text-lg dark:text-white mt-5">
                                     Commencez à ajouter des éléments à votre liste
                                 </Text>
-                                <Button variant="outlined" title="Ajouter" onPress={() => bottomSheetRef.current?.expand()} />
+                                <Button variant="contained" title="Ajouter" onPress={() => bottomSheetRef.current?.expand()} />
                             </View>
                     }
                     onEndReached={() => {
                         if (hasNextPage)
                             fetchNextPage();
                     }}
-                    ListHeaderComponent={() =>
-                        isLoading ?
-                            <Animated.View entering={FadeIn}>
-                                <ActivityIndicator size="large" />
-                            </Animated.View>
-                            :
-                            <></>
+                    ListHeaderComponent={() => {
+
+                        if (isFetchingNextPage)
+                            return (
+                                <View className="items-center">
+                                    <ActivityIndicator />
+                                </View>);
+
+                        if (goods?.length > 0)
+                            return
+                    }
+
                     }
                 />
 
