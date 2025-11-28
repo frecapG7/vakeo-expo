@@ -78,11 +78,6 @@ export default function GoodPage() {
         <SafeAreaView style={{ flex: 1 }}>
             <GestureHandlerRootView style={styles.container}>
                 <Animated.View entering={ZoomIn} exiting={ZoomOut} className="border-b border-orange-400 dark:border-gray-400 pb-1 mb-5">
-                    <View className="flex-row">
-                        {/* <Text>Courses</Text> */}
-                        {/* <IconSymbol name="cart" size={34} color="black"/> */}
-                    </View>
-
                     <View className="flex-row items-center">
                         <Button className="flex-row flex-1 ml-10 gap-2 items-center" onPress={() => bottomSheetRef?.current?.expand()}>
                             <IconSymbol name="plus" color="blue" />

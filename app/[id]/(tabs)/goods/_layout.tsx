@@ -12,11 +12,6 @@ export default function GoodsLayout() {
     return (
         <Stack screenOptions={{
             title: "Courses",
-        
-              headerStyle: {
-                // backgroundColor: colors.background,
-                // height:2
-            },
             headerShadowVisible: false
         }}>
             <Stack.Screen name="index" options={{

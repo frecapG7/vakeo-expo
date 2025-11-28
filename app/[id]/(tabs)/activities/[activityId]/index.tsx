@@ -173,9 +173,9 @@ export default function TripActivityDetails() {
 
 
                 <View className="my-5">
-                    <EventGoodAccordion event={activity} onClick={(event) => {
-                        if (event)
-                            reset(event);
+                    <EventGoodAccordion event={activity} onClick={(good) => {
+                        if (good)
+                            reset(good);
                         else
                             reset({
                                 name: "",
@@ -224,7 +224,8 @@ export default function TripActivityDetails() {
                                 </View>
                                 <Text className="text-2xl font-bold dark:text-white">{_id ? 'Modifier course' : 'Nouvel course'}</Text>
                             </Pressable>
-                            <Button className="rounded-full border border-red-200 bg-white p-1 justify-center">
+                            <Button className="rounded-full border border-red-200 bg-white p-1 justify-center"
+                            onPress={() => console.log("call delete")}>
                                 <IconSymbol name="trash" size={24} color="red"/>
                             </Button>
                         </View>
@@ -236,7 +237,7 @@ export default function TripActivityDetails() {
                                     className="px-10"
                                     title={_id ? "Modifier" : "Ajouter"}
                                     onPress={handleSubmit(onSubmit)}
-                                    isLoading={postGood.isPending} />
+                                    isLoading={postGood.isPending || putGood.isPending} />
                             </View>
                         </View>
                     </BottomSheetView>
