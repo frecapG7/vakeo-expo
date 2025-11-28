@@ -9,15 +9,17 @@ const getGoods = async (tripId, params) => {
 }
 
 
-export const useGetGoods = (tripId) => {
+export const useGetGoods = (tripId, params, options) => {
     return useInfiniteQuery({
-        queryKey: ["trips", tripId, "goods"],
+        queryKey: ["trips", tripId, "goods", params],
         queryFn: ({ pageParam }) => getGoods(tripId, {
             cursor: pageParam,
             limit: 50,
+            ...params
         }),
         getNextPageParam: (lastPage) => lastPage?.nextCursor,
-        enabled: !!tripId
+        enabled: (!!tripId && options?.enabled),
+        ...options
     })
 }
 
@@ -35,6 +37,18 @@ export const usePostGood = (tripId) => {
     });
 }
 
+const putGood = async (tripId, data) => {
+    const response = await axios.put(`/trips/${tripId}/goods/${data._id}`, data);
+    return response.data;
+}
+export const usePutGood = (tripId) => {
+
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data) => putGood(tripId, data),
+        onSuccess:() => queryClient.invalidateQueries(["trips", tripId, "goods"])
+    });
+}
 
 const checkGood = async (tripId, goodId) => {
     const response = await axios.put(`/trips/${tripId}/goods/${goodId}/checked`);
@@ -72,4 +86,18 @@ export const useGetNames = (tripId, search) => {
         queryFn: () => getNames(tripId, search),
         enabled: isEnabled(search)
     });
+}
+
+
+const getCount = async (tripId) => {
+    const response = await axios.get(`/trips/${tripId}/goods/count`);
+    return response.data;
+}
+
+export const useGetGoodsCount = (tripId) => {
+    return useQuery({
+        queryKey: ["trips", tripId, "goods", "count"],
+        queryFn: () => getCount(tripId),
+        enabled: !!tripId
+    })
 }

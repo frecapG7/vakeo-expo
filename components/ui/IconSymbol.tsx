@@ -25,6 +25,7 @@ const MAPPING = {
   "person.circle": "person",
   "plus.circle": "add-circle-outline",
   "plus": "add",
+  "checkmark": "check",
   "checkmark.circle": "check-circle",
   "checkmark.circle.fill": "check-circle",
   "calendar": "calendar-month",
@@ -47,9 +48,11 @@ const MAPPING = {
   "circle.fill": "radio-button-checked",
   "message": "chat-bubble-outline",
   "doc.on.doc": "content-copy",
-  "list.bullet" : "list" ,
+  "list.bullet": "list",
   "person": "person",
-  "chart.bar.fill": "poll"
+  "chart.bar.fill": "poll",
+  "chevron.down": "keyboard-arrow-down",
+  "chevron.up": "keyboard-arrow-up"
 } as IconMapping;
 
 /**
