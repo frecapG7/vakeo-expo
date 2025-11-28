@@ -1,13 +1,11 @@
 import { EventListItem } from "@/components/events/EventListItem";
-import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
 import { useGetEvents } from "@/hooks/api/useEvents";
-import { useGetTrip } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import dayjs from "dayjs";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useMemo, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { useMemo } from "react";
+import { Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -25,11 +23,8 @@ const showDay = (previous?: any, current?: any) => {
 export default function TripActivities() {
 
     const { id } = useLocalSearchParams();
-    const { data: trip } = useGetTrip(id);
-    const [sort, setSort] = useState("createdAt");
     const { data, hasNextPage, fetchNextPage } = useGetEvents(id, {
         type: "ACTIVITY",
-        sort
     });
 
     const router = useRouter();
@@ -39,19 +34,7 @@ export default function TripActivities() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View className="flex-row w-full justify-center">
-                <View className="rounded-full flex-row border bg-orange-200 dark:bg-gray-500">
-                    <Pressable className={`${sort === "createdAt" ? "bg-orange-400 dark:bg-gray-200" : ""} flex rounded-l-full p-2 px-7 items-center`}
-                        onPress={() => setSort("createdAt")}>
-                        <IconSymbol name="list.bullet" size={20} color="black" />
-                    </Pressable>
-                    <View className="w-0.5 dark:bg-black" />
-                    <Pressable className={`${sort === "startDate" ? "bg-orange-400 dark:bg-gray-300" : ""} flex rounded-r-full p-2 px-7 items-center`}
-                        onPress={() => setSort("startDate")}>
-                        <IconSymbol name="calendar" size={20} color="black" />
-                    </Pressable>
-                </View>
-            </View>
+        
 
 
             <Animated.FlatList

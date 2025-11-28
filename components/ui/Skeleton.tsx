@@ -26,6 +26,11 @@ export const Skeleton = ({ variant = "rectangular", height = 10 }: { variant?: S
     }, []);
 
 
+
+    if(variant === "circular")
+        return <Animated.View className={`flex bg-gray-400 dark:bg-gray-700 rounded-full w-${height} h-${height}`} style={animatedStyle} />
+
+
     return (
         <Animated.View className={`flex bg-gray-400 dark:bg-gray-700 rounded-lg w-full h-${height}`} style={animatedStyle} />
     )

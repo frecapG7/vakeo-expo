@@ -67,7 +67,9 @@ const EventGoodAccordion = ({ event, onClick }: { event: Event, onClick: (good?:
                                     <Text className={`text-xl capitalize flex-1 ${good.checked ? "line-through" : ""}`} >{good.name} ({good.quantity})</Text>
                                 </View>
 
-                                <Button className="rounded-full border bg-blue-500 p-1" onPress={() => onClick(good)} >
+                                <Button className="rounded-full border bg-blue-500 p-1"
+                                    onPress={() => onClick(good)}
+                                    disabled={good.checked} >
                                     <IconSymbol name="pencil" color="black" size={16} />
                                 </Button>
                             </Button>
@@ -214,19 +216,25 @@ export default function TripActivityDetails() {
                 >
 
                     <BottomSheetView style={{ flex: 1 }} className="gap-2 py-5 px-2">
-                        <Pressable className="flex-row gap-1 mb-5 items-center" onPress={() => bottomSheetRef.current?.close()}>
-                            <View className="rounded-full">
-                                <IconSymbol name="xmark.circle" color={colors?.text} />
-                            </View>
-                            <Text className="text-2xl font-bold dark:text-white">{_id ? 'Modifier course' : 'Nouvel course'}</Text>
-                        </Pressable>
+
+                        <View className="flex-row justify-between items-center">
+                            <Pressable className="flex-row gap-1 items-center" onPress={() => bottomSheetRef.current?.close()}>
+                                <View className="rounded-full">
+                                    <IconSymbol name="xmark.circle" color={colors?.text} />
+                                </View>
+                                <Text className="text-2xl font-bold dark:text-white">{_id ? 'Modifier course' : 'Nouvel course'}</Text>
+                            </Pressable>
+                            <Button className="rounded-full border border-red-200 bg-white p-1 justify-center">
+                                <IconSymbol name="trash" size={24} color="red"/>
+                            </Button>
+                        </View>
 
                         <View className="gap-5 my-5">
                             <GoodForm control={control} trip={{ _id: String(id) }} />
                             <View className="px-10">
                                 <Button variant="contained"
                                     className="px-10"
-                                    title="Ajouter"
+                                    title={_id ? "Modifier" : "Ajouter"}
                                     onPress={handleSubmit(onSubmit)}
                                     isLoading={postGood.isPending} />
                             </View>

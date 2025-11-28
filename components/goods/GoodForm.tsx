@@ -34,7 +34,7 @@ export const GoodForm = ({ control, trip }: { control: any, trip: Trip }) => {
 
     return (
         <View className="flex-row flex-1 bg-gray-200 flex-grow rounded-lg focus:border-2 focus:border-blue-400">
-            <View className="flex-1 border-r border-black px-2">
+            <View className="flex-1 relative border-r border-black px-2">
                 <FormAutocomplete control={control}
                     name="name"
                     rules={{
@@ -55,6 +55,7 @@ export const GoodForm = ({ control, trip }: { control: any, trip: Trip }) => {
                     onChangeText={setQuantity}
                     value={quantity}
                     className="text-md flex-1 text-dark bg-gray-200 text-right"
+                    placeholderTextColor="#0000"
                 />
 
             </View>

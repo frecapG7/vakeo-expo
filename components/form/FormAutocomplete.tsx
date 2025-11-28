@@ -24,13 +24,13 @@ export const FormAutocomplete = ({ control, name, rules, options = [] }: { contr
 
 
     return (
-        <View className="relative z-10">
+        <View className="z-10">
 
-            <View className="flex flex-row gap-2 bg-gray-200 justify-between items-center ">
+            <View className="flex relative  flex-row gap-2 bg-gray-200 justify-between items-center ">
                 <TextInput
                     value={value}
                     onChangeText={onChange}
-                    className="flex-grow"
+                    className="flex-grow placeholder-black"
                     onFocus={() => setShowDropdown(true)}
                     onBlur={() => setShowDropdown(false)}
 
@@ -40,8 +40,6 @@ export const FormAutocomplete = ({ control, name, rules, options = [] }: { contr
                         <Button onPress={() => onChange("")}>
                             <IconSymbol name="xmark.circle" color="black" />
                         </Button>
-
-
                     </Animated.View>
                 }
 

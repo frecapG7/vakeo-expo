@@ -46,6 +46,7 @@ export const FormText = ({ control, name, label, placeholder, rules, endAdornmen
                 onChangeText={onChange}
                 value={value}
                 className="text-md flex-1 text-dark"
+                placeholderTextColor="#000000"
                 ref={ref}
                 placeholder={placeholder}
             />
