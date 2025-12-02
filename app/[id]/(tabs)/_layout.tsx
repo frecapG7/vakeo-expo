@@ -1,6 +1,5 @@
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Tabs, useLocalSearchParams, useRouter } from "expo-router";
-import { Pressable } from "react-native";
 
 
 
@@ -72,15 +71,7 @@ export default function ItemDetailsLayout() {
                 options={{
                     href: null
                 }} />
-            <Tabs.Screen name="groceries"
-                options={{
-                    href: null,
-                    headerShown: true,
-                    headerLeft: () => <Pressable onPress={() => router.navigate(`/trips/${id}`)}>
-                        <IconSymbol name="arrow.left" />
-                    </Pressable>,
-                    title: "Les courses",
-                }} />
+        
 
 
         </Tabs >
