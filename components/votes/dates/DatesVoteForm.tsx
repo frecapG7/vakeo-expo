@@ -58,20 +58,20 @@ const buildCustomDayClassName = (marking, active) => {
     let output = "text-xl rounded-full w-10 h-10 text-center items-center font-bold dark:text-white"
 
     if (marking?.startingDay)
-        output = output + " bg-orange-200 dark:bg-gray-200 dark:text-black";
+        output = output + " bg-orange-200 dark:bg-gray-200 dark:text-gray-600 ";
     if (marking?.endingDay)
-        output = output + " bg-orange-400 dark:bg-gray-400";
+        output = output + " bg-orange-400 dark:bg-gray-400 dark:text-gray-600 ";
 
-    if(marking?.selected)
+    if (marking?.selected)
         output = output + " border dark:border-white"
 
-    if(active)
-        output = output + " bg-blue-200";
+    if (active)
+        output = output + " bg-blue-200 dark:bg-blue-200 dark:text-gray-600";
     return output;
 
 }
 
-const CustomDay = ({ date, marking, onPress, theme, percent , active}: { date: DateData, marking?: any, onPress: (day: any) => void, theme?: any, percent: String, active: boolean }) => {
+const CustomDay = ({ date, marking, onPress, theme, percent, active }: { date: DateData, marking?: any, onPress: (day: any) => void, theme?: any, percent: String, active: boolean }) => {
 
     const className = buildCustomDayClassName(marking, active);
 
@@ -81,14 +81,7 @@ const CustomDay = ({ date, marking, onPress, theme, percent , active}: { date: D
             disabled={marking?.selected && !(marking?.startingDay || marking?.endingDay)}
 
         >
-            <Text
-                // className={`text-xl rounded-full w-10 h-10 text-center items-center font-bold dark:text-white ${isStartingOrEnding ? "bg-orange-200 dark:bg-gray-200" : ""} ${marking?.selected ? "border dark:border-white" : ""}`}
-                className={className}
-                style={{
-                    // borderColor: marking?.color,
-                    // ...((marking?.startingDay || marking?.endingDay) && { backgroundColor: theme?.primary }),
-                    // color: marking?.selected ? marking?.textColor : theme?.dayTextColor
-                }}>
+            <Text className={className}>
                 {date.day}
             </Text>
             <Text className="text-sm text-black text-center italic dark:text-white">{percent !== "0 %" && percent}</Text>
@@ -108,15 +101,8 @@ export const DatesVoteForm = ({ control, user, disabled = false }: { control: an
             minLength: 1
         }
     });
-    const minDate = useMemo(() => {
-        if (votes?.length > 0)
-            return dayjs.min(votes.map(v => dayjs(v.startDate).startOf("day")));
-        return dayjs().startOf("day");
-    }, [votes]);
-
 
     const [activeDate, setActiveDate] = useState<string>("");
-    const [selectedStartDate, setSelectedStartDate] = useState();
 
     const voters = useWatch({
         control,
@@ -136,8 +122,6 @@ export const DatesVoteForm = ({ control, user, disabled = false }: { control: an
 
     return (
         <View>
-            {/* <Text>{JSON.stringify(markedDays)}</Text> */}
-            <Text>{JSON.stringify(activeDate)}</Text>
             <CalendarList
                 ref={calendarRef}
                 theme={{
@@ -160,7 +144,7 @@ export const DatesVoteForm = ({ control, user, disabled = false }: { control: an
                     // primary: colors.primary
                 }}
                 markingType="period"
-                minDate={dayjs(minDate).toISOString()}
+                minDate={dayjs().toISOString()}
                 // Max amount of months allowed to scroll to the past. Default = 50
                 pastScrollRange={1}
                 // Max amount of months allowed to scroll to the future. Default = 50
@@ -206,9 +190,9 @@ export const DatesVoteForm = ({ control, user, disabled = false }: { control: an
                         marking={marking}
                         onPress={onPress}
                         theme={theme}
-                        percent={formatPercent(getPercent(marking?.users?.length, nbOfVoters), 0)} 
+                        percent={formatPercent(getPercent(marking?.users?.length, nbOfVoters), 0)}
                         active={activeDate === date?.dateString}
-                        />
+                    />
                 }
 
 
