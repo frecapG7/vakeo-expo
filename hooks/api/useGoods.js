@@ -46,7 +46,7 @@ export const usePutGood = (tripId) => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data) => putGood(tripId, data),
-        onSuccess:() => queryClient.invalidateQueries(["trips", tripId, "goods"])
+        onSuccess: () => queryClient.invalidateQueries(["trips", tripId, "goods"])
     });
 }
 
@@ -84,7 +84,7 @@ export const useGetNames = (tripId, search) => {
     return useQuery({
         queryKey: ["trips", tripId, "goods", "names", search],
         queryFn: () => getNames(tripId, search),
-        enabled: isEnabled(search)
+        enabled: (!!tripId && isEnabled(search))
     });
 }
 
@@ -100,4 +100,19 @@ export const useGetGoodsCount = (tripId) => {
         queryFn: () => getCount(tripId),
         enabled: !!tripId
     })
+}
+
+
+const deleteGood = async (tripId, goodId) => {
+    const response = await axios.delete(`/trips/${tripId}/goods/${goodId}`);
+    return response.data;
+}
+
+export const useDeleteGood = (tripId) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (data) => deleteGood(tripId, data._id),
+        onSuccess: () => queryClient.invalidateQueries(["trips", tripId, "goods"])
+    });
 }

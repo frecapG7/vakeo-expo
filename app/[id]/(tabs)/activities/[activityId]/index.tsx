@@ -1,4 +1,4 @@
-import { GoodForm } from "@/components/goods/GoodForm";
+import { GoodBottomSheet } from "@/components/goods/GoodBottomSheet";
 import { PickUsersModal } from "@/components/modals/PickUsersModal";
 import { Avatar, AvatarsGroup } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
@@ -8,27 +8,23 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetEvent } from "@/hooks/api/useEvents";
-import { useCheckGood, useGetGoods, usePostGood, usePutGood } from "@/hooks/api/useGoods";
+import { useCheckGood, useGetGoods } from "@/hooks/api/useGoods";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
-import useColors from "@/hooks/styles/useColors";
-import { Event, Good } from '@/types/models';
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import { Event, Good, TripUser } from '@/types/models';
 import { useLocalSearchParams } from "expo-router";
-import { useContext, useMemo, useRef, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useContext, useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import Animated, { FadeIn, StretchInY, StretchOutY } from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut, StretchInY, StretchOutY } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Toast } from "toastify-react-native";
 
 
-const EventGoodAccordion = ({ event, onClick }: { event: Event, onClick: (good?: Good) => void }) => {
+const EventGoodAccordion = ({ event, user, onClick }: { event: Event, user: TripUser, onClick: (good?: Good) => void }) => {
 
 
     const [expanded, setExpanded] = useState(true);
 
-    const { data, isLoading } = useGetGoods(event?.trip, {
+    const { data } = useGetGoods(event?.trip, {
         event: event?._id
     });
     const checkGood = useCheckGood(event?.trip);
@@ -50,10 +46,24 @@ const EventGoodAccordion = ({ event, onClick }: { event: Event, onClick: (good?:
 
                 <Animated.View entering={StretchInY} exiting={StretchOutY} className="gap-2 bg-orange-100 dark:bg-gray-400 p-2 rounded-lg">
 
-                    <Button className="flex-row gap-1" onPress={() => onClick()}>
-                        <IconSymbol name="plus" color="blue" />
-                        <Text className="text-xl text-blue-700 font-bold">Ajouter</Text>
-                    </Button>
+                    {goods?.length < 50 &&
+
+                        <Animated.View entering={FadeIn} exiting={FadeOut}>
+                            <Button className="flex-row gap-1" onPress={() => onClick({
+                                _id: "",
+                                name: "",
+                                quantity: "1",
+                                event,
+                                createdBy: user,
+                                checked: false
+                            })}>
+                                <IconSymbol name="plus" color="blue" />
+                                <Text className="text-xl text-blue-700 font-bold">Ajouter</Text>
+                            </Button>
+
+                        </Animated.View>
+
+                    }
 
                     {goods?.map((good) =>
                         <Animated.View key={good._id} entering={FadeIn} className="flex-row items-center">
@@ -93,155 +103,80 @@ export default function TripActivityDetails() {
     const [openOwners, setOpenOwners] = useState(false);
 
     const { getDayNumber, getMonthName } = useI18nTime();
-    const bottomSheetRef = useRef<BottomSheet>(null);
 
-    const colors = useColors();
-
-
-    const { control, handleSubmit, reset } = useForm({
-        defaultValues: {
-            _id: "",
-            name: "",
-            quantity: "1"
-        }
-    });
-
-    const postGood = usePostGood(id);
-    const putGood = usePutGood(id);
-
-    const onSubmit = async (data: any) => {
-        if (data._id)
-            await putGood.mutateAsync(data);
-        else
-            await postGood.mutateAsync({
-                ...data,
-                event: activity,
-                createdBy: me
-            });
-        Toast.success(data._id ? "Course modifiée" : "Course ajoutée");
-        reset({
-            name: "",
-            quantity: "1"
-        });
-    }
-    const _id = useWatch({
-        control,
-        name: "_id"
-    });
+    const [selectedGood, setSelectedGood] = useState<Good | null>(null);
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <GestureHandlerRootView style={styles.container}>
+                <Animated.ScrollView>
 
-                <View className="flex-row justify-between px-5">
-                    <CalendarDayView>
-                        {!!activity?.startDate ? (
-                            <Animated.View entering={FadeIn} className="flex flex-1 items-center px-5">
-                                <Text className="text-lg">{getDayNumber(activity.startDate)}</Text>
-                                <Text className="capitalize text-xl font-bold">{getMonthName(activity.startDate)}</Text>
-                            </Animated.View>
-                        ) :
-                            <View className="flex items-center m-1">
-                                <IconSymbol name="pencil" size={24} color="dark" />
-                                <Text className="text-sm">Ajouter des dates</Text>
-                            </View>
-                        }
-                    </CalendarDayView>
-
-
-
-                    <Button className="flex max-w-50 items-center justify-center gap-2 p-2" onPress={() => setOpenOwners(true)}>
-
-                        <AvatarsGroup avatars={activity?.owners.map((owner) => ({
-                            avatar: owner?.avatar,
-                            alt: owner.name.charAt(0)
-                        }))}
-                            size2="md"
-                            maxLength={4}
-                        />
-                        <View className="max-w-40 ml-5 ">
-                            <Text className="dark:text-white text-center text-sm" numberOfLines={1} >
-                                {activity?.owners.map((owner) => owner.name).join(", ")}
-                            </Text>
-
-                        </View>
-                    </Button>
-                </View>
-
-
-
-
-
-                <View className="my-5">
-                    <EventGoodAccordion event={activity} onClick={(good) => {
-                        if (good)
-                            reset(good);
-                        else
-                            reset({
-                                name: "",
-                                quantity: "1"
-                            })
-                        bottomSheetRef.current?.expand();
-                    }} />
-                </View>
-
-
-                <View className="my-5">
-                    <Text className="font-bold text-xl dark:text-white ml-2">
-                        Participants
-                    </Text>
-                    <View className="rounded-lg bg-orange-100 dark:bg-gray-400 gap-2 px-2 py-4">
-                        {activity?.attendees.map((attendee) =>
-                            <View key={attendee._id} className="flex flex-row gap-2 items-center">
-                                <Avatar alt={attendee.name?.charAt(0)} size2="sm" src={attendee.avatar} />
-                                <Text className="text-lg ">{attendee.name}</Text>
-                            </View>)}
-                    </View>
-                </View>
-                <PickUsersModal open={openOwners}
-                    onClose={() => setOpenOwners(false)}
-                    users={activity?.owners}
-                    disabled
-                />
-
-
-                {/* TODO : factorize with goods ? */}
-                <BottomSheet ref={bottomSheetRef}
-                    index={-1}
-                    backgroundStyle={{
-                        backgroundColor: colors.background,
-                        ...styles.bottomSheet
-                    }}
-                    enablePanDownToClose={true}
-                >
-
-                    <BottomSheetView style={{ flex: 1 }} className="gap-2 py-5 px-2">
-
-                        <View className="flex-row justify-between items-center">
-                            <Pressable className="flex-row gap-1 items-center" onPress={() => bottomSheetRef.current?.close()}>
-                                <View className="rounded-full">
-                                    <IconSymbol name="xmark.circle" color={colors?.text} />
+                    <View className="flex-row justify-between px-5">
+                        <CalendarDayView>
+                            {!!activity?.startDate ? (
+                                <Animated.View entering={FadeIn} className="flex flex-1 items-center px-5">
+                                    <Text className="text-lg">{getDayNumber(activity.startDate)}</Text>
+                                    <Text className="capitalize text-xl font-bold">{getMonthName(activity.startDate)}</Text>
+                                </Animated.View>
+                            ) :
+                                <View className="flex items-center m-1">
+                                    <IconSymbol name="pencil" size={24} color="dark" />
+                                    <Text className="text-sm">Ajouter des dates</Text>
                                 </View>
-                                <Text className="text-2xl font-bold dark:text-white">{_id ? 'Modifier course' : 'Nouvel course'}</Text>
-                            </Pressable>
-                            <Button className="rounded-full border border-red-200 bg-white p-1 justify-center"
-                            onPress={() => console.log("call delete")}>
-                                <IconSymbol name="trash" size={24} color="red"/>
-                            </Button>
-                        </View>
+                            }
+                        </CalendarDayView>
 
-                        <View className="gap-5 my-5">
-                            <GoodForm control={control} trip={{ _id: String(id) }} />
-                            <View className="px-10">
-                                <Button variant="contained"
-                                    className="px-10"
-                                    title={_id ? "Modifier" : "Ajouter"}
-                                    onPress={handleSubmit(onSubmit)}
-                                    isLoading={postGood.isPending || putGood.isPending} />
+
+
+                        <Button className="flex max-w-50 items-center justify-center gap-2 p-2" onPress={() => setOpenOwners(true)}>
+
+                            <AvatarsGroup avatars={activity?.owners.map((owner) => ({
+                                avatar: owner?.avatar,
+                                alt: owner.name.charAt(0)
+                            }))}
+                                size2="md"
+                                maxLength={4}
+                            />
+                            <View className="max-w-40 ml-5 ">
+                                <Text className="dark:text-white text-center text-sm" numberOfLines={1} >
+                                    {activity?.owners.map((owner) => owner.name).join(", ")}
+                                </Text>
+
                             </View>
+                        </Button>
+                    </View>
+
+
+
+
+
+                    <View className="my-5">
+                        <EventGoodAccordion event={activity} user={me} onClick={(good) => setSelectedGood(good)} />
+                    </View>
+
+
+                    <View className="my-5">
+                        <Text className="font-bold text-xl dark:text-white ml-2">
+                            Participants
+                        </Text>
+                        <View className="rounded-lg bg-orange-100 dark:bg-gray-400 gap-2 px-2 py-4">
+                            {activity?.attendees.map((attendee) =>
+                                <View key={attendee._id} className="flex flex-row gap-2 items-center">
+                                    <Avatar alt={attendee.name?.charAt(0)} size2="sm" src={attendee.avatar} />
+                                    <Text className="text-lg ">{attendee.name}</Text>
+                                </View>)}
                         </View>
-                    </BottomSheetView>
-                </BottomSheet>
+                    </View>
+                    <PickUsersModal open={openOwners}
+                        onClose={() => setOpenOwners(false)}
+                        users={activity?.owners}
+                        disabled
+                    />
+
+
+                    <GoodBottomSheet good={selectedGood} trip={{ _id: id }} onClose={() => setSelectedGood(null)} />
+                </Animated.ScrollView>
+
             </GestureHandlerRootView>
         </SafeAreaView>
     )
