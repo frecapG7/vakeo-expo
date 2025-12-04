@@ -5,7 +5,7 @@ import { Good, Trip } from "@/types/models"
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet"
 import { useEffect, useRef } from "react"
 import { useForm } from "react-hook-form"
-import { Alert, Pressable, Text, View } from "react-native"
+import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native"
 import Animated, { FadeIn } from "react-native-reanimated"
 import { Toast } from "toastify-react-native"
 import { Backdrop } from "../ui/Backdrop"
@@ -87,7 +87,7 @@ export const GoodBottomSheet = ({ good, trip, onClose }: { good?: Good | null, t
                         </View>
                         <Text className="text-2xl font-bold dark:text-white">{good?._id ? 'Modifier course' : 'Nouvel course'}</Text>
                     </Pressable>
-                    {!!good &&
+                    {!!good?._id &&
                         <Animated.View entering={FadeIn}>
                             <Button className="rounded-full border border-red-200 bg-white p-1 justify-center"
                                 onPress={() => Alert.alert("Voulez vous supprimer cette course ?",
@@ -110,9 +110,9 @@ export const GoodBottomSheet = ({ good, trip, onClose }: { good?: Good | null, t
 
                 </View>
 
-                <View className="gap-5 my-5">
+                <View className="gap-5 my-1">
                     <GoodForm control={control} trip={trip} />
-                    <View className="px-10">
+                    <View className="px-10 mt-10">
                         <Button variant="contained"
                             className="px-10"
                             title={good?._id ? "Modifier" : "Ajouter"}
@@ -123,7 +123,12 @@ export const GoodBottomSheet = ({ good, trip, onClose }: { good?: Good | null, t
             </BottomSheetView>
 
 
-            <Backdrop visible={deleteGood.isPending} />
+            <Backdrop visible={deleteGood.isPending} >
+                <Animated.View
+                    className="flex-1 justify-center items-center ">
+                    <ActivityIndicator size="large" />
+                </Animated.View>
+            </Backdrop>
         </BottomSheet>
     );
 }

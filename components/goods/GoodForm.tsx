@@ -1,102 +1,15 @@
 // Is name weird ? 
 import { useGetNames } from "@/hooks/api/useGoods";
 import { Trip } from "@/types/models";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useController } from "react-hook-form";
-import { FlatList, Pressable, Text, TextInput, View } from "react-native";
-import Animated, { FadeIn, SlideInDown } from "react-native-reanimated";
+import { Text, TextInput, View } from "react-native";
+import Animated, { FadeIn, FadeInDown, FadeOutDown } from "react-native-reanimated";
 import { Button } from "../ui/Button";
 import { IconSymbol } from "../ui/IconSymbol";
 
-
-
-const NameInput = ({ trip, control }: { trip: Trip, control: any }) => {
-
-
-
-    const { field: { value, onChange } } = useController({
-        control,
-        name: "name",
-        rules: {
-            required: true,
-            minLength: 1,
-            maxLength: 100
-        }
-    });
-    const { data: names } = useGetNames(trip?._id, value);
-
-    const [showDropdown, setShowDropdown] = useState(false);
-
-
-
-    return (
-        <View className="">
-
-            <View className="flex relative  flex-row gap-2 bg-gray-200 justify-between items-center ">
-                <TextInput
-                    value={value}
-                    onChangeText={onChange}
-                    className="flex-grow placeholder-black"
-                    onFocus={() => setShowDropdown(true)}
-                    onBlur={() => setShowDropdown(false)}
-
-                />
-                {value !== "" &&
-                    <Animated.View entering={FadeIn} >
-                        <Button onPress={() => onChange("")}>
-                            <IconSymbol name="xmark.circle" color="black" />
-                        </Button>
-                    </Animated.View>
-                }
-
-
-
-            </View>
-            {showDropdown &&
-                <Animated.View entering={SlideInDown}
-                    // exiting={SlideInUp}
-                    pointerEvents="auto"
-                    className="absolute top-full left-0 right-0 z-50 border border-blue-300 rounded-lg bg-white dark:bg-gray-200">
-                    
-                    <FlatList
-                        data={names}
-                        keyExtractor={(item, index) => String(index)}
-                        renderItem={({ item, index }) =>
-                            <Pressable onPress={() => {
-                                console.log("toto")
-                                onChange(item);
-                                setShowDropdown(false);
-                            }}
-                            className="z-51">
-                                <Text className="capitalize text-lg">{item}</Text>
-                            </Pressable>
-                        }
-                        ItemSeparatorComponent={() =>
-                            <View className="items-center my-1">
-                                <View className="w-80 h-0.5 bg-blue-700 content-center" />
-                            </View>
-                        }
-                    />
-                </Animated.View>
-
-            }
-        </View>
-    )
-}
-
-
 export const GoodForm = ({ control, trip }: { control: any, trip: Trip }) => {
 
-
-    const { field: { value: name, onChange: setName } } = useController({
-        control,
-        name: "name",
-        rules: {
-            required: true,
-            minLength: 1,
-            maxLength: 100
-        }
-    });
     const { field: { value: quantity, onChange: setQuantity } } = useController({
         control,
         name: "quantity",
@@ -106,23 +19,81 @@ export const GoodForm = ({ control, trip }: { control: any, trip: Trip }) => {
         }
     });
 
+
+    const { field: { value, onChange } , fieldState: { isDirty }} = useController({
+        control,
+        name: "name",
+        rules: {
+            required: true,
+            minLength: 1,
+            maxLength: 100
+        },
+        defaultValue: ""
+    });
+    const { data: names } = useGetNames(trip?._id, value);
+
+    const [showDropdown, setShowDropdown] = useState(false);
+
+    useEffect(() => {
+        if (isDirty)
+            setShowDropdown(true);
+    }, [isDirty, setShowDropdown])
+
     return (
-        <View className="flex-row flex-1 bg-gray-200 flex-grow rounded-lg focus:border-2 focus:border-blue-400">
-            <View className="flex-1 border-r border-black px-2">
-                <NameInput trip={trip} control={control} />
+
+        <View className="flex-1">
+            <View className="flex-row flex-1 bg-gray-200 flex-grow rounded-lg focus:border-2 focus:border-blue-400">
+                <View className="flex-1 border-r border-black px-2">
+                    <View className="flex relative  flex-row gap-2 bg-gray-200 justify-between items-center ">
+                        <TextInput
+                            value={value}
+                            onChangeText={onChange}
+                            className="flex-grow placeholder-black"
+                            onFocus={() => setShowDropdown(true)}
+                            onBlur={() => setShowDropdown(false)}
+
+                        />
+                        {value !== "" &&
+                            <Animated.View entering={FadeIn} >
+                                <Button onPress={() => onChange("")}>
+                                    <IconSymbol name="xmark.circle" color="black" />
+                                </Button>
+                            </Animated.View>
+                        }
+                    </View>
+                </View>
+
+                <View className="flex-row items-center w-1/3 px-2">
+                    <Text>x</Text>
+                    <TextInput
+                        onChangeText={setQuantity}
+                        value={quantity}
+                        className="text-md flex-1 text-dark bg-gray-200 text-right"
+                        placeholderTextColor="#0000"
+                    />
+                </View>
             </View>
 
-            <View className="flex-row items-center w-1/6 px-2">
-                <Text>x</Text>
-                <TextInput
+            {showDropdown &&
+                <Animated.View entering={FadeInDown}
+                    exiting={FadeOutDown}
+                    className="flex px-4 gap-2">
+                    {names?.map((name: string, index: number) =>
+                        <View key={index} className="border-b dark:border-white bg-orange-200">
+                            <Button
+                                onPress={() => {
+                                    onChange(name);
+                                    setShowDropdown(false);
+                                }}
+                                className="flex-1 ml-2 flex-row items-center gap-1">
+                                <IconSymbol name="cart" size={12} color="black" />
+                                <Text className="capitalize text-lg">{name}</Text>
+                            </Button>
 
-                    onChangeText={setQuantity}
-                    value={quantity}
-                    className="text-md flex-1 text-dark bg-gray-200 text-right"
-                    placeholderTextColor="#0000"
-                />
-
-            </View>
+                        </View>
+                    )}
+                </Animated.View>
+            }
         </View>
     )
 }
