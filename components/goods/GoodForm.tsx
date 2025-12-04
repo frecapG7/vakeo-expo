@@ -79,7 +79,7 @@ export const GoodForm = ({ control, trip }: { control: any, trip: Trip }) => {
                     exiting={FadeOutDown}
                     className="flex px-4 gap-2">
                     {names?.map((name: string, index: number) =>
-                        <View key={index} className="border-b dark:border-white bg-orange-200">
+                        <View key={index} className="border-b dark:border-white bg-orange-200 dark:bg-gray-200 rounded-b-lg">
                             <Button
                                 onPress={() => {
                                     onChange(name);

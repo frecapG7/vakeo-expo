@@ -1,6 +1,8 @@
 import useI18nNumbers from "@/hooks/i18n/useI18nNumbers";
 import useColors from "@/hooks/styles/useColors";
+import { getDatesBetween } from "@/lib/utils";
 import { getPercent } from "@/lib/voteUtils";
+import { DateVote, TripUser } from "@/types/models";
 import dayjs from "dayjs";
 import { useMemo, useRef, useState } from "react";
 import { useFieldArray, useWatch } from "react-hook-form";
@@ -14,63 +16,81 @@ interface CustomDayProps extends DayProps {
 }
 
 
+const buildMarkedDays = (votes: DateVote[], user: TripUser) => {
 
-const setMarkedDay = (markedDay, previousMarkedDays) => {
+    const result = {};
 
-    debugger
-    const previousMarkedDay = previousMarkedDays[markedDay?.day];
-    return {
-        ...previousMarkedDays,
-        [markedDay.day]: {
-            startingDay: markedDay.startingDay,
-            endingDay: markedDay.endingDay,
-            selected: true,
-            color: markedDay.color,
-            textColor: markedDay.textColor,
-            disableTouchEvent: markedDay.disableTouchEvent,
-            nbOfVoters: markedDay.nbOfVoters,
-            users: previousMarkedDay ? [...new Set([...previousMarkedDay.users, ...markedDay?.users])] : [...markedDay?.users]
+    votes.forEach(vote => {
+        const startDate = dayjs(vote?.startDate);
+        const endDate = dayjs(vote?.endDate);
 
-        }
-    }
+        getDatesBetween(startDate, endDate, true)
+            .map(date => dayjs(date).format("YYYY-MM-DD"))
+            .forEach((dateKey) => {
 
+                if (!result[dateKey])
+                    result[dateKey] = {
+                        startingDay: false,
+                        endingDay: false,
+                        users: [],
+                        selected: false
+                    }
+
+                vote.users
+                    .filter(user => !result[dateKey].users.includes(user._id))
+                    .forEach(user => result[dateKey].users.push(user._id))
+
+                if (startDate.format("YYYY-MM-DD") === dateKey)
+                    result[dateKey].startingDay = true;
+                if (endDate.format("YYYY-MM-DD") === dateKey)
+                    result[dateKey].endingDay = true
+                if (result[dateKey].users.includes(user._id))
+                    result[dateKey].selected = true
+            });
+    });
+
+    return result
+};
+
+
+const buildCustomDayClassName = (marking, active) => {
+
+    let output = "text-xl rounded-full w-10 h-10 text-center items-center font-bold dark:text-white"
+
+    if (marking?.startingDay)
+        output = output + " bg-orange-200 dark:bg-gray-200 dark:text-gray-600 ";
+    if (marking?.endingDay)
+        output = output + " bg-orange-400 dark:bg-gray-400 dark:text-gray-600 ";
+
+    if (marking?.selected)
+        output = output + " border dark:border-white"
+
+    if (active)
+        output = output + " bg-blue-200 dark:bg-blue-200 dark:text-gray-600";
+    return output;
 
 }
 
-const setResult = (date, prevResult, user, options) => {
-    const result = prevResult[date.format("YYYY-MM-DD")] || {
-        voters: [],
-        ...options
-    };
-    result.voters?.push(user);
-    return result;
-}
+const CustomDay = ({ date, marking, onPress, theme, percent, active }: { date: DateData, marking?: any, onPress: (day: any) => void, theme?: any, percent: String, active: boolean }) => {
 
-
-const CustomDay: React.FC<CustomDayProps> = ({ date, marking, onPress, theme }: { date: DateData, marking?: any, onPress: (day: any) => void, theme?: any }) => {
-
-    const { formatPercent } = useI18nNumbers();
-
-    const percent = marking?.nbOfVoters ? getPercent(marking?.users?.length, marking?.nbOfVoters) : 0;
+    const className = buildCustomDayClassName(marking, active);
 
     return (
         <Pressable className="flex items-center justify-center p-2"
-            onPress={() => onPress(date)}>
-            <Text className={`text-xl rounded-full w-10 h-10 text-center items-center font-bold dark:text-white ${marking?.color && "border"}`}
-                style={{
-                    borderColor: marking?.color,
-                    ...(marking?.selected && { backgroundColor: marking?.color }),
-                    color: marking?.selected ? marking?.textColor : theme?.dayTextColor
-                }}>
+            onPress={() => onPress(date)}
+            disabled={marking?.selected && !(marking?.startingDay || marking?.endingDay)}
+
+        >
+            <Text className={className}>
                 {date.day}
             </Text>
-            <Text className="text-sm text-black text-center italic dark:text-white">{percent ? formatPercent(percent, 0) : ""}</Text>
+            <Text className="text-sm text-black text-center italic dark:text-white">{percent !== "0 %" && percent}</Text>
         </Pressable>
     )
 }
 
 
-export const DatesVoteForm = ({ control, user, disabled = false }: { control: any, user: any, disabled: boolean }) => {
+export const DatesVoteForm = ({ control, user, disabled = false }: { control: any, user: TripUser, disabled: boolean }) => {
 
     const colors = useColors();
 
@@ -81,91 +101,25 @@ export const DatesVoteForm = ({ control, user, disabled = false }: { control: an
             minLength: 1
         }
     });
-    const minDate = useMemo(() => {
-        if (votes?.length > 0)
-            return dayjs.min(votes.map(v => dayjs(v.startDate).startOf("day")));
-        return dayjs().startOf("day");
-    }, [votes]);
 
-
-    const [selectedStartDate, setSelectedStartDate] = useState();
+    const [activeDate, setActiveDate] = useState<string>("");
 
     const voters = useWatch({
         control,
         name: "voters"
     });
     const nbOfVoters = useMemo(() => {
-        if (!voters)
-            return 1 // ME
-
-        return voters.filter(v => v._id !== user._id)?.length + 1
+        return voters?.filter(v => v._id !== user._id)?.length + 1
     }, [voters]);
 
 
     const calendarRef = useRef();
 
-    // const markedDays = useMemo(() => {
-    //     let result: Record<string, any> = {};
+    const markedDays = useMemo(() => buildMarkedDays(votes, user, nbOfVoters), [votes]);
 
-    //     if (!!selectedStartDate)
-    //         result = setMarkedDay({
-    //             day: selectedStartDate.format("YYYY-MM-DD"),
-    //             selected: true,
-    //             color: colors.primary,
-    //             textColor: colors.neutral,
-    //             disableTouchEvent: true,
-    //             nbOfVoters,
-    //             users: [user]
-    //         }, result)
+    const { formatPercent } = useI18nNumbers();
 
 
-    //     votes.forEach((vote) => {
-    //         const selected = vote?.users.map(u => u._id).includes(user._id);
-
-    //         result = setMarkedDay({
-    //             day: dayjs(vote.startDate)?.format("YYYY-MM-DD"),
-    //             selected: selected,
-    //             color: colors.primary,
-    //             textColor: colors.neutral,
-    //             nbOfVoters,
-    //         }, result);
-
-    //         result = setMarkedDay({
-    //             day: dayjs(vote.endDate)?.format("YYYY-MM-DD"),
-    //             endingDay: true,
-    //             selected: selected,
-    //             color: colors.primary,
-    //             textColor: colors.neutral,
-    //             nbOfVoters,
-    //         }, result);
-
-
-
-    //         getDatesBetween(vote.startDate, vote.endDate, false)
-    //             .filter(date => !dayjs(date).isSame(vote.startDate, "day") && !dayjs(date).isSame(vote.endDate, "day"))
-    //             .map(date => date?.format('YYYY-MM-DD'))
-    //             // .filter(v => v !== dayjs(vote.startDate).format("YYYY-MM-DD") && v !== dayjs(vote.endDate).format("YYYY-MM-DD"))
-    //             // .forEach(day => {
-    //             //     result[day] = {
-    //             //         color: colors.neutral,
-    //             //         textColor: colors.text,
-    //             //         selected: selected,
-    //             //         nbOfVoters,
-    //             //         users: result[day] ? [...new Set([...result[day]?.users, ...vote?.users])] : [...vote?.users]
-
-    //             //     }
-    //             // });
-    //             .forEach((day) => setMarkedDay({
-    //                 day,
-    //                 selected,
-    //                 nbOfVoters,
-    //                 users: vote?.users
-    //             }, result));
-    //     });
-    //     return result;
-    // }, [votes, selectedStartDate])
-
-    const markedDays = {}
     return (
         <View>
             <CalendarList
@@ -187,9 +141,10 @@ export const DatesVoteForm = ({ control, user, disabled = false }: { control: an
                     disabledArrowColor: '#d9e1e8',
                     monthTextColor: colors.text,
                     indicatorColor: colors.text,
+                    // primary: colors.primary
                 }}
                 markingType="period"
-                minDate={dayjs(minDate).toISOString()}
+                minDate={dayjs().toISOString()}
                 // Max amount of months allowed to scroll to the past. Default = 50
                 pastScrollRange={1}
                 // Max amount of months allowed to scroll to the future. Default = 50
@@ -202,11 +157,11 @@ export const DatesVoteForm = ({ control, user, disabled = false }: { control: an
                 onDayPress={({ dateString }) => {
                     if (disabled)
                         return;
-                    if (!selectedStartDate)
-                        setSelectedStartDate(dayjs(dateString).startOf("day"))
+                    if (!activeDate)
+                        setActiveDate(dateString);
                     else {
 
-                        const startDate = selectedStartDate;
+                        const startDate = dayjs(activeDate).startOf("day");
                         const endDate = dayjs(dateString).endOf("day");
 
                         const index = votes?.findIndex(v => dayjs(startDate).isSame(v?.startDate) && endDate.isSame(v.endDate));
@@ -220,16 +175,26 @@ export const DatesVoteForm = ({ control, user, disabled = false }: { control: an
                             });
                         } else {
                             append({
-                                startDate: selectedStartDate,
-                                endDate: dayjs(dateString).endOf("day"),
+                                startDate: startDate,
+                                endDate: endDate,
                                 users: [user]
                             });
                         }
-                        setSelectedStartDate(null);
+                        setActiveDate("");
 
                     }
                 }}
-                dayComponent={CustomDay}
+                dayComponent={({ date, marking, onPress, theme }) =>
+                    <CustomDay
+                        date={date}
+                        marking={marking}
+                        onPress={onPress}
+                        theme={theme}
+                        percent={formatPercent(getPercent(marking?.users?.length, nbOfVoters), 0)}
+                        active={activeDate === date?.dateString}
+                    />
+                }
+
 
             />
         </View>

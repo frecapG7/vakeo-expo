@@ -28,6 +28,13 @@ export interface Good {
     name: string,
     quantity: string,
     createdBy: TripUser,
-    event ?: Event,
+    event?: Event,
     checked: boolean
+}
+
+
+export interface DateVote {
+    startDate: Date,
+    endDate: Date,
+    users: TripUser[]
 }

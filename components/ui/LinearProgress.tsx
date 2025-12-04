@@ -1,12 +1,7 @@
-import useI18nNumbers from "@/hooks/i18n/useI18nNumbers";
 import { View } from "react-native";
 
 
 export const LinearProgress = ({ progress = 0, color = "bg-green-400" }: { progress: number, color?: String }) => {
-
-
-    const { formatPercent } = useI18nNumbers();
-
 
     return (
         <View>
