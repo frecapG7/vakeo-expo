@@ -1,4 +1,4 @@
-import { GoodForm } from "@/components/goods/GoodForm";
+import { GoodBottomSheet } from "@/components/goods/GoodBottomSheet";
 import { GoodListItemSkeleton } from "@/components/goods/GoodListItem";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
@@ -6,18 +6,16 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Switch } from "@/components/ui/Switch";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
-import { useCheckGood, useGetGoods, usePostGood, usePutGood } from "@/hooks/api/useGoods";
+import { useCheckGood, useGetGoods } from "@/hooks/api/useGoods";
 import useColors from "@/hooks/styles/useColors";
 import { Good } from "@/types/models";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
-import { useContext, useMemo, useRef, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { useContext, useMemo, useState } from "react";
+import { ActivityIndicator, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { FadeIn, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Toast } from "toastify-react-native";
 
 export default function GoodPage() {
 
@@ -29,46 +27,21 @@ export default function GoodPage() {
     const { data, isLoading, isFetching, isFetchingNextPage, hasNextPage, fetchNextPage } = useGetGoods(id, {
         ...(unchecked && { unchecked: true })
     });
-    const postGood = usePostGood(id);
-    const putGood = usePutGood(id);
+    const queryClient = useQueryClient();
+
     const checkGood = useCheckGood(id);
 
-    const { control, handleSubmit, reset } = useForm({
-        defaultValues: {
-            _id: "",
-            name: "",
-            quantity: "1"
-        }
-    });
 
-    const onSubmit = async (data: any) => {
-        if (data._id)
-            await putGood.mutateAsync(data);
-        else
-            await postGood.mutateAsync({
-                ...data,
-                createdBy: me
-            });
-        if (data._id)
-            bottomSheetRef.current?.close();
-        reset({
-            name: "",
-            quantity: "1"
-        });
 
-        Toast.success(data._id ? "Course modifiée" : "Course ajoutée");
-
-    }
 
     const onCheck = async (data: Good) => {
         await checkGood.mutateAsync(data);
     }
 
-    const _id = useWatch({
-        control,
-        name: "_id"
-    });
-    const bottomSheetRef = useRef<BottomSheet>(null);
+
+
+
+    const [selectedGood, setSelectedGood] = useState<Good | null>();
 
     const colors = useColors();
 
@@ -79,7 +52,17 @@ export default function GoodPage() {
             <GestureHandlerRootView style={styles.container}>
                 <Animated.View entering={ZoomIn} exiting={ZoomOut} className="border-b border-orange-400 dark:border-gray-400 pb-1 mb-5">
                     <View className="flex-row items-center">
-                        <Button className="flex-row flex-1 ml-10 gap-2 items-center" onPress={() => bottomSheetRef?.current?.expand()}>
+                        <Button className="flex-row flex-1 ml-10 gap-2 items-center" onPress={() => {
+                            setSelectedGood({
+                                _id: "",
+                                name: "",
+                                quantity: "1",
+                                createdBy: me,
+                                trip: {
+                                    _id: id
+                                }
+                            });
+                        }}>
                             <IconSymbol name="plus" color="blue" />
                             <Text className="text-2xl font-bold text-blue-400">Ajouter</Text>
                         </Button>
@@ -119,10 +102,7 @@ export default function GoodPage() {
                                     </View>
                                     <Text className={`dark:text-white text-lg font-bold ${item.checked ? "line-through opacity-50" : ""}`}>{item?.quantity}</Text>
                                 </Button>
-                                <Button className="rounded-full bg-blue-400 p-1" onPress={() => {
-                                    reset(item);
-                                    bottomSheetRef?.current?.expand();
-                                }}>
+                                <Button className="rounded-full bg-blue-400 p-1" onPress={() => setSelectedGood(item)}>
                                     <IconSymbol name="pencil" size={16} />
                                 </Button>
                             </View>
@@ -150,6 +130,7 @@ export default function GoodPage() {
                                 </Text>
                             </View>
                     }
+                    onRefresh={() => queryClient.invalidateQueries({ queryKey: ["trips", id, "goods"] })}
                     onEndReached={() => {
                         if (hasNextPage)
                             fetchNextPage();
@@ -171,35 +152,12 @@ export default function GoodPage() {
 
 
 
-                <BottomSheet ref={bottomSheetRef}
-                    index={-1}
-                    backgroundStyle={{
-                        backgroundColor: colors.background,
-                        ...styles.bottomSheet
+                <GoodBottomSheet good={selectedGood}
+                    trip={{
+                        _id: id
                     }}
-                    enablePanDownToClose={true}
-                >
-
-                    <BottomSheetView style={{ flex: 1 }} className="gap-2 py-5 px-2">
-                        <Pressable className="flex-row gap-1 mb-5 items-center" onPress={() => bottomSheetRef.current?.close()}>
-                            <View className="rounded-full">
-                                <IconSymbol name="xmark.circle" color={colors?.text} />
-                            </View>
-                            <Text className="text-2xl font-bold dark:text-white">{_id ? "Modifier course" : "Ajouter course"}</Text>
-                        </Pressable>
-
-                        <View className="gap-5 my-5">
-                            <GoodForm control={control} trip={{ _id: id }} />
-                            <View className="px-10">
-                                <Button variant="contained"
-                                    className="px-10"
-                                    title={_id ? "Modifier" : "Ajouter"}
-                                    onPress={handleSubmit(onSubmit)}
-                                    isLoading={postGood.isPending} />
-                            </View>
-                        </View>
-                    </BottomSheetView>
-                </BottomSheet>
+                    open={!!selectedGood}
+                    onClose={() => setSelectedGood(null)} />
             </GestureHandlerRootView>
         </SafeAreaView>
     )
