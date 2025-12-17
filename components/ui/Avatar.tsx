@@ -18,7 +18,7 @@ const sizeToClassMap = {
 
 const sizeToMarginMap = {
     xs: "-mr-2",
-    sm: "-mr-5",
+    sm: "-mr-3",
     md: "-mr-6",
     lg: "-mr-7",
     xl: "-mr-10"
