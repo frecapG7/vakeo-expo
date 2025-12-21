@@ -164,7 +164,14 @@ export default function TripActivityDetails() {
                     </View>
                     <Pressable className="flex-row gap-5 items-center py-2" onPress={() => setShowOwners(true)}>
                         <IconSymbol name="smiley" color="gray" size={34} />
+
+
                         <View className="flex-row flex-1 border-b border-gray-800 py-2 items-center gap-2">
+
+                            {activity?.owners?.length === 0 &&
+
+                                <Text className="dark:text-white text-center text-md">Aucun responsable</Text>
+                            }
                             <AvatarsGroup avatars={activity?.owners.map((owner) => ({
                                 avatar: owner?.avatar,
                                 alt: owner.name.charAt(0)
@@ -220,7 +227,7 @@ export default function TripActivityDetails() {
                 </View>
 
 
-                <View className="px-4 mt-2">
+                <View className="px-4 mt-5">
                     <View className="flex-row justify-between items-center">
                         <Text className="font-bold text-lg dark:text-white">Détails</Text>
                         {/* <Button variant="contained"

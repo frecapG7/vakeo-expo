@@ -44,7 +44,7 @@ export const PickUsersModal = ({
                             <Text className="text-xl dark:text-white">Fermer</Text>
                         </Button>
 
-                        <Text className="text-2xl font-bold">{title}</Text>
+                        <Text className="text-2xl font-bold dark:text-white">{title}</Text>
                     </View>
 
 

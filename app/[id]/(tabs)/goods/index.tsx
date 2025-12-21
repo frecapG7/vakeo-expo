@@ -10,9 +10,9 @@ import { useCheckGood, useGetGoods } from "@/hooks/api/useGoods";
 import useColors from "@/hooks/styles/useColors";
 import { Good } from "@/types/models";
 import { useQueryClient } from "@tanstack/react-query";
-import { useLocalSearchParams } from "expo-router";
-import { useContext, useMemo, useState } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
+import { useContext, useEffect, useMemo, useState } from "react";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { FadeIn, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -31,15 +31,9 @@ export default function GoodPage() {
 
     const checkGood = useCheckGood(id);
 
-
-
-
     const onCheck = async (data: Good) => {
         await checkGood.mutateAsync(data);
     }
-
-
-
 
     const [selectedGood, setSelectedGood] = useState<Good | null>();
 
@@ -47,32 +41,45 @@ export default function GoodPage() {
 
     const goods = useMemo(() => data?.pages.flatMap((page) => page?.goods), [data]);
 
+    const handleAdd = () => setSelectedGood({
+        _id: "",
+        name: "",
+        quantity: "1",
+        createdBy: me,
+        trip: {
+            _id: id
+        }
+    });
+
+    const router = useRouter();
+    const navigation = useNavigation();
+
+
+    useEffect(() => {
+        navigation.setOptions({
+            headerRight: () => <Pressable
+                onPressOut={handleAdd}
+                className="bg-gray-800 rounded-full p-2 mx-2 z-1000">
+                <IconSymbol name="plus" color="white" />
+            </Pressable>,
+        })
+    }, [navigation]);
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <GestureHandlerRootView style={styles.container}>
                 <Animated.View entering={ZoomIn} exiting={ZoomOut} className="border-b border-orange-400 dark:border-gray-400 pb-1 mb-5">
                     <View className="flex-row items-center">
-                        <Button className="flex-row flex-1 ml-10 gap-2 items-center" onPress={() => {
-                            setSelectedGood({
-                                _id: "",
-                                name: "",
-                                quantity: "1",
-                                createdBy: me,
-                                trip: {
-                                    _id: id
-                                }
-                            });
-                        }}>
+                        {/* <Button className="flex-row flex-1 ml-10 gap-2 items-center" onPress={handleAdd}>
                             <IconSymbol name="plus" color="blue" />
                             <Text className="text-2xl font-bold text-blue-400">Ajouter</Text>
-                        </Button>
+                        </Button> */}
                         <View className="items-center">
                             <Switch value={unchecked} onSwitch={(v) => setUnchecked(!unchecked)} />
                             <Text className="text-sm dark:text-white">Uniquement manquant</Text>
                         </View>
 
                     </View>
-                </Animated.View>
+                </Animated.View>a
                 <Animated.FlatList
                     data={goods}
                     refreshing={isLoading}

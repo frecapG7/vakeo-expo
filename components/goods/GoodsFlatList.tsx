@@ -18,6 +18,7 @@ export const GoodsFlatList = (
         <Animated.FlatList
             data={goods}
             refreshing={isRefreshing}
+            className="flex-1"
             renderItem={({ item, index }) =>
                 <View className="px-2">
                     {item?.name !== goods[index - 1]?.name &&
@@ -33,11 +34,11 @@ export const GoodsFlatList = (
                             <Text className={`dark:text-white text-p=p=m font-bold ${item.checked ? "line-through opacity-50" : ""}`}>{item?.quantity}</Text>
                         </Button>
 
-                         <Button className="rounded-full border bg-blue-500 p-1"
-                                    onPress={() => onClick(item)}
-                                    disabled={item.checked} >
-                                    <IconSymbol name="pencil" color="black" size={16} />
-                                </Button>
+                        <Button className="rounded-full border bg-blue-500 p-1"
+                            onPress={() => onClick(item)}
+                            disabled={item.checked} >
+                            <IconSymbol name="pencil" color="black" size={16} />
+                        </Button>
                     </View>
                 </View>
             }
@@ -78,7 +79,6 @@ export const GoodsFlatList = (
                 if (goods?.length > 0)
                     return
             }
-
             }
         />
     )

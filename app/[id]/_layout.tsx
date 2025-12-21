@@ -5,8 +5,6 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect } from "react";
 
 
-
-
 export default function TripDetailsLayout() {
 
     const router = useRouter();
@@ -23,8 +21,6 @@ export default function TripDetailsLayout() {
         if (!!storageTrip && !storageTrip.user)
             router.navigate('./pick-user');
     }, [router, storageTrip]);
-
-
 
     return (
         <TripContext.Provider value={{
@@ -66,8 +62,6 @@ export default function TripDetailsLayout() {
                         headerShown: false
                     }} />
             </Stack>
-
-
         </TripContext.Provider>
 
     )

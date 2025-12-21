@@ -68,7 +68,7 @@ export const GoodForm = ({ control, trip }: { control: any, trip: Trip }) => {
                     <TextInput
                         onChangeText={setQuantity}
                         value={quantity}
-                        className="text-md flex-1 text-dark bg-gray-200 text-right"
+                        className="text-md flex-1 text-dark bg-gray-200 text-right min-h-5"
                         placeholderTextColor="#0000"
                     />
                 </View>

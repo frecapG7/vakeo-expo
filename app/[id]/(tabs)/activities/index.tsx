@@ -43,7 +43,6 @@ const EventItem = ({ event, onPress, user }: { event: Event, onPress: () => void
                     }))}
                         maxLength={2}
                         size2="sm" />
-
                 </View>
             </View>
             <View className="flex-row gap-1">
@@ -74,7 +73,7 @@ export default function TripActivities() {
     const { formatDate } = useI18nTime();
 
     const events = useMemo(() => data?.pages.flatMap((page) => page?.events), [data]);
-
+    
     return (
         <SafeAreaView style={styles.container}>
 
