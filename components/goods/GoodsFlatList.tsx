@@ -1,5 +1,5 @@
 import { Good } from "@/types/models";
-import { ActivityIndicator, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { Button } from "../ui/Button";
 import { Checkbox } from "../ui/Checkbox";
@@ -69,17 +69,17 @@ export const GoodsFlatList = (
                 if (hasNextPage)
                     fetchNextPage();
             }}
-            ListHeaderComponent={() => {
-                if (isFetching)
-                    return (
-                        <View className="items-center">
-                            <ActivityIndicator />
-                        </View>);
+            // ListHeaderComponent={() => {
+            //     if (isFetching)
+            //         return (
+            //             <View className="items-center">
+            //                 <ActivityIndicator />
+            //             </View>);
 
-                if (goods?.length > 0)
-                    return
-            }
-            }
+            //     if (goods?.length > 0)
+            //         return
+            // }
+            // }
         />
     )
 }
