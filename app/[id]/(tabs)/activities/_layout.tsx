@@ -17,12 +17,11 @@ export default function TripEventsLayout() {
             headerShown: true
         }}>
             <Stack.Screen name="index" options={{
-                headerShown: false,
+                headerShown: true,
                 title: "Activités",
                 headerTintColor: "white",
                 headerTitleStyle: styles.headerTitle,
                 headerRight: () =>
-
                     <Pressable
                         onPressOut={() =>
                             router.push({
@@ -44,7 +43,6 @@ export default function TripEventsLayout() {
             }} />
             <Stack.Screen name="[activityId]" options={{
                 headerShown: false,
-                title: "",
             }} />
         </Stack >
     )
