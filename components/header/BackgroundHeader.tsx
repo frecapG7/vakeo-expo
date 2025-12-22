@@ -2,11 +2,7 @@ import { Trip } from "@/types/models";
 import { ImageBackground, View } from "react-native";
 
 
-
-
 export const BackgroundHeader = ({ trip }: { trip: Trip }) => {
-
-
     return (
         <View  pointerEvents="none" >
             <ImageBackground
