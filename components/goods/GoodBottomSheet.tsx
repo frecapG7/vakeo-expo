@@ -3,7 +3,7 @@ import { useDeleteGood, usePostGood, usePutGood } from "@/hooks/api/useGoods"
 import useColors from "@/hooks/styles/useColors"
 import { Good, Trip } from "@/types/models"
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet"
-import { useEffect, useRef } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import { useForm } from "react-hook-form"
 import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native"
 import Animated, { FadeIn } from "react-native-reanimated"
@@ -34,6 +34,8 @@ export const GoodBottomSheet = ({ good, trip, onClose }: { good?: Good | null, t
     const putGood = usePutGood(trip?._id);
     const deleteGood = useDeleteGood(trip?._id);
 
+
+    const snapPoints = useMemo(() => ["25%"], []);
 
     const onSubmit = async (data: any) => {
         if (data._id) {
@@ -73,6 +75,9 @@ export const GoodBottomSheet = ({ good, trip, onClose }: { good?: Good | null, t
                 ...styles.bottomSheet
             }}
             enablePanDownToClose={true}
+            keyboardBehavior="interactive"
+            keyboardBlurBehavior="restore"
+            snapPoints={snapPoints}
         >
 
             <BottomSheetView style={{ flex: 1 }} className="gap-2 py-5 px-2">
@@ -111,6 +116,7 @@ export const GoodBottomSheet = ({ good, trip, onClose }: { good?: Good | null, t
                 </View>
 
                 <View className="gap-5 my-1">
+                  
                     <GoodForm control={control} trip={trip} />
                     <View className="px-10 mt-10">
                         <Button variant="contained"

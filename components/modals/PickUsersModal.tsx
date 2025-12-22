@@ -1,4 +1,5 @@
 import useColors from "@/hooks/styles/useColors"
+import { TripUser } from "@/types/models"
 import { Modal, Pressable, Text, View } from "react-native"
 import AnimatedCheckbox from "react-native-checkbox-reanimated"
 import Animated from "react-native-reanimated"
@@ -12,14 +13,16 @@ export const PickUsersModal = ({
     users = [],
     onClick,
     disabled = false,
+    title
 }
     :
     {
         open: boolean,
         onClose: () => void,
-        users: [],
+        users: TripUser[],
         onClick?: (user: any, index: number) => void,
         disabled?: boolean,
+        title?: string
     }) => {
 
 
@@ -36,10 +39,12 @@ export const PickUsersModal = ({
                     backgroundColor: colors.background,
                     padding: 25
                 }}>
-                    <View className="my-5">
+                    <View className="my-5 flex-row gap-5 items-center">
                         <Button onPress={onClose}>
                             <Text className="text-xl dark:text-white">Fermer</Text>
                         </Button>
+
+                        <Text className="text-2xl font-bold dark:text-white">{title}</Text>
                     </View>
 
 

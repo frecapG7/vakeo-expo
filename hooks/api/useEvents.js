@@ -34,9 +34,7 @@ export const usePostEvent = (tripId) => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data) => postEvent(tripId, data),
-        onSuccess: () => queryClient.invalidateQueries({
-            queryKey: ["trips", tripId, "events"]
-        })
+        onSuccess: () => queryClient.invalidateQueries(["trips", tripId, "events"])
     })
 }
 

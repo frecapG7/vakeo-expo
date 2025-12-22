@@ -52,7 +52,13 @@ const MAPPING = {
   "person": "person",
   "chart.bar.fill": "poll",
   "chevron.down": "keyboard-arrow-down",
-  "chevron.up": "keyboard-arrow-up"
+  "chevron.up": "keyboard-arrow-up",
+  "bookmark.fill": "bookmark",
+  "bookmark": "bookmark-outline",
+  "smiley": "face",
+  "map": "location-pin",
+  "sportscourt": "sports-gymnastics",
+  "moon.stars.fill": "nights-stay"
 } as IconMapping;
 
 /**

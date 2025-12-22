@@ -137,6 +137,7 @@ export const EventForm = ({ control, }: {
                 </View>
             </View>
 
+
             <View className="flex-1 mt-1 gap-2">
                 <View className="flex flex-row justify-between" >
                     <Text className="text-lg font-bold  italic ml-5 dark:text-white">
@@ -153,8 +154,8 @@ export const EventForm = ({ control, }: {
                                 <Avatar src={owner.avatar} alt={owner.name.charAt(0)} size2="sm" />
                                 <Text className="text-lg font-bold">{owner.name}</Text>
                             </View>
-                            <Button onPress={() => remove(index)} className="bg-red-500 dark:bg-gray-700 rounded-full p-2">
-                                <IconSymbol name="trash" size={20} color="white" />
+                            <Button onPress={() => remove(index)} className="bg-red-500 dark:bg-gray-700 rounded-full p-1">
+                                <IconSymbol name="trash" size={20} color="black" />
                             </Button>
                         </View>
                     ))}

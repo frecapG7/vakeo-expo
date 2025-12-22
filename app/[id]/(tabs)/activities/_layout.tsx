@@ -1,62 +1,48 @@
-import { Button } from "@/components/ui/Button";
+import { BackgroundHeader } from "@/components/header/BackgroundHeader";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import useColors from "@/hooks/styles/useColors";
+import styles from "@/constants/Styles";
+import { useGetTrip } from "@/hooks/api/useTrips";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { Text, View } from "react-native";
-
-
-
+import { Pressable } from "react-native";
 
 export default function TripEventsLayout() {
 
-
     const { id } = useLocalSearchParams();
+    const { data: trip } = useGetTrip(id);
 
-    const colors = useColors();
     const router = useRouter();
 
     return (
         <Stack screenOptions={{
-            title: "",
-            headerStyle: {
-                backgroundColor: colors.background,
-            },
-            headerShadowVisible: false
+            headerShown: true
         }}>
             <Stack.Screen name="index" options={{
-                headerLeft: () => (
-                    <View className="flex-row items-center justify-center gap-1">
-                        <Text className="text-2xl font-bold dark:text-white">Activités</Text>
-                        <View className="rounded-full bg-orange-400 dark:bg-gray-400 p-2">
-                            <IconSymbol name="flame" size={20} color="black" />
-                        </View>
-                    </View>),
-                headerRight: () => (
-                    <Button variant="contained"
-                        className="p-2 rounded-full ringed"
-                        onPress={() => {
-                            //TODO: ./new should be enought but it is not
+                headerShown: true,
+                title: "Activités",
+                headerTintColor: "white",
+                headerTitleStyle: styles.headerTitle,
+                headerRight: () =>
+                    <Pressable
+                        onPressOut={() =>
                             router.push({
                                 pathname: "/[id]/(tabs)/activities/new",
                                 params: { id: String(id) }
-                            });
-                        }} >
-                        <IconSymbol name="plus" size={20} />
-                    </Button>
-                )
+                            })
+
+                        }
+                        className="bg-gray-800 rounded-full p-2 mx-2 z-1000">
+                        <IconSymbol name="plus" color="white" />
+                    </Pressable>,
+                headerBackground: () => <BackgroundHeader trip={trip} />,
             }} />
             <Stack.Screen name="new" options={{
                 title: "Nouvelle activité",
                 headerBackTitle: "Annuler",
-                presentation: "modal"
-            }}
-            />
+                presentation: "modal",
+                headerShown: true,
+            }} />
             <Stack.Screen name="[activityId]" options={{
                 headerShown: false,
-                headerStyle: {
-                    backgroundColor: colors.background,
-                }
-
             }} />
         </Stack >
     )

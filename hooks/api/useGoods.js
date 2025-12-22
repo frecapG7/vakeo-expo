@@ -89,15 +89,17 @@ export const useGetNames = (tripId, search) => {
 }
 
 
-const getCount = async (tripId) => {
-    const response = await axios.get(`/trips/${tripId}/goods/count`);
+const getCount = async (tripId, params) => {
+    const response = await axios.get(`/trips/${tripId}/goods/count`, {
+        params
+    });
     return response.data;
 }
 
-export const useGetGoodsCount = (tripId) => {
+export const useGetGoodsCount = (tripId, params) => {
     return useQuery({
-        queryKey: ["trips", tripId, "goods", "count"],
-        queryFn: () => getCount(tripId),
+        queryKey: ["trips", tripId, "goods", "count", params],
+        queryFn: () => getCount(tripId, params),
         enabled: !!tripId
     })
 }

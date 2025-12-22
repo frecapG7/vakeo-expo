@@ -16,6 +16,13 @@ const styles = StyleSheet.create({
     image: {
         flex: 1,
         borderRadius: 10
+    },
+    headerTitle: {
+        fontWeight: "bold",
+        fontSize: 25,
+        textShadowColor: 'rgba(0, 0, 0, 0.75)',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 3,
     }
 });
 
