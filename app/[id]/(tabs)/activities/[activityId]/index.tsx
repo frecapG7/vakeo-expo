@@ -145,10 +145,14 @@ export default function TripActivityDetails() {
                     }
                 </View>
 
+<<<<<<< HEAD
                 <View className="px-4 mt-5 gap-2">
                     <Text className="text-xl capitalize font-bold ml-2 dark:text-white">
                         Détails
                     </Text>
+=======
+                <View className="px-4 mt-5">
+>>>>>>> origin/main
                     <Text className="dark:text-white">
                         {activity?.details ? activity.details : "Pas de détails"}
                     </Text>

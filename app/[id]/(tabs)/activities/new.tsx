@@ -8,7 +8,11 @@ import { useGetTrip } from "@/hooks/api/useTrips";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { useContext, useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
+<<<<<<< HEAD
 import { KeyboardAvoidingView, Platform, Text, View } from "react-native";
+=======
+import { Text, View } from "react-native";
+>>>>>>> origin/main
 import Animated, { SlideInRight, SlideOutLeft } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Toast } from "toastify-react-native";
@@ -33,7 +37,6 @@ export default function NewTripActivity() {
             owners: [],
             type: "",
             details: ""
-
         }
     });
     const type = useWatch({

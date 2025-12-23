@@ -11,6 +11,10 @@ import { useCallback, useRef } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+<<<<<<< HEAD
+=======
+import { SafeAreaView } from "react-native-safe-area-context";
+>>>>>>> origin/main
 import { Toast } from "toastify-react-native";
 
 
@@ -43,7 +47,11 @@ export default function ItemDetailsLayout() {
     }
 
     return (
+<<<<<<< HEAD
         // <SafeAreaView style={{ flex: 1 }}>
+=======
+        <SafeAreaView style={{ flex: 1 }}>
+>>>>>>> origin/main
             <GestureHandlerRootView style={{ flex: 1 }}>
                 <BottomSheetModalProvider>
                     <Tabs screenOptions={{
@@ -181,7 +189,11 @@ export default function ItemDetailsLayout() {
                     </BottomSheetModal>
                 </BottomSheetModalProvider>
             </GestureHandlerRootView>
+<<<<<<< HEAD
         // </SafeAreaView>
+=======
+        </SafeAreaView>
+>>>>>>> origin/main
 
 
 
