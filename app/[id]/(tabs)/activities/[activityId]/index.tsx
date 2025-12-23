@@ -87,10 +87,7 @@ export default function TripActivityDetails() {
                     </View>
                     <Pressable className="flex-row gap-5 items-center py-2" onPress={() => setShowOwners(true)}>
                         <IconSymbol name="smiley" color="gray" size={34} />
-
-
                         <View className="flex-row flex-1 border-b border-gray-800 py-2 items-center gap-2">
-
                             {activity?.owners?.length === 0 &&
 
                                 <Text className="dark:text-white text-center text-md">Aucun responsable</Text>
@@ -148,7 +145,10 @@ export default function TripActivityDetails() {
                     }
                 </View>
 
-                <View className="px-4 mt-5">
+                <View className="px-4 mt-5 gap-2">
+                    <Text className="text-xl capitalize font-bold ml-2 dark:text-white">
+                        Détails
+                    </Text>
                     <Text className="dark:text-white">
                         {activity?.details ? activity.details : "Pas de détails"}
                     </Text>

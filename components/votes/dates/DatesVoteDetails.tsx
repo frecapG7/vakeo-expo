@@ -4,32 +4,27 @@ import { Button } from "@/components/ui/Button"
 import { LinearProgress } from "@/components/ui/LinearProgress"
 import useI18nTime from "@/hooks/i18n/useI18nTime"
 import { getPercent } from "@/lib/voteUtils"
+import { TripUser } from "@/types/models"
 import { useState } from "react"
 import { Pressable, Text, View } from "react-native"
 import AnimatedCheckbox from "react-native-checkbox-reanimated"
 
 
-interface IUser {
-    _id: string,
-    name: string,
-    avatar: string
-}
-
 interface IVote {
     _id: string,
     startDate: Date,
     endDate: Date
-    users: [IUser]
+    users: [TripUser]
 }
 
 interface IDatesVote {
-    createdBy: IUser,
-    voters: [IUser],
+    createdBy: TripUser,
+    voters: [TripUser],
     votes: [IVote],
     status: string
 }
 
-export const DatesVoteDetails = ({ vote, me, onVote, onUnVote }: { vote?: IDatesVote, me?: IUser, onVote: (id: string) => void, onUnVote: (id: string) => void }) => {
+export const DatesVoteDetails = ({ vote, me, onVote, onUnVote }: { vote?: IDatesVote, me?: TripUser, onVote: (id: string) => void, onUnVote: (id: string) => void }) => {
 
     const { formatRange } = useI18nTime();
 
@@ -61,7 +56,6 @@ export const DatesVoteDetails = ({ vote, me, onVote, onUnVote }: { vote?: IDates
                                         <View className="flex-row items-end justify-between px-2">
                                             {/* <Text className="text-xl dark:text-white">{formatDate(v.startDate)} - {formatDate(v.endDate)}</Text> */}
                                             <View className="flex-row items-end">
-
                                                 <Text className="text-sm capitalize">{formatRange(v.startDate, v.endDate)}</Text>
                                             </View>
                                             

@@ -1,4 +1,5 @@
 import { FormText } from "@/components/form/FormText"
+import { FormTextArea } from "@/components/form/FormTextArea"
 import { Button } from "@/components/ui/Button"
 import useI18nTime from "@/hooks/i18n/useI18nTime"
 import DateTimePicker from "@react-native-community/datetimepicker"
@@ -8,6 +9,7 @@ import { useController, useFieldArray } from "react-hook-form"
 import { Pressable, Text, View } from "react-native"
 import AnimatedCheckbox from "react-native-checkbox-reanimated"
 import Animated from "react-native-reanimated"
+
 import { PickUsersModal } from "../modals/PickUsersModal"
 import { Avatar } from "../ui/Avatar"
 import { IconSymbol } from "../ui/IconSymbol"
@@ -164,6 +166,17 @@ export const EventForm = ({ control, }: {
                     </Button>
 
                 </View>
+            </View>
+
+            <View className="my-5">
+                <Text className="text-lg capitalize font-bold italic ml-5 dark:text-white">
+                    Détails
+                </Text>
+                <FormTextArea control={control}
+                    name="details"
+                    rules={{
+                        maxLength: 255
+                    }}/>
             </View>
 
             <View className="flex-1 mt-5 ">

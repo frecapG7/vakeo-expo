@@ -3,8 +3,6 @@ import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTim
 
 type SkeletonVariant = "rectangular" | "circular";
 
-
-
 export const Skeleton = ({ variant = "rectangular", height = 10 }: { variant?: SkeletonVariant, height?: number }) => {
 
     const opacity = useSharedValue(0.75);
@@ -13,7 +11,6 @@ export const Skeleton = ({ variant = "rectangular", height = 10 }: { variant?: S
             opacity: opacity.value
         }
     });
-
 
     useEffect(() => {
         opacity.value = withRepeat(withTiming(0.3, {

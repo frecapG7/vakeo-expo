@@ -11,14 +11,11 @@ export const usePostVote = (tripId) => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (vote) => postVote(tripId, vote),
-        onSuccess: (data) => {
-            queryClient.invalidateQueries(["trips", tripId]).then(() =>
-                queryClient.setQueryData(["trips", tripId, "votes", data._id], data)
-            )
+        onSuccess: () => {
+            queryClient.invalidateQueries(["trips", tripId])
         }
     })
 }
-
 
 const getVotes = async (tripId, params) => {
     const response = await axios.get(`/trips/${tripId}/votes`, {
