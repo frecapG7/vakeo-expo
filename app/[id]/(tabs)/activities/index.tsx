@@ -33,7 +33,7 @@ const EventItem = ({ event, onPress, user }: { event: Event, onPress: () => void
         <Button className=" bg-orange-200 dark:bg-gray-200 p-2 rounded-lg gap-2" onPress={onPress}>
             <View className="flex-row justify-between items-center gap-5">
                 <View className="flex-row flex-1 gap-2">
-                    <IconSymbol name={toIcon(event)} size={24} />
+                    <IconSymbol name={toIcon(event)} size={24} color="black" />
                     <Text className="text-lg font-bold max-w-xs" numberOfLines={1}>{event.name}</Text>
                 </View>
                 <View className="flex-1">

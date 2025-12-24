@@ -1,6 +1,6 @@
 import useColors from "@/hooks/styles/useColors";
 import { ActivityIndicator, Pressable, Text } from "react-native";
-import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 
 type ButtonVariant = 'none' | 'contained' | 'outlined';
@@ -18,13 +18,13 @@ const ButtonTitle = ({ title, isLoading }: { title: string, isLoading: boolean }
     const colors = useColors();
     if (isLoading)
         return (
-            <Animated.View entering={ZoomIn} exiting={ZoomOut} className="p-4 w-full">
+            <Animated.View entering={FadeIn} exiting={FadeOut} className="p-4 w-full">
                 <ActivityIndicator size="large" color={colors.text} />
             </Animated.View>
         );
 
     return (
-        <Animated.View entering={ZoomIn} exiting={ZoomOut} className="p-4 w-full">
+        <Animated.View entering={FadeIn} exiting={FadeOut} className="p-4 w-full">
             <Text className="text-sm font-bold text-center dark:text-white" >{title}</Text>
         </Animated.View>
     );

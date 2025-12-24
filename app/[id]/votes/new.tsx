@@ -18,7 +18,13 @@ export default function NewVotePage() {
     const { id, type } = useLocalSearchParams();
     const { me } = useContext(TripContext);
 
-    const { control, handleSubmit, reset } = useForm();
+    const { control, handleSubmit, reset } = useForm({
+        defaultValues: {
+            type: "",
+            createdBy: {},
+            votes: []
+        }
+    });
     const navigation = useNavigation();
 
 
@@ -26,7 +32,7 @@ export default function NewVotePage() {
     const postVote = usePostVote(id);
 
     const onSubmit = async (data) => {
-        if (data?.votes.length === 0) {
+        if (data?.votes?.length === 0) {
             Toast.warn("STP frangin choisit au moins une date")
             return;
         }
@@ -46,7 +52,7 @@ export default function NewVotePage() {
             headerRight: () =>
                 <Button className="flex"
                     onPress={handleSubmit(onSubmit)}
-                    isLoading={postVote.isPending}>
+                    isLoading={postVote?.isPending}>
                     <Text className="text-lg dark:text-white">
                         Ajouter
                     </Text>
@@ -59,7 +65,8 @@ export default function NewVotePage() {
     useEffect(() => {
         reset({
             type,
-            createdBy: me
+            createdBy: me,
+            votes: []
         });
     }, [type, me]);
 

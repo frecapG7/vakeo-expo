@@ -11,7 +11,6 @@ import { useCallback, useRef } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Toast } from "toastify-react-native";
 
 
@@ -44,7 +43,7 @@ export default function ItemDetailsLayout() {
     }
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        // <SafeAreaView style={{ flex: 1 }}>
             <GestureHandlerRootView style={{ flex: 1 }}>
                 <BottomSheetModalProvider>
                     <Tabs screenOptions={{
@@ -148,7 +147,7 @@ export default function ItemDetailsLayout() {
                                     <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
                                         <IconSymbol name="chart.bar.fill" size={30} />
                                     </View>
-                                    <Text className="text-lg dark:text-white">Voir les votes</Text>
+                                    <Text className="text-lg dark:text-white">Voir les sondages</Text>
                                 </Button>
                                 <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
 
@@ -182,7 +181,7 @@ export default function ItemDetailsLayout() {
                     </BottomSheetModal>
                 </BottomSheetModalProvider>
             </GestureHandlerRootView>
-        </SafeAreaView>
+        // </SafeAreaView>
 
 
 
