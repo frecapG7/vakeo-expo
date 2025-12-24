@@ -1,6 +1,6 @@
-import { PickUsersModal } from "@/components/modals/PickUsersModal";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { DatesVoteDetails } from "@/components/votes/dates/DatesVoteDetails";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
@@ -9,17 +9,11 @@ import { useCloseVote, useGetVote, usePutVote } from "@/hooks/api/useVotes";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import { getTypeLabel } from "@/lib/voteUtils";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { Text, View } from "react-native";
-import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-
-
-
-
 export default function TripVoteDetailsPage() {
-
 
     const { id, voteId } = useLocalSearchParams();
 
@@ -38,12 +32,34 @@ export default function TripVoteDetailsPage() {
         navigation.setOptions({
             title: getTypeLabel(vote?.type)
         });
-    }, [vote]);
-
-    const [openVoters, setOpenVoter] = useState(false);
+    }, [vote, navigation]);
 
     const router = useRouter();
- 
+
+
+    if (!vote)
+        return (
+            <SafeAreaView style={styles.container}>
+                <View className="flex-row justify-between items-center px-10 mb-5">
+                    <View className="items-center w-40 gap-2">
+                        <Skeleton height={20} />
+                        <Skeleton height={5} />
+                    </View>
+                    <View className="w-40">
+                        <Skeleton height={10} />
+                    </View>
+                </View>
+
+                <View className="gap-2 my-5">
+                    <Skeleton height={10}/>
+                    <Skeleton height={10}/>
+                    <Skeleton height={10}/>
+                </View>
+
+            </SafeAreaView>
+        )
+
+
     return (
         <SafeAreaView style={styles.container}>
             <View className="flex-row justify-between items-center px-10 mb-5">
@@ -52,27 +68,24 @@ export default function TripVoteDetailsPage() {
                     <Text className="text-sm dark:text-gray-400">Depuis {formatDuration(vote?.createdAt, new Date())}</Text>
                 </View>
 
-                {/* {vote?.status !== "CLOSED" && */}
-                <Animated.View entering={ZoomIn} exiting={ZoomOut}>
-                    <Button variant="contained"
-                        className="flex-row gap-1 items-center p-2"
-                        onPress={() => router.navigate({
-                            pathname: "/[id]/votes/[voteId]/edit",
-                            params: {
-                                id,
-                                voteId
-                            }
-                        })}>
-                        <IconSymbol name="calendar" color="white" />
-                        <Text className="text-white">Ouvrir le calendrier</Text>
-                    </Button>
-                </Animated.View>
+                <Button variant="contained"
+                    className="flex-row gap-1 items-center p-2"
+                    onPress={() => router.navigate({
+                        pathname: "/[id]/votes/[voteId]/edit",
+                        params: {
+                            id,
+                            voteId
+                        }
+                    })}>
+                    <IconSymbol name="calendar" color="white" />
+                    <Text className="text-white">Ouvrir le calendrier</Text>
+                </Button>
             </View>
 
 
 
             {vote?.type === "DATES" &&
-                <Animated.View entering={ZoomIn} className="gap-5 my-2">
+                <View className="gap-5 my-2">
                     <View className="px-2">
                         <DatesVoteDetails vote={vote}
                             me={me}
@@ -110,31 +123,19 @@ export default function TripVoteDetailsPage() {
                             }}
                         />
                     </View>
-                    {(vote?.status === "OPEN" && vote?.createdBy._id === me?._id) &&
+                    {(vote?.status === "OPEN" && vote?.createdBy?._id === me?._id) &&
                         <View className="my-10 px-10">
                             <Button variant="contained"
                                 className="bg-red-400"
                                 title="Terminer le vote"
-                                onPress={async () => {
-                                    await closeVote.mutateAsync(me?._id)
-                                }}
-                                isLoading={closeVote.isPending}
+                                onPress={async () => await closeVote.mutateAsync(me?._id)}
+                                isLoading={closeVote?.isPending}
                             />
                         </View>
                     }
-                </Animated.View>
+                </View>
 
             }
-
-
-            <PickUsersModal open={openVoters}
-                onClose={() => setOpenVoter(false)}
-                users={trip?.users.map((u) => ({
-                    ...u,
-                    checked: vote?.voters.map(u => u._id).includes(u._id)
-                }))}
-                disabled
-            />
 
         </SafeAreaView>
     )

@@ -61,7 +61,8 @@ export const VoteListItem = ({ vote, trip, user, onClick }: { vote: IVote, trip:
                             <Text className="font-bold">{vote?.voters.length}</Text>
                         </View>
                     </View>
-                    <LinearProgress progress={getPercent(vote?.voters.length, trip?.users.length)} />
+                
+                    <LinearProgress progress={vote ? getPercent(vote?.voters.length, trip?.users.length) : 0} />
                 </View>
 
             </Button>
