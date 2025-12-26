@@ -12,7 +12,7 @@ export const usePostVote = (tripId) => {
     return useMutation({
         mutationFn: (vote) => postVote(tripId, vote),
         onSuccess: () => {
-            queryClient.invalidateQueries(["trips", tripId])
+            queryClient.invalidateQueries(["trips", tripId, "votes"])
         }
     })
 }
@@ -23,8 +23,6 @@ const getVotes = async (tripId, params) => {
     });
     return response.data;
 }
-
-
 
 export const useGetVotes = (tripId, params) => {
     return useQuery({
@@ -47,13 +45,10 @@ export const useGetVote = (tripId, voteId) => {
     });
 }
 
-
-
 const putVote = async (tripId, voteId, vote) => {
     const response = await axios.put(`/trips/${tripId}/votes/${voteId}`, vote);
     return response.data;
 }
-
 
 export const usePutVote = (tripId, voteId) => {
     const queryClient = useQueryClient();
@@ -66,7 +61,6 @@ export const usePutVote = (tripId, voteId) => {
     });
 }
 
-
 const closeVote = async (tripId, voteId, user) => {
     const response = await axios.put(`/trips/${tripId}/votes/${voteId}/close`,
         {},
@@ -77,7 +71,6 @@ const closeVote = async (tripId, voteId, user) => {
         });
     return response.data;
 }
-
 
 export const useCloseVote = (tripId, voteId) => {
     const queryClient = useQueryClient();
