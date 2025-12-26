@@ -15,7 +15,7 @@ import { getPercent } from "@/lib/voteUtils";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext } from "react";
 import { Text, View } from "react-native";
-import Animated, { FadeIn, FadeOut, SlideInDown, ZoomIn, ZoomOut } from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut, SlideInDown, SlideOutDown, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ItemDetails() {
@@ -116,7 +116,7 @@ export default function ItemDetails() {
                 </View>
                 {votePage?.totalResults === 0 &&
                     <Animated.View entering={SlideInDown}
-                        exiting={SlideInDown}
+                        exiting={SlideOutDown}
                         className="flex-row items-end px-1 py-2 justify-between bg-orange-200 dark:bg-gray-200 rounded-lg">
                         <View>
                             <Text className="text-lg">Aucun sondage en cours</Text>
