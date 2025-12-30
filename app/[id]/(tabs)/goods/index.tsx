@@ -41,7 +41,7 @@ export default function GoodPage() {
     const handleAdd = () => setSelectedGood({
         _id: "",
         name: "",
-        quantity: "1",
+        quantity: "",
         createdBy: me,
         trip: {
             _id: id

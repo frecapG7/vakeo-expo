@@ -41,7 +41,6 @@ export const GoodBottomSheet = ({ open, good, trip, onClose }: { open: boolean, 
         control,
         name: "quantity",
         rules: {
-            required: true,
             maxLength: 155
         }
     });
@@ -135,8 +134,17 @@ export const GoodBottomSheet = ({ open, good, trip, onClose }: { open: boolean, 
 
                 </View>
 
-                <View className="gap-5 my-1">
+                <View className="my-1">
+                    <View className="flex-row px-5 justify-between">
+                        <Text className="italic font-bold">
+                            Nom
+                        </Text>
+                        <Text className="italic font-bold">
+                            Quantité
+                        </Text>
+                    </View>
                     <View className="flex-row flex-1 bg-gray-200 flex-grow rounded-lg focus:border-2 focus:border-blue-400">
+                        
                         <View className="flex-1 border-r border-black px-2">
                             <View className="flex flex-row gap-2 bg-gray-200 justify-between items-center ">
                                 <BottomSheetTextInput
@@ -172,7 +180,7 @@ export const GoodBottomSheet = ({ open, good, trip, onClose }: { open: boolean, 
                         </View>
                     </View>
 
-                    <View className="px-10">
+                    <View className="px-10 mt-2">
                         <Button variant="contained"
                             className="px-10"
                             title={good?._id ? "Modifier" : "Ajouter"}

@@ -1,6 +1,5 @@
 import { Good } from "@/types/models";
-import { Pressable, Text, View } from "react-native";
-import Animated from "react-native-reanimated";
+import { FlatList, Pressable, Text, View } from "react-native";
 import { Button } from "../ui/Button";
 import { IconSymbol } from "../ui/IconSymbol";
 import { GoodListItemSkeleton } from "./GoodListItem";
@@ -14,7 +13,7 @@ export const GoodsFlatList = (
 
 
     return (
-        <Animated.FlatList
+        <FlatList
             data={goods}
             refreshing={isRefreshing}
             className="flex-1"
@@ -23,7 +22,7 @@ export const GoodsFlatList = (
                     <Button className="flex-row flex-1 items-center gap-2" onPress={() => onCheck(item)} disabled={disabled}>
                         <IconSymbol name={item.checked ? "circle.fill" : "circle"} color={item.checked ? "green" : "gray"} />
                         <Text className={`dark:text-white capitalize text-2xl ${item.checked && "line-through"}`}>
-                            {item.name} ({item?.quantity})
+                            {item.name} {item.quantity && `(${item?.quantity})`}
                             </Text>
                     </Button>
                     <Pressable className="p-2"
