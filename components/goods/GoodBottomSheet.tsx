@@ -2,19 +2,19 @@ import styles from "@/constants/Styles"
 import { useDeleteGood, usePostGood, usePutGood } from "@/hooks/api/useGoods"
 import useColors from "@/hooks/styles/useColors"
 import { Good, Trip } from "@/types/models"
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet"
+import BottomSheet, { BottomSheetTextInput, BottomSheetView } from "@gorhom/bottom-sheet"
 import { useEffect, useMemo, useRef } from "react"
-import { useForm } from "react-hook-form"
+import { useController, useForm } from "react-hook-form"
 import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native"
+import { TextInput } from "react-native-gesture-handler"
 import Animated, { FadeIn } from "react-native-reanimated"
 import { Toast } from "toastify-react-native"
 import { Backdrop } from "../ui/Backdrop"
 import { Button } from "../ui/Button"
 import { IconSymbol } from "../ui/IconSymbol"
-import { GoodForm } from "./GoodForm"
 
 
-export const GoodBottomSheet = ({ good, trip, onClose }: { good?: Good | null, trip: Trip, onClose: () => void }) => {
+export const GoodBottomSheet = ({ open, good, trip, onClose }: { open: boolean, good?: Good | null, trip: Trip, onClose: () => void }) => {
 
     const bottomSheetRef = useRef<BottomSheet>(null);
     const colors = useColors();
@@ -37,6 +37,27 @@ export const GoodBottomSheet = ({ good, trip, onClose }: { good?: Good | null, t
 
     const snapPoints = useMemo(() => ["25%"], []);
 
+    const { field: { value: quantity, onChange: setQuantity } } = useController({
+        control,
+        name: "quantity",
+        rules: {
+            required: true,
+            maxLength: 155
+        }
+    });
+
+
+    const { field: { value, onChange: setName }, fieldState: { isDirty } } = useController({
+        control,
+        name: "name",
+        rules: {
+            required: true,
+            minLength: 1,
+            maxLength: 100
+        },
+        defaultValue: ""
+    });
+
     const onSubmit = async (data: any) => {
         if (data._id) {
             await putGood.mutateAsync(data);
@@ -56,16 +77,17 @@ export const GoodBottomSheet = ({ good, trip, onClose }: { good?: Good | null, t
         Toast.success("Course supprimée");
     }
 
-
     useEffect(() => {
         reset(good);
     }, [good, reset]);
 
     useEffect(() => {
-        if (good)
+        if (open)
             bottomSheetRef.current?.expand();
     }, [bottomSheetRef, good]);
 
+    const valueTextInputRef: React.RefObject<TextInput | null> = useRef<TextInput>(null);
+    const quantityTextInputRef: React.RefObject<TextInput | null> = useRef<TextInput>(null);
 
     return (
         <BottomSheet ref={bottomSheetRef}
@@ -79,9 +101,7 @@ export const GoodBottomSheet = ({ good, trip, onClose }: { good?: Good | null, t
             keyboardBlurBehavior="restore"
             snapPoints={snapPoints}
         >
-
             <BottomSheetView style={{ flex: 1 }} className="gap-2 py-5 px-2">
-
                 <View className="flex-row justify-between items-center">
                     <Pressable className="flex-row gap-1 items-center" onPress={() => {
                         bottomSheetRef.current?.close()
@@ -116,9 +136,43 @@ export const GoodBottomSheet = ({ good, trip, onClose }: { good?: Good | null, t
                 </View>
 
                 <View className="gap-5 my-1">
-                  
-                    <GoodForm control={control} trip={trip} />
-                    <View className="px-10 mt-10">
+                    <View className="flex-row flex-1 bg-gray-200 flex-grow rounded-lg focus:border-2 focus:border-blue-400">
+                        <View className="flex-1 border-r border-black px-2">
+                            <View className="flex flex-row gap-2 bg-gray-200 justify-between items-center ">
+                                <BottomSheetTextInput
+                                    value={value}
+                                    onChangeText={(v) => {
+                                        setName(v);
+                                    }}
+                                    className="flex-grow placeholder-black"
+                                    placeholderTextColor="#0000"
+                                    style={styles.textInput}
+                                    ref={valueTextInputRef}
+                                />
+                                {value !== "" &&
+                                    <Animated.View entering={FadeIn} >
+                                        <Button onPress={() => setName("")}>
+                                            <IconSymbol name="xmark.circle" color="black" />
+                                        </Button>
+                                    </Animated.View>
+                                }
+                            </View>
+                        </View>
+
+                        <View className="flex-row items-center w-1/3 px-2">
+                            <Text>x</Text>
+                            <BottomSheetTextInput
+                                onChangeText={setQuantity}
+                                value={quantity}
+                                className="text-md flex-1 text-dark bg-gray-200 text-right min-h-5"
+                                placeholderTextColor="#0000"
+                                ref={quantityTextInputRef}
+                                style={styles.textInput}
+                            />
+                        </View>
+                    </View>
+
+                    <View className="px-10">
                         <Button variant="contained"
                             className="px-10"
                             title={good?._id ? "Modifier" : "Ajouter"}
