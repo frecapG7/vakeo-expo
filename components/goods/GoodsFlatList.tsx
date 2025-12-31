@@ -1,8 +1,6 @@
 import { Good } from "@/types/models";
-import { Text, View } from "react-native";
-import Animated, { FadeIn } from "react-native-reanimated";
+import { FlatList, Pressable, Text, View } from "react-native";
 import { Button } from "../ui/Button";
-import { Checkbox } from "../ui/Checkbox";
 import { IconSymbol } from "../ui/IconSymbol";
 import { GoodListItemSkeleton } from "./GoodListItem";
 
@@ -15,31 +13,26 @@ export const GoodsFlatList = (
 
 
     return (
-        <Animated.FlatList
+        <FlatList
             data={goods}
             refreshing={isRefreshing}
             className="flex-1"
             renderItem={({ item, index }) =>
-                <View className="px-2">
-                    {item?.name !== goods[index - 1]?.name &&
-                        <Animated.View entering={FadeIn} className="flex-row items-end justify-between">
-                            <Text className="dark:text-white capitalize text-xl">{item.name}</Text>
-                        </Animated.View>
-                    }
-                    <View className="flex flex-row justify-between items-end gap-5 ml-10  pb-1 border-b-2 border-blue-400">
-                        <Button className="flex-row flex-1 items-center gap-2" onPress={() => onCheck(item)} disabled={disabled}>
-                            <View className="w-5 h-7" >
-                                <Checkbox checked={item.checked} />
-                            </View>
-                            <Text className={`dark:text-white text-p=p=m font-bold ${item.checked ? "line-through opacity-50" : ""}`}>{item?.quantity}</Text>
-                        </Button>
+                <View className={`flex-row ${item.checked ? "opacity-50" : ""}`}>
+                    <Button className="flex-row flex-1 items-center gap-2" onPress={() => onCheck(item)} disabled={disabled}>
+                        <IconSymbol name={item.checked ? "circle.fill" : "circle"} color={item.checked ? "green" : "gray"} />
+                        <Text className={`dark:text-white capitalize text-2xl ${item.checked && "line-through"}`}>
+                            {item.name} {item.quantity && `(${item?.quantity})`}
+                            </Text>
+                    </Button>
+                    <Pressable className="p-2"
+                        onPress={() => onClick(item)}
+                        disabled={item.checked} >
 
-                        <Button className="rounded-full border bg-blue-500 p-1"
-                            onPress={() => onClick(item)}
-                            disabled={item.checked} >
+                        <View className="rounded-full bg-blue-400 p-1">
                             <IconSymbol name="pencil" color="black" size={16} />
-                        </Button>
-                    </View>
+                        </View>
+                    </Pressable>
                 </View>
             }
             keyExtractor={(i) => i._id}
@@ -69,17 +62,17 @@ export const GoodsFlatList = (
                 if (hasNextPage)
                     fetchNextPage();
             }}
-            // ListHeaderComponent={() => {
-            //     if (isFetching)
-            //         return (
-            //             <View className="items-center">
-            //                 <ActivityIndicator />
-            //             </View>);
+        // ListHeaderComponent={() => {
+        //     if (isFetching)
+        //         return (
+        //             <View className="items-center">
+        //                 <ActivityIndicator />
+        //             </View>);
 
-            //     if (goods?.length > 0)
-            //         return
-            // }
-            // }
+        //     if (goods?.length > 0)
+        //         return
+        // }
+        // }
         />
     )
 }

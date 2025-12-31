@@ -38,7 +38,7 @@ export default function ActivityGoods() {
                     {
                         _id: "",
                         name: "",
-                        quantity: "1",
+                        quantity: "",
                         createdBy: me,
                         trip: {
                             _id: id

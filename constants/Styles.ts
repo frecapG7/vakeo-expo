@@ -23,6 +23,12 @@ const styles = StyleSheet.create({
         textShadowColor: 'rgba(0, 0, 0, 0.75)',
         textShadowOffset: { width: 1, height: 1 },
         textShadowRadius: 3,
+    },
+    textInput: {
+        // backgroundColor: "grey",
+        color: "black",
+        textAlign: "left",
+        textTransform: "capitalize"
     }
 });
 

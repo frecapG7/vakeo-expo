@@ -1,3 +1,4 @@
+import styles from "@/constants/Styles";
 import { useEffect } from "react";
 import { useController } from "react-hook-form";
 import { TextInput, View } from "react-native";
@@ -49,6 +50,7 @@ export const FormText = ({ control, name, label, placeholder, rules, endAdornmen
                 placeholderTextColor="#000000"
                 ref={ref}
                 placeholder={placeholder}
+                style={styles.textInput}
             />
             {endAdornment &&
                 <View

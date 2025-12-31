@@ -6,7 +6,6 @@ import { Switch } from "@/components/ui/Switch";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useCheckGood, useGetGoods } from "@/hooks/api/useGoods";
-import useColors from "@/hooks/styles/useColors";
 import { Good } from "@/types/models";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
@@ -36,14 +35,13 @@ export default function GoodPage() {
 
     const [selectedGood, setSelectedGood] = useState<Good | null>();
 
-    const colors = useColors();
 
     const goods = useMemo(() => data?.pages.flatMap((page) => page?.goods), [data]);
 
     const handleAdd = () => setSelectedGood({
         _id: "",
         name: "",
-        quantity: "1",
+        quantity: "",
         createdBy: me,
         trip: {
             _id: id
@@ -63,7 +61,6 @@ export default function GoodPage() {
                             <Switch value={unchecked} onSwitch={(v) => setUnchecked(!unchecked)} />
                             <Text className="text-sm dark:text-white">Uniquement manquant</Text>
                         </View>
-
                     </View>
                 </Animated.View>
 
