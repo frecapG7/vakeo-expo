@@ -83,7 +83,7 @@ export default function NewTripActivity() {
                     <Animated.View entering={SlideInRight} exiting={SlideOutLeft}
                         className="flex-1 justify-center my-5">
                         <Text className="text-xl font-bold mx-1 my-2 dark:text-white">
-                            Quel type d'événement veux tu créer ?
+                            Que prévoies tu ?
                         </Text>
                         <View className="flex-1 flex-row flex-wrap gap-5 p3-2 justify-center items-center">
 

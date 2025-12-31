@@ -5,7 +5,7 @@ const lightColor = {
 //   background: "rgba(196, 235, 187, 1)",
   background: "rgba(255, 255, 255, 1)",
   primary: "#rgba(245, 149, 5, 1)",
-  card: 'rgba(243, 213, 167, 1)',
+  card: 'rgba(163, 225, 253, 1)',
   text: 'rgb(28, 28, 30)',
   border: 'rgb(216, 216, 216)',
   notification: 'rgb(255, 59, 48)',
