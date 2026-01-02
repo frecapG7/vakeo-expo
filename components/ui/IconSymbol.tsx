@@ -21,6 +21,7 @@ const MAPPING = {
   'chevron.right': 'chevron-right',
   'chevron.left': 'chevron-left',
   'xmark.circle': 'cancel',
+  "xmark": "close",
   'pencil': 'edit',
   "person.circle": "person",
   "plus.circle": "add-circle-outline",

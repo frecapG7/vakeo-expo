@@ -20,7 +20,7 @@ export const GoodsFlatList = (
             renderItem={({ item, index }) =>
                 <View className={`flex-row ${item.checked ? "opacity-50" : ""}`}>
                     <Button className="flex-row flex-1 items-center gap-2" onPress={() => onCheck(item)} disabled={disabled}>
-                        <IconSymbol name={item.checked ? "circle.fill" : "circle"} color={item.checked ? "green" : "gray"} />
+                        <IconSymbol name={item.checked ? "checkmark.circle.fill" : "circle"} color={item.checked ? "green" : "gray"} />
                         <Text className={`dark:text-white capitalize text-2xl ${item.checked && "line-through"}`}>
                             {item.name} {item.quantity && `(${item?.quantity})`}
                             </Text>
