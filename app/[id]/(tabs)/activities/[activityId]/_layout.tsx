@@ -1,9 +1,8 @@
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
 import { useGetEvent } from "@/hooks/api/useEvents";
-import { useGetTrip } from "@/hooks/api/useTrips";
 import useColors from "@/hooks/styles/useColors";
-import { toIcon } from "@/lib/eventUtils";
+import { toIcon, toLabel } from "@/lib/eventUtils";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 
@@ -12,7 +11,6 @@ export default function TripActivityDetailLayout() {
 
     const { id, activityId } = useLocalSearchParams();
 
-    const { data: trip } = useGetTrip(id);
     const { data: activity } = useGetEvent(id, activityId);
 
     const router = useRouter();
@@ -23,14 +21,12 @@ export default function TripActivityDetailLayout() {
         <Stack screenOptions={{
             headerShown: true,
             title: activity?.name,
-            // headerTintColor: "white",
             headerTitleStyle: styles.headerSubTitle,
             headerStyle: {
                 backgroundColor: colors.background,
             },
             headerShadowVisible: false,
             headerTitleAlign: "left",
-            // headerBackground: () => <BackgroundHeader trip={trip} />,
             headerLeft: () =>
                 <Pressable onPressOut={() => router.dismissTo({
                     pathname: "/[id]/(tabs)/activities",
@@ -51,16 +47,20 @@ export default function TripActivityDetailLayout() {
                 })}
                     className="bg-gray-800 rounded-full p-2">
                     <IconSymbol name="pencil" size={20} color="white" />
-                </Pressable>
+                </Pressable>,
+            headerTitle: ({ children }) =>
+                <View className="flex-row items-center justify-start gap-1">
+                    <View className="rounded-full border p-2 bg-gray-200">
+                        <IconSymbol name={toIcon(activity)} size={25} color="black" />
+                    </View>
+                    <View>
+                        <Text className="text-lg dark:text-white font-bold shadow">{children}</Text>
+                        <Text className="dark:text-white italic capitalize">{toLabel(activity)}</Text>
+                    </View>
+                </View>,
         }}>
             <Stack.Screen name="index" options={{
-                headerTitle: ({ children }) =>
-                    <View className="flex items-start">
-                        <View className="rounded-full border p-2 bg-gray-200">
-                            <IconSymbol name={toIcon(activity)} size={25} color="black" />
-                        </View>
-                        <Text className="text-lg dark:text-white font-bold shadow">{children}</Text>
-                    </View>,
+
             }} />
 
             <Stack.Screen name="edit" options={{

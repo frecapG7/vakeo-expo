@@ -136,10 +136,10 @@ export const GoodBottomSheet = ({ open, good, trip, onClose }: { open: boolean, 
 
                 <View className="my-1">
                     <View className="flex-row px-5 justify-between">
-                        <Text className="italic font-bold">
+                        <Text className="italic font-bold dark:text-white">
                             Nom
                         </Text>
-                        <Text className="italic font-bold">
+                        <Text className="italic font-bold dark:text-white">
                             Quantité
                         </Text>
                     </View>

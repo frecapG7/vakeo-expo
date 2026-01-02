@@ -54,7 +54,9 @@ export default function GoodPage() {
                 <Animated.View entering={ZoomIn} exiting={ZoomOut} className="border-b border-orange-400 dark:border-gray-400 pb-1 mb-5">
                     <View className="flex-row items-center">
                         <Button className="flex-row flex-1 ml-10 gap-2 items-center" onPress={handleAdd}>
-                            <IconSymbol name="plus" color="blue" />
+                            <View className="bg-blue-400 rounded-full">
+                            <IconSymbol name="plus" color="black" />
+                            </View>
                             <Text className="text-2xl font-bold text-blue-400">Ajouter</Text>
                         </Button>
                         <View className="items-center">
