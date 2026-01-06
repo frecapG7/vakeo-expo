@@ -57,11 +57,7 @@ export default function TripDetailsLayout() {
         <GestureHandlerRootView style={{ flex: 1 }}>
             <BottomSheetModalProvider>
                 <TripContext.Provider value={{
-                    me: {
-                        _id: me?._id,
-                        avatar: me?.avatar,
-                        name: me?.name
-                    }
+                    me
                 }}>
                     <Stack screenOptions={{
                         headerBackground: () => <BackgroundHeader trip={trip} />,

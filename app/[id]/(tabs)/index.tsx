@@ -99,9 +99,15 @@ export default function ItemDetails() {
 
                 <Button
                     className="flex items-center justify-center"
-                    onPress={() => router.push("./edit-user")}
+                    onPress={() => router.navigate({
+                        pathname: "/[id]/(tabs)/settings",
+                        params: {
+                            id: String(id)
+                        }
+                    })}
                     onLongPress={() => router.push("./pick-user")}
                 >
+
                     <Avatar src={me?.avatar} alt={me?.name?.charAt(0)} size2="lg" />
                     <Text className="font-bold text-lg dark:text-white">{me?.name}</Text>
                 </Button>
@@ -110,7 +116,6 @@ export default function ItemDetails() {
             <Animated.View entering={FadeIn}
                 exiting={FadeOut}
                 className="my-5 px-2 rounded-lg p-1 pb-5">
-
                 <View>
                     <Text className="text-2xl dark:text-white font-bold">Sondage</Text>
                 </View>
