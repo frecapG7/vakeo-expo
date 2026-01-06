@@ -129,20 +129,25 @@ export default function TripActivityDetails() {
                             Voir les courses {goodsCount?.totalCount > 0 && `(${goodsCount?.totalCount})`}
                         </Text>
                     </Pressable>
-                    {activity?.address &&
-                        <Pressable className="flex-row gap-5  items-center py-2" onPress={() => router.push({
+                    <Pressable className="flex-row gap-5 items-center py-2"
+                        onPress={() => router.push({
                             pathname: "/[id]/(tabs)/activities/[activityId]/goods",
                             params: {
                                 id: String(id),
                                 activityId: activityId
                             }
                         })}>
-                            <IconSymbol name="map" size={34} color="grey" />
-                            <Text className="flex-1 border-b border-gray-800  py-2 dark:text-white">
-                                45 Rue Pouchet, 75017, Paris
-                            </Text>
-                        </Pressable>
-                    }
+                        <IconSymbol name="map" size={34} color="grey" />
+                        <Text className="flex-1 border-b border-gray-800  py-2 dark:text-white">
+                            Ajouter une adresse
+                        </Text>
+                    </Pressable>
+                    <Pressable className="flex-row gap-5 items-center py-2" onPress={() => setShowAttendees(true)}>
+                        <IconSymbol name="info.circle" size={34} color="grey"/>
+                        <Text className="flex-1 border-b border-gray-800  py-2 dark:text-white">
+                            Sans porc, Halal
+                        </Text>
+                    </Pressable>
                 </View>
 
                 <View className="px-4 mt-5 gap-2">
