@@ -49,6 +49,7 @@ export const useGetTripUser = (tripId, userId, options) => {
   return useQuery({
     queryKey: ["trips", tripId, "users", userId],
     queryFn: () => getTripUser(tripId, userId),
+    enabled: options?.enabled && (!!tripId && !!userId),
     ...options
   });
 }

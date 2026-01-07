@@ -30,8 +30,12 @@ export default function PickTripUserPage() {
             image: trip?.image,
             user: item._id
         });
-        //TODO: save img
-        router.back();
+        router.dismissTo({
+            pathname: "/[id]/(tabs)/settings",
+            params: {
+                id: String(id)
+            }
+        });
     }
 
     return (

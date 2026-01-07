@@ -9,7 +9,8 @@ export interface Trip {
 export interface TripUser {
     _id: string,
     name: string,
-    avatar: string
+    avatar: string,
+    restrictions: string[]
 }
 
 
