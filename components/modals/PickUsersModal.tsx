@@ -1,4 +1,5 @@
 import useColors from "@/hooks/styles/useColors"
+import { translateRestriction } from "@/lib/userUtils"
 import { TripUser } from "@/types/models"
 import { Modal, Pressable, Text, View } from "react-native"
 import AnimatedCheckbox from "react-native-checkbox-reanimated"
@@ -13,7 +14,8 @@ export const PickUsersModal = ({
     users = [],
     onClick,
     disabled = false,
-    title
+    title,
+    showRestrictions = false
 }
     :
     {
@@ -22,7 +24,8 @@ export const PickUsersModal = ({
         users: TripUser[],
         onClick?: (user: any, index: number) => void,
         disabled?: boolean,
-        title?: string
+        title?: string,
+        showRestrictions?: boolean
     }) => {
 
 
@@ -56,7 +59,15 @@ export const PickUsersModal = ({
                                 disabled={disabled}>
                                 <View className="flex flex-row gap-2 items-center">
                                     <Avatar alt={item.name.charAt(0)} size2="md" src={item.avatar} />
-                                    <Text className="text-lg ">{item.name}</Text>
+                                    <View className="">
+                                        <Text className="text-lg ">{item.name}</Text>
+                                        {showRestrictions &&
+                                            <Text className="text-xs flex-wrap max-w-40 capitalize" numberOfLines={2}>
+                                                {item.restrictions.map(translateRestriction).join(", ")}
+                                            </Text>
+
+                                        }
+                                    </View>
                                 </View>
                                 {!disabled &&
                                     <View className="w-10 h-10">

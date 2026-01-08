@@ -6,7 +6,7 @@ import { IconSymbol } from "./IconSymbol";
 
 
 
-export const Switch = ({ value = false, onSwitch }: { value: boolean, onSwitch: (value: boolean) => void }) => {
+export const Switch = ({ value = false, onSwitch, disabled = false }: { value: boolean, onSwitch: (value: boolean) => void, disabled?: boolean }) => {
 
     const offset = useSharedValue(0);
 
@@ -23,14 +23,15 @@ export const Switch = ({ value = false, onSwitch }: { value: boolean, onSwitch: 
 
     const animatedStyle = useAnimatedStyle(() => {
         return {
-            transform: [{translateX: offset.value}]
+            transform: [{ translateX: offset.value }]
         }
     });
 
 
     return (
         <Pressable onPress={() => onSwitch(!value)}
-            className={`flex-row items-center justify-between p-1 rounded-full w-20 ${value ? 'bg-green-600 dark:bg-gray-200' : 'bg-gray-500 dark:bg-gray-700'}`}>
+            className={`flex-row items-center justify-between p-1 rounded-full w-20 ${value ? 'bg-green-600 dark:bg-gray-200' : 'bg-gray-500 dark:bg-gray-700'}`}
+            disabled={disabled}>
             <Animated.View className={`items-center rounded-full dark:bg-blue-200 shadow-md transform `} style={animatedStyle}>
                 <IconSymbol name={value ? "checkmark" : "xmark.circle"} />
             </Animated.View>

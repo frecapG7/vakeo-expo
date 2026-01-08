@@ -59,7 +59,8 @@ const MAPPING = {
   "smiley": "face",
   "map": "location-pin",
   "sportscourt": "sports-gymnastics",
-  "moon.stars.fill": "nights-stay"
+  "moon.stars.fill": "nights-stay",
+  "info.circle" : "info-outline"
 } as IconMapping;
 
 /**

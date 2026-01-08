@@ -76,6 +76,7 @@ export default function GoodPage() {
                     hasNextPage={hasNextPage}
                     fetchNextPage={fetchNextPage}
                     disabled={checkGood?.isPending}
+                    showEvent
                     />
                 <GoodBottomSheet good={selectedGood}
                     trip={{
