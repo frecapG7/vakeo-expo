@@ -13,7 +13,6 @@ import { useContext, useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function GoodPage() {
 
@@ -49,10 +48,10 @@ export default function GoodPage() {
     });
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <Animated.View style={{ flex: 1 }}>
             <GestureHandlerRootView style={styles.container}>
                 <Animated.View entering={ZoomIn} exiting={ZoomOut} className="border-b border-orange-400 dark:border-gray-400 pb-1 mb-5">
-                    <View className="flex-row items-center">
+                    <View className="flex-row items-center my-2">
                         <Button className="flex-row flex-1 ml-10 gap-2 items-center" onPress={handleAdd}>
                             <View className="bg-blue-400 rounded-full">
                             <IconSymbol name="plus" color="black" />
@@ -85,6 +84,6 @@ export default function GoodPage() {
                     open={!!selectedGood}
                     onClose={() => setSelectedGood(null)} />
             </GestureHandlerRootView>
-        </SafeAreaView>
+        </Animated.View>
     )
 }

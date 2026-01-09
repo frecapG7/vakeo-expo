@@ -8,7 +8,7 @@ import { useGetTripUser, useUpdateTripUser } from "@/hooks/api/useTrips";
 import { useLocalSearchParams } from "expo-router";
 import { useContext, useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import Animated from "react-native-reanimated";
 
 
 
@@ -43,7 +43,7 @@ export default function TripSettings() {
 
     if (!user)
         return (
-            <SafeAreaView style={styles.container}>
+            <Animated.View style={styles.container}>
                 <View className="flex gap-2 items-start border-b border-blue-700  pb-2 mx-5">
                     <Skeleton variant="circular" height={40} />
                     <View className="flex-row gap-5 items-center">
@@ -59,10 +59,10 @@ export default function TripSettings() {
                 <View className="my-5 gap-4 ml-5 ">
                     <Skeleton height={40} />
                 </View>
-            </SafeAreaView>)
+            </Animated.View>)
 
     return (
-        <SafeAreaView style={styles.container}>
+        <Animated.View style={styles.container}>
             <View className="flex gap-2 items-start border-b border-blue-700  pb-2 mx-5">
                 <Avatar src={user?.avatar} size2="xl" alt={user?.name.charAt(0)} />
                 <View className="flex-row gap-5 items-center">
@@ -133,6 +133,6 @@ export default function TripSettings() {
                     });
                     setOpenAvatarModal(false);
                 }} />
-        </SafeAreaView>
+        </Animated.View>
     )
 }
