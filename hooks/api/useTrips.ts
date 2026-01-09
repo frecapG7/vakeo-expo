@@ -1,8 +1,8 @@
 import axios from "@/lib/axios";
-import { Trip, TripUser } from "@/types/models";
+import { Dashboard, Trip, TripUser } from "@/types/models";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-const postTrip = async (trip: Omit<Trip, '_id'>) : Promise<Trip> => {
+const postTrip = async (trip: Omit<Trip, '_id'>): Promise<Trip> => {
   const response = await axios.post("/trips", trip);
   return response?.data;
 };
@@ -26,7 +26,7 @@ export const useGetTrip = (tripId: string) => {
   });
 };
 
-const updateTrip = async (tripId: string, data: Trip) : Promise<Trip> => {
+const updateTrip = async (tripId: string, data: Trip): Promise<Trip> => {
   const response = await axios.put(`/trips/${tripId}`, data);
   return response.data;
 }
@@ -63,7 +63,7 @@ export const useUpdateTripUser = (tripId: string, userId: string) => {
     mutationFn: (data) => updateTripUser(tripId, userId, data),
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({ queryKey: ["trips", tripId] });
-      await queryClient.setQueryData(["trips", tripId, "users", userId],data);
+      await queryClient.setQueryData(["trips", tripId, "users", userId], data);
     }
   })
 }
@@ -77,4 +77,25 @@ export const useShareTrip = (id: string) => {
   return useMutation({
     mutationFn: () => shareTrip(id)
   });
+}
+
+
+
+const getDashboard = async (tripId: string, user: string): Promise<Dashboard> => {
+  const response = await axios.get(`/trips/${tripId}/dashboard`, {
+    params: {
+      user
+    }
+  });
+  return response.data;
+}
+
+
+
+export const useGetDashboard = (tripId: string, user: string, options: any) => {
+  return useQuery<Dashboard>({
+    queryKey: ["trips", tripId, "dashboard"],
+    queryFn: () => getDashboard(tripId, user),
+    ...options
+  })
 }

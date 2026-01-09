@@ -2,43 +2,35 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { CalendarDayView } from "@/components/ui/CalendarDayView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { LinearProgress } from "@/components/ui/LinearProgress";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { VoteListItem } from "@/components/votes/VoteListItem";
 import { default as styles, default as Styles } from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
-import { useGetGoodsCount } from "@/hooks/api/useGoods";
-import { useGetTrip } from "@/hooks/api/useTrips";
-import { useGetVotes } from "@/hooks/api/useVotes";
+import { useGetDashboard, useGetTrip } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
-import { getPercent } from "@/lib/voteUtils";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext } from "react";
-import { Text, View } from "react-native";
-import Animated, { FadeIn, FadeOut, SlideInDown, SlideOutDown, ZoomIn, ZoomOut } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Pressable, Text, View } from "react-native";
+import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 
 export default function ItemDetails() {
 
     const { id } = useLocalSearchParams();
     const { data: trip } = useGetTrip(String(id));
+    const { me } = useContext(TripContext);
 
-    const { data: votePage } = useGetVotes(id, {
-        status: "OPEN",
-        limit: 3
+
+    const { data: dashboard } = useGetDashboard(String(id), String(me?._id), {
+        enabled: (!!trip && !!me?._id)
     });
-    const { data: goodsCount } = useGetGoodsCount(id);
     const router = useRouter();
 
-    const { me } = useContext(TripContext);
 
     const { formatDate } = useI18nTime();
 
 
     if (!trip)
         return (
-            <SafeAreaView style={styles.container}>
-
+            <Animated.ScrollView style={styles.container}>
                 <View className="flex-row justify-between my-5 px-5">
                     <View className="flex w-40">
                         <Skeleton height={20} />
@@ -51,19 +43,16 @@ export default function ItemDetails() {
                         <Skeleton height={5} />
                     </View>
                 </View>
-
-
                 <View className="mt-10 gap-5">
                     <Skeleton height={20} />
                     <Skeleton height={20} />
                 </View>
-
-            </SafeAreaView>
+            </Animated.ScrollView>
         );
 
 
     return (
-        <SafeAreaView style={Styles.container}>
+        <Animated.ScrollView style={Styles.container}>
             <View className="flex flex-row justify-between items-center px-5 my-5">
 
                 <View className="gap-1">
@@ -107,88 +96,99 @@ export default function ItemDetails() {
                     })}
                     onLongPress={() => router.push("./pick-user")}
                 >
-
                     <Avatar src={me?.avatar} alt={me?.name?.charAt(0)} size2="lg" />
                     <Text className="font-bold text-lg dark:text-white">{me?.name}</Text>
                 </Button>
             </View>
 
-            <Animated.View entering={FadeIn}
-                exiting={FadeOut}
-                className="my-5 px-2 rounded-lg p-1 pb-5">
-                <View>
-                    <Text className="text-2xl dark:text-white font-bold">Sondage</Text>
-                </View>
-                {votePage?.totalResults === 0 &&
-                    <Animated.View entering={SlideInDown}
-                        exiting={SlideOutDown}
-                        className="flex-row items-end px-1 py-2 justify-between bg-orange-200 dark:bg-gray-200 rounded-lg">
-                        <View>
-                            <Text className="text-lg">Aucun sondage en cours</Text>
-                        </View>
-                        <View className="flex-row items-center gap-2 ">
-                            <Button className="border bg-blue-400 rounded-full p-1"
-                                onPress={() => router.navigate({
-                                    pathname: "/[id]/votes/new?type=DATES",
-                                    params: {
-                                        id,
-                                    },
 
-                                })}>
-                                <IconSymbol name="calendar" color="black" size={24} />
-                            </Button>
-                            <Button className="border bg-blue-400 rounded-full p-1"
-                                onPress={() => console.log("TODO")}>
-                                <IconSymbol name="house.fill" color="black" />
-                            </Button>
-                        </View>
-                    </Animated.View>
 
-                }
 
-                {votePage?.votes?.map((vote) =>
-                    <View key={vote._id}>
-                        <VoteListItem
-                            vote={vote}
-                            trip={trip}
-                            user={me}
-                            onClick={() =>
-                                router.push({
-                                    pathname: "/[id]/votes/[voteId]",
-                                    params: {
-                                        id,
-                                        voteId: vote._id
-                                    }
-                                })
-                            } />
-                    </View>
-                )}
+            <View className="gap-2 flex-1">
 
-            </Animated.View>
 
-            <View className="mt-5 px-2">
-                <View className="flex flex-row justify-between">
-                    <Text className="text-2xl dark:text-white font-bold">Courses</Text>
-                </View>
-                <View className="bg-orange-200 dark:bg-gray-200 p-2 rounded-lg">
-                    {goodsCount?.totalCount > 0 ?
 
-                        <View>
-                            <View className="items-end flex-row justify-end gap-2">
-                                <IconSymbol name="cart" color="black" />
-                                <Text className="text-lg font-bold">{goodsCount?.checkedCount} / {goodsCount?.totalCount}</Text>
+                <View className="flex-row gap-2">
+                    <Pressable className="rounded-lg bg-blue-100 dark:bg-gray-200 flex-1 p-2"
+                        onPress={() => router.navigate({
+                            pathname: "/[id]/votes",
+                            params: {
+                                id: String(id)
+                            }
+                        })}>
+                        <View className="flex-row justify-between">
+                            <View className="rounded-full bg-orange-400 dark:bg-blue-400 p-2">
+                                <IconSymbol name="chart.bar.fill" size={40} color="black" />
                             </View>
-                            <LinearProgress progress={getPercent(goodsCount?.checkedCount, goodsCount?.totalCount)} />
                         </View>
-                        :
-                        <Text>Vous n'avez aucune courses à faire</Text>
-                    }
+                        <Text className="text-xl font-bold">Sondages</Text>
+                        <Text className="text-xs italic">
+                            Il n'y a présentement aucun sondage en cours
+                        </Text>
+                    </Pressable>
+
+                    <Pressable className="rounded-lg bg-blue-100 dark:bg-gray-600 border border-gray-200 shadow flex-1 p-2"
+                        onPress={() => router.navigate({
+                            pathname: "/[id]/activities",
+                            params: {
+                                id: String(id)
+                            }
+                        })}>
+                        <View className="flex-row justify-between">
+                            <View className="rounded-full bg-orange-400 dark:bg-blue-400 p-2">
+                                <IconSymbol name="calendar" size={40} color="black" />
+                            </View>
+                        </View>
+                        <Text className="text-xl font-bold mb-2">Evenements</Text>
+                        <View>
+                            <Text className="text-sm italic">{dashboard?.events.attending} auquel tu participes</Text>
+                            <Text className="text-sm italic">{dashboard?.events.ownership} dont tu es responsable</Text>
+                            <Text className="text-sm italic">{dashboard?.events.total} au total</Text>
+                        </View>
+                    </Pressable>
                 </View>
 
 
-            </View>
-        </SafeAreaView>
+                <View className="flex-row gap-2">
+                    <Pressable className="rounded-lg bg-orange-100 dark:bg-gray-200 flex-1 p-2"
+                        onPress={() => router.push({
+                            pathname: "/[id]/(tabs)/goods",
+                            params: {
+                                id: String(id)
+                            }
+                        })}>
+                        <View className="flex-row justify-between">
+                            <View className="rounded-full bg-blue-400 p-2">
+                                <IconSymbol name="cart" size={40} color="black" />
+                            </View>
+                        </View>
+                        <Text className="text-xl font-bold mb-2">La liste</Text>
+                        <View>
+                            <Text className="text-sm italic">{dashboard?.goods.missing} manquants</Text>
+                            <Text className="font-bold">{dashboard?.goods.total} au total</Text>
+                        </View>
+                    </Pressable>
 
+                    <Pressable className="rounded-lg bg-orange-100 dark:bg-gray-200 flex-1 p-2">
+                        <View className="flex-row justify-between">
+                            <View className="rounded-full bg-blue-400 p-2">
+                                <IconSymbol name="person.circle" size={40} color="black" />
+                            </View>
+                        </View>
+                        <Text className="text-xl font-bold">Participants</Text>
+                        <View>
+                            <Text className="text-xs italic">
+                                14 personnes ont déja rejoints
+                            </Text>
+                            <Text className="text-xs italic">
+                                Aucune restrictions alimentaire
+                            </Text>
+                        </View>
+                    </Pressable>
+                </View>
+            </View>
+
+        </Animated.ScrollView>
     )
 
 }

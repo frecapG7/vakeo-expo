@@ -42,3 +42,27 @@ export interface DateVote {
     endDate: Date,
     users: TripUser[]
 }
+
+
+export interface Dashboard {
+    polls: {
+        pending: number,
+        total: number
+    },
+    attendees: {
+        total: number,
+        restrictions: string[]
+    },
+    goods: {
+        missing: number,
+        total: number
+    },
+    events: {
+        attending: number,
+        ownership: number,
+        total: number
+    }
+}
+
+
+
