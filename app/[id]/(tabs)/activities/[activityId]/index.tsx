@@ -7,6 +7,7 @@ import { TripContext } from "@/context/TripContext";
 import { useGetEvent } from "@/hooks/api/useEvents";
 import { useGetGoodsCount } from "@/hooks/api/useGoods";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
+import { translateRestriction } from "@/lib/userUtils";
 import { router, useLocalSearchParams } from "expo-router";
 import { useContext, useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
@@ -18,8 +19,7 @@ export default function TripActivityDetails() {
     const { id, activityId } = useLocalSearchParams();
     const { me } = useContext(TripContext);
 
-    const { data: activity } = useGetEvent(id, activityId);
-
+    const { data: activity } = useGetEvent(String(id), String(activityId));
 
     const [showAttendees, setShowAttendees] = useState(false);
     const [showOwners, setShowOwners] = useState(false);
@@ -29,7 +29,7 @@ export default function TripActivityDetails() {
     });
 
     const { formatRange } = useI18nTime();
-    const isParticipant = useMemo(() => activity?.attendees?.map(u => u._id).includes(me?._id), [me, activity]);
+    const isParticipant = useMemo(() => activity?.attendees?.map(u => u._id).includes(String(me?._id)), [me, activity]);
 
 
     if (!activity)
@@ -121,7 +121,7 @@ export default function TripActivityDetails() {
                         pathname: "/[id]/(tabs)/activities/[activityId]/goods",
                         params: {
                             id: String(id),
-                            activityId: activityId
+                            activityId: String(activityId)
                         }
                     })}>
                         <IconSymbol name="cart" size={34} color="grey" />
@@ -134,7 +134,7 @@ export default function TripActivityDetails() {
                             pathname: "/[id]/(tabs)/activities/[activityId]/goods",
                             params: {
                                 id: String(id),
-                                activityId: activityId
+                                activityId: String(activityId)
                             }
                         })}>
                         <IconSymbol name="map" size={34} color="grey" />
@@ -142,10 +142,13 @@ export default function TripActivityDetails() {
                             Ajouter une adresse
                         </Text>
                     </Pressable>
+                    {}
                     <Pressable className="flex-row gap-5 items-center py-2" onPress={() => setShowAttendees(true)}>
                         <IconSymbol name="info.circle" size={34} color="grey"/>
-                        <Text className="flex-1 border-b border-gray-800  py-2 dark:text-white">
-                            Sans porc, Halal
+                        <Text className="flex-1 border-b border-gray-800  py-2 dark:text-white capitalize">
+                            {[...new Set(activity?.attendees?.flatMap(u => u.restrictions)
+                                .map(translateRestriction))]
+                                .join(", ") || "Aucune restrictions"}
                         </Text>
                     </Pressable>
                 </View>
@@ -165,6 +168,7 @@ export default function TripActivityDetails() {
                     users={activity?.attendees}
                     disabled
                     title="Participants"
+                    showRestrictions
                 />
 
                 <PickUsersModal open={showOwners}

@@ -2,26 +2,44 @@ import { FormText } from "@/components/form/FormText"
 import { FormTextArea } from "@/components/form/FormTextArea"
 import { Button } from "@/components/ui/Button"
 import useI18nTime from "@/hooks/i18n/useI18nTime"
-import DateTimePicker from "@react-native-community/datetimepicker"
 import dayjs from "dayjs"
 import { useMemo, useState } from "react"
-import { useController, useFieldArray } from "react-hook-form"
+import { Control, useController, useFieldArray } from "react-hook-form"
 import { Pressable, Text, View } from "react-native"
 import AnimatedCheckbox from "react-native-checkbox-reanimated"
-import Animated from "react-native-reanimated"
 
+import { TripUser } from "@/types/models"
 import { PickUsersModal } from "../modals/PickUsersModal"
 import { Avatar } from "../ui/Avatar"
 import { IconSymbol } from "../ui/IconSymbol"
+
+
+
+
+interface IUser extends TripUser {
+    checked: boolean,
+    customId: string
+}
+
+
+export interface EventFormValues {
+    name: string,
+    startDate: Date;
+    endDate: Date;
+    details: string;
+    owners: IUser[];
+    attendees: IUser[];
+    type: string
+}
+
 
 const buildDateTime = (date, time) => {
     return new Date(date.toISOString().split("T")[0] + "T" + time.toISOString().split("T")[1]);
 }
 
 
-
 export const EventForm = ({ control, }: {
-    control: any,
+    control: Control<EventFormValues>,
 }) => {
 
     const { fields: owners, remove, append } = useFieldArray({
@@ -49,10 +67,9 @@ export const EventForm = ({ control, }: {
         = useController({
             control,
             name: "startDate",
-            defaultValue: "",
             rules: {
                 validate: (v) => {
-                    if(!v && !!endDate)
+                    if (!v && !!endDate)
                         return "La date de début est obligatoire"
                     if (v > endDate)
                         return "La date de début est postérieure à la date de fin"
@@ -65,7 +82,7 @@ export const EventForm = ({ control, }: {
             name: "endDate",
             rules: {
                 validate: (v) => {
-                    if(!v && !!startDate)
+                    if (!v && !!startDate)
                         return "La date de fin est obligatoire"
                     if (v < startDate)
                         return "La date de fin est antérieure à la date de début"
@@ -102,7 +119,7 @@ export const EventForm = ({ control, }: {
 
     const value = useMemo(() => {
         let v;
-        if(pickDateTime === "startDate")
+        if (pickDateTime === "startDate")
             v = startDate;
         else if (pickDateTime === "endDate")
             v = endDate;
@@ -111,8 +128,8 @@ export const EventForm = ({ control, }: {
     }, [startDate, endDate, pickDateTime])
 
     return (
-        <Animated.ScrollView style={{ flex: 1 }} className="flex flex-grow">
-            <View className="flex ">
+        <View>
+            <View className="flex">
                 <Text className="text-lg font-bold  italic ml-5 dark:text-white">
                     Nom
                 </Text>
@@ -149,9 +166,7 @@ export const EventForm = ({ control, }: {
                 </View>
                 <View className="flex gap-5 bg-gray-200 rounded-lg py-2 ">
                     {owners?.map((owner, index) => (
-                        <View key={owner._id} className="flex flex-row items-center justify-between px-5" onPress={() => updateOwner(index, {
-                            ...owner,
-                        })}>
+                        <View key={owner._id} className="flex flex-row items-center justify-between px-5" >
                             <View className="flex-row gap-2 items-center">
                                 <Avatar src={owner.avatar} alt={owner.name.charAt(0)} size2="sm" />
                                 <Text className="text-lg font-bold">{owner.name}</Text>
@@ -176,7 +191,7 @@ export const EventForm = ({ control, }: {
                     name="details"
                     rules={{
                         maxLength: 255
-                    }}/>
+                    }} />
             </View>
 
             <View className="flex-1 mt-5 ">
@@ -194,10 +209,15 @@ export const EventForm = ({ control, }: {
                 </View>
                 <View className="flex gap-5 bg-gray-200 rounded-lg py-2">
                     {attendees?.map((attendee, index) => (
-                        <Button key={attendee._id} className="flex flex-row items-center justify-between px-5" onPress={() => update(index, {
-                            ...attendee,
-                            checked: !attendee.checked
-                        })}>
+                        <Pressable key={attendee._id}
+                            className="flex flex-row items-center justify-between px-5"
+                            onPressOut={() => {
+                                debugger
+                                update(index, {
+                                ...attendee,
+                                checked: !attendee.checked
+                            })
+                            }}>
                             <View className="flex-row gap-1 items-center">
                                 <Avatar src={attendee.avatar} alt={attendee.name.charAt(0)} size2="sm" />
                                 <Text className="text-lg font-bold">{attendee.name}</Text>
@@ -210,7 +230,7 @@ export const EventForm = ({ control, }: {
                                     boxOutlineColor="#4444ff"
                                 />
                             </View>
-                        </Button>
+                        </Pressable>
                     ))}
 
                 </View>
@@ -221,7 +241,7 @@ export const EventForm = ({ control, }: {
                 onClose={() => setEditOwners(false)}
                 users={attendees?.map((u) => ({
                     ...u,
-                    checked: owners.map(u => u._id).includes(u._id)
+                    checked: owners.map(o => String(o._id)).includes(String(u._id))
                 })) || []}
                 onClick={(user, index) => {
                     if (user.checked)
@@ -230,7 +250,7 @@ export const EventForm = ({ control, }: {
                         append(user);
                 }} />
 
-            {!!pickDateTime &&
+            {/* {!!pickDateTime &&
 
                 <DateTimePicker
                     is24Hour
@@ -252,7 +272,7 @@ export const EventForm = ({ control, }: {
                     minimumDate={dayjs().subtract(6, "month").toDate()}
                     maximumDate={dayjs().add(6, "month").toDate()}
                 />
-            }
-        </Animated.ScrollView>
+            } */}
+        </View>
     )
 }

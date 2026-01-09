@@ -3,7 +3,8 @@
 
 export interface Trip {
     _id: string,
-    image: string
+    image: string,
+    users: TripUser[]
 }
 
 export interface TripUser {
@@ -21,7 +22,8 @@ export interface Event {
     name: string,
     attendees: TripUser[],
     owners: TripUser[],
-    trip: string
+    trip: string,
+    details?: string
 }
 
 
