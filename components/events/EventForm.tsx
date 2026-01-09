@@ -29,6 +29,7 @@ export interface EventFormValues {
     details: string;
     owners: IUser[];
     attendees: IUser[];
+    type: string
 }
 
 

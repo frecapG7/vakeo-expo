@@ -12,7 +12,6 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext, useMemo } from "react";
 import { Text, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const showDay = (previous?: any, current?: any) => {
     if (!current?.startDate)
@@ -75,10 +74,10 @@ export default function TripActivities() {
     const { formatDate } = useI18nTime();
 
     const events = useMemo(() => data?.pages.flatMap((page) => page?.events), [data]);
-    
-    return (
-        <SafeAreaView style={styles.container}>
 
+    return (
+        // <SafeAreaView style={styles.container}>
+        <Animated.View style={styles.container}>
             <Animated.FlatList
                 data={events || []}
                 renderItem={({ item, index, }) =>
@@ -103,6 +102,7 @@ export default function TripActivities() {
                 }
 
                 keyExtractor={(item) => item?._id}
+                className="flex"
                 contentContainerClassName="p-2 gap-5"
                 ListEmptyComponent={
                     <View className="my-5 flex-1 flex-grow justify-center">
@@ -116,9 +116,11 @@ export default function TripActivities() {
                         fetchNextPage();
                 }}
             />
+        </Animated.View>
 
 
 
-        </SafeAreaView>
+
+        // </SafeAreaView>
     )
 }
