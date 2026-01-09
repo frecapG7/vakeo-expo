@@ -7,6 +7,7 @@ import { default as styles, default as Styles } from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetDashboard, useGetTrip } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
+import { translateRestriction } from "@/lib/userUtils";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext } from "react";
 import { Pressable, Text, View } from "react-native";
@@ -178,10 +179,10 @@ export default function ItemDetails() {
                         <Text className="text-xl font-bold">Participants</Text>
                         <View>
                             <Text className="text-xs italic">
-                                14 personnes ont déja rejoints
+                                {dashboard?.attendees.total} personnes ont déja rejoints
                             </Text>
                             <Text className="text-xs italic">
-                                Aucune restrictions alimentaire
+                                {dashboard?.attendees.restrictions?.length === 0 ? "Aucune restrictions" : dashboard?.attendees.restrictions?.map(translateRestriction).join(", ")}
                             </Text>
                         </View>
                     </Pressable>
