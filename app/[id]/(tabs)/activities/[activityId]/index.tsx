@@ -142,12 +142,13 @@ export default function TripActivityDetails() {
                             Ajouter une adresse
                         </Text>
                     </Pressable>
+                    {}
                     <Pressable className="flex-row gap-5 items-center py-2" onPress={() => setShowAttendees(true)}>
                         <IconSymbol name="info.circle" size={34} color="grey"/>
                         <Text className="flex-1 border-b border-gray-800  py-2 dark:text-white capitalize">
                             {[...new Set(activity?.attendees?.flatMap(u => u.restrictions)
                                 .map(translateRestriction))]
-                                .join(", ")}
+                                .join(", ") || "Aucune restrictions"}
                         </Text>
                     </Pressable>
                 </View>

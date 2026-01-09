@@ -8,9 +8,8 @@ import { useGetTrip } from "@/hooks/api/useTrips";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { useContext, useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { KeyboardAvoidingView, Platform, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import Animated, { SlideInRight, SlideOutLeft } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Toast } from "toastify-react-native";
 
 
@@ -74,11 +73,7 @@ export default function NewTripActivity() {
             })
     }, [navigation, isPending, type]);
     return (
-        <SafeAreaView style={styles.container}>
-            <KeyboardAvoidingView
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
-                style={{ flex: 1 }}>
-
+        <Animated.ScrollView style={styles.container}>
                 {!type &&
                     <Animated.View entering={SlideInRight} exiting={SlideOutLeft}
                         className="flex-1 justify-center my-5">
@@ -113,7 +108,6 @@ export default function NewTripActivity() {
                         <EventForm control={control} />
                     </Animated.View>
                 }
-            </KeyboardAvoidingView>
-        </SafeAreaView>
+        </Animated.ScrollView>
     )
 }

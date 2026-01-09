@@ -5,7 +5,6 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tansta
 interface IParams {
     cursor: string,
     limit: number,
-    type: string
 }
 
 interface IPage {
@@ -22,18 +21,18 @@ const search = async (tripId: string, params?: IParams): Promise<IPage> => {
     return response.data;
 }
 
-export const useGetEvents = (tripId: string, params?: any) => {
+export const useGetEvents = (tripId: string, options?: any) => {
 
     return useInfiniteQuery<IPage, Error>({
-        queryKey: ["trips", tripId, "events", params],
+        queryKey: ["trips", tripId, "events"],
         queryFn: ({ pageParam }) => search(tripId, {
-            cursor: pageParam,
+            cursor: String(pageParam),
             limit: 25,
-            ...params
         }),
         initialPageParam: "",
         getNextPageParam: (lastPage) => lastPage?.nextCursor,
-        enabled: !!tripId
+        enabled: !!tripId,
+        ...options
     });
 }
 

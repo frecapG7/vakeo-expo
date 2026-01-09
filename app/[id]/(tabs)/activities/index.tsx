@@ -66,7 +66,9 @@ const EventItem = ({ event, onPress, user }: { event: Event, onPress: () => void
 export default function TripActivities() {
 
     const { id } = useLocalSearchParams();
-    const { data, hasNextPage, fetchNextPage } = useGetEvents(String(id));
+    const { data, hasNextPage, fetchNextPage } = useGetEvents(String(id), {
+        enabled: !!id
+    });
 
     const router = useRouter();
     const { me } = useContext(TripContext);

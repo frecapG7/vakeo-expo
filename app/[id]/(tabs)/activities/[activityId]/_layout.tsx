@@ -65,7 +65,9 @@ export default function TripActivityDetailLayout() {
 
             <Stack.Screen name="edit" options={{
                 presentation: "modal",
-                title: `Modifier (${activity?.name})`
+                headerTitle: "Modifier",
+                title: `Modifier (${activity?.name})`,
+                // headerShown: false
             }}
             />
             <Stack.Screen name="goods" options={{

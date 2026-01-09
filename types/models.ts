@@ -3,7 +3,8 @@
 
 export interface Trip {
     _id: string,
-    image: string
+    image: string,
+    users: TripUser[]
 }
 
 export interface TripUser {

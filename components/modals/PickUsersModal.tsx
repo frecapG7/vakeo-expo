@@ -55,7 +55,7 @@ export const PickUsersModal = ({
                         data={users}
                         renderItem={({ item, index }) =>
                             <Pressable className="flex flex-row justify-between items-center p-2"
-                                onPress={async () => onClick && await onClick(item, index)}
+                                onPress={async () => onClick && onClick(item, index)}
                                 disabled={disabled}>
                                 <View className="flex flex-row gap-2 items-center">
                                     <Avatar alt={item.name.charAt(0)} size2="md" src={item.avatar} />
