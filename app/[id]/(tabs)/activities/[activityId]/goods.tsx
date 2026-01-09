@@ -8,8 +8,8 @@ import { Good } from "@/types/models";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useContext, useEffect, useMemo, useState } from "react";
-import { Pressable } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Pressable, View } from "react-native";
+import Animated from "react-native-reanimated";
 
 
 
@@ -33,28 +33,31 @@ export default function ActivityGoods() {
     const navigation = useNavigation();
     useEffect(() => {
         navigation.setOptions({
-            headerRight: () => <Pressable
-                onPressOut={() => setSelectedGood(
-                    {
-                        _id: "",
-                        name: "",
-                        quantity: "",
-                        createdBy: me,
-                        trip: {
-                            _id: id
-                        },
-                        event: {
-                            _id: activityId
-                        }
-                    })}
-                className="bg-gray-800 rounded-full p-2">
-                <IconSymbol name="plus" size={25} color="white" />
-            </Pressable>
+            headerRight: () =>
+                <View className="mx-2">
+                    <Pressable
+                        onPressOut={() => setSelectedGood(
+                            {
+                                _id: "",
+                                name: "",
+                                quantity: "",
+                                createdBy: me,
+                                trip: {
+                                    _id: id
+                                },
+                                event: {
+                                    _id: activityId
+                                }
+                            })}
+                        className="bg-gray-800 rounded-full p-2">
+                        <IconSymbol name="plus" size={25} color="white" />
+                    </Pressable>
+                </View>
         })
     }, [navigation]);
 
     return (
-        <SafeAreaView style={styles.container}>
+        <Animated.View style={styles.container}>
             <GoodsFlatList
                 goods={goods}
                 isRefreshing={isLoading}
@@ -72,6 +75,6 @@ export default function ActivityGoods() {
                 }}
                 open={!!selectedGood}
                 onClose={() => setSelectedGood(null)} />
-        </SafeAreaView>
+        </Animated.View>
     )
 }
