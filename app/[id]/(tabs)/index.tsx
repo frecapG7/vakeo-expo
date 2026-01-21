@@ -1,13 +1,13 @@
-import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { CalendarDayView } from "@/components/ui/CalendarDayView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { default as styles, default as Styles } from "@/constants/Styles";
+import { default as styles } from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetDashboard, useGetTrip } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import { translateRestriction } from "@/lib/userUtils";
+import { ImageBackground } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext } from "react";
 import { Pressable, Text, View } from "react-native";
@@ -17,7 +17,7 @@ export default function ItemDetails() {
 
     const { id } = useLocalSearchParams();
     const { data: trip } = useGetTrip(String(id));
-    const { me } = useContext(TripContext);
+    const { me, showMenu } = useContext(TripContext);
 
 
     const { data: dashboard } = useGetDashboard(String(id), String(me?._id), {
@@ -53,9 +53,51 @@ export default function ItemDetails() {
 
 
     return (
-        <Animated.ScrollView style={Styles.container}>
-            <View className="flex flex-row justify-between items-center px-5 my-5">
 
+
+        <Animated.ScrollView style={{ flex: 1 }}>
+            <View className="h-80">
+                <ImageBackground source={trip?.image}
+                    style={{
+                        height: "100%",
+                        width: "100%",
+                        // aspectRatio:"2.0"
+                    }}
+                    contentFit="cover"
+
+                >
+                    <View className="flex-1 justify-between mt-10 p-2">
+                        <View className="flex-row justify-between items-center">
+                            <Pressable className="rounded-full bg-gray-800 p-1 shadow"
+                                onPress={() => router.dismissAll()}>
+                                <IconSymbol name="chevron.left" size={25} color="white" />
+                            </Pressable>
+                            <View className="flex-row gap-2">
+                                <Pressable onPressOut={() => router.push({
+                                    pathname: "/[id]/messages",
+                                    params: {
+                                        id: String(id)
+                                    }
+                                })}
+                                    className="bg-gray-800 rounded-full p-2">
+                                    <IconSymbol name="message" size={25} color="white" />
+                                </Pressable>
+                                <Pressable onPressOut={showMenu}
+                                    className="bg-gray-800 rounded-full p-2">
+                                    <IconSymbol name="ellipsis.circle" size={25} color="white" />
+                                </Pressable>
+                            </View>
+                        </View>
+
+                        <View>
+                            <Text className="text-2xl text-white font-bold">
+                                {trip?.name}
+                            </Text>
+                        </View>
+                    </View>
+                </ImageBackground>
+            </View>
+            <View className="flex flex-row justify-between items-center px-5 my-5">
                 <View className="gap-1">
                     <Button onPress={() => router.push("./dates")} >
                         <CalendarDayView>
@@ -87,7 +129,7 @@ export default function ItemDetails() {
                     </Button>
                 </View>
 
-                <Button
+                {/* <Button
                     className="flex items-center justify-center"
                     onPress={() => router.navigate({
                         pathname: "/[id]/(tabs)/settings",
@@ -99,9 +141,23 @@ export default function ItemDetails() {
                 >
                     <Avatar src={me?.avatar} alt={me?.name?.charAt(0)} size2="lg" />
                     <Text className="font-bold text-lg dark:text-white">{me?.name}</Text>
-                </Button>
+                </Button> */}
             </View>
 
+
+
+            <View className="gap-2 my-2">
+                <View className="flex-row">
+                    <IconSymbol name="map" size={34} color="grey" />
+                    <Text className="flex-1 border-b border-gray-800  py-2 dark:text-white">
+                        45 rue pouchet
+                    </Text>
+                </View>
+                <View className="flex-row">
+                    <IconSymbol name="person" size={34} color="grey" />
+                    {/* <AvatarsGroup avatars={trip?.att} */}
+                </View>
+            </View>
 
 
 

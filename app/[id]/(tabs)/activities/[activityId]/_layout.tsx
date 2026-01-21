@@ -25,7 +25,7 @@ export default function TripActivityDetailLayout() {
             headerStyle: {
                 backgroundColor: colors.background,
             },
-            headerShadowVisible: true,
+            headerShadowVisible: false,
             headerTitleAlign: "left",
             headerLeft: () =>
                 <Pressable onPressOut={() => router.dismissTo({

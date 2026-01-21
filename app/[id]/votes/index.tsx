@@ -1,3 +1,4 @@
+import { IconSymbol } from "@/components/ui/IconSymbol";
 import { VoteListItem } from "@/components/votes/VoteListItem";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
@@ -5,8 +6,8 @@ import { useGetTrip } from "@/hooks/api/useTrips";
 import { useGetVotes } from "@/hooks/api/useVotes";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext } from "react";
+import { Pressable } from "react-native";
 import Animated from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 
 export default function TripVotesPage() {
@@ -25,8 +26,7 @@ export default function TripVotesPage() {
 
 
     return (
-        <SafeAreaView style={styles.container}>
-
+        <Animated.View style={styles.container}>
             <Animated.FlatList data={page?.votes}
                 keyExtractor={(item) => item._id}
                 renderItem={({ item }) =>
@@ -43,6 +43,16 @@ export default function TripVotesPage() {
                             })} />
                 }
                 contentContainerClassName='gap-5' />
-        </SafeAreaView>
+
+            <Pressable className="absolute bottom-12 right-6 w-20 h-20 rounded-full bg-blue-400 items-center justify-center"
+                onPress={() => router.push({
+                    pathname: "/[id]/votes/new",
+                    params: {
+                        id: String(id)
+                    }
+                })}>
+                <IconSymbol name="plus" color="white" size={40} />
+            </Pressable>
+        </Animated.View>
     )
 }
