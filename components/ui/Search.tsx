@@ -1,5 +1,6 @@
 import styles from "@/constants/Styles"
-import { Pressable, TextInput, View } from "react-native"
+import { Pressable, View } from "react-native"
+import { TextInput } from "react-native-gesture-handler"
 import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated"
 import { IconSymbol } from "./IconSymbol"
 
@@ -17,9 +18,9 @@ export const Search = ({ value, onChange }: { value: string, onChange: (text: st
                 onChangeText={onChange}
                 value={value}
                 className="text-md flex-1 text-dark"
-                placeholderTextColor="#000000"
+                placeholderTextColor="#0c0b20"
                 // ref={ref}
-                // placeholder={placeholder}
+                placeholder="Rechercher"
                 style={styles.textInput}
             />
             {!!value &&

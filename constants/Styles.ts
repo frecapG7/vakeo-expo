@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
         // backgroundColor: "grey",
         color: "black",
         textAlign: "left",
-        textTransform: "capitalize"
+        // textTransform: "capitalize"
     }
 });
 
