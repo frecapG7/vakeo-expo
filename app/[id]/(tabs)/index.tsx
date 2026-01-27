@@ -1,17 +1,15 @@
 import { Button } from "@/components/ui/Button";
-import { CalendarDayView } from "@/components/ui/CalendarDayView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { default as styles } from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
-import { useGetDashboard, useGetTrip } from "@/hooks/api/useTrips";
+import { useGetTrip } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
-import { translateRestriction } from "@/lib/userUtils";
 import { ImageBackground } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext } from "react";
 import { Pressable, Text, View } from "react-native";
-import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 export default function ItemDetails() {
 
@@ -20,28 +18,24 @@ export default function ItemDetails() {
     const { me, showMenu } = useContext(TripContext);
 
 
-    const { data: dashboard } = useGetDashboard(String(id), String(me?._id), {
-        enabled: (!!trip && !!me?._id)
-    });
+    // const { data: dashboard } = useGetDashboard(String(id), String(me?._id), {
+    //     enabled: (!!trip && !!me?._id)
+    // });
     const router = useRouter();
 
 
-    const { formatDate } = useI18nTime();
+    const { formatDate, formatRange } = useI18nTime();
 
 
-    if (!trip)
+    if (!trip || !router)
         return (
             <Animated.ScrollView style={styles.container}>
-                <View className="flex-row justify-between my-5 px-5">
+                <View className="h-80 bg-gray-600">
+                </View>
+
+                <View className="shadow mx-4 -mt-10 bg-yellow-50 dark:bg-gray-400 rounded-lg p-2 pb-10">
                     <View className="flex w-40">
                         <Skeleton height={20} />
-                    </View>
-
-                    <View className="gap-1 justify-center">
-                        <View className="w-40 items-center">
-                            <Skeleton variant="circular" height={20} />
-                        </View>
-                        <Skeleton height={5} />
                     </View>
                 </View>
                 <View className="mt-10 gap-5">
@@ -53,18 +47,14 @@ export default function ItemDetails() {
 
 
     return (
-
-
         <Animated.ScrollView style={{ flex: 1 }}>
-            <View className="h-80">
+            <View className="h-80 w-full">
                 <ImageBackground source={trip?.image}
                     style={{
                         height: "100%",
                         width: "100%",
-                        // aspectRatio:"2.0"
                     }}
-                    contentFit="cover"
-
+                    contentFit="fill"
                 >
                     <View className="flex-1 justify-between mt-10 p-2">
                         <View className="flex-row justify-between items-center">
@@ -82,168 +72,63 @@ export default function ItemDetails() {
                                     className="bg-gray-800 rounded-full p-2">
                                     <IconSymbol name="message" size={25} color="white" />
                                 </Pressable>
-                                <Pressable onPressOut={showMenu}
+                                <Pressable onPressOut={() => showMenu()}
                                     className="bg-gray-800 rounded-full p-2">
                                     <IconSymbol name="ellipsis.circle" size={25} color="white" />
                                 </Pressable>
                             </View>
                         </View>
 
-                        <View>
+                        {/* <View>
                             <Text className="text-2xl text-white font-bold">
                                 {trip?.name}
                             </Text>
-                        </View>
+                        </View> */}
                     </View>
                 </ImageBackground>
             </View>
-            <View className="flex flex-row justify-between items-center px-5 my-5">
-                <View className="gap-1">
-                    <Button onPress={() => router.push("./dates")} >
-                        <CalendarDayView>
-                            {!!trip?.startDate ? (
-                                <View className="px-5 pb-2 flex items-center">
-                                    <Text className="text-2xl">
-                                        {formatDate(trip?.startDate, {
-                                            day: "numeric",
-                                            month: "long",
-                                        })}
-                                    </Text>
-                                    <Text className="text-xl font-bold">-</Text>
-                                    <Text className="text-2xl">
-                                        {formatDate(trip?.endDate, {
-                                            day: "numeric",
-                                            month: "long"
-                                        })}
-                                    </Text>
-                                </View>) :
-                                (<Animated.View entering={ZoomIn} exiting={ZoomOut} >
-                                    <View className="flex items-center m-1">
-                                        <IconSymbol name="pencil" size={24} color="dark" />
-                                        <Text className="text-sm">Ajouter des dates</Text>
-                                    </View>
-                                </Animated.View>)
-                            }
 
-                        </CalendarDayView>
-                    </Button>
+
+            <View className="shadow mx-4 -mt-10 mb-5 p-2 rounded-lg bg-yellow-50 dark:bg-gray-400 flex" >
+                <View className="flex-row justify-between items-end px-5">
+                    <Text className="text-3xl font-bold mb-5" numberOfLines={2}>{trip?.name}</Text>
                 </View>
-
-                {/* <Button
-                    className="flex items-center justify-center"
-                    onPress={() => router.navigate({
-                        pathname: "/[id]/(tabs)/settings",
-                        params: {
-                            id: String(id)
-                        }
-                    })}
-                    onLongPress={() => router.push("./pick-user")}
-                >
-                    <Avatar src={me?.avatar} alt={me?.name?.charAt(0)} size2="lg" />
-                    <Text className="font-bold text-lg dark:text-white">{me?.name}</Text>
-                </Button> */}
-            </View>
-
-
-
-            <View className="gap-2 my-2">
-                <View className="flex-row">
-                    <IconSymbol name="map" size={34} color="grey" />
-                    <Text className="flex-1 border-b border-gray-800  py-2 dark:text-white">
-                        45 rue pouchet
-                    </Text>
-                </View>
-                <View className="flex-row">
-                    <IconSymbol name="person" size={34} color="grey" />
-                    {/* <AvatarsGroup avatars={trip?.att} */}
-                </View>
-            </View>
-
-
-
-            <View className="gap-2 flex-1">
-
-
-
-                <View className="flex-row gap-2">
-                    <Pressable className="rounded-lg bg-blue-100 dark:bg-gray-200 flex-1 p-2"
-                        onPress={() => router.navigate({
-                            pathname: "/[id]/votes",
+                <View className="flex-row ">
+                    <View className="flex-1">
+                        <Button className="flex-row items-center" onPress={() => router.push({
+                            pathname: "/[id]/dates",
                             params: {
                                 id: String(id)
                             }
                         })}>
-                        <View className="flex-row justify-between">
-                            <View className="rounded-full bg-orange-400 dark:bg-blue-400 p-2">
-                                <IconSymbol name="chart.bar.fill" size={40} color="black" />
-                            </View>
-                        </View>
-                        <Text className="text-xl font-bold">Sondages</Text>
-                        <Text className="text-xs italic">
-                            Il n'y a présentement aucun sondage en cours
-                        </Text>
-                    </Pressable>
+                            <IconSymbol name="calendar" size={32} color="black" />
+                            {trip?.startDate ?
+                                <Text className="capitalize text-md" numberOfLines={2} >
+                                    {formatRange(trip?.startDate, trip?.endDate)}
+                                </Text>
 
-                    <Pressable className="rounded-lg bg-blue-100 dark:bg-gray-600 border border-gray-200 shadow flex-1 p-2"
-                        onPress={() => router.navigate({
-                            pathname: "/[id]/activities",
-                            params: {
-                                id: String(id)
+                                :
+                                <Text className="capitalize text-sm">
+                                    A définir
+                                </Text>
                             }
-                        })}>
-                        <View className="flex-row justify-between">
-                            <View className="rounded-full bg-orange-400 dark:bg-blue-400 p-2">
-                                <IconSymbol name="calendar" size={40} color="black" />
-                            </View>
-                        </View>
-                        <Text className="text-xl font-bold mb-2">Evenements</Text>
-                        <View>
-                            <Text className="text-sm italic">{dashboard?.events.attending} auquel tu participes</Text>
-                            <Text className="text-sm italic">{dashboard?.events.ownership} dont tu es responsable</Text>
-                            <Text className="text-sm italic">{dashboard?.events.total} au total</Text>
-                        </View>
-                    </Pressable>
-                </View>
-
-
-                <View className="flex-row gap-2">
-                    <Pressable className="rounded-lg bg-orange-100 dark:bg-gray-200 flex-1 p-2"
-                        onPress={() => router.push({
-                            pathname: "/[id]/(tabs)/goods",
-                            params: {
-                                id: String(id)
-                            }
-                        })}>
-                        <View className="flex-row justify-between">
-                            <View className="rounded-full bg-blue-400 p-2">
-                                <IconSymbol name="cart" size={40} color="black" />
-                            </View>
-                        </View>
-                        <Text className="text-xl font-bold mb-2">La liste</Text>
-                        <View>
-                            <Text className="text-sm italic">{dashboard?.goods.missing} manquants</Text>
-                            <Text className="font-bold">{dashboard?.goods.total} au total</Text>
-                        </View>
-                    </Pressable>
-
-                    <Pressable className="rounded-lg bg-orange-100 dark:bg-gray-200 flex-1 p-2">
-                        <View className="flex-row justify-between">
-                            <View className="rounded-full bg-blue-400 p-2">
-                                <IconSymbol name="person.circle" size={40} color="black" />
-                            </View>
-                        </View>
-                        <Text className="text-xl font-bold">Participants</Text>
-                        <View>
-                            <Text className="text-xs italic">
-                                {dashboard?.attendees.total} personnes ont déja rejoints
+                        </Button>
+                        <View className="h-0.5 w-80% rounded-xl bg-gray-800" />
+                        <Button className="flex-row items-center" onPress={() => console.log("todo")}>
+                            <IconSymbol name="map" size={32} color="black" />
+                            <Text className="capitalize text-sm" numberOfLines={2} >
+                                A définir
                             </Text>
-                            <Text className="text-xs italic">
-                                {dashboard?.attendees.restrictions?.length === 0 ? "Aucune restrictions" : dashboard?.attendees.restrictions?.map(translateRestriction).join(", ")}
-                            </Text>
-                        </View>
-                    </Pressable>
+                        </Button>
+
+                    </View>
+
                 </View>
             </View>
+
+         
+
+
 
         </Animated.ScrollView>
     )

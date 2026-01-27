@@ -4,7 +4,10 @@
 export interface Trip {
     _id: string,
     image: string,
-    users: TripUser[]
+    users: TripUser[],
+    name: String,
+    startDate?: Date,
+    endDate?: Date
 }
 
 export interface TripUser {
