@@ -1,3 +1,4 @@
+import { Avatar, AvatarsGroup } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -89,44 +90,55 @@ export default function ItemDetails() {
             </View>
 
 
-            <View className="shadow mx-4 -mt-10 mb-5 p-2 rounded-lg bg-yellow-50 dark:bg-gray-400 flex" >
-                <View className="flex-row justify-between items-end px-5">
-                    <Text className="text-3xl font-bold mb-5" numberOfLines={2}>{trip?.name}</Text>
-                </View>
-                <View className="flex-row ">
-                    <View className="flex-1">
-                        <Button className="flex-row items-center" onPress={() => router.push({
-                            pathname: "/[id]/dates",
-                            params: {
-                                id: String(id)
-                            }
-                        })}>
-                            <IconSymbol name="calendar" size={32} color="black" />
-                            {trip?.startDate ?
-                                <Text className="capitalize text-md" numberOfLines={2} >
-                                    {formatRange(trip?.startDate, trip?.endDate)}
-                                </Text>
-
-                                :
-                                <Text className="capitalize text-sm">
-                                    A définir
-                                </Text>
-                            }
-                        </Button>
-                        <View className="h-0.5 w-80% rounded-xl bg-gray-800" />
-                        <Button className="flex-row items-center" onPress={() => console.log("todo")}>
-                            <IconSymbol name="map" size={32} color="black" />
-                            <Text className="capitalize text-sm" numberOfLines={2} >
-                                A définir
-                            </Text>
-                        </Button>
-
+            <View className="shadow mx-4 -mt-10 mb-5 p-2 rounded-lg bg-yellow-50 dark:bg-gray-900 flex" >
+                <View className="px-5">
+                    <Text className="text-3xl font-bold dark:text-white" numberOfLines={2}>{trip?.name}</Text>
+                    <View className="flex-row gap-2 items-center justify-start">
+                        <View className="items-center">
+                            <Avatar src={me?.avatar} alt={me?.name?.charAt(0)} size2="md" />
+                            <Text className="dark:text-gray-400">{me?.name}</Text>
+                        </View>
+                        <View className="w-0.5 h-10 bg-gray-400" />
+                            <AvatarsGroup
+                                maxLength={5}
+                                size2="sm"
+                                avatars={trip?.users?.filter(u => u._id !== me?._id).map(u => ({
+                                    avatar: u.avatar,
+                                    alt: u?.name.charAt(0)
+                                })
+                                )} />
                     </View>
+                </View>
+                <View className="flex my-5 gap-2">
+                    <Button className="flex-row items-end border-b gap-2 border-gray-400 p-1" onPress={() => router.push({
+                        pathname: "/[id]/dates",
+                        params: {
+                            id: String(id)
+                        }
+                    })}>
+                        <IconSymbol name="calendar" size={32} color="gray" />
+                        {trip?.startDate ?
+                            <Text className="capitalize text-md text-gray-400" numberOfLines={2} >
+                                {formatRange(trip?.startDate, trip?.endDate)}
+                            </Text>
+                            :
+                            <Text className="capitalize text-sm text-gray-400">
+                                Saisir des dates
+                            </Text>
+                        }
+                    </Button>
+                    <Button className="flex-row items-end border-b border-gray-400 p-1" onPress={() => console.log("todo")}>
+                        <IconSymbol name="map" size={32} color="gray" />
+                        <Text className="text-sm text-gray-400" numberOfLines={2} >
+                            Saisir un lieu
+                        </Text>
+                    </Button>
 
                 </View>
+
             </View>
 
-         
+
 
 
 

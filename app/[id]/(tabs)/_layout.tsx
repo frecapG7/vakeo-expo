@@ -18,7 +18,7 @@ export default function ItemDetailsLayout() {
     return (
         <Tabs screenOptions={{
             headerShown: true,
-            headerBackground: () => <BackgroundHeader trip={trip} />,
+            headerBackground: () => trip && <BackgroundHeader trip={trip} />,
             headerTintColor: "white",
             headerRight: () => (
                 <View className="flex flex-row gap-2 justify-end items-center mx-5">
@@ -109,12 +109,7 @@ export default function ItemDetailsLayout() {
                     href: null
                 }} />
 
-
-
         </Tabs >
-
-
-
 
     );
 }

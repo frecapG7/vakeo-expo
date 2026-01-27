@@ -2,6 +2,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Search } from "@/components/ui/Search";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { default as styles } from "@/constants/Styles";
 import { useSearchTrips } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
@@ -29,7 +30,7 @@ export default function HomePage() {
   const ids = useMemo(() => storageTrips?.map(trip => trip._id) || [], [storageTrips]);
 
 
-  const { data: trips } = useSearchTrips(ids, search);
+  const { data: trips, isLoading } = useSearchTrips(ids, search);
 
   const { formatRange, formatDate, formatDuration } = useI18nTime();
 
@@ -76,7 +77,7 @@ export default function HomePage() {
 
                 <View className="flex-1 rounded-lg flex-row justify-between bg-[rgba(0,0,0,0.3)] px-5 ">
                   <View className="justify-between py-2">
-                    <View>
+                    <View className="">
                       <Text className="text-white text-2xl font-bold align-end">{item.name}</Text>
                       {item.startDate &&
 
@@ -112,6 +113,14 @@ export default function HomePage() {
           ItemSeparatorComponent={() => <View className="my-5" />}
           // keyboardDismissMode="on-drag"
           itemLayoutAnimation={LinearTransition}
+          ListEmptyComponent={<View>
+            {isLoading &&
+              <View className="gap-10">
+                <Skeleton height={40} />
+                <Skeleton height={40} />
+              </View>
+            }
+          </View>}
         />
         <BottomSheet ref={bottomSheetRef}
           index={-1}
