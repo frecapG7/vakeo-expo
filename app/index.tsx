@@ -71,7 +71,7 @@ export default function HomePage() {
                   width: '100%', // Prend toute la largeur disponible,
                 }}
                 imageStyle={{ borderRadius: 6 }}
-                contentFit="fill"
+                contentFit="cover"
               // imageStyle={{ borderRadius: 8 }} // Arrondi les coins de l'image
               >
 

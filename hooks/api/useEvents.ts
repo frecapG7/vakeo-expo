@@ -22,14 +22,14 @@ const search = async (tripId: string, params?: IParams): Promise<IPage> => {
     return response.data;
 }
 
-export const useGetEvents = (tripId: string, type?: string, options?: any) => {
+export const useGetEvents = (tripId: string, params?: any, options?: any) => {
 
     return useInfiniteQuery<IPage, Error>({
-        queryKey: ["trips", tripId, "events", type],
+        queryKey: ["trips", tripId, "events", params],
         queryFn: ({ pageParam }) => search(tripId, {
             cursor: String(pageParam),
             limit: 25,
-            type
+            ...params
         }),
         initialPageParam: "",
         getNextPageParam: (lastPage) => lastPage?.nextCursor,

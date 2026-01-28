@@ -55,7 +55,7 @@ export default function ItemDetails() {
                         height: "100%",
                         width: "100%",
                     }}
-                    contentFit="fill"
+                    contentFit="cover"
                 >
                     <View className="flex-1 justify-between mt-10 p-2">
                         <View className="flex-row justify-between items-center">

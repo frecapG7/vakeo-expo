@@ -1,3 +1,4 @@
+import { EventIcon } from "@/components/events/EventIcon";
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
 import { IconSymbol } from "@/components/ui/IconSymbol";
@@ -6,7 +7,7 @@ import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetEvents } from "@/hooks/api/useEvents";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
-import { toIcon, toLabel } from "@/lib/eventUtils";
+import { toLabel } from "@/lib/eventUtils";
 import { Event, TripUser } from "@/types/models";
 import dayjs from "dayjs";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -36,11 +37,11 @@ const typeFilters = [
         icon: "cart",
         label: "Repas"
     },
-    {
-        value: "RESTAURANT",
-        icon: "suit.spade",
-        label: "Restaurant"
-    },
+    // {
+    //     value: "RESTAURANT",
+    //     icon: "suit.spade",
+    //     label: "Restaurant"
+    // },
     {
         value: "SPORT",
         icon: "sportscourt",
@@ -62,20 +63,21 @@ const EventItem = ({ event, onPress, user }: { event: Event, onPress: () => void
     const isOwner = useMemo(() => event.owners.map(u => u._id).includes(user?._id), [user, event])
 
     return (
-        <Button className="flex-1 bg-orange-200  dark:bg-gray-400 rounded-lg shadow border border-orange-400 dark:border-gray-100" onPress={onPress}>
+        <Button className="flex-1 bg-blue-100  dark:bg-gray-400 rounded-lg shadow border border-orange-400 dark:border-gray-100" onPress={onPress}>
 
-            <View className="flex-row py-1 shadow">
+            <View className="flex-row py-1 shadow justify-between">
                 <View>
-                    <Text className="text-2xl text-blue-600 dark:text-white font-bold" numberOfLines={1}>
+                    <Text className="text-2xl text-blue-800 dark:text-white font-bold" numberOfLines={1}>
                         {event.name}
                     </Text>
                 </View>
+                <EventIcon name={event.type} size="sm"/>
             </View>
 
             <View className="rounded-t-xl bg-white dark:bg-black  border-blue-200 border p-2 gap-2">
 
                 <View className="flex-row  flex-1 items-center gap-2">
-                    <IconSymbol name={toIcon(event)} color="gray" />
+                    <EventIcon name={event?.type} size="sm" />
                     <Text className="capitalize text-gray-400">{toLabel(event)}</Text>
                 </View>
                 <View className="flex-row items-center gap-2">
@@ -116,14 +118,18 @@ export default function TripActivities() {
     const [onlyAttendee, setOnlyAttendee] = useState(false);
     const [onlyOwner, setOnlyOwner] = useState(false);
 
-    const { data, hasNextPage, fetchNextPage } = useGetEvents(String(id), typeFilter, {
-        enabled: !!id,
-    });
 
     const router = useRouter();
     const { me } = useContext(TripContext);
     const { formatDate } = useI18nTime();
 
+    const { data, hasNextPage, fetchNextPage } = useGetEvents(String(id), {
+        type: typeFilter,
+        ...(onlyAttendee && { attendees: me?._id }),
+        ...(onlyOwner && { owners: me?._id }),
+    }, {
+        enabled: !!id,
+    });
     const events = useMemo(() => data?.pages.flatMap((page) => page?.events), [data?.pages]);
 
 
@@ -143,8 +149,8 @@ export default function TripActivities() {
                                 <Pressable key={item.value}
                                     onPress={() => setTypeFilter(typeFilter === item?.value ? "" : item.value)}
                                     className="mx-4 items-center">
-                                    <View className={`rounded-full p-3 ${typeFilter === item.value ? " bg-blue-200 dark:bg-gray-200" : ""}`}>
-                                        <IconSymbol name={item.icon} color={typeFilter === item.value ? "black" : "gray"} size={34} />
+                                    <View className={`rounded-full p-2 ${typeFilter === item.value ? "rounded-full bg-blue-200 dark:bg-gray-200" : ""}`}>
+                                        <EventIcon name={item.value} color={typeFilter === item.value ? "black" : "gray"} size="md" />
                                     </View>
                                     <Text className="font-bold dark:text-white">{item.label}</Text>
                                 </Pressable>
@@ -156,7 +162,9 @@ export default function TripActivities() {
                             <Chip text="Je participe"
                                 onPress={() => setOnlyAttendee(!onlyAttendee)}
                                 variant={onlyAttendee ? "contained" : "outlined"} />
-                            <Chip text="Je suis responsable" onPress={() => setOnlyOwner(!onlyOwner)} />
+                            <Chip text="Je suis responsable"
+                             onPress={() => setOnlyOwner(!onlyOwner)}
+                             variant={onlyOwner ? "contained" : "outlined"} />
                         </Animated.ScrollView>
                     </View>
                 }
