@@ -1,4 +1,3 @@
-import { BackgroundHeader } from "@/components/header/BackgroundHeader";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
@@ -57,16 +56,17 @@ export default function TripDetailsLayout() {
         <GestureHandlerRootView style={{ flex: 1 }}>
             <BottomSheetModalProvider>
                 <TripContext.Provider value={{
-                    me
+                    me,
+                    showMenu: handlePresentModalPress
                 }}>
                     <Stack screenOptions={{
-                        headerBackground: () => <BackgroundHeader trip={trip} />,
+                        // headerBackground: () => <BackgroundHeader trip={trip} />,
                         headerTintColor: "white",
                         headerTitleStyle: styles.headerTitle,
                         // headerTitleAlign: "left"
                     }}>
                         <Stack.Screen name="(tabs)" options={{
-                            headerShown: true,
+                            headerShown: false,
                             title: trip?.name || "",
                             headerRight: () => (
                                 <View className="flex flex-row gap-2 justify-end items-center mx-5">
@@ -120,7 +120,7 @@ export default function TripDetailsLayout() {
                         backgroundStyle={{
                             backgroundColor: colors.neutral
                         }}
-                        
+
                     >
                         <BottomSheetView style={{ flex: 1, padding: 10, minHeight: 150 }}>
                             <View className="flex flex-grow gap-5 p-1 divide-y-5 divide-solid dark:divide-white">

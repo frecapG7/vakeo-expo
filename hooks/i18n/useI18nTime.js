@@ -46,6 +46,7 @@ const formatDay = (date) => {
 };
 
 
+
 const formatRange = (startDate, endDate, options) => {
   if (!startDate || !endDate)
     return "";
@@ -63,7 +64,7 @@ const formatRange = (startDate, endDate, options) => {
       weekday: "long",
       day: "numeric",
       month: "long",
-      year: "numeric"
+      ...(!options?.hideYear && { year: "numeric" })
     })
   if (months < 1)
     return `${formatDate2(start, {
@@ -73,7 +74,7 @@ const formatRange = (startDate, endDate, options) => {
       weekday: "long",
       day: "numeric",
       month: "long",
-      year: "numeric"
+      ...(!options?.hideYear && { year: "numeric" })
     })}`;
 
   if (years < 1)
@@ -85,7 +86,7 @@ const formatRange = (startDate, endDate, options) => {
       weekday: "long",
       day: "numeric",
       month: "long",
-      year: "numeric"
+      ...(!options?.hideYear && { year: "numeric" })
     })}`;
 
 
@@ -93,12 +94,12 @@ const formatRange = (startDate, endDate, options) => {
     weekday: "long",
     day: "numeric",
     month: "long",
-    year: "numeric"
+    ...(!options?.hideYear && { year: "numeric" })
   })} - ${formatDate2(end, {
     weekday: "long",
     day: "numeric",
     month: "long",
-    year: "numeric"
+    ...(!options?.hideYear && { year: "numeric" })
   })}`;
 
 

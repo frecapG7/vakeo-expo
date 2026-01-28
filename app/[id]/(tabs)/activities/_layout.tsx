@@ -19,7 +19,7 @@ export default function TripEventsLayout() {
             headerShown: true
         }}>
             <Stack.Screen name="index" options={{
-                headerShown: true,
+                headerShown: false,
                 title: "Au programme",
                 headerTintColor: colors.text,
                 headerTitleStyle: styles.headerSubTitle,

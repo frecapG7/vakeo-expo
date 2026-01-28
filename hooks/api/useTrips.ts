@@ -26,6 +26,24 @@ export const useGetTrip = (tripId: string) => {
   });
 };
 
+
+const searchTrips = async (ids: string[], search?: string) => {
+  const response = await axios.get("/trips", {
+    params: {
+      ids: ids?.join(",") || "",
+      search
+    }
+  });
+  return response.data;
+}
+
+export const useSearchTrips = (ids: string[], search: string) => {
+  return useQuery({
+    queryKey: ["trips", ids, search],
+    queryFn: () => searchTrips(ids, search)
+  });
+}
+
 const updateTrip = async (tripId: string, data: Trip): Promise<Trip> => {
   const response = await axios.put(`/trips/${tripId}`, data);
   return response.data;

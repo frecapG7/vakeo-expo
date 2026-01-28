@@ -1,34 +1,38 @@
-import { FormText } from "@/components/form/FormText";
+import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { Search } from "@/components/ui/Search";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { default as styles } from "@/constants/Styles";
+import { useSearchTrips } from "@/hooks/api/useTrips";
+import useI18nTime from "@/hooks/i18n/useI18nTime";
 import { useGetStorageTrips } from "@/hooks/storage/useStorageTrips";
 import useColors from "@/hooks/styles/useColors";
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
-import { Image } from "expo-image";
+import { ImageBackground } from "expo-image";
 import { useNavigation, useRouter } from "expo-router";
-import { useEffect, useRef } from "react";
-import { useForm, useWatch } from "react-hook-form";
-import { Pressable, Text, View } from "react-native";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import Animated, { LinearTransition, ZoomIn } from "react-native-reanimated";
+import Animated, { LinearTransition } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomePage() {
 
-  const { control, setValue } = useForm();
   const router = useRouter();
 
-  const search = useWatch({
-    control,
-    name: "search"
-  });
+  const [search, setSearch] = useState<string>("");
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const navigation = useNavigation();
 
   const { data: storageTrips } = useGetStorageTrips();
+  const ids = useMemo(() => storageTrips?.map(trip => trip._id) || [], [storageTrips]);
 
+
+  const { data: trips, isLoading } = useSearchTrips(ids, search);
+
+  const { formatRange, formatDate, formatDuration } = useI18nTime();
 
   useEffect(() => {
     navigation.setOptions({
@@ -48,63 +52,83 @@ export default function HomePage() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <GestureHandlerRootView style={styles.container}>
-        <View className="h-20 mx-5 mb-5">
-          <Text className="dark:text-white ml-5">Rechercher</Text>
-          <FormText label="Rechercher"
-            control={control}
-            name="search"
-            endAdornment={<View className="flex flex-row gap-1 items-center">
-              {!!search &&
-                <Animated.View entering={ZoomIn}>
-                  <Pressable onPress={() => setValue("search", "")}>
-                    <IconSymbol name="xmark.circle" />
-                  </Pressable>
-                </Animated.View>
-              }
-              <IconSymbol name="magnifyingglass" />
-            </View>} />
-        </View>
-        <View>
-          <Animated.FlatList
-            data={storageTrips?.filter(item => !search || item.name.toLowerCase().includes(search))}
-            keyExtractor={(item) => item._id}
-            renderItem={({ item, separators }) =>
-              <Button
-                className="flex flex-row justify-between items-center bg-orange-100 dark:bg-gray-100 px-5 py-2 rounded-lg"
-                onPress={() => router.push(`./${item._id}`)}>
-                <View className="flex flex-row gap-1 items-center">
-                  <Image
-                    style={{
-                      ...styles.image,
-                      maxWidth: 75,
-                      height: 80
-                    }}
-                    source={item.image}
-                    contentFit="cover"
-                    transition={1000}
-                  />
-                  <View className="flex flex-col">
-                    <Text className="text-2xl font-bold">{item.name}</Text>
+        <Animated.FlatList
+          ListHeaderComponent={
+            <View className="mx-5 mb-5">
+              <Search value={search} onChange={setSearch} />
+            </View>
+          }
+          data={trips}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) =>
+            <Button
+              className="rounded-xl h-60 p-1 shadow bg-blue-100 dark:bg-gray-600"
+              onPress={() => router.push(`./${item._id}`)}>
+
+              <ImageBackground source={item.image}
+                style={{
+                  height: "100%",
+                  width: '100%', // Prend toute la largeur disponible,
+                }}
+                imageStyle={{ borderRadius: 6 }}
+                contentFit="fill"
+              // imageStyle={{ borderRadius: 8 }} // Arrondi les coins de l'image
+              >
+
+                <View className="flex-1 rounded-lg flex-row justify-between bg-[rgba(0,0,0,0.3)] px-5 ">
+                  <View className="justify-between py-2">
+                    <View className="">
+                      <Text className="text-white text-2xl font-bold align-end">{item.name}</Text>
+                      {item.startDate &&
+
+                        <View className="flex gap-1">
+                          <Text className="text-lg text-white capitalize font-bold">
+                            {formatRange(item.startDate, item.endDate, { hideYear: false })}
+                          </Text>
+                        </View>
+                      }
+                    </View>
+                    <View className="flex-row gap-3 items-center">
+                      {item?.users?.slice(0, 5).map((user) =>
+                        <View key={user._id} className="items-center">
+                          <Avatar src={user?.avatar} alt={user?.name?.charAt(0)} size2="sm" />
+                          <Text className="font-bold text-white max-w-120" numberOfLines={1}>{user?.name}</Text>
+                        </View>
+                      )}
+                      {item?.users?.length > 5 &&
+                        <View className="items-center">
+                          <Avatar alt="..." size2="md" />
+                          <Text className="font-bold text-white">+{item?.users.length - 5}</Text>
+                        </View>}
+                    </View>
+                  </View>
+                  <View className="flex h-full justify-center">
+                    <IconSymbol name="chevron.right" size={34} color="white" />
                   </View>
                 </View>
-                <View>
-                  <IconSymbol name="chevron.right" size={24} color="black" />
-                </View>
-              </Button>
-            }
-            ItemSeparatorComponent={() => <View className="h-5" />}
-            keyboardDismissMode="on-drag"
-            itemLayoutAnimation={LinearTransition}
-          />
-        </View>
 
+              </ImageBackground>
+            </Button>
+          }
+          ItemSeparatorComponent={() => <View className="my-5" />}
+          // keyboardDismissMode="on-drag"
+          itemLayoutAnimation={LinearTransition}
+          ListEmptyComponent={<View>
+            {isLoading &&
+              <View className="gap-10">
+                <Skeleton height={40} />
+                <Skeleton height={40} />
+              </View>
+            }
+          </View>}
+        />
         <BottomSheet ref={bottomSheetRef}
           index={-1}
           backgroundStyle={{
             backgroundColor: colors.neutral,
             ...styles.bottomSheet
           }}>
-          <BottomSheetView style={{flex: 1}}>
+          <BottomSheetView style={{ flex: 1 }}>
             <View className="flex flex-col gap-2 m-2 pb-5">
               <Button onPress={() => bottomSheetRef.current?.close()}>
                 <IconSymbol name="xmark.circle" color={colors.text} />

@@ -51,6 +51,7 @@ const MAPPING = {
   "doc.on.doc": "content-copy",
   "list.bullet": "list",
   "person": "person",
+  "person.2.fill": "people",
   "chart.bar.fill": "poll",
   "chevron.down": "keyboard-arrow-down",
   "chevron.up": "keyboard-arrow-up",

@@ -59,8 +59,8 @@ export default Sentry.wrap(function RootLayout() {
         colors
       }}>
         <SafeAreaProvider>
-          <RootNav />
-          <ToastManager/>
+            <RootNav />
+            <ToastManager />
         </SafeAreaProvider>
       </ThemeProvider>
     </QueryClientProvider>
@@ -72,6 +72,7 @@ const RootNav = () => {
 
 
   return (
+
     <Stack initialRouteName="index">
       <Stack.Screen name="index" options={{
         headerShown: true,
