@@ -72,7 +72,6 @@ export default function HomePage() {
                 }}
                 imageStyle={{ borderRadius: 6 }}
                 contentFit="cover"
-              // imageStyle={{ borderRadius: 8 }} // Arrondi les coins de l'image
               >
 
                 <View className="flex-1 rounded-lg flex-row justify-between bg-[rgba(0,0,0,0.3)] px-5 ">
@@ -125,7 +124,7 @@ export default function HomePage() {
         <BottomSheet ref={bottomSheetRef}
           index={-1}
           backgroundStyle={{
-            backgroundColor: colors.neutral,
+            backgroundColor: colors.background,
             ...styles.bottomSheet
           }}>
           <BottomSheetView style={{ flex: 1 }}>

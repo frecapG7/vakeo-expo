@@ -214,10 +214,5 @@ export default function TripActivities() {
                 <IconSymbol name="plus" color="white" size={40} />
             </Pressable>
         </Animated.View>
-
-
-
-
-        // </SafeAreaView>
     )
 }

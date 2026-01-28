@@ -18,15 +18,12 @@ export default function ItemDetails() {
     const { data: trip } = useGetTrip(String(id));
     const { me, showMenu } = useContext(TripContext);
 
-
     // const { data: dashboard } = useGetDashboard(String(id), String(me?._id), {
     //     enabled: (!!trip && !!me?._id)
     // });
     const router = useRouter();
 
-
     const { formatDate, formatRange } = useI18nTime();
-
 
     if (!trip || !router)
         return (
@@ -45,7 +42,6 @@ export default function ItemDetails() {
                 </View>
             </Animated.ScrollView>
         );
-
 
     return (
         <Animated.ScrollView style={{ flex: 1 }}>
@@ -133,15 +129,8 @@ export default function ItemDetails() {
                             Saisir un lieu
                         </Text>
                     </Button>
-
                 </View>
-
             </View>
-
-
-
-
-
         </Animated.ScrollView>
     )
 
