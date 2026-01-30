@@ -35,6 +35,7 @@ const MAPPING = {
   "ellipsis.circle": "more-horiz",
   "flame": "local-fire-department",
   "arrow.left": "arrow-back",
+  "arrow.up.right" : "arrow-outward",
   "cart": "shopping-cart",
   "link": "insert-link",
   "trash": "delete-outline",
@@ -61,7 +62,7 @@ const MAPPING = {
   "map": "location-pin",
   "sportscourt": "sports-gymnastics",
   "moon.stars.fill": "nights-stay",
-  "info.circle" : "info-outline"
+  "info.circle" : "info-outline",
 } as IconMapping;
 
 /**

@@ -20,6 +20,7 @@ export const useGetMessages = (tripId) => {
         getNextPageParam: (lastPage) => {
             return lastPage.nextCursor;
         },
+        enabled: !!tripId && tripId !== "undefined"
     })
 }
 

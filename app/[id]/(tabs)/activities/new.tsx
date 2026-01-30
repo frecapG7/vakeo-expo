@@ -1,10 +1,11 @@
 import { EventForm, EventFormValues } from "@/components/events/EventForm";
+import { EventIcon } from "@/components/events/EventIcon";
 import { Button } from "@/components/ui/Button";
-import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { usePostEvent } from "@/hooks/api/useEvents";
 import { useGetTrip } from "@/hooks/api/useTrips";
+import { toLabel } from "@/lib/eventUtils";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { useContext, useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -82,22 +83,16 @@ export default function NewTripActivity() {
                     </Text>
                     <View className="flex-1 flex-row flex-wrap gap-5 p3-2 justify-center items-center">
 
-                        <Button className="w-[40%] rounded-lg border items-center p-5 dark:bg-gray-400" onPress={() => setValue("type", "ACTIVITY")}>
-                            <IconSymbol name="flame" size={34} color="black" />
-                            <Text>Activité</Text>
-                        </Button>
-                        <Button className="w-[40%] rounded-xl border items-center p-5 dark:bg-gray-400" onPress={() => setValue("type", "MEAL")}>
-                            <IconSymbol name="suit.spade" size={34} color="black" />
-                            <Text>Repas</Text>
-                        </Button>
-                        <Button className="w-[40%] rounded-xl border items-center p-5" onPress={() => setValue("type", "ACTIVITY")} disabled>
-                            <IconSymbol name="sportscourt" size={34} color="black" />
-                            <Text>Sport</Text>
-                        </Button>
-                        <Button className="w-[40%] rounded-xl border items-center p-5" onPress={() => setValue("type", "ACTIVITY")} disabled>
-                            <IconSymbol name="moon.stars.fill" size={34} color="black" />
-                            <Text>Soirée</Text>
-                        </Button>
+                        {["MEAL", "RESTAURANT", "SPORT", "PARTY", "ACTIVITY"]
+                            .map((value) => (
+                                <Button className="w-[40%] rounded-lg border items-center p-5 dark:bg-gray-400"
+                                    onPress={() => setValue("type", value)}
+                                    key={value}>
+                                    <EventIcon name={value} size="lg" />
+                                    <Text className="capitalize font-bold">{toLabel({type: value})}</Text>
+                                </Button>
+
+                            ))}
 
                     </View>
                 </Animated.View>

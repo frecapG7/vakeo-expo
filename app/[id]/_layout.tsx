@@ -98,12 +98,7 @@ export default function TripDetailsLayout() {
                             title: "Modifier mon utilisateur",
                             headerBackTitle: "Annuler"
                         }} />
-                        <Stack.Screen name="messages" options={{
-                            title: "Messagerie",
-                            headerTitleStyle: {
-                                fontWeight: 'bold',
-                            },
-                        }} />
+                    
                         <Stack.Screen name="dates"
                             options={{
                                 presentation: "modal",
@@ -118,7 +113,7 @@ export default function TripDetailsLayout() {
                     <BottomSheetModal
                         ref={bottomSheetModalRef}
                         backgroundStyle={{
-                            backgroundColor: colors.neutral
+                            backgroundColor: colors.background
                         }}
 
                     >
