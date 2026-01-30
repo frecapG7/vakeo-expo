@@ -1,4 +1,5 @@
 import { EventIcon } from "@/components/events/EventIcon";
+import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Search } from "@/components/ui/Search";
@@ -56,14 +57,14 @@ const typeFilters = [
 
 
 
-const EventItem = ({ event, onPress, user }: { event: Event, onPress: () => void, user: TripUser }) => {
+const EventItem = ({ event,  user }: { event: Event, user: TripUser }) => {
 
 
     const isAttendee = useMemo(() => event.attendees.map(u => u._id).includes(user?._id), [user, event]);
     const isOwner = useMemo(() => event.owners.map(u => u._id).includes(user?._id), [user, event])
 
     return (
-        <Pressable className="flex-1 bg-blue-200  dark:bg-gray-400 rounded-t-lg shadow dark:border-gray-100 justify-betweens" onPress={onPress}>
+        <View className="flex-1 bg-blue-200  dark:bg-gray-400 rounded-t-lg shadow dark:border-gray-100 justify-betweens">
 
             <View className="flex-row p-1 shadow justify-between items-center">
                 <View>
@@ -107,7 +108,7 @@ const EventItem = ({ event, onPress, user }: { event: Event, onPress: () => void
                     }
                 </View>
             </View>
-        </Pressable>
+        </View>
     )
 }
 
@@ -172,19 +173,17 @@ export default function TripActivities() {
                     </View>
                 }
                 renderItem={({ item, index, }) =>
-                    <View className="min-h-50">
-                        <EventItem event={item}
-                            onPress={() => router.navigate({
+                    <Button className="min-h-50" onPress={() => router.navigate({
                                 pathname: "/[id]/(tabs)/activities/[activityId]",
                                 params: { id: String(id), activityId: item._id }
-                            })}
+                            })}>
+                        <EventItem event={item}
+                            
                             user={me} />
-                    </View>
+                    </Button>
                 }
                 ItemSeparatorComponent={() => <View className="my-5" />}
-                    
                 keyExtractor={(item) => item?._id}
-                // className="flex"
                 contentContainerClassName="p-2"
                 ListEmptyComponent={
                     isLoading ?

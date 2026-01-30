@@ -39,10 +39,7 @@ export default function TripActivityDetails() {
                 <View className="gap-2 px-5">
                     <View className="flex-row items-center gap-2">
 
-                        <View className="flex-row rounded-full border p-1 items-center gap-1">
-                            <Text>Je participe</Text>
-                            <IconSymbol name="bookmark" color="black" />
-                        </View>
+                        <Chip text="Je participe" />
                         <View className="w-20">
                             <Skeleton variant="rectangular" />
                         </View>

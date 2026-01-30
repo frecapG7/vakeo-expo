@@ -28,16 +28,6 @@ export default function TripActivityDetailLayout() {
             },
             headerShadowVisible: false,
             headerTitleAlign: "left",
-            // headerLeft: () =>
-            //     <Pressable onPressOut={() => router.dismissTo({
-            //         pathname: "/[id]/(tabs)/activities",
-            //         params: {
-            //             id: String(id)
-            //         }
-            //     })} className="mr-2">
-            //         <IconSymbol name="arrow.left" color={colors.text} />
-            //     </Pressable>,
-
             headerRight: () =>
                 <Pressable onPressOut={() => router.push({
                     pathname: "/[id]/(tabs)/activities/[activityId]/edit",
@@ -67,13 +57,9 @@ export default function TripActivityDetailLayout() {
                 presentation: "modal",
                 headerTitle: "Modifier",
                 title: `Modifier (${activity?.name})`,
-                // headerShown: false
             }}
             />
             <Stack.Screen name="goods" options={{
-                // headerBackground: () => <BackgroundHeader trip={trip} />,
-                // headerTintColor: "white",
-                // headerTitleStyle: styles.headerTitle,
                 title: "La liste"
             }} />
         </Stack>

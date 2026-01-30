@@ -16,7 +16,7 @@ export default function TripMessages() {
 
     const { me } = useContext(TripContext);
 
-    const { data, fetchNextPage, hasNextPage } = useGetMessages(String(id));
+    const { data, fetchNextPage, hasNextPage } = useGetMessages(id);
     const postMessage = usePostMessage(String(id));
     
     const messages = useMemo(() => data?.pages.flatMap((page) => page.messages), [data]);

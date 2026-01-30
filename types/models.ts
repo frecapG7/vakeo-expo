@@ -5,7 +5,7 @@ export interface Trip {
     _id: string,
     image: string,
     users: TripUser[],
-    name: String,
+    name: string,
     startDate?: Date,
     endDate?: Date
 }

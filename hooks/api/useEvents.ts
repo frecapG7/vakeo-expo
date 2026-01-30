@@ -59,7 +59,7 @@ const getEvent = async (tripId : string, eventId: string): Promise<Event> => {
     return response.data;
 }
 
-export const useGetEvent = (tripId: string, eventId: string) => {
+export const useGetEvent = (tripId: any, eventId: any) => {
     return useQuery<Event>({
         queryKey: ["trips", tripId, "events", eventId],
         queryFn: () => getEvent(tripId, eventId),
