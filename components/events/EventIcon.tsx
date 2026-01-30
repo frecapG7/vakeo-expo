@@ -1,12 +1,12 @@
 
+import GameEventIcon from "@/assets/icons/game_event_icon.png";
+import MealEventIcon from "@/assets/icons/meal_event_icon.png";
+import PartyEventIcon from "@/assets/icons/party_event_icon.png";
+import RestaurantEventIcon from "@/assets/icons/restaurant_event_icon.png";
+import SportEventIcon from "@/assets/icons/sport_event_icon.png";
 import { EventType } from "@/types/models";
 import { Image } from "expo-image";
 import { View } from "react-native";
-import GameEventIcon from "../../assets/icons/game_event_icon.png";
-import MealEventIcon from "../../assets/icons/meal_event_icon.png";
-import PartyEventIcon from "../../assets/icons/party_event_icon.png";
-import RestaurantEventIcon from "../../assets/icons/restaurant_event_icon.png";
-import SportEventIcon from "../../assets/icons/sport_event_icon.png";
 
 
 type ImageSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -33,7 +33,7 @@ const nameToSource = {
 export const EventIcon = ({ name, size = "md" }: { name: EventType, size: ImageSize }) => {
 
 
-    
+
     const sizeClass = sizeToClassMap[size];
     const source = nameToSource[name];
 
