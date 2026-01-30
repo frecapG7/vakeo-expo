@@ -33,7 +33,6 @@ const nameToSource = {
 export const EventIcon = ({ name, size = "md" }: { name: EventType, size: ImageSize }) => {
 
 
-
     const sizeClass = sizeToClassMap[size];
     const source = nameToSource[name];
 
