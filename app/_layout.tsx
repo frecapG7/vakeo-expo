@@ -4,6 +4,7 @@ import * as Sentry from '@sentry/react-native';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect, useState } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import ToastManager from "toastify-react-native";
 import '../global.css';
@@ -59,8 +60,8 @@ export default Sentry.wrap(function RootLayout() {
         colors
       }}>
         <SafeAreaProvider>
-            <RootNav />
-            <ToastManager />
+          <RootNav />
+          <ToastManager />
         </SafeAreaProvider>
       </ThemeProvider>
     </QueryClientProvider>
@@ -72,25 +73,27 @@ const RootNav = () => {
 
 
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Stack initialRouteName="index">
+        <Stack.Screen name="index" options={{
+          headerShown: true,
+          title: "Mes projets",
+        }} />
+        <Stack.Screen name="new" options={{
+          title: "Nouveau voyage",
+          headerBackTitle: "Annuler"
+        }} />
+        <Stack.Screen name="join" options={{
+          title: "Rejoins un voyage",
+          headerBackTitle: "Annuler"
+        }} />
+        <Stack.Screen name="[id]" options={{
+          title: "Mon voyage",
+          headerShown: false
+        }} />
+        <Stack.Screen name="token" options={{ headerShown: false }} />
+      </Stack>
+    </GestureHandlerRootView>
 
-    <Stack initialRouteName="index">
-      <Stack.Screen name="index" options={{
-        headerShown: true,
-        title: "Mes projets",
-      }} />
-      <Stack.Screen name="new" options={{
-        title: "Nouveau voyage",
-        headerBackTitle: "Annuler"
-      }} />
-      <Stack.Screen name="join" options={{
-        title: "Rejoins un voyage",
-        headerBackTitle: "Annuler"
-      }} />
-      <Stack.Screen name="[id]" options={{
-        title: "Mon voyage",
-        headerShown: false
-      }} />
-      <Stack.Screen name="token" options={{ headerShown: false }} />
-    </Stack>
   );
 }

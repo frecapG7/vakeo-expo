@@ -1,5 +1,6 @@
 import { PickUsersModal } from "@/components/modals/PickUsersModal";
 import { AvatarsGroup } from "@/components/ui/Avatar";
+import { Chip } from "@/components/ui/Chip";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
@@ -38,10 +39,7 @@ export default function TripActivityDetails() {
                 <View className="gap-2 px-5">
                     <View className="flex-row items-center gap-2">
 
-                        <View className="flex-row rounded-full border p-1 items-center gap-1">
-                            <Text>Je participe</Text>
-                            <IconSymbol name="bookmark" color="black" />
-                        </View>
+                        <Chip text="Je participe" />
                         <View className="w-20">
                             <Skeleton variant="rectangular" />
                         </View>
@@ -74,10 +72,8 @@ export default function TripActivityDetails() {
                 <View className="gap-2 px-5">
                     <View className="flex-row items-center gap-2">
 
-                        <View className={`flex-row rounded-full border p-1 items-center gap-1 ${isParticipant ? "bg-orange-200 dark:bg-gray-200" : "dark:border-white dark:bg-gray-700"}`}>
-                            <Text>Je participe</Text>
-                            <IconSymbol name={isParticipant ? "bookmark.fill" : "bookmark"} color="black" />
-                        </View>
+
+                        <Chip text="Je participe" variant={isParticipant ? "contained" : "outlined"} />
 
                         <Pressable onPress={() => setShowAttendees(true)}>
                             <Text className="underline font-bold dark:text-white">
@@ -107,16 +103,15 @@ export default function TripActivityDetails() {
                             </View>
                         </View>
                     </Pressable>
-                    {activity?.startDate &&
-                        <Animated.View className="flex-row gap-5 items-center py-2">
-                            <IconSymbol name="calendar" size={34} color="grey" />
-                            <View className="flex-row flex-1 border-b border-gray-800  items-center py-2 ">
-                                <Text className="capitalize  dark:text-white">
-                                    {formatRange(activity?.startDate, activity?.endDate)}
-                                </Text>
-                            </View>
-                        </Animated.View>
-                    }
+
+                    <Animated.View className="flex-row gap-5 items-center py-2">
+                        <IconSymbol name="clock" size={34} color="grey" />
+                        <View className="flex-row flex-1 border-b border-gray-800  items-center py-2 ">
+                            <Text className="capitalize  dark:text-white">
+                                {activity?.startDate ? formatRange(activity?.startDate, activity?.endDate) : "a spécifier"}
+                            </Text>
+                        </View>
+                    </Animated.View>
                     <Pressable className="flex-row gap-5  items-center py-2" onPress={() => router.push({
                         pathname: "/[id]/(tabs)/activities/[activityId]/goods",
                         params: {
@@ -129,28 +124,33 @@ export default function TripActivityDetails() {
                             Voir les courses {goodsCount?.totalCount > 0 && `(${goodsCount?.totalCount})`}
                         </Text>
                     </Pressable>
-                    <Pressable className="flex-row gap-5 items-center py-2"
-                        onPress={() => router.push({
-                            pathname: "/[id]/(tabs)/activities/[activityId]/goods",
-                            params: {
-                                id: String(id),
-                                activityId: String(activityId)
-                            }
-                        })}>
-                        <IconSymbol name="map" size={34} color="grey" />
-                        <Text className="flex-1 border-b border-gray-800  py-2 dark:text-white">
-                            Ajouter une adresse
-                        </Text>
-                    </Pressable>
-                    {}
-                    <Pressable className="flex-row gap-5 items-center py-2" onPress={() => setShowAttendees(true)}>
-                        <IconSymbol name="info.circle" size={34} color="grey"/>
-                        <Text className="flex-1 border-b border-gray-800  py-2 dark:text-white capitalize">
-                            {[...new Set(activity?.attendees?.flatMap(u => u.restrictions)
-                                .map(translateRestriction))]
-                                .join(", ") || "Aucune restrictions"}
-                        </Text>
-                    </Pressable>
+                    {activity?.type !== "MEAL" &&
+
+                        <Pressable className="flex-row gap-5 items-center py-2"
+                            onPress={() => router.push({
+                                pathname: "/[id]/(tabs)/activities/[activityId]/goods",
+                                params: {
+                                    id: String(id),
+                                    activityId: String(activityId)
+                                }
+                            })}>
+                            <IconSymbol name="map" size={34} color="grey" />
+                            <Text className="flex-1 border-b border-gray-800  py-2 dark:text-white">
+                                Ajouter une adresse
+                            </Text>
+                        </Pressable>
+                    }
+                    {activity?.type === "MEAL" &&
+
+                        <Pressable className="flex-row gap-5 items-center py-2" onPress={() => setShowAttendees(true)}>
+                            <IconSymbol name="info.circle" size={34} color="grey" />
+                            <Text className="flex-1 border-b border-gray-800  py-2 dark:text-white capitalize">
+                                {[...new Set(activity?.attendees?.flatMap(u => u.restrictions)
+                                    .map(translateRestriction))]
+                                    .join(", ") || "Aucune restrictions"}
+                            </Text>
+                        </Pressable>
+                    }
                 </View>
 
                 <View className="px-4 mt-5 gap-2">

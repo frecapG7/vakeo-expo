@@ -5,7 +5,7 @@ export interface Trip {
     _id: string,
     image: string,
     users: TripUser[],
-    name: String,
+    name: string,
     startDate?: Date,
     endDate?: Date
 }
@@ -18,6 +18,9 @@ export interface TripUser {
 }
 
 
+export type EventType = "MEAL" | "RESTAURANT" | "SPORT" | "PARTY" | "VISITATION" | "ACTIVITY" | "OTHER";
+
+
 export interface Event {
     _id: string,
     startDate: Date,
@@ -26,7 +29,8 @@ export interface Event {
     attendees: TripUser[],
     owners: TripUser[],
     trip: string,
-    details?: string
+    details?: string,
+    type: EventType
 }
 
 

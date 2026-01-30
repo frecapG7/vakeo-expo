@@ -16,19 +16,20 @@ export default function TripEventsLayout() {
 
     return (
         <Stack screenOptions={{
-            headerShown: true
+            headerShown: true,
+            headerTintColor: colors.text,
+            headerTitleStyle: styles.headerSubTitle,
+            headerStyle: {
+                backgroundColor: colors.background
+
+            },
+            // headerBackVisible: false,
+            headerShadowVisible: false,
+
         }}>
             <Stack.Screen name="index" options={{
                 headerShown: false,
                 title: "Au programme",
-                headerTintColor: colors.text,
-                headerTitleStyle: styles.headerSubTitle,
-                headerStyle: {
-                    backgroundColor: colors.background
-
-                },
-                // headerBackVisible: false,
-                headerShadowVisible: false,
                 headerRight: () =>
                     <Pressable
                         onPressOut={() =>

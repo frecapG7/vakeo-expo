@@ -1,18 +1,18 @@
 import { BackgroundHeader } from "@/components/header/BackgroundHeader";
-import { Button } from "@/components/ui/Button";
+import { Avatar } from "@/components/ui/Avatar";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { TripContext } from "@/context/TripContext";
 import { useGetTrip } from "@/hooks/api/useTrips";
 
 import { Tabs, useLocalSearchParams, useRouter } from "expo-router";
 import { useContext } from "react";
-import { Pressable, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 export default function ItemDetailsLayout() {
 
     const router = useRouter();
     const { id } = useLocalSearchParams();
-    const {showMenu} = useContext(TripContext);
+    const {me} = useContext(TripContext);
     const { data: trip } = useGetTrip(String(id));
 
     return (
@@ -21,19 +21,21 @@ export default function ItemDetailsLayout() {
             headerBackground: () => trip && <BackgroundHeader trip={trip} />,
             headerTintColor: "white",
             headerRight: () => (
-                <View className="flex flex-row gap-2 justify-end items-center mx-5">
-                    <Pressable onPressOut={() => router.push({
-                        pathname: "/[id]/messages",
+                <View className="flex flex-row gap-2 justify-end items-center mx-10">
+                    <Pressable className="flex-row gap-1 items-center"
+                     onPressOut={() => router.push({
+                        pathname: "/[id]/(tabs)/settings",
                         params: {
                             id: String(id)
                         }
-                    })}
-                        className="bg-gray-800 rounded-full p-2">
-                        <IconSymbol name="message" size={25} color="white" />
+                     })}>
+                        <Text className="text-white font-bold text-sm">
+                            {me?.name}
+                        </Text>
+                        <Avatar src={me?.avatar} alt={me?.name?.charAt(0)} size2="md"/>
                     </Pressable>
-                    <Pressable className="bg-gray-800 p-2 rounded-full" onPressOut={showMenu}>
-                        <IconSymbol name="ellipsis.circle" size={25} color="white" />
-                    </Pressable>
+
+                    
                 </View>
             ),
         }}>
@@ -47,10 +49,6 @@ export default function ItemDetailsLayout() {
                         }
                     },
                     headerShown: false,
-                    headerTitle: trip?.name,
-                    headerLeft: () => <Button onPress={() => router.dismissAll()}>
-                        <IconSymbol name="arrow.left" color="white" />
-                    </Button>,
                     tabBarIcon: ({ color }) => <IconSymbol name="house.fill" color={color} />,
                 }} />
             <Tabs.Screen
@@ -64,7 +62,7 @@ export default function ItemDetailsLayout() {
                     },
                     tabBarIcon: ({ color }) => <IconSymbol name="calendar" color={color} />,
                     headerShown: true,
-                    title: "Le Programme",
+                    title: "Activités",
 
                 }}
             />
@@ -78,18 +76,31 @@ export default function ItemDetailsLayout() {
                     },
                     tabBarIcon: ({ color, size }) => <IconSymbol name="cart" size={size} color={color} />,
                     headerShown: true,
-                    title: "La Liste",
+                    title: "Liste",
                 }} />
 
-            <Tabs.Screen name="settings"
+            <Tabs.Screen name="messages"
                 options={{
                     href: {
-                        pathname: "/[id]/(tabs)/settings",
+                        pathname: "/[id]/(tabs)/messages",
                         params: {
                             id: String(id)
                         }
                     },
                     headerShown: true,
+                    title: "Messages",
+                    tabBarIcon: ({ color, size }) => (
+                        <IconSymbol name="paperplane.fill" size={size} color={color} />
+                    ),
+                }}
+
+            />
+
+            <Tabs.Screen name="settings"
+                options={{
+                    href: null,
+                    headerShown: true,
+                    headerRight: () => <></>,
                     title: "Réglages",
                     tabBarIcon: ({ color, size }) => (
                         <IconSymbol name="person.circle" size={size} color={color} />
