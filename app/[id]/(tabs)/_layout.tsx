@@ -32,7 +32,7 @@ export default function ItemDetailsLayout() {
                         <Text className="text-white font-bold text-sm">
                             {me?.name}
                         </Text>
-                        <Avatar src={me?.avatar} alt={me?.name?.charAt(0)} size2="md"/>
+                        <Avatar src={me?.avatar} alt={me?.name?.charAt(0)} size2="sm"/>
                     </Pressable>
 
                     
