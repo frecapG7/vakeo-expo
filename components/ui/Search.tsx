@@ -11,9 +11,9 @@ export const Search = ({ value, onChange }: { value: string, onChange: (text: st
 
 
     return (
-        <View className="flex-row bg-gray-200 dark:bg-gray-400 focus:border focus:border-blue-400 shadow items-center px-2 rounded-lg">
+        <View className="flex-row bg-gray-200 dark:bg-gray-400 focus:border focus:border-blue-400 shadow items-center px-2 rounded-full">
 
-            <IconSymbol name="magnifyingglass" color="blue"/>
+            <IconSymbol name="magnifyingglass" color="gray"/>
             <TextInput
                 onChangeText={onChange}
                 value={value}
