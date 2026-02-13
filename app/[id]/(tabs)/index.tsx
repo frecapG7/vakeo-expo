@@ -5,9 +5,10 @@ import { LinearProgress } from "@/components/ui/LinearProgress";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { default as styles } from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
-import { useGetTrip, useShareTrip } from "@/hooks/api/useTrips";
+import { useGetDashboard, useGetTrip, useShareTrip } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import useColors from "@/hooks/styles/useColors";
+import { Trip } from "@/types/models";
 import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from "@gorhom/bottom-sheet";
 import * as Clipboard from 'expo-clipboard';
 import { ImageBackground } from "expo-image";
@@ -17,12 +18,89 @@ import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
 
+
+
+const PollsWidget = ({ trip }: { trip: Trip }) => {
+
+
+    return (
+        <View>
+            <View className="flex-row items-center justify-between">
+                <View>
+                    <Text className="font-bold dark:text-white">
+                        Choix de la date
+                    </Text>
+                    <Text className="text-gray-400 text-sm">
+                        Pour fixer le départ
+                    </Text>
+                </View>
+                <View className="flex-row items-center">
+                    <IconSymbol name="clock" color="gray" size={16} />
+                    <Text className="text-sm text-gray-400">J+2</Text>
+                </View>
+            </View>
+
+
+            <View className="gap-1 justify-start mt-2">
+                <View className="flex-row items-center justify-between ">
+                    <Text className="dark:text-white">
+                        12 - 14 Juillet
+                    </Text>
+                    <Text className="font-bold text-blue-600">
+                        60%
+                    </Text>
+                </View>
+                <LinearProgress progress={0.60} />
+                <View className="flex-row items-center gap-5">
+                    <AvatarsGroup
+                        avatars={trip?.users?.map(u => ({
+                            avatar: u.avatar,
+                            alt: u?.name.charAt(0)
+                        }))}
+                        size2="sm"
+                        maxLength={5}
+                    />
+                    <Text className="text-gray-400">
+                        3 votes
+                    </Text>
+                </View>
+            </View>
+            <View className="gap-1 justify-start mt-2">
+                <View className="flex-row items-center justify-between">
+                    <Text className="dark:text-white">
+                        15 - 27 Juillet
+                    </Text>
+                    <Text className="font-bold text-gray-400">
+                        40%
+                    </Text>
+                </View>
+                <LinearProgress progress={0.40} disabled />
+                <View className="flex-row items-center gap-5">
+                    <AvatarsGroup
+                        avatars={trip?.users?.map(u => ({
+                            avatar: u.avatar,
+                            alt: u?.name.charAt(0)
+                        }))}
+                        size2="sm"
+                        maxLength={5}
+                    />
+                    <Text className="text-gray-400">
+                        2 votes
+                    </Text>
+                </View>
+            </View>
+        </View>
+
+    )
+}
+
 export default function ItemDetails() {
 
     const { id } = useLocalSearchParams();
     const { data: trip } = useGetTrip(String(id));
-    const shareTrip = useShareTrip(String(id));
     const { me } = useContext(TripContext);
+    const { data: dashboard } = useGetDashboard(id, me?._id);
+    const shareTrip = useShareTrip(String(id));
 
     const router = useRouter();
 
@@ -186,78 +264,40 @@ export default function ItemDetails() {
                         <Text className="text-xl font-bold dark:text-white">
                             Sondages
                         </Text>
-                        <View className="rounded-full bg-red-200 px-2 shadow">
-                            <Text className="text-red-600 font-bold">
-                                1 Actif
-                            </Text>
-                        </View>
+                        {dashboard?.polls?.pending > 0 &&
+                            <Animated.View className="rounded-full bg-red-200 px-2 shadow">
+                                <Text className="text-red-600 font-bold">
+                                    {dashboard?.polls?.pending} Actif
+                                </Text>
+
+                            </Animated.View>
+                        }
                     </View>
 
-                    <View className="p-2 rounded-xl bg-yellow-50 dark:bg-gray-900 shadow">
-                        <View className="flex-row items-center justify-between">
-                            <View>
-                                <Text className="font-bold dark:text-white">
-                                    Choix de la date
-                                </Text>
-                                <Text className="text-gray-400 text-sm">
-                                    Pour fixer le départ
-                                </Text>
-                            </View>
-                            <View className="flex-row items-center">
-                                <IconSymbol name="clock" color="gray" size={16} />
-                                <Text className="text-sm text-gray-400">J+2</Text>
-                            </View>
-                        </View>
+                    <View
+                        className="p-2 py-4 rounded-xl bg-stone-50 dark:bg-gray-900 shadow">
+                        {dashboard?.polls.pending > 0 ?
+                            <Pressable onPress={() => router.push({
+                                pathname: "/[id]/polls",
+                                params: {
+                                    id: String(id)
+                                }
+                            })}>
+                                <PollsWidget trip={trip} />
+                            </Pressable>
+                            :
+                            <Pressable onPress={() => router.push({
+                                pathname: "/[id]/polls/new",
+                                params: {
+                                    id: String(id)
+                                }
+                            })}>
+                                <Text>Aucun sondages en cours</Text>
+                                <Text>Démarrer un sondage</Text>
+                            </Pressable>
+                        }
 
 
-                        <View className="gap-1 justify-start mt-2">
-                            <View className="flex-row items-center justify-between ">
-                                <Text className="dark:text-white">
-                                    12 - 14 Juillet
-                                </Text>
-                                <Text className="font-bold text-blue-600">
-                                    60%
-                                </Text>
-                            </View>
-                            <LinearProgress progress={0.60} />
-                            <View className="flex-row items-center gap-5">
-                                <AvatarsGroup
-                                    avatars={trip?.users?.map(u => ({
-                                        avatar: u.avatar,
-                                        alt: u?.name.charAt(0)
-                                    }))}
-                                    size2="sm"
-                                    maxLength={5}
-                                />
-                                <Text className="text-gray-400">
-                                    3 votes
-                                </Text>
-                            </View>
-                        </View>
-                        <View className="gap-1 justify-start mt-2">
-                            <View className="flex-row items-center justify-between">
-                                <Text className="dark:text-white">
-                                    15 - 27 Juillet
-                                </Text>
-                                <Text className="font-bold text-gray-400">
-                                    40%
-                                </Text>
-                            </View>
-                            <LinearProgress progress={0.40} disabled />
-                            <View className="flex-row items-center gap-5">
-                                <AvatarsGroup
-                                    avatars={trip?.users?.map(u => ({
-                                        avatar: u.avatar,
-                                        alt: u?.name.charAt(0)
-                                    }))}
-                                    size2="sm"
-                                    maxLength={5}
-                                />
-                                <Text className="text-gray-400">
-                                    2 votes
-                                </Text>
-                            </View>
-                        </View>
                     </View>
                 </View>
 
@@ -287,9 +327,7 @@ export default function ItemDetails() {
                     ref={bottomSheetModalRef}
                     backgroundStyle={{
                         backgroundColor: colors.background
-                    }}
-
-                >
+                    }}>
                     <BottomSheetView style={{ flex: 1, padding: 10, minHeight: 150 }}>
                         <View className="flex flex-grow gap-5 p-1 divide-y-5 divide-solid dark:divide-white">
                             <Button onPress={() => router.navigate({

@@ -30,10 +30,10 @@ export const Switch = ({ value = false, onSwitch, disabled = false }: { value: b
 
     return (
         <Pressable onPress={() => onSwitch(!value)}
-            className={`flex-row items-center justify-between p-1 rounded-full w-20 ${value ? 'bg-green-600 dark:bg-gray-200' : 'bg-gray-500 dark:bg-gray-700'}`}
+            className={`flex-row items-center justify-between  rounded-full w-20 ${value ? 'bg-blue-400 dark:bg-blue-500' : 'bg-blue-200 dark:bg-gray-700'}`}
             disabled={disabled}>
-            <Animated.View className={`items-center rounded-full dark:bg-blue-200 shadow-md transform `} style={animatedStyle}>
-                <IconSymbol name={value ? "checkmark" : "xmark.circle"} />
+            <Animated.View className={`items-center rounded-full border bg-white dark:bg-blue-200 shadow-md transform border-4 border-blue-400`} style={animatedStyle}>
+                <IconSymbol name={value ? "checkmark" : "xmark.circle"} color={value ? "blue" : "gray"}/>
             </Animated.View>
         </Pressable>
     )
