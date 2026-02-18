@@ -17,11 +17,11 @@ const sizeToClassMap = {
 
 
 const sizeToMarginMap = {
-    xs: "-mr-2",
-    sm: "-mr-3",
-    md: "-mr-6",
-    lg: "-mr-7",
-    xl: "-mr-10"
+    xs: "-ml-2",
+    sm: "-ml-3",
+    md: "-ml-6",
+    lg: "-ml-7",
+    xl: "-ml-10"
 }
 
 
@@ -71,7 +71,7 @@ export const AvatarsGroup = ({ avatars = [], size2 = "sm", maxLength = 3 }: { av
     return (
         <View className="flex-row items-center justify-center">
             {avatars?.slice(0, maxLength).map((avatar, index) =>
-                <View key={index} className={`flex ${marginClass}`}>
+                <View key={index} className={`flex ${index > 0 && marginClass}`}>
                     <Avatar
                         size2={size2}
                         src={avatar.avatar}

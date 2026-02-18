@@ -63,7 +63,9 @@ const MAPPING = {
   "sportscourt": "sports-gymnastics",
   "moon.stars.fill": "nights-stay",
   "info.circle" : "info-outline",
-  "line.horizontal.3": "drag-indicator"
+  "line.horizontal.3": "drag-indicator",
+  "eye": "visibility",
+  "eye.slash": "visibility-off" 
 } as IconMapping;
 
 /**

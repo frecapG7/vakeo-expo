@@ -62,6 +62,7 @@ export const Button = ({ title,
     return (
         <Pressable
             onPress={onPress}
+            onLongPress={onLongPress}
             className={`${variantClass} active:opacity-75 ${className} ${disableClass}`}
             disabled={disabled || isLoading}
             {...props}

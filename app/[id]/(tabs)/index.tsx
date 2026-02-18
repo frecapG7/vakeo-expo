@@ -287,12 +287,12 @@ export default function ItemDetails() {
                             </Pressable>
                             :
                             <Pressable onPress={() => router.push({
-                                pathname: "/[id]/polls/new",
+                                pathname: "/[id]/polls",
                                 params: {
                                     id: String(id)
                                 }
                             })}>
-                                <Text>Aucun sondages en cours</Text>
+                                <Text className="text-lg dark:text-gray-400">Aucun sondages en cours</Text>
                                 <Text>Démarrer un sondage</Text>
                             </Pressable>
                         }

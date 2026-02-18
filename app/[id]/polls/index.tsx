@@ -1,22 +1,25 @@
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
+import { useGetPolls } from "@/hooks/api/usePolls";
 import { useGetTrip } from "@/hooks/api/useTrips";
-import { useGetVotes } from "@/hooks/api/useVotes";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext } from "react";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 
 
 const typeToIconColor = {
-    "DATES": "blue"
+    "DatesPoll": "blue",
+    "OtherPoll": "orange"
 }
 
 const typeToColor = {
-    "DATES": "text-blue-400"
+    "DatesPoll": "text-blue-400",
+    "OtherPoll": "text-orange-400"
 }
 
 
@@ -25,21 +28,32 @@ export default function PollsPage() {
 
     const { id } = useLocalSearchParams();
     const { data: trip } = useGetTrip(id);
-    const { data: page } = useGetVotes(id);
+    const { data: page } = useGetPolls(id);
 
 
 
     const { me } = useContext(TripContext);
+    const router = useRouter();
 
     const { formatDate, formatDuration } = useI18nTime();
 
+
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <Animated.FlatList
-                data={page?.votes || []}
+                data={page?.polls || []}
+                contentContainerClassName="m-2"
                 keyExtractor={(item) => item._id}
                 renderItem={({ item }) => (
-                    <View className="rounded-xl bg-stone-50 dark:bg-gray-800 p-3 ">
+                    <Pressable 
+                    onPress={() => router.push({
+                        pathname: "/[id]/polls/[pollId]",
+                        params: {
+                            id: String(id),
+                            pollId: item._id
+                        }
+                    })}
+                    className="rounded-xl bg-stone-50 dark:bg-gray-800 p-3 ">
                         <View className="flex-row items-center justify-between">
                             <View className="flex-row gap-2">
                                 <IconSymbol name="calendar" color={typeToIconColor[item?.type]} />
@@ -67,7 +81,7 @@ export default function PollsPage() {
 
                             <View className="flex-row flex-1 justify-around items-center">
                                 <Text className="text-gray-400">
-                                    {item?.voters?.length} votes
+                                    {item?.hasSelected?.length} votes
                                 </Text>
                                 <Text className="text-gray-400">
                                     •
@@ -78,16 +92,28 @@ export default function PollsPage() {
                             </View>
 
 
-                            <View className="bg-blue-600 flex-1 rounded-xl m-5 p-2 items-center">
-                                <Text className="text-lg text-white">Voter</Text>
-                            </View>
+                            {!item?.hasSelected.map(u => u._id).includes(me?._id) &&
+
+                                <View className="bg-blue-600 flex-1 rounded-xl m-5 p-2 items-center">
+                                    <Text className="text-lg text-white">Voter</Text>
+                                </View>
+                            }
 
                         </View>
 
-                    </View>
+                    </Pressable>
                 )}
                 ItemSeparatorComponent={() => <View className="my-5" />}
             />
-        </View>
+            <Pressable className="absolute bottom-20 right-6 w-20 h-20 rounded-full border border-white bg-blue-400 items-center justify-center shadow"
+                onPress={() => router.push({
+                    pathname: "/[id]/polls/new",
+                    params: {
+                        id: String(id)
+                    }
+                })}>
+                <IconSymbol name="plus" color="white" size={40} />
+            </Pressable>
+        </SafeAreaView>
     )
 }
