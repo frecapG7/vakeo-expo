@@ -18,7 +18,7 @@ const getTrip = async (tripId: string): Promise<Trip> => {
   return response.data;
 };
 
-export const useGetTrip = (tripId: string) => {
+export const useGetTrip = (tripId: any) => {
   return useQuery<Trip>({
     queryKey: ["trips", tripId],
     queryFn: () => getTrip(tripId),
@@ -110,10 +110,11 @@ const getDashboard = async (tripId: string, user: string): Promise<Dashboard> =>
 
 
 
-export const useGetDashboard = (tripId: string, user: string, options: any) => {
+export const useGetDashboard = (tripId: any, user: any, options?: any) => {
   return useQuery<Dashboard>({
     queryKey: ["trips", tripId, "dashboard"],
     queryFn: () => getDashboard(tripId, user),
+    enabled: !!tripId && !!user,
     ...options
   })
 }

@@ -6,6 +6,7 @@ export interface Trip {
     image: string,
     users: TripUser[],
     name: string,
+
     startDate?: Date,
     endDate?: Date
 }
@@ -69,6 +70,53 @@ export interface Dashboard {
         ownership: number,
         total: number
     }
+}
+
+
+export type PollType = "DatesPoll" | "HousingPoll" | "OtherPoll";
+
+
+export interface Poll {
+    _id: string,
+    type: PollType,
+    question: string,
+    trip: string,
+    createdBy?: TripUser,
+    isSingleAnswer: boolean,
+    isAnonymous: boolean,
+    isClosed: boolean,
+    hasSelected: TripUser[]
+};
+
+
+export interface DatesPoll extends Poll{
+    options: [
+        {
+            startDate: Date,
+            endDate: Date,
+            selectedBy: TripUser[]
+        }
+    ]
+};
+
+
+export interface HousingPoll extends Poll {
+    options: [
+        {
+            value : string,
+            title: string,
+            selectedBy: TripUser[]
+        }
+    ]
+};
+
+export interface OtherPoll extends Poll {
+    options: [
+        {
+            value : string,
+            selectedBy: TripUser[]
+        }
+    ]
 }
 
 

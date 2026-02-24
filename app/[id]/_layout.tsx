@@ -1,3 +1,4 @@
+import { BackgroundHeader } from "@/components/header/BackgroundHeader";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetTrip, useGetTripUser } from "@/hooks/api/useTrips";
@@ -56,6 +57,14 @@ export default function TripDetailsLayout() {
                         title: "Votes",
                         headerShown: false
                     }} />
+                <Stack.Screen name="polls"
+                    options={{
+                        headerShown: true,
+                        title: "Sondages",
+                        headerBackground:() => trip && <BackgroundHeader trip={trip} />
+                    }}
+
+                />
             </Stack>
 
         </TripContext.Provider>
