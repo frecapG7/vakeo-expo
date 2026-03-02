@@ -1,6 +1,5 @@
 import { Good } from "@/types/models";
-import { FlatList, Pressable, Text, View } from "react-native";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { FlatList, Text, View } from "react-native";
 import { Button } from "../ui/Button";
 import { IconSymbol } from "../ui/IconSymbol";
 import { GoodListItemSkeleton } from "./GoodListItem";
@@ -10,7 +9,7 @@ import { GoodListItemSkeleton } from "./GoodListItem";
 
 export const GoodsFlatList = (
     { goods, isRefreshing, isFetching, onCheck, onClick, onRefresh, hasNextPage, fetchNextPage, disabled, showEvent }:
-        { goods: Good[], isRefreshing: boolean, isFetching: boolean, onCheck: (good: Good) => void, onClick: (good: Good) => void, onRefresh: () => void, hasNextPage: boolean, fetchNextPage: () => void, disabled: boolean, showEvent?: boolean }) => {
+        { goods: Good[], isRefreshing: boolean, isFetching: boolean, onCheck: (good: Good) => Promise<void>, onClick: (good: Good) => void, onRefresh: () => void, hasNextPage: boolean, fetchNextPage: () => void, disabled: boolean, showEvent?: boolean }) => {
 
 
     return (
@@ -19,34 +18,36 @@ export const GoodsFlatList = (
             refreshing={isRefreshing}
             className="flex-1"
             renderItem={({ item }) =>
-                <View className={`flex-row ${item.checked ? "opacity-50" : ""}`}>
-                    <Button className="flex-row flex-1 items-center gap-2" onPress={() => onCheck(item)} disabled={disabled}>
-                        <IconSymbol name={item.checked ? "checkmark.circle.fill" : "circle"} color={item.checked ? "green" : "gray"} />
-                        <View className="justify-end">
-                            <Text className={`dark:text-white capitalize text-2xl ${item.checked && "line-through"}`}>
-                                {item.name} {item.quantity && `(${item?.quantity})`}
-                            </Text>
-                            {(showEvent && item.event) &&
-                                <Text className="dark:text-white text-xs">
-                                    {item.event?.name}
-                                </Text>
-
-                            }
-                        </View>
+                <View className={`flex-row  items-center  ${item.checked ? "opacity-50" : ""}`}>
+                    <Button className="px-5"
+                        onPress={() => onCheck(item)}
+                        disabled={disabled}>
+                        <IconSymbol name={item.checked ? "checkmark.circle.fill" : "circle"}
+                            color={item.checked ? "green" : "gray"}
+                            size={32} />
                     </Button>
-                    {!item.checked &&
-                        <Animated.View entering={FadeIn} exiting={FadeOut}>
-                            <Pressable className="p-2"
-                                onPress={() => onClick(item)}
-                                disabled={item.checked} >
+                    <Button
+                        onPress={() => onClick(item)}
+                        disabled={item?.checked}
+                        className="flex-1 border-b border-orange-200">
+                        <Text className={`dark:text-white capitalize  ${item.checked && "line-through"}`}>
+                            <Text className="text-2xl">
 
-                                <View className="rounded-full bg-blue-400 p-1">
-                                    <IconSymbol name="pencil" color="black" size={16} />
-                                </View>
-                            </Pressable>
+                                {item.name}
+                            </Text>
+                            <Text className="text-md">
+                                {item.quantity && `(${item?.quantity})`}
 
-                        </Animated.View>
-                    }
+                            </Text>
+                        </Text>
+                        {(showEvent && item.event) &&
+                            <Text className="dark:text-white text-xs">
+                                {item.event?.name}
+                            </Text>
+
+                        }
+                    </Button>
+
                 </View>
             }
             keyExtractor={(i) => i._id}

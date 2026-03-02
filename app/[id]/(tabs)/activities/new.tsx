@@ -99,7 +99,7 @@ export default function NewTripActivity() {
             }
 
             {type &&
-                <Animated.View entering={SlideInRight} exiting={SlideOutLeft} className="flex-1">
+                <Animated.View entering={SlideInRight} exiting={SlideOutLeft} className="flex-1 mb-5">
                     <EventForm control={control} />
                 </Animated.View>
             }

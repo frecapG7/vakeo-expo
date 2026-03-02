@@ -1,5 +1,4 @@
 import useColors from "@/hooks/styles/useColors"
-import { translateRestriction } from "@/lib/userUtils"
 import { TripUser } from "@/types/models"
 import { Modal, Pressable, Text, View } from "react-native"
 import AnimatedCheckbox from "react-native-checkbox-reanimated"
@@ -7,6 +6,7 @@ import Animated from "react-native-reanimated"
 import { Avatar } from "../ui/Avatar"
 import { Button } from "../ui/Button"
 import { ThemeProvider } from "../ui/ThemeProvider"
+import { RestrictionIcon } from "../users/RestrictionIcon"
 
 export const PickUsersModal = ({
     open,
@@ -62,10 +62,14 @@ export const PickUsersModal = ({
                                     <View className="">
                                         <Text className="text-lg ">{item.name}</Text>
                                         {showRestrictions &&
-                                            <Text className="text-xs flex-wrap max-w-40 capitalize" numberOfLines={2}>
-                                                {item.restrictions.map(translateRestriction).join(", ")}
-                                            </Text>
-
+                                            // <Text className="text-xs flex-wrap max-w-40 capitalize" numberOfLines={2}>
+                                            //     {item.restrictions.map(translateRestriction).join(", ")}
+                                            // </Text>
+                                            <Animated.View className="flex-row gap-2">
+                                                {item.restrictions.map(restriction => (
+                                                    <RestrictionIcon key={restriction} value={restriction} size="xs"/>
+                                                ))}
+                                            </Animated.View>
                                         }
                                     </View>
                                 </View>

@@ -4,12 +4,13 @@ import { Text, View } from "react-native";
 const blurhash =
     '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
-type ImageSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+type ImageSize = 'xs' | 'sm' | 'sm2' | 'md' | 'lg' | 'xl';
 
 
 const sizeToClassMap = {
     xs: 'w-6 h-6',
     sm: 'w-10 h-10',
+    sm2: "w-14 h-14",
     md: 'w-16 h-16',
     lg: 'w-24 h-24',
     xl: 'w-36 h-36'
