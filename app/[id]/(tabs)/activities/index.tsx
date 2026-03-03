@@ -64,7 +64,7 @@ const EventItem = ({ event, user }: { event: Event, user: TripUser }) => {
 
 
     return (
-        <View className={`shadow bg-white dark:bg-stone-600 rounded-lg py-3 px-2 ${isOwner ? "border-l-4 border-orange-400" : ""}`} >
+        <View className={`shadow-lg dark:shadow-gray-200 bg-white dark:bg-stone-800 rounded-lg py-3 px-2 ${isOwner ? "border-l-4 border-orange-400" : ""}`} >
             <View className="flex-row gap-2 items-center justify-between">
                 <View className="flex-row">
                     <EventIcon name={event.type} size="md" />

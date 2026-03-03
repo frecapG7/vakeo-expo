@@ -17,8 +17,8 @@ export default function EditTripActivity() {
 
 
     const { data: trip } = useGetTrip(String(id));
-    const { data: activity } = useGetEvent(String(id), String(activityId));
-    const updateEvent = useUpdateEvent(String(id), String(activityId));
+    const { data: activity } = useGetEvent(id, activityId);
+    const updateEvent = useUpdateEvent(id, activityId);
 
     const router = useRouter();
 

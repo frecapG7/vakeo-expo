@@ -73,7 +73,7 @@ const updateEvent = async (tripId: string, eventId: string, data: Event): Promis
     return response.data;
 }
 
-export const useUpdateEvent = (tripId: string, eventId: string) => {
+export const useUpdateEvent = (tripId: any, eventId: any) => {
     const queryClient = useQueryClient();
     return useMutation<Event, Error, Event>({
         mutationFn: (data) => updateEvent(tripId, eventId, data),

@@ -42,6 +42,7 @@ export default function TripActivityDetailLayout() {
 
         }}>
             <Stack.Screen name="index" options={{
+                headerShown: false,
                 headerTitle: ({ children }) =>
                     <View className="flex-row items-center justify-start gap-1">
                         <EventIcon name={activity?.type} size="md" />

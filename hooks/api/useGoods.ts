@@ -1,4 +1,5 @@
 import axios from "@/lib/axios";
+import { Good } from "@/types/models";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const getGoods = async (tripId, params) => {
@@ -117,4 +118,29 @@ export const useDeleteGood = (tripId) => {
         mutationFn: (data) => deleteGood(tripId, data._id),
         onSuccess: () => queryClient.invalidateQueries(["trips", tripId, "goods"])
     });
+}
+
+interface IGoodSummary {
+    totalCount: number,
+    checkedCount: number,
+    goods: Good[]
+}
+
+
+const getGoodSummary = async (tripId: string, event?: string): Promise<IGoodSummary> => {
+    const response = await axios.get(`/trips/${tripId}/goods/summary`, {
+        params: {
+            ...(event && { event })
+        }
+    });
+    return response.data;
+}
+
+
+export const useGetGoodSummary = (tripId: string, event ?: string) => {
+    return useQuery<IGoodSummary>({
+        queryKey: ["trips", tripId, ...(event ? ["event", event] : [])],
+        queryFn: () => getGoodSummary(tripId, event)
+    });
+
 }
