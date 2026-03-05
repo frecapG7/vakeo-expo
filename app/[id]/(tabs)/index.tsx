@@ -5,6 +5,7 @@ import { LinearProgress } from "@/components/ui/LinearProgress";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { default as styles } from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
+import { useGetPolls } from "@/hooks/api/usePolls";
 import { useGetDashboard, useGetTrip, useShareTrip } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import useColors from "@/hooks/styles/useColors";
@@ -23,72 +24,50 @@ import { Toast } from "toastify-react-native";
 const PollsWidget = ({ trip }: { trip: Trip }) => {
 
 
+    const { data: page } = useGetPolls(trip._id);
+
     return (
-        <View>
-            <View className="flex-row items-center justify-between">
-                <View>
-                    <Text className="font-bold dark:text-white">
-                        Choix de la date
+        <View className="gap-2">
+            {page?.polls.slice(0, 2).map((poll) =>
+                <View key={poll._id} className="pb-2 border-b border-gray-200">
+                    <Text className="font-bold dark:text-white text-lg">
+                        {poll.question}
                     </Text>
-                    <Text className="text-gray-400 text-sm">
-                        Pour fixer le départ
-                    </Text>
-                </View>
-                <View className="flex-row items-center">
-                    <IconSymbol name="clock" color="gray" size={16} />
-                    <Text className="text-sm text-gray-400">J+2</Text>
-                </View>
-            </View>
 
+                    <View>
+                        {poll.options.slice(0, 3).map((option) =>
+                            <View className="gap-1 justify-start mt-2" key={option._id}>
+                                <View className="flex-row items-center justify-between ">
+                                    <Text className="dark:text-white text-sm max-w-[80%]" numberOfLines={3}>
+                                        {option?.title || option?.value}
+                                    </Text>
+                                    <Text className="font-bold text-blue-600">
+                                        {option.percent}%
+                                    </Text>
+                                </View>
+                                <LinearProgress progress={option.percent / 100} />
+                                <View className="flex-row items-center gap-5">
+                                    <AvatarsGroup
+                                        avatars={option.selectedBy?.map(u => ({
+                                            avatar: u?.avatar,
+                                            alt: u?.name?.charAt(0)
+                                        }))}
+                                        size2="xs"
+                                        maxLength={5}
+                                    />
+                                    <Text className="text-gray-400">
+                                        {option.selectedBy?.length} votes
+                                    </Text>
+                                </View>
+                            </View>
+                        )}
+                    </View>
+                </View>
+            )}
 
-            <View className="gap-1 justify-start mt-2">
-                <View className="flex-row items-center justify-between ">
-                    <Text className="dark:text-white">
-                        12 - 14 Juillet
-                    </Text>
-                    <Text className="font-bold text-blue-600">
-                        60%
-                    </Text>
-                </View>
-                <LinearProgress progress={0.60} />
-                <View className="flex-row items-center gap-5">
-                    <AvatarsGroup
-                        avatars={trip?.users?.map(u => ({
-                            avatar: u.avatar,
-                            alt: u?.name.charAt(0)
-                        }))}
-                        size2="sm"
-                        maxLength={5}
-                    />
-                    <Text className="text-gray-400">
-                        3 votes
-                    </Text>
-                </View>
-            </View>
-            <View className="gap-1 justify-start mt-2">
-                <View className="flex-row items-center justify-between">
-                    <Text className="dark:text-white">
-                        15 - 27 Juillet
-                    </Text>
-                    <Text className="font-bold text-gray-400">
-                        40%
-                    </Text>
-                </View>
-                <LinearProgress progress={0.40} disabled />
-                <View className="flex-row items-center gap-5">
-                    <AvatarsGroup
-                        avatars={trip?.users?.map(u => ({
-                            avatar: u.avatar,
-                            alt: u?.name.charAt(0)
-                        }))}
-                        size2="sm"
-                        maxLength={5}
-                    />
-                    <Text className="text-gray-400">
-                        2 votes
-                    </Text>
-                </View>
-            </View>
+            <Text className="dark:text-white text-center">
+                Voir tout
+            </Text>
         </View>
 
     )
@@ -287,13 +266,20 @@ export default function ItemDetails() {
                             </Pressable>
                             :
                             <Pressable onPress={() => router.push({
-                                pathname: "/[id]/polls",
+                                pathname: "/[id]/polls/new",
                                 params: {
                                     id: String(id)
                                 }
-                            })}>
-                                <Text className="text-lg dark:text-gray-400">Aucun sondages en cours</Text>
-                                <Text>Démarrer un sondage</Text>
+                            })}
+                                className="flex-row gap-2 items-end">
+
+                                <Text className="text-lg dark:text-white">
+                                    Démarrer un sondage
+                                </Text>
+                                <View className="bg-blue-400 rounded-full p-1" >
+                                    <IconSymbol name="tray" color="white" />
+
+                                </View>
                             </Pressable>
                         }
 

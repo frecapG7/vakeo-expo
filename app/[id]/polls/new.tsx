@@ -105,8 +105,10 @@ export default function NewPoll() {
             setValue("question", "Quelles dates ?");
         else if (type === "HousingPoll")
             setValue("question", "Quels hébergement ? ");
-        else
+        else{
             setValue("question", "Qu'est ce qu'on mange ? ")
+        
+        }
     }, [type,]);
 
     if (!type)
@@ -142,15 +144,11 @@ export default function NewPoll() {
     return (
 
         <SafeAreaView style={{ flex: 1 }}>
-
             <Animated.ScrollView style={styles.container}>
                 <Pressable className="flex-row bg-green-200 py-5" onPress={() => setType("")}>
                     <IconSymbol name="checkmark.circle.fill" color="green" />
                     <Text>Sondages de dates</Text>
                 </Pressable>
-
-
-
 
                 {type === "HousingPoll" &&
                     <View className="flex-1 my-2">
@@ -158,9 +156,7 @@ export default function NewPoll() {
                     </View>
                 }
                 {type !== "HousingPoll" &&
-
-
-                    <View className="gap-2 my-2">
+                    <View className="flex-1 gap-2 my-2">
                         <View className="flex-1 border-b border-gray-200 my-2">
                             <Text className="text-lg text-gray-600 dark:text-gray-200">Posez une question*</Text>
                             <FormText control={control}
@@ -179,8 +175,6 @@ export default function NewPoll() {
                                 </View>
                             ))}
 
-
-
                         </View>
 
                         <Pressable
@@ -196,7 +190,6 @@ export default function NewPoll() {
                 }
 
                 <View className="flex-1">
-
                     <PollSettingsForm control={control} />
                 </View>
 
