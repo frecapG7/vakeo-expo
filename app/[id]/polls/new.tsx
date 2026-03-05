@@ -1,7 +1,8 @@
 import { FormText } from "@/components/form/FormText";
+import { HousingOptionsForm } from "@/components/polls/HousingOptionsForm";
+import { PollSettingsForm } from "@/components/polls/PollSettingsForm";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { Switch } from "@/components/ui/Switch";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { usePostPoll } from "@/hooks/api/usePolls";
@@ -27,7 +28,6 @@ const ListItem = ({ control, item, index, onRemove }) => {
         }
     });
 
-
     return (
         <Animated.View className="flex-row items-center" key={index}>
             <IconSymbol name="line.horizontal.3" color="gray" />
@@ -42,8 +42,6 @@ const ListItem = ({ control, item, index, onRemove }) => {
             </Pressable>
         </Animated.View>
     )
-
-
 }
 
 
@@ -56,11 +54,11 @@ export default function NewPoll() {
             type: "",
             singleAnswer: false,
             anonymous: false,
-            options: [{
-                value: "",
-            }, {
-                value: ""
-            }]
+            // options: [{
+            //     value: "",
+            // }, {
+            //     value: ""
+            // }]
         }
     });
 
@@ -72,15 +70,6 @@ export default function NewPoll() {
         }
     });
 
-    const { field: { value: singleAnswer, onChange: setSingleAnswer } } = useController({
-        control,
-        name: "singleAnswer",
-    });
-
-    const { field: { value: anonymous, onChange: setAnonymous } } = useController({
-        control,
-        name: "anonymous",
-    });
 
     const { fields: options, append, update, remove } = useFieldArray({
         control,
@@ -92,8 +81,8 @@ export default function NewPoll() {
     })
 
 
-    const {id} = useLocalSearchParams();
-    const {me} = useContext(TripContext);
+    const { id } = useLocalSearchParams();
+    const { me } = useContext(TripContext);
     const postPoll = usePostPoll(id);
     const router = useRouter();
 
@@ -115,7 +104,7 @@ export default function NewPoll() {
         if (type === "DatesPoll")
             setValue("question", "Quelles dates ?");
         else if (type === "HousingPoll")
-            setValue("question", "Quelles hébergement ? ");
+            setValue("question", "Quels hébergement ? ");
         else
             setValue("question", "Qu'est ce qu'on mange ? ")
     }, [type,]);
@@ -124,8 +113,6 @@ export default function NewPoll() {
         return (
             <View style={styles.container}>
                 <Text>Quel type de sondage veux tu organiser ? </Text>
-
-
                 <View className="flex-row flex-wrap gap-5 m-5">
                     <Button className="flex bg-orange-200 rounded-xl w-[40%] gap-2 border-blue-50 shadow p-2"
                         onPress={() => setType("DatesPoll")}>
@@ -165,19 +152,26 @@ export default function NewPoll() {
 
 
 
-                <View className="flex-1 border-b border-gray-200 my-2">
-                    <Text className="text-lg text-gray-600 dark:text-gray-200">Posez une question*</Text>
-                    <FormText control={control}
-                        name="question"
-                        placeholder="Quelles date?"
-                    />
+                {type === "HousingPoll" &&
+                    <View className="flex-1 my-2">
+                        <HousingOptionsForm control={control} />
+                    </View>
+                }
+                {type !== "HousingPoll" &&
+
 
                     <View className="gap-2 my-2">
+                        <View className="flex-1 border-b border-gray-200 my-2">
+                            <Text className="text-lg text-gray-600 dark:text-gray-200">Posez une question*</Text>
+                            <FormText control={control}
+                                name="question"
+                                placeholder="Quelles date?"
+                            />
+                        </View>
                         <Text className="text-lg text-gray-600 dark:text-gray-200">Options</Text>
                         <View className="gap-2 mx-2">
                             {options?.map((option, index) => (
                                 <View key={option.key}>
-
                                     <ListItem control={control}
                                         item={option}
                                         index={index}
@@ -199,41 +193,20 @@ export default function NewPoll() {
                         </Pressable>
 
                     </View>
+                }
+
+                <View className="flex-1">
+
+                    <PollSettingsForm control={control} />
                 </View>
 
 
-                <View className="flex-1 gap-4 my-2">
-                    <Text className="text-lg text-gray-600 dark:text-gray-200">Réglages</Text>
-                    <View
-                        className={`flex-row items-center rounded-lg justify-between border border-2 p-5 ${singleAnswer ? "border-blue-400 dark:border-blue-600" : "border-gray-200 dark:border-gray-600"}`}>
-                        <View>
-                            <Text className="font-bold dark:text-white">
-                                Réponse unique
-                            </Text>
-                            <Text className="text-gray-600 dark:text-gray-200 text-xs italic">
-                                Seule réponse à la fois sera possible
-                            </Text>
-                        </View>
-                        <Switch value={singleAnswer} onSwitch={setSingleAnswer} />
-                    </View>
 
-                    <View
-                        className={`flex-row items-center rounded-lg justify-between border border-2 p-5 ${anonymous ? "border-blue-400 dark:border-blue-600" : "border-gray-200 dark:border-gray-600"}`}>
-                        <View>
-                            <Text className="font-bold dark:text-white">
-                                Votes anonyme
-                            </Text>
-                            <Text className="text-gray-600 dark:text-gray-200 text-xs italic">
-                                Seul les résultats du vote seront visible
-                            </Text>
-                        </View>
-                        <Switch value={anonymous} onSwitch={setAnonymous} />
-                    </View>
-                </View>
-                <Button className="bg-blue-400 items-center rounded-full p-4 my-5"
+                <Button className="flex-row  bg-blue-400 items-center justify-center rounded-full p-4 my-5"
                     onPress={handleSubmit(onSubmit)}
                     isLoading={postPoll?.isPending}>
                     <Text className="text-white font-bold text-xl">Créér</Text>
+                    <IconSymbol name="tray" color="white" />
                 </Button>
 
             </Animated.ScrollView>

@@ -1,15 +1,18 @@
 import { PickUsersModal } from "@/components/modals/PickUsersModal";
-import { Avatar, AvatarsGroup } from "@/components/ui/Avatar";
+import { HousingOptions } from "@/components/polls/HousingOptions";
+import { PollOption } from "@/components/polls/PollOption";
+import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetPoll, useUnvotePoll, useVotePoll } from "@/hooks/api/usePolls";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
-import { getPercent } from "@/lib/voteUtils";
 import { useLocalSearchParams } from "expo-router";
 import { useContext, useState } from "react";
 import { Text, View } from "react-native";
+import Animated from "react-native-reanimated";
 
 
 const getColorForPercent = (percent) => {
@@ -60,8 +63,30 @@ export default function PollDetailsPage() {
 
 
 
+    if (!poll)
+        return (
+            <View style={styles.container}>
+                <View className="flex-row gap-2 items-center">
+                    <Skeleton variant="circular" />
+                    <View className="w-40">
+                        <Skeleton height={5} />
+
+                    </View>
+                </View>
+                <View className="gap-5 my-5">
+                    <Skeleton height={40}/>
+                    <Skeleton height={40}/>
+                    <Skeleton height={40}/>
+
+                </View>
+
+            </View>
+        );
+
+
+
     return (
-        <View style={styles.container}>
+        <Animated.ScrollView style={styles.container}>
 
             <View className="flex-row gap-2 items-center my-2">
                 <Avatar src={poll?.createdBy?.avatar}
@@ -69,71 +94,60 @@ export default function PollDetailsPage() {
                     size2="md"
                 />
                 <View>
-                    <Text className="font-bold text-lg">
+                    <Text className="font-bold text-lg dark:text-white">
                         {poll?.createdBy?.name}
                     </Text>
-                    <Text>{formatDuration(poll?.createdAt)}</Text>
+                    <Text className="dark:text-white">{formatDuration(poll?.createdAt)}</Text>
                 </View>
             </View>
 
-            <View className="m-2 rounded-xl p-2 border border-gray-200">
+            <View className="m-2 mb-10 rounded-xl p-2 border border-gray-200">
                 <View className="mb-5">
-                    <Text className="text-xl font-bold">
+                    <Text className="text-xl font-bold dark:text-white">
                         {poll?.question}
                     </Text>
-                    <Text className="text-gray-600 text-lg">
+                    <Text className="text-gray-600 dark:text-gray-300 text-lg">
                         {poll?.hasSelected.length} votes
                     </Text>
                 </View>
 
-                <View className="gap-2">
-                    {poll?.options?.map((option) => {
-                        const includeMe = option?.selectedBy?.map(u => u._id).includes(me?._id);
-                        const percent = Math.round(getPercent(option?.selectedBy?.length, poll?.hasSelected.length) * 100);
-                        return (
-                            <Button
-                                disabled={poll?.isClosed || votePoll?.isPending}
-                                key={option?._id}
-                                onPress={() => handleClick(option, includeMe)}
-                                onLongPress={() => setSelectedOption(option)}
-                                className="rounded-full py-4 bg-orange-50 border border-orange-200">
-                                <View
-                                    className="absolute left-0 top-0 bottom-0 rounded-full"
-                                    style={{
-                                        width: `${percent}%`,
-                                        backgroundColor: getColorForPercent(percent)
-                                    }}
-                                />
-                                <View className="flex-row justify-between items-center px-2 ">
-                                    <View className="flex-row items-center gap-2">
-                                        <View className={`rounded-full w-10 h-10 border-2 items-center justify-center border-white ${includeMe ? "bg-orange-600" : "bg-orange-100"}`} >
-                                        {includeMe && <IconSymbol name="checkmark" size={24}/>}
-                                            </View>
-                                        <Text className="text-lg">{option.value}</Text>
-                                    </View>
-                                    <View className="flex-row items-center gap-1">
-                                        {!poll?.isAnonymous &&
 
-                                            <AvatarsGroup avatars={option?.selectedBy?.map(u => ({
-                                                avatar: u.avatar,
-                                                alt: u?.name.charAt(0)
-                                            }))}
-                                                size2="sm"
-                                                maxLength={3}
-                                            />
-                                        }
-                                        <Text className="font-bold text-lg">
-                                            {percent} %
-                                        </Text>
 
-                                    </View>
+                {poll?.type === "HousingPoll" &&
+                    <View className="mb-5">
+                        <HousingOptions
+                            poll={poll}
+                            user={me}
+                            onVote={(option) => handleClick(option, false)}
+                            onUnVote={(option) => handleClick(option, true)}
+                            onSelected={(option) => setSelectedOption(option) } />
+                    </View>
+                }
+                {poll?.type !== "HousingPoll" &&
 
-                                </View>
-                            </Button>
-                        );
+                    <View className="gap-5 mb-5">
+                        {poll?.options?.map((option) => {
+                            const includeMe = option?.selectedBy?.map(u => u._id).includes(me?._id);
+                            // const percent = Math.round(getPercent(option?.selectedBy?.length, poll?.hasSelected.length) * 100);
+                            return (
+                                <Button
+                                    disabled={poll?.isClosed || votePoll?.isPending}
+                                    key={option?._id}
+                                    onPress={() => handleClick(option, includeMe)}
+                                    onLongPress={() => setSelectedOption(option)}
+                                    >
+                                <PollOption label={option.value} 
+                                    selectedBy={option.selectedBy}
+                                    percent={option.percent}
+                                    isAnonymous={poll.isAnonymous}
+                                    includeUser={includeMe}
+                                    />
+                                </Button>
+                            );
 
-                    })}
-                </View>
+                        })}
+                    </View>
+                }
 
 
                 <View className="flex-row justify-between items-center my-2">
@@ -163,13 +177,13 @@ export default function PollDetailsPage() {
             </View>
 
 
-            <PickUsersModal open={!!selectedOption}
+            <PickUsersModal open={!!selectedOption && !poll.isAnonymous}
                 onClose={() => setSelectedOption(null)}
                 users={selectedOption?.selectedBy}
                 disabled
                 title="Votants"
             />
-        </View>
+        </Animated.ScrollView>
     )
 
 
