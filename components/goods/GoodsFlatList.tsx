@@ -1,5 +1,5 @@
 import { Good } from "@/types/models";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, Pressable, Text, View } from "react-native";
 import { Button } from "../ui/Button";
 import { IconSymbol } from "../ui/IconSymbol";
 import { GoodListItemSkeleton } from "./GoodListItem";
@@ -26,7 +26,7 @@ export const GoodsFlatList = (
                             color={item.checked ? "green" : "gray"}
                             size={32} />
                     </Button>
-                    <Button
+                    <Pressable
                         onPress={() => onClick(item)}
                         disabled={item?.checked}
                         className="flex-1 border-b border-orange-200">
@@ -46,7 +46,7 @@ export const GoodsFlatList = (
                             </Text>
 
                         }
-                    </Button>
+                    </Pressable>
 
                 </View>
             }

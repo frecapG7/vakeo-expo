@@ -64,7 +64,8 @@ const EventItem = ({ event, user }: { event: Event, user: TripUser }) => {
 
 
     return (
-        <View className={`shadow-lg dark:shadow-gray-200 bg-white dark:bg-stone-800 rounded-lg py-3 px-2 ${isOwner ? "border-l-4 border-orange-400" : ""}`} >
+        <View className={`shadow-lg dark:shadow-gray-200 bg-white dark:bg-gray-900
+         rounded-lg py-3 px-2 ${isOwner ? "border-l-4 border-orange-400" : ""}`} >
             <View className="flex-row gap-2 items-center justify-between">
                 <View className="flex-row">
                     <EventIcon name={event.type} size="md" />
@@ -138,12 +139,12 @@ export default function TripActivities() {
                     <View className="gap-2 mb-5">
                         <Search value={search} onChange={setSearch} />
                         <View className="flex-row justify-between gap-5">
-                            <Pressable className={`flex-1 shadow flex-row rounded-lg justify-center items-center p-2 ${onlyAttendee ? "bg-orange-200 dark:bg-orange-600 border border-orange-300" : "bg-white dark:bg-stone-800 dark:border dark:border-gray-600"}`}
+                            <Pressable className={`flex-1 shadow flex-row rounded-lg justify-center items-center p-2 ${onlyAttendee ? "bg-orange-200 dark:bg-orange-600 border border-orange-300" : "bg-white dark:bg-gray-900 dark:border dark:border-gray-600"}`}
                                 onPress={() => setOnlyAttendee(!onlyAttendee)}>
                                 <IconSymbol name="checkmark" color="orange" />
                                 <Text className={`${onlyAttendee ? "font-bold" : ""} text-sm dark:text-white`}>Mes participations</Text>
                             </Pressable>
-                            <Pressable className={`flex-1 shadow flex-row rounded-lg justify-center items-center p-2 ${onlyOwner ? "bg-orange-200 dark:bg-orange-600 border border-orange-300" : "bg-white dark:bg-stone-800 dark:border dark:border-gray-600"}`}
+                            <Pressable className={`flex-1 shadow flex-row rounded-lg justify-center items-center p-2 ${onlyOwner ? "bg-orange-200 dark:bg-orange-600 border border-orange-300" : "bg-white dark:bg-gray-900 dark:border dark:border-gray-600"}`}
                                 onPress={() => setOnlyOwner(!onlyOwner)}>
                                 <IconSymbol name="bookmark.fill" color="orange" />
                                 <Text className={`${onlyOwner ? "font-bold" : ""} text-sm dark:text-white`}>Mes responsabilités</Text>
@@ -157,7 +158,7 @@ export default function TripActivities() {
                             {typeFilters.map(item => (
                                 <Pressable
                                     key={item.value}
-                                    className={`shadow py-2 px-4 items-center rounded-full ${typeFilter === item.value ? "bg-orange-600 border-orange-400 " :"bg-white dark:bg-stone-800 border border-gray-600" }`}
+                                    className={`shadow py-2 px-4 items-center rounded-full ${typeFilter === item.value ? "bg-orange-600 border-orange-400 " : "bg-white dark:bg-gray-900 border border-gray-600"}`}
                                     onPress={() => setTypeFilter(typeFilter === item?.value ? "" : item.value)}
                                 >
                                     <Text className={`${typeFilter === item.value ? "font-bold text-white" : "dark:text-white"}`}>{item.label}</Text>
@@ -167,10 +168,11 @@ export default function TripActivities() {
                     </View>
                 }
                 renderItem={({ item, index, }) =>
-                    <Button className="min-h-50" onPress={() => router.navigate({
-                        pathname: "/[id]/(tabs)/activities/[activityId]",
-                        params: { id: String(id), activityId: item._id }
-                    })}>
+                    <Button className="min-h-50"
+                        onPress={() => router.navigate({
+                            pathname: "/[id]/(tabs)/activities/[activityId]",
+                            params: { id: String(id), activityId: item._id }
+                        })}>
                         <EventItem event={item}
                             user={me} />
                     </Button>

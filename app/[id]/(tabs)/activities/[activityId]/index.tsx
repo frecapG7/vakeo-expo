@@ -2,10 +2,10 @@ import { EventIcon } from "@/components/events/EventIcon";
 import { PickUsersModal } from "@/components/modals/PickUsersModal";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
-import { Chip } from "@/components/ui/Chip";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { RestrictionIcon } from "@/components/users/RestrictionIcon";
+import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetEvent, useUpdateEvent } from "@/hooks/api/useEvents";
 import { useGetGoodSummary } from "@/hooks/api/useGoods";
@@ -57,9 +57,9 @@ const ActivityGoodsWidget = ({ event, onPress }: { event: Event, onPress: () => 
     return (
         <View>
             <View className="flex-row justify-between items-center">
-                <View className="flex-row gap-1 items-center">
+                <View className="flex-row gap-1 items-end">
                     <IconSymbol name="bag.fill" size={36} color="orange" />
-                    <Text className="font-bold capitalize dark:text-white">
+                    <Text className="font-bold capitalize dark:text-white text-xl">
                         à apporter
                     </Text>
                 </View>
@@ -71,7 +71,7 @@ const ActivityGoodsWidget = ({ event, onPress }: { event: Event, onPress: () => 
             </View>
 
 
-            <View className="border rounded-xl p-2 border-orange-400 dark:border-gray-400">
+            <View className="rounded-xl p-2  bg-white dark:bg-gray-900  shadow shadow-orange-200">
                 {goodSummary?.goods.map((good) => (
                     <View
                         key={good._id}
@@ -94,7 +94,9 @@ const ActivityGoodsWidget = ({ event, onPress }: { event: Event, onPress: () => 
                 <Button
                     onPress={onPress}
                     className="bg-blue-50 dark:bg-neutral-800 border border-blue-200 dark:border-gray-200 border-dashed rounded-xl p-1 m-2">
-                    <Text className="text-center dark:text-white">{goodSummary.totalCount > 0 ? "Voir tout" : "Ajouter +"}</Text>
+                    <Text className="text-center text-gray-600 dark:text-gray-200 font-bold">
+                        {goodSummary.totalCount > 0 ? "Voir tout" : "Ajouter +"}
+                    </Text>
                 </Button>
             </View>
         </View>
@@ -137,33 +139,27 @@ export default function TripActivityDetails() {
 
     if (!activity)
         return (
-            <SafeAreaView>
-                <View className="gap-2 px-5">
-                    <View className="flex-row items-center gap-2">
-
-                        <Chip text="Je participe" />
+            <SafeAreaView style={styles.container}>
+                <View className="items-center gap-2">
+                    <Skeleton variant="circular" height={20} />
+                    <View className="w-60">
+                        <Skeleton height={10} />
+                    </View>
+                    <View className="flex-row gap-2">
                         <View className="w-20">
-                            <Skeleton variant="rectangular" />
+                            <Skeleton height={10} />
                         </View>
-                    </View>
-
-                    <View className="flex-row gap-5 items-center py-2" >
-                        <IconSymbol name="smiley" color="gray" size={34} />
-                        <View className="flex-row flex-1 border-b items-center gap-5">
-                            <Skeleton variant="circular" />
-                            <View className="w-10">
-                                <Skeleton height={5} />
-                            </View>
-                        </View>
-                    </View>
-                    <View className="flex-row gap-5 items-center py-2" >
-                        <IconSymbol name="cart" color="gray" size={34} />
                         <View className="w-20">
-                            <Skeleton variant="rectangular" />
+                            <Skeleton height={10} />
                         </View>
                     </View>
 
-
+                    <View className="w-[80%]">
+                        <Skeleton height={40} />
+                    </View>
+                    <View className="w-full">
+                        <Skeleton height={60} />
+                    </View>
                 </View>
             </SafeAreaView>
         );
@@ -175,7 +171,6 @@ export default function TripActivityDetails() {
                 <Text className="text-4xl font-bold dark:text-white">
                     {activity?.name}
                 </Text>
-
 
                 <View className="flex-row justify-center gap-1">
                     {isOwner &&
@@ -202,8 +197,8 @@ export default function TripActivityDetails() {
                 </View>
             </View>
 
-            <View className="gap-2 mx-5 my-5">
-                <View className="flex-row p-2 gap-2 items-center rounded-xl shadow-lg shadow-stone-200 bg-white dark:bg-stone-800 border border-orange-100 dark:border-gray-200">
+            <View className="gap-2 mx-5 my-5 shadow-lg shadow-orange-200 bg-white dark:bg-gray-900 rounded-xl">
+                <View className="flex-row p-2 gap-2 items-center">
                     <View className="rounded-full bg-orange-200 p-2">
                         <IconSymbol name="calendar" size={30} color="gray" />
                     </View>
@@ -216,7 +211,10 @@ export default function TripActivityDetails() {
                         </Text>
                     </View>
                 </View>
-                <View className="flex-row p-2 gap-2 items-center rounded-xl bg-white dark:bg-stone-800 shadow-lg shadow-stone-200 border border-orange-100">
+                <View className="flex-1 px-5  justify-center">
+                    <View className="flex-1 h-0.5 bg-orange-200" />
+                </View>
+                <View className="flex-row p-2 gap-2 items-center">
                     <View className="rounded-full bg-blue-200 p-2">
                         <IconSymbol name="map" size={30} color="gray" />
                     </View>
@@ -234,9 +232,9 @@ export default function TripActivityDetails() {
 
             <View className="mx-2 gap-1 my-2">
                 <View className="flex-row justify-between items-center">
-                    <View className="flex-row items-center gap-1">
+                    <View className="flex-row items-end gap-1">
                         <IconSymbol name="person.2.fill" color="orange" size={34} />
-                        <Text className="text-xl font-bold dark:text-white">Participants</Text>
+                        <Text className="text-2xl font-bold dark:text-white">Participants</Text>
                     </View>
 
                     <View className="bg-orange-200 p-2 rounded-full">
@@ -246,14 +244,14 @@ export default function TripActivityDetails() {
                     </View>
                 </View>
 
-                <View className="gap-1">
+                <View className="gap-1 bg-white dark:bg-gray-900 p-2 rounded-xl">
                     {activity?.attendees?.slice(0, 3).map((attendee) => (
                         <View
                             key={attendee._id}
-                            className="flex-row p-2 rounded-xl gap-2 p-2 items-center bg-white dark:bg-stone-800 shadow-lg dark:shadow-stone-200 " >
-                            <Avatar size2="sm2" alt={attendee.name.charAt(0)} src={attendee?.avatar} />
+                            className="flex-row p-2 rounded-xl gap-2 p-2 items-center " >
+                            <Avatar size2="sm" alt={attendee.name.charAt(0)} src={attendee?.avatar} />
                             <View>
-                                <Text className="font-bold text-lg dark:text-white">
+                                <Text className="text-md dark:text-white">
                                     {attendee.name}
                                     {attendee._id === me._id &&
                                         <Text className="text-xs capitalize">
@@ -274,12 +272,10 @@ export default function TripActivityDetails() {
                     {activity?.attendees?.length > 0 ?
                         <Button
                             onPress={() => setShowAttendees(true)}
-                            className="bg-blue-50 dark:bg-stone-800 border border-dashed border-blue-200 dark:border-gray-200 rounded-xl justify-center flex-row items-center p-2">
+                            className="bg-blue-50 dark:bg-stone-900 border border-dashed border-blue-200 dark:border-gray-200 rounded-xl justify-center flex-row items-center p-2">
                             <Text className="font-bold text-md text-center text-gray-600 dark:text-gray-200">
                                 Voir tout
                             </Text>
-                            <IconSymbol name="chevron.down" color="gray" size={16} />
-
                         </Button>
                         :
                         <Button
@@ -308,23 +304,23 @@ export default function TripActivityDetails() {
 
             {activity.type === "MEAL" &&
                 <View className="m-2">
-                    <View className="flex-row gap-2 items-center mb-1">
+                    <View className="flex-row gap-2 items-end mb-1">
                         <IconSymbol name="suit.spade" color="orange" size={34} />
-                        <Text className="max-w-50 font-bold dark:text-white" numberOfLines={2}>
+                        <Text className="max-w-50 font-bold dark:text-white text-xl" numberOfLines={2}>
                             Restrictions alimentaires
                         </Text>
                     </View>
 
-                    <View className="gap-2 border border-orange-400 dark:border-gray-200 p-2 rounded-xl">
+                    <View className="gap-2 p-2 rounded-xl bg-white dark:bg-gray-900 shadow shadow-orange-200">
                         <Text className="text-gray-800 dark:text-gray-200">Récapitulatif pour le groupe</Text>
                         {Object.values(restrictions)?.map((restriction) =>
                             <View key={restriction.name}
-                                className="flex-row px-2 py-5 bg-white dark:bg-stone-800 rounded-xl items-center justify-between">
+                                className="flex-row p-2 items-center justify-between border-b border-gray-200">
                                 <View className="flex-row items-center  gap-2">
-                                    <View className="bg-orange-200 dark:bg-gray-200 rounded-full p-2 ">
+                                    <View className="bg-orange-200 dark:bg-gray-200 rounded-full p-1 ">
                                         <RestrictionIcon value={restriction.name} size="sm" />
                                     </View>
-                                    <Text className="font-bold text-lg dark:text-white">{translateRestriction(restriction.name)}</Text>
+                                    <Text className="font-bold text-md dark:text-white capitalize" numberOfLines={2}>{translateRestriction(restriction.name)}</Text>
                                 </View>
                                 <View className="bg-orange-200 border rounded-lg p-1">
                                     <Text className="font-bold text-lg">{restriction.count}</Text>

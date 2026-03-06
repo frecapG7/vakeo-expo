@@ -1,11 +1,12 @@
 import { EventForm, EventFormValues } from "@/components/events/EventForm";
 import { Button } from "@/components/ui/Button";
+import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useGetEvent, useUpdateEvent } from "@/hooks/api/useEvents";
 import { useGetTrip } from "@/hooks/api/useTrips";
-import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Text, View } from "react-native";
+import { Text } from "react-native";
 import Animated from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
 
@@ -24,8 +25,6 @@ export default function EditTripActivity() {
 
     const { control, reset, handleSubmit } = useForm<EventFormValues>();
 
-    const navigation = useNavigation();
-
 
     const onSubmit = async (data: any) => {
         await updateEvent.mutateAsync({
@@ -36,18 +35,6 @@ export default function EditTripActivity() {
         router.dismissTo("..");
 
     }
-
-    useEffect(() => {
-        navigation.setOptions({
-            headerRight: () =>
-                <View className="mx-2">
-                    <Button onPress={handleSubmit(onSubmit)} isLoading={updateEvent.isPending}>
-                        <Text className="text-md font-bold dark:text-white">Appliquer</Text>
-                    </Button>
-
-                </View>
-        })
-    })
 
     useEffect(() => {
         if (activity)
@@ -63,6 +50,13 @@ export default function EditTripActivity() {
     return (
             <Animated.ScrollView style={{ flex: 1 }} className="flex flex-grow">
                 <EventForm control={control} />
+
+                  <Button className="flex-row bg-blue-600 items-center justify-center rounded-full p-4 my-5"
+                                onPress={handleSubmit(onSubmit)}
+                                isLoading={updateEvent.isPending}>
+                                <IconSymbol name="pencil" color="white" />
+                                <Text className="text-white font-bold text-xl">Modifier</Text>
+                            </Button>
             </Animated.ScrollView>
     )
 }
