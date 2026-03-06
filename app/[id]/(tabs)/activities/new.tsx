@@ -1,12 +1,13 @@
 import { EventForm, EventFormValues } from "@/components/events/EventForm";
 import { EventIcon } from "@/components/events/EventIcon";
 import { Button } from "@/components/ui/Button";
+import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { usePostEvent } from "@/hooks/api/useEvents";
 import { useGetTrip } from "@/hooks/api/useTrips";
 import { toLabel } from "@/lib/eventUtils";
-import { router, useLocalSearchParams, useNavigation } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useContext, useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Text, View } from "react-native";
@@ -50,29 +51,20 @@ export default function NewTripActivity() {
     }, [trip, setValue]);
 
     const onSubmit = async (data) => {
-        await postEvent({
+        const result = await postEvent({
             ...data,
             attendees: data.attendees.filter(attendee => attendee.checked)
         });
-        router.back();
+        router.dismissTo({
+            pathname: "/[id]/(tabs)/activities/[activityId]",
+            params: {
+                id: String(id),
+                activityId: result._id
+            }
+        });
         Toast.success("Nouvelle activité ajoutée");
 
     }
-
-    const navigation = useNavigation();
-
-    useEffect(() => {
-        if (type)
-            navigation.setOptions({
-                headerRight: () =>
-                    <Button className="flex" onPress={handleSubmit(onSubmit)} isLoading={isPending}>
-                        <Text className="text-lg dark:text-white">
-                            Ajouter
-                        </Text>
-                    </Button>
-
-            })
-    }, [navigation, isPending, type]);
     return (
         <Animated.ScrollView style={styles.container}>
             {!type &&
@@ -89,7 +81,7 @@ export default function NewTripActivity() {
                                     onPress={() => setValue("type", value)}
                                     key={value}>
                                     <EventIcon name={value} size="lg" />
-                                    <Text className="capitalize font-bold">{toLabel({type: value})}</Text>
+                                    <Text className="capitalize font-bold">{toLabel({ type: value })}</Text>
                                 </Button>
 
                             ))}
@@ -103,6 +95,14 @@ export default function NewTripActivity() {
                     <EventForm control={control} />
                 </Animated.View>
             }
+
+
+            <Button className="flex-row  bg-blue-400 items-center justify-center rounded-full p-4 my-5"
+                onPress={handleSubmit(onSubmit)}
+                isLoading={isPending}>
+                <Text className="text-white font-bold text-xl">Ajouter</Text>
+                <IconSymbol name="plus" color="white" />
+            </Button>
         </Animated.ScrollView>
     )
 }

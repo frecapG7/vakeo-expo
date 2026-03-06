@@ -27,7 +27,7 @@ const PollsWidget = ({ trip }: { trip: Trip }) => {
         <View className="gap-2">
             {page?.polls.slice(0, 2).map((poll) =>
                 <View key={poll._id} className="pb-2 border-b border-gray-200">
-                    <Text className="font-bold dark:text-white text-lg">
+                    <Text className="dark:text-white text-lg">
                         {poll.question}
                     </Text>
 
@@ -35,7 +35,7 @@ const PollsWidget = ({ trip }: { trip: Trip }) => {
                         {poll.options.slice(0, 3).map((option) =>
                             <View className="gap-1 justify-start mt-2" key={option._id}>
                                 <View className="flex-row items-center justify-between ">
-                                    <Text className="dark:text-white text-sm max-w-[80%]" numberOfLines={3}>
+                                    <Text className="dark:text-white text-xs max-w-[80%]" numberOfLines={3}>
                                         {option?.title || option?.value}
                                     </Text>
                                     <Text className="font-bold text-orange-400">
@@ -44,8 +44,11 @@ const PollsWidget = ({ trip }: { trip: Trip }) => {
                                 </View>
                                 <LinearProgress progress={option.percent / 100} />
                                 <View className="flex-row items-center gap-5">
-                                    {!poll.isAnonymous &&
-
+                                    {poll.isAnonymous ?
+                                        <Text className="text-gray-400">
+                                            {option.selectedBy?.length} votes
+                                        </Text>
+                                        :
                                         <AvatarsGroup
                                             avatars={option.selectedBy?.map(u => ({
                                                 avatar: u?.avatar,
@@ -55,9 +58,6 @@ const PollsWidget = ({ trip }: { trip: Trip }) => {
                                             maxLength={5}
                                         />
                                     }
-                                    <Text className="text-gray-400">
-                                        {option.selectedBy?.length} votes
-                                    </Text>
                                 </View>
                             </View>
                         )}
@@ -132,15 +132,6 @@ export default function ItemDetails() {
                                     <IconSymbol name="chevron.left" size={25} color="white" />
                                 </Pressable>
                                 <View className="flex-row gap-5 items-center">
-                                    {/* <Pressable onPressOut={() => router.push({
-                                    pathname: "/[id]/messages",
-                                    params: {
-                                        id: String(id)
-                                    }
-                                })}
-                                    className="bg-gray-800 rounded-full p-2">
-                                    <IconSymbol name="message" size={25} color="white" />
-                                </Pressable> */}
 
                                     <Pressable className="items-center"
                                         onPressOut={() => router.push({
@@ -158,12 +149,6 @@ export default function ItemDetails() {
                                     </Pressable>
                                 </View>
                             </View>
-
-                            {/* <View>
-                            <Text className="text-2xl text-white font-bold">
-                                {trip?.name}
-                            </Text>
-                        </View> */}
                         </View>
                     </ImageBackground>
                 </View>
@@ -171,13 +156,8 @@ export default function ItemDetails() {
 
                 <View className="shadow mx-4 -mt-10 mb-5 p-2 rounded-lg bg-white dark:bg-gray-900 flex" >
                     <View className="px-5 gap-2">
-                        <Text className="text-3xl font-bold dark:text-white" numberOfLines={2}>{trip?.name}</Text>
+                        <Text className="text-4xl font-bold dark:text-white" numberOfLines={2}>{trip?.name}</Text>
                         <View className="flex gap-1 items-start justify-start">
-                            {/* <View className="items-center">
-                            <Avatar src={me?.avatar} alt={me?.name?.charAt(0)} size2="md" />
-                            <Text className="dark:text-gray-400">{me?.name}</Text>
-                        </View>
-                        <View className="w-0.5 h-10 bg-gray-400" /> */}
                             <AvatarsGroup
                                 maxLength={5}
                                 size2="sm"
@@ -238,9 +218,8 @@ export default function ItemDetails() {
 
 
                 <View className="m-5 gap-2">
-
                     <View className="flex-row justify-between items-center">
-                        <Text className="text-xl font-bold dark:text-white">
+                        <Text className="font-bold text-2xl text-white">
                             Sondages
                         </Text>
                         {dashboard?.polls?.pending > 0 &&
@@ -291,7 +270,7 @@ export default function ItemDetails() {
                     <Text className="text-xl font-bold dark:text-white">
                         Cagnotte
                     </Text>
-                    <View className="flex-row bg-white dark:bg-gray-800 rounded-lg shadow p-5 justify-between items-center">
+                    <View className="flex-row bg-white dark:bg-gray-900 rounded-lg shadow p-5 justify-between items-center">
                         <View className="rounded-full bg-blue-200 items-center p-1">
                             <IconSymbol name="eurosign.circle" color="blue" />
                         </View>
@@ -316,8 +295,8 @@ export default function ItemDetails() {
                     }}>
                     <BottomSheetView style={{ flex: 1, padding: 10, minHeight: 150 }}>
                         <View className="flex flex-grow gap-5 p-1 divide-y-5 divide-solid dark:divide-white">
-                            <Button onPress={() => router.navigate({
-                                pathname: "/[id]/votes",
+                            {/* <Button onPress={() => router.navigate({
+                                pathname: "/[id]/polls",
                                 params: {
                                     id
                                 }
@@ -328,7 +307,7 @@ export default function ItemDetails() {
                                 </View>
                                 <Text className="text-lg dark:text-white">Voir les sondages</Text>
                             </Button>
-                            <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
+                            <View className="w-60% bg-black dark:bg-gray-200 h-0.5" /> */}
 
                             <Button onPress={handleShare} className="flex flex-row gap-5 items-center" isLoading={shareTrip.isPending}>
                                 <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
