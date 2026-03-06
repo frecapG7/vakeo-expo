@@ -2,6 +2,7 @@ import { TripUser } from "@/types/models";
 import dayjs from "dayjs";
 
 
+export const urlRegex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
 
 
 

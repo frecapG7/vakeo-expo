@@ -66,7 +66,8 @@ const MAPPING = {
   "line.horizontal.3": "drag-indicator",
   "eye": "visibility",
   "eye.slash": "visibility-off",
-  "bag.fill":"shopping-bag"
+  "bag.fill":"shopping-bag",
+  "tray": "how-to-vote"
 } as IconMapping;
 
 /**

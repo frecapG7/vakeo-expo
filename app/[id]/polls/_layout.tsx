@@ -10,7 +10,8 @@ export default function PollsLayout() {
     return (
         <Stack screenOptions={{
             title: "Sondages",
-            headerShadowVisible: false
+            headerShadowVisible: false,
+            headerShown: false
         }}>
             <Stack.Screen name="index" options={{
                 headerShown: false

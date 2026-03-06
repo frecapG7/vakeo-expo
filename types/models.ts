@@ -45,11 +45,6 @@ export interface Good {
 }
 
 
-export interface DateVote {
-    startDate: Date,
-    endDate: Date,
-    users: TripUser[]
-}
 
 
 export interface Dashboard {
@@ -94,7 +89,8 @@ export interface DatesPoll extends Poll{
         {
             startDate: Date,
             endDate: Date,
-            selectedBy: TripUser[]
+            selectedBy: TripUser[],
+            percent: number
         }
     ]
 };
@@ -103,9 +99,12 @@ export interface DatesPoll extends Poll{
 export interface HousingPoll extends Poll {
     options: [
         {
-            value : string,
+            image: string,
+            icon: string,
+            url : string,
             title: string,
-            selectedBy: TripUser[]
+            selectedBy: TripUser[],
+            percent: number
         }
     ]
 };
@@ -114,7 +113,8 @@ export interface OtherPoll extends Poll {
     options: [
         {
             value : string,
-            selectedBy: TripUser[]
+            selectedBy: TripUser[],
+            percent: number
         }
     ]
 }
