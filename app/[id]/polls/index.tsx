@@ -1,4 +1,4 @@
-import { Avatar } from "@/components/ui/Avatar";
+import { Avatar, AvatarsGroup } from "@/components/ui/Avatar";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
@@ -47,7 +47,7 @@ export default function PollsPage() {
                 contentContainerClassName="m-2"
                 keyExtractor={(item) => item._id}
                 renderItem={({ item }) => {
-                    const containUser = containsUser(me, item.hasSelected.map(_id => ({ _id })));
+                    const containUser = containsUser(me, item.hasSelected);
                     return (
                         <Pressable
                             onPress={() => router.push({
@@ -100,7 +100,20 @@ export default function PollsPage() {
 
 
                             <View className="flex-row flex-1 justify-between items-end">
-                                <View className="flex-row flex-1 items-center">
+                                <View className="flex-row flex-1 items-center gap-1">
+                                    <AvatarsGroup
+                                        avatars={item.hasSelected.map(u => ({
+                                            avatar: u.avatar,
+                                            alt: u.name.charAt(0)
+                                        }))}
+                                        maxLength={3}
+                                        size2="xs"
+                                    />
+                                    {item.hasSelected.length > 0 &&
+                                        <Text className="font-bold text-gray-400">
+                                            •
+                                        </Text>
+                                    }
                                     <Text className="text-gray-400">
                                         {item?.hasSelected?.length} votes
                                     </Text>

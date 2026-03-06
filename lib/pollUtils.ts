@@ -10,7 +10,7 @@ export const translateType = (type: string)  => {
         case "HousingPoll":
             return "hébergement";
         default:
-            return "type inconnu"
+            return "autre"
     }
 
 } 

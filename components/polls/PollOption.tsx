@@ -17,7 +17,7 @@ const getColorForPercent = (percent: number) => {
     return `rgb(${r}, ${g}, ${b})`;
 }
 
-export const PollOption = ({ label, selectedBy, percent, isAnonymous, includeUser }: { label?: string, selectedBy?: TripUser[], percent: number, isAnonymous?: boolean, includeUser?: boolean }) => {
+export const PollOption = ({ label, selectedBy, percent, isAnonymous, includeUser }: { label?: string, selectedBy?: TripUser[], percent: stringnumber, isAnonymous?: boolean, includeUser?: boolean }) => {
 
 
 
@@ -50,7 +50,7 @@ export const PollOption = ({ label, selectedBy, percent, isAnonymous, includeUse
                         />
                     }
                     <Text className="font-bold text-lg">
-                        {percent} %
+                       {Number(percent).toFixed()} %
                     </Text>
 
                 </View>

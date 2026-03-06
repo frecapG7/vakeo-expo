@@ -19,10 +19,7 @@ import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
 
-
-
 const PollsWidget = ({ trip }: { trip: Trip }) => {
-
 
     const { data: page } = useGetPolls(trip._id);
 
@@ -41,20 +38,23 @@ const PollsWidget = ({ trip }: { trip: Trip }) => {
                                     <Text className="dark:text-white text-sm max-w-[80%]" numberOfLines={3}>
                                         {option?.title || option?.value}
                                     </Text>
-                                    <Text className="font-bold text-blue-600">
-                                        {option.percent}%
+                                    <Text className="font-bold text-orange-400">
+                                        {Number(option.percent).toFixed()} %
                                     </Text>
                                 </View>
                                 <LinearProgress progress={option.percent / 100} />
                                 <View className="flex-row items-center gap-5">
-                                    <AvatarsGroup
-                                        avatars={option.selectedBy?.map(u => ({
-                                            avatar: u?.avatar,
-                                            alt: u?.name?.charAt(0)
-                                        }))}
-                                        size2="xs"
-                                        maxLength={5}
-                                    />
+                                    {!poll.isAnonymous &&
+
+                                        <AvatarsGroup
+                                            avatars={option.selectedBy?.map(u => ({
+                                                avatar: u?.avatar,
+                                                alt: u?.name?.charAt(0)
+                                            }))}
+                                            size2="xs"
+                                            maxLength={5}
+                                        />
+                                    }
                                     <Text className="text-gray-400">
                                         {option.selectedBy?.length} votes
                                     </Text>
@@ -169,7 +169,7 @@ export default function ItemDetails() {
                 </View>
 
 
-                <View className="shadow mx-4 -mt-10 mb-5 p-2 rounded-lg bg-yellow-50 dark:bg-gray-900 flex" >
+                <View className="shadow mx-4 -mt-10 mb-5 p-2 rounded-lg bg-white dark:bg-gray-900 flex" >
                     <View className="px-5 gap-2">
                         <Text className="text-3xl font-bold dark:text-white" numberOfLines={2}>{trip?.name}</Text>
                         <View className="flex gap-1 items-start justify-start">
@@ -244,8 +244,8 @@ export default function ItemDetails() {
                             Sondages
                         </Text>
                         {dashboard?.polls?.pending > 0 &&
-                            <Animated.View className="rounded-full bg-red-200 px-2 shadow">
-                                <Text className="text-red-600 font-bold">
+                            <Animated.View className="rounded-full bg-orange-200 px-2 shadow">
+                                <Text className="text-orange-600 font-bold">
                                     {dashboard?.polls?.pending} Actif
                                 </Text>
 
@@ -287,11 +287,11 @@ export default function ItemDetails() {
                     </View>
                 </View>
 
-                <View className="m-5 gap-2">
+                <View className="m-5 mt-2 gap-2">
                     <Text className="text-xl font-bold dark:text-white">
                         Cagnotte
                     </Text>
-                    <View className="flex-row bg-yellow-50 dark:bg-gray-800 rounded-lg shadow p-5 justify-between items-center">
+                    <View className="flex-row bg-white dark:bg-gray-800 rounded-lg shadow p-5 justify-between items-center">
                         <View className="rounded-full bg-blue-200 items-center p-1">
                             <IconSymbol name="eurosign.circle" color="blue" />
                         </View>

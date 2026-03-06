@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetPoll, useUnvotePoll, useVotePoll } from "@/hooks/api/usePolls";
+import useI18nNumbers from "@/hooks/i18n/useI18nNumbers";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import { useLocalSearchParams } from "expo-router";
 import { useContext, useState } from "react";
@@ -44,6 +45,7 @@ export default function PollDetailsPage() {
 
     const { formatDuration } = useI18nTime();
 
+    const {formatPercent} = useI18nNumbers();
 
     const [selectedOption, setSelectedOption] = useState(null);
 
