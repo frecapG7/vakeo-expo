@@ -1,7 +1,6 @@
 import { Pressable, Text, View } from "react-native";
 
 import useI18nTime from "@/hooks/i18n/useI18nTime";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { useState } from "react";
 import { useController } from "react-hook-form";
 
@@ -35,7 +34,7 @@ export const FormDateTimePicker = ({
             <Pressable className="flex bg-gray-200 rounded-lg p-2 mb-2" onPress={() => setShow(true)}>
                 <Text>{formatDate(value)}</Text>
             </Pressable>
-            {show &&
+            {/* {show &&
                 <DateTimePicker
                     testID="dateTimePicker"
                     value={value || new Date()}
@@ -44,7 +43,7 @@ export const FormDateTimePicker = ({
                     onChange={(v) => onChange(v)} 
                     />
 
-            }
+            } */}
 
         </View>
 

@@ -25,7 +25,6 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      // "edgeToEdgeEnabled": true,
       "package": "com.frecapg7.vakeoexpo"
     },
     "web": {
@@ -56,7 +55,6 @@
           "organization": "florian-recape"
         }
       ],
-      "@react-native-community/datetimepicker",
       "@sentry/react-native",
       "expo-font",
       "expo-image"
