@@ -8,7 +8,7 @@ type ButtonVariant = 'none' | 'contained' | 'outlined';
 
 const variantToClassMap = {
     'none': '',
-    'contained': 'bg-blue-400 rounded-lg',
+    'contained': 'bg-blue-600 rounded-lg',
     'outlined': 'border border-blue-200 rounded-lg'
 }
 

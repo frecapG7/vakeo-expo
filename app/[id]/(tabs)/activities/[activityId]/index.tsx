@@ -236,7 +236,6 @@ export default function TripActivityDetails() {
                         <IconSymbol name="person.2.fill" color="orange" size={34} />
                         <Text className="text-2xl font-bold dark:text-white">Participants</Text>
                     </View>
-
                     <View className="bg-orange-200 p-2 rounded-full">
                         <Text className="text-orange-600 font-bold">
                             {activity?.attendees?.length} inscrits
@@ -244,11 +243,11 @@ export default function TripActivityDetails() {
                     </View>
                 </View>
 
-                <View className="gap-1 bg-white dark:bg-gray-900 p-2 rounded-xl">
+                <View className="gap-1 bg-white dark:bg-gray-900 rounded-xl">
                     {activity?.attendees?.slice(0, 3).map((attendee) => (
                         <View
                             key={attendee._id}
-                            className="flex-row p-2 rounded-xl gap-2 p-2 items-center " >
+                            className="flex-row p-2 rounded-xl gap-2 p-2 items-center border-b border-gray-600 dark:border-gray-200" >
                             <Avatar size2="sm" alt={attendee.name.charAt(0)} src={attendee?.avatar} />
                             <View>
                                 <Text className="text-md dark:text-white">
@@ -259,7 +258,6 @@ export default function TripActivityDetails() {
                                         </Text>}
                                 </Text>
                                 <View className="flex-row gap-2 items-center">
-
                                     {containsUser(attendee, activity.owners) && (
                                         <Text className="text-sm capitalize text-gray-600 dark:text-gray-400">
                                             Responsable
@@ -272,7 +270,7 @@ export default function TripActivityDetails() {
                     {activity?.attendees?.length > 0 ?
                         <Button
                             onPress={() => setShowAttendees(true)}
-                            className="bg-blue-50 dark:bg-stone-900 border border-dashed border-blue-200 dark:border-gray-200 rounded-xl justify-center flex-row items-center p-2">
+                            className="justify-center flex-row items-center p-2">
                             <Text className="font-bold text-md text-center text-gray-600 dark:text-gray-200">
                                 Voir tout
                             </Text>

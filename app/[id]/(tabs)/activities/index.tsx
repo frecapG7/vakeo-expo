@@ -1,7 +1,6 @@
 import { EventIcon } from "@/components/events/EventIcon";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { Search } from "@/components/ui/Search";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
@@ -61,11 +60,8 @@ const EventItem = ({ event, user }: { event: Event, user: TripUser }) => {
     const isAttendee = useMemo(() => event.attendees.map(u => u._id).includes(user?._id), [user, event]);
     const isOwner = useMemo(() => event.owners.map(u => u._id).includes(user?._id), [user, event])
 
-
-
     return (
-        <View className={`shadow-lg dark:shadow-gray-200 bg-white dark:bg-gray-900
-         rounded-lg py-3 px-2 ${isOwner ? "border-l-4 border-orange-400" : ""}`} >
+        <View className={`p-2 ${isOwner ? "border-l-4 border-orange-400" : ""}`} >
             <View className="flex-row gap-2 items-center justify-between">
                 <View className="flex-row">
                     <EventIcon name={event.type} size="md" />
@@ -137,7 +133,7 @@ export default function TripActivities() {
                 data={events || []}
                 ListHeaderComponent={
                     <View className="gap-2 mb-5">
-                        <Search value={search} onChange={setSearch} />
+                        {/* <Search value={search} onChange={setSearch} /> */}
                         <View className="flex-row justify-between gap-5">
                             <Pressable className={`flex-1 shadow flex-row rounded-lg justify-center items-center p-2 ${onlyAttendee ? "bg-orange-200 dark:bg-orange-600 border border-orange-300" : "bg-white dark:bg-gray-900 dark:border dark:border-gray-600"}`}
                                 onPress={() => setOnlyAttendee(!onlyAttendee)}>
@@ -153,15 +149,17 @@ export default function TripActivities() {
                         <Animated.ScrollView
                             horizontal
                             showsHorizontalScrollIndicator={false}
-                            className="flex-1 flex-row my-2"
-                            contentContainerClassName="gap-5">
+                            className="flex-row my-2"
+                            contentContainerClassName="gap-5 flex-1">
                             {typeFilters.map(item => (
                                 <Pressable
                                     key={item.value}
-                                    className={`shadow py-2 px-4 items-center rounded-full ${typeFilter === item.value ? "bg-orange-600 border-orange-400 " : "bg-white dark:bg-gray-900 border border-gray-600"}`}
+                                    className={`py-2 px-4 items-center rounded-full ${typeFilter === item.value ? "bg-orange-600 border-orange-400 " : "bg-white dark:bg-gray-900 border border-gray-600"}`}
                                     onPress={() => setTypeFilter(typeFilter === item?.value ? "" : item.value)}
                                 >
-                                    <Text className={`${typeFilter === item.value ? "font-bold text-white" : "dark:text-white"}`}>{item.label}</Text>
+                                    <Text className={`${typeFilter === item.value ? "font-bold text-white" : "dark:text-white"}`}>
+                                        {item.label}
+                                    </Text>
                                 </Pressable>
                             ))}
                         </Animated.ScrollView>
@@ -177,7 +175,7 @@ export default function TripActivities() {
                             user={me} />
                     </Button>
                 }
-                ItemSeparatorComponent={() => <View className="my-2" />}
+                ItemSeparatorComponent={() => <View className="my-2 border-b border-gray-600 dark:border-gray-200" />}
                 keyExtractor={(item) => item?._id}
                 contentContainerClassName="p-2"
                 ListEmptyComponent={
