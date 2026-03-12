@@ -217,9 +217,9 @@ export default function ItemDetails() {
 
 
 
-                <View className="m-5 gap-2">
+                <View className="m-5">
                     <View className="flex-row justify-between items-center">
-                        <Text className="font-bold text-2xl text-white">
+                        <Text className="font-bold text-2xl dark:text-white">
                             Sondages
                         </Text>
                         {dashboard?.polls?.pending > 0 &&

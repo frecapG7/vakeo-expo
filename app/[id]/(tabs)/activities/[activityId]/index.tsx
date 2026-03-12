@@ -15,8 +15,8 @@ import { containsUser } from "@/lib/utils";
 import { Event } from "@/types/models";
 import { router, useLocalSearchParams } from "expo-router";
 import { useContext, useMemo, useState } from "react";
-import { Text, View } from "react-native";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { Pressable, Text, View } from "react-native";
+import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 
@@ -44,7 +44,7 @@ const ActivityGoodsWidget = ({ event, onPress }: { event: Event, onPress: () => 
         return (
             <View>
                 <View className="flex-row gap-1 items-center">
-                    <IconSymbol name="bag.fill" size={36} color="orange" />
+                    <IconSymbol name="cart" size={36} color="orange" />
                     <Text className="font-bold capitalize dark:text-white">
                         à apporter
                     </Text>
@@ -58,47 +58,60 @@ const ActivityGoodsWidget = ({ event, onPress }: { event: Event, onPress: () => 
         <View>
             <View className="flex-row justify-between items-center">
                 <View className="flex-row gap-1 items-end">
-                    <IconSymbol name="bag.fill" size={36} color="orange" />
+                    <IconSymbol name="cart" size={36} color="orange" />
                     <Text className="font-bold capitalize dark:text-white text-xl">
-                        à apporter
+                        panier
                     </Text>
                 </View>
-                <View className="bg-gray-200 rounded-full px-2 py-1">
-                    <Text>
-                        {goodSummary?.checkedCount} / {goodSummary?.totalCount}
-                    </Text>
-                </View>
-            </View>
-
-
-            <View className="rounded-xl p-2  bg-white dark:bg-gray-900  shadow shadow-orange-200">
-                {goodSummary?.goods.map((good) => (
-                    <View
-                        key={good._id}
-                        className="flex-row gap-2 p-1">
-                        <IconSymbol name={good.checked ? "checkmark.circle.fill" : "circle"} color={good.checked ? "green" : "gray"} />
-
-                        <Text className={`${good.checked ? "line-through text-gray-400" : "dark:text-white"} `}>
-                            <Text className="text-lg capitalize">
-                                {good?.name}
-                            </Text>
-                            {good?.quantity &&
-                                <Text className="text-md10">
-                                    ({good.quantity})
-                                </Text>
-                            }
+                {goodSummary?.totalCount > 0 &&
+                    <View className="bg-gray-200 rounded-full px-2 py-1">
+                        <Text>
+                            {goodSummary?.checkedCount} / {goodSummary?.totalCount}
                         </Text>
                     </View>
-                ))}
 
-                <Button
-                    onPress={onPress}
-                    className="bg-blue-50 dark:bg-neutral-800 border border-blue-200 dark:border-gray-200 border-dashed rounded-xl p-1 m-2">
-                    <Text className="text-center text-gray-600 dark:text-gray-200 font-bold">
-                        {goodSummary.totalCount > 0 ? "Voir tout" : "Ajouter +"}
-                    </Text>
-                </Button>
+                }
             </View>
+
+            {goodSummary.totalCount > 0 ?
+
+                <View className="rounded-xl p-2  bg-white dark:bg-gray-900">
+                    {goodSummary?.goods.map((good) => (
+                        <View
+                            key={good._id}
+                            className="flex-row gap-2 p-1">
+                            <IconSymbol name={good.checked ? "checkmark.circle.fill" : "circle"} color={good.checked ? "green" : "gray"} />
+
+                            <Text className={`${good.checked ? "line-through text-gray-400" : "dark:text-white"} `}>
+                                <Text className="text-lg capitalize">
+                                    {good?.name}
+                                </Text>
+                                {good?.quantity &&
+                                    <Text className="text-md10">
+                                        ({good.quantity})
+                                    </Text>
+                                }
+                            </Text>
+                        </View>
+                    ))}
+
+                    <Button
+                        onPress={onPress}
+                        className="border-t border-gray-600 dark:border-gray-200 p-2 m-2">
+                        <Text className="text-center text-gray-600 dark:text-gray-200 font-bold">
+                            Voir tout
+                        </Text>
+                    </Button>
+                </View>
+                :
+                <Pressable
+                    onPress={onPress}
+                    className="bg-white dark:bg-gray-400 flex-row border border-dashed dark:border-gray-200 justify-center items-center py-2 rounded-xl">
+                    <IconSymbol name="plus" size={15} color="black" />
+                    <Text>Ajouter</Text>
+                </Pressable>
+
+            }
         </View>
 
     )
@@ -128,12 +141,39 @@ export default function TripActivityDetails() {
     const restrictions = useMemo(() => activity ? buildRestrictions(activity) : {}, [activity]);
 
 
+    // Deprecated
     const handleJoin = async () => {
+
         const newAttendees = activity?.attendees;
         newAttendees?.push(me);
         await updateEvent.mutateAsync({
             ...activity,
             attendees: newAttendees
+        });
+    }
+
+    const onJoinClick = async () => {
+        let newAttendees = activity?.attendees;
+        if (isAttendee) {
+            newAttendees = newAttendees?.filter(u => u._id !== me._id);
+        } else {
+            newAttendees?.push(me);
+        }
+        await updateEvent.mutateAsync({
+            ...activity,
+            attendees: newAttendees
+        });
+    }
+    const onOwnershipClick = async () => {
+        let newOwners = activity?.owners;
+        if (isOwner) {
+            newOwners = newOwners?.filter(u => u._id !== me._id);
+        } else {
+            newOwners?.push(me);
+        }
+        await updateEvent.mutateAsync({
+            ...activity,
+            owners: newOwners
         });
     }
 
@@ -166,14 +206,46 @@ export default function TripActivityDetails() {
 
     return (
         <Animated.ScrollView className="flex gap-2">
+
             <View className="flex items-center gap-2">
+
+                <View className="absolute left-1 top-5 ">
+                    <Pressable
+                        onPress={() => router.dismissTo({
+                            pathname: "/[id]/(tabs)/activities",
+                            params: {
+                                id: String(id)
+                            }
+                        })}
+                        className="bg-gray-200 rounded-full h-10 w-10 p-2 justify-center items-center flex">
+                        <IconSymbol name="arrow.left" color="black" />
+                    </Pressable>
+                </View>
                 <EventIcon name={activity?.type} size="lg" />
                 <Text className="text-4xl font-bold dark:text-white">
                     {activity?.name}
                 </Text>
 
                 <View className="flex-row justify-center gap-1">
-                    {isOwner &&
+                    <Pressable
+                        disabled={updateEvent.isPending}
+                        onPress={onOwnershipClick}
+                        className={`flex items-center rounded-xl p-2  border  ${isOwner ? "bg-orange-200 border-orange-600" : "bg-white dark:bg-gray-900 border-gray-600"}`}>
+                        <Text className={` ${isOwner ? "text-orange-600 font-bold" : "dark:text-white"}`}>
+                            Responsable
+                        </Text>
+                    </Pressable>
+
+                    <Pressable
+                        disabled={updateEvent.isPending}
+                        onPress={onJoinClick}
+                        className={`flex items-center rounded-xl p-2  border  ${isAttendee ? "bg-blue-200 border-blue-600" : "bg-white dark:bg-gray-900 border-gray-600"}`}>
+                        <Text className={` ${isAttendee ? "text-blue-600 font-bold" : "dark:text-white"}`}>
+                            Inscrit
+                        </Text>
+                    </Pressable>
+
+                    {/* {isOwner &&
                         <Animated.View
                             entering={FadeIn}
                             exiting={FadeOut}
@@ -192,7 +264,7 @@ export default function TripActivityDetails() {
                             <Text className="text-blue-600 font-bold">
                                 Inscrit
                             </Text>
-                        </Animated.View>}
+                        </Animated.View>} */}
 
                 </View>
             </View>
@@ -230,8 +302,8 @@ export default function TripActivityDetails() {
             </View>
 
 
-            <View className="mx-2 gap-1 my-2">
-                <View className="flex-row justify-between items-center">
+            <View className="m-2 gap-1">
+                <View className="flex-row justify-between items-end">
                     <View className="flex-row items-end gap-1">
                         <IconSymbol name="person.2.fill" color="orange" size={34} />
                         <Text className="text-2xl font-bold dark:text-white">Participants</Text>
@@ -276,11 +348,12 @@ export default function TripActivityDetails() {
                             </Text>
                         </Button>
                         :
-                        <Button
-                            onPress={handleJoin}
-                            variant="contained"
-                            isLoading={updateEvent.isPending}
-                            title="Participer" />
+                        <View className="py-2">
+
+                            <Text className="dark:text-white">
+                                Aucun participants
+                            </Text>
+                        </View>
                     }
                 </View>
             </View>
@@ -303,17 +376,16 @@ export default function TripActivityDetails() {
             {activity.type === "MEAL" &&
                 <View className="m-2">
                     <View className="flex-row gap-2 items-end mb-1">
-                        <IconSymbol name="suit.spade" color="orange" size={34} />
+                        <IconSymbol name="info.circle" color="orange" size={34} />
                         <Text className="max-w-50 font-bold dark:text-white text-xl" numberOfLines={2}>
                             Restrictions alimentaires
                         </Text>
                     </View>
 
-                    <View className="gap-2 p-2 rounded-xl bg-white dark:bg-gray-900 shadow shadow-orange-200">
-                        <Text className="text-gray-800 dark:text-gray-200">Récapitulatif pour le groupe</Text>
-                        {Object.values(restrictions)?.map((restriction) =>
+                    <View className="gap-2 p-2 rounded-xl">
+                        {Object.values(restrictions)?.map((restriction, index) =>
                             <View key={restriction.name}
-                                className="flex-row p-2 items-center justify-between border-b border-gray-200">
+                                className={`flex-row p-2 items-center justify-between ${index !== Object(restrictions).length ? "border-b border-gray-200" : ""} `}>
                                 <View className="flex-row items-center  gap-2">
                                     <View className="bg-orange-200 dark:bg-gray-200 rounded-full p-1 ">
                                         <RestrictionIcon value={restriction.name} size="sm" />
@@ -352,7 +424,8 @@ export default function TripActivityDetails() {
                             activityId: activity._id
                         }
                     })}
-                    className="bg-blue-600 border border-blue-400 rounded-xl shadow flex-row p-3 items-center justify-center gap-2">
+                    className="flex-row bg-blue-400 dark:bg-blue-600 items-center justify-center rounded-full p-4 my-5"
+                >
                     <IconSymbol name="pencil" color="white" size={16} />
                     <Text className="font-bold text-white">Modifier</Text>
                 </Button>

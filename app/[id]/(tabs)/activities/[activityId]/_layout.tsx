@@ -1,10 +1,7 @@
-import { EventIcon } from "@/components/events/EventIcon";
 import styles from "@/constants/Styles";
 import { useGetEvent } from "@/hooks/api/useEvents";
 import useColors from "@/hooks/styles/useColors";
-import { toLabel } from "@/lib/eventUtils";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { Text, View } from "react-native";
 
 
 export default function TripActivityDetailLayout() {
@@ -32,26 +29,17 @@ export default function TripActivityDetailLayout() {
         }}>
             <Stack.Screen name="index" options={{
                 headerShown: false,
-                headerTitle: ({ children }) =>
-                    <View className="flex-row items-center justify-start gap-1">
-                        <EventIcon name={activity?.type} size="md" />
-                        <View>
-                            <Text className="text-lg dark:text-white font-bold shadow">{children}</Text>
-                            <Text className="dark:text-white italic capitalize">{toLabel(activity)}</Text>
-                        </View>
-                    </View>,
-
-
+                title:""
             }} />
 
             <Stack.Screen name="edit" options={{
                 presentation: "modal",
                 headerTitle: activity?.name,
-                title: activity?.name,
+                title: "Modifier",
             }}
             />
             <Stack.Screen name="goods" options={{
-                title: "La liste"
+                title: "Le panier"
             }} />
         </Stack>
     )

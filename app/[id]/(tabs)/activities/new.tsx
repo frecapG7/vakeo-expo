@@ -93,16 +93,16 @@ export default function NewTripActivity() {
             {type &&
                 <Animated.View entering={SlideInRight} exiting={SlideOutLeft} className="flex-1 mb-5">
                     <EventForm control={control} />
+                    <Button className="flex-row  bg-blue-600 items-center justify-center rounded-full p-4 my-5"
+                        onPress={handleSubmit(onSubmit)}
+                        isLoading={isPending}>
+                        <Text className="text-white font-bold text-xl">Ajouter</Text>
+                        <IconSymbol name="plus" color="white" />
+                    </Button>
                 </Animated.View>
             }
 
 
-            <Button className="flex-row  bg-blue-400 items-center justify-center rounded-full p-4 my-5"
-                onPress={handleSubmit(onSubmit)}
-                isLoading={isPending}>
-                <Text className="text-white font-bold text-xl">Ajouter</Text>
-                <IconSymbol name="plus" color="white" />
-            </Button>
         </Animated.ScrollView>
     )
 }

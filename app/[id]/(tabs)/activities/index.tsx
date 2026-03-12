@@ -61,18 +61,17 @@ const EventItem = ({ event, user }: { event: Event, user: TripUser }) => {
     const isOwner = useMemo(() => event.owners.map(u => u._id).includes(user?._id), [user, event])
 
     return (
-        <View className={`p-2 ${isOwner ? "border-l-4 border-orange-400" : ""}`} >
+        <View className={`py-3 pr-1 bg-white dark:bg-gray-900 rounded-xl ${isOwner ? "border-l-4 border-orange-400" : ""}`} >
             <View className="flex-row gap-2 items-center justify-between">
-                <View className="flex-row">
+                <View className="flex-row items-center" >
                     <EventIcon name={event.type} size="md" />
                     <View className="flex gap-1">
-                        <View className="flex-row max-w-40 items-start gap-1">
-                            <Text className="text-lg text-gray-800 dark:text-white font-bold"
+                        <View className="flex-row items-start gap-1">
+                            <Text className="text-lg text-gray-800 max-w-50 dark:text-white font-bold"
                                 numberOfLines={2}>
                                 {event.name}
                             </Text>
                             {isOwner &&
-
                                 <Animated.View className="bg-orange-200 items-center rounded-lg p-1">
                                     <Text className="text-sm upper-case text-orange-600 font-bold">RESP.</Text>
                                 </Animated.View>}
@@ -166,7 +165,7 @@ export default function TripActivities() {
                     </View>
                 }
                 renderItem={({ item, index, }) =>
-                    <Button className="min-h-50"
+                    <Button className="min-h-50 "
                         onPress={() => router.navigate({
                             pathname: "/[id]/(tabs)/activities/[activityId]",
                             params: { id: String(id), activityId: item._id }
@@ -175,7 +174,7 @@ export default function TripActivities() {
                             user={me} />
                     </Button>
                 }
-                ItemSeparatorComponent={() => <View className="my-2 border-b border-gray-600 dark:border-gray-200" />}
+                ItemSeparatorComponent={() => <View className="my-2" />}
                 keyExtractor={(item) => item?._id}
                 contentContainerClassName="p-2"
                 ListEmptyComponent={

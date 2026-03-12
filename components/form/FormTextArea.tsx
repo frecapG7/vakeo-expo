@@ -42,7 +42,7 @@ export const FormTextArea = ({ control, name, rules }: {
     }, [error, shakeAnimation]);
 
     return (
-        <Animated.View style={animatedStyle} className="flex-1 flex-row bg-gray-200 focus:border focus:border-blue-500 rounded-lg h-40">
+        <Animated.View style={animatedStyle} className="flex-1 flex-row bg-white dark:bg-gray-200 border border-gray-200 dark:border-gray-400 focus:border-blue-500 rounded-xl h-40">
             <TextInput
                 onChangeText={onChange}
                 value={value}
