@@ -11,7 +11,7 @@ export default function PollsLayout() {
         <Stack screenOptions={{
             title: "Sondages",
             headerShadowVisible: false,
-            headerShown: false
+            headerShown: false,
         }}>
             <Stack.Screen name="index" options={{
                 headerShown: false
@@ -19,9 +19,12 @@ export default function PollsLayout() {
 
             <Stack.Screen name="new"
                 options={{
-                    presentation: "modal",
                     title: "Nouveau sondage",
                     headerBackTitle: "Annuler",
+                }} />
+            <Stack.Screen name="[pollId]"
+                options={{
+                    headerShown: false
                 }} />
         </Stack>
     )

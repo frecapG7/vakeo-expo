@@ -6,7 +6,7 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 5,
+        // padding: 5,
         marginBottom: 5
     },
     bottomSheet: {
@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
         // backgroundColor: "grey",
         color: "black",
         textAlign: "left",
-        minHeight: 5,
+        minHeight: 10,
         width: "100%"
         // textTransform: "capitalize"
     }

@@ -7,8 +7,8 @@ export interface Trip {
     users: TripUser[],
     name: string,
 
-    startDate?: Date,
-    endDate?: Date
+    startDate?: Date | string,
+    endDate?: Date | string
 }
 
 export interface TripUser {

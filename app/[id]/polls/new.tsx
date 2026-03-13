@@ -1,4 +1,5 @@
 import { FormText } from "@/components/form/FormText";
+import { DatesPollOptionsForm } from "@/components/polls/DatesPollOptionsForm";
 import { HousingOptionsForm } from "@/components/polls/HousingOptionsForm";
 import { PollSettingsForm } from "@/components/polls/PollSettingsForm";
 import { Button } from "@/components/ui/Button";
@@ -81,7 +82,7 @@ export default function NewPoll() {
     })
 
 
-    const { id } = useLocalSearchParams();
+    const { id, type: typeParam } = useLocalSearchParams();
     const { me } = useContext(TripContext);
     const postPoll = usePostPoll(id);
     const router = useRouter();
@@ -105,11 +106,16 @@ export default function NewPoll() {
             setValue("question", "Quelles dates ?");
         else if (type === "HousingPoll")
             setValue("question", "Quels hébergement ? ");
-        else{
+        else {
             setValue("question", "Qu'est ce qu'on mange ? ")
-        
+
         }
     }, [type,]);
+
+    useEffect(() => {
+        if (typeParam)
+            setValue("type", String(typeParam));
+    }, [typeParam, setValue]);
 
     if (!type)
         return (
@@ -145,25 +151,33 @@ export default function NewPoll() {
 
         <SafeAreaView style={{ flex: 1 }}>
             <Animated.ScrollView style={styles.container}>
-                <Pressable className="flex-row bg-green-200 py-5" onPress={() => setType("")}>
+                {/* <Pressable className="flex-row bg-green-200 py-5" onPress={() => setType("")}>
                     <IconSymbol name="checkmark.circle.fill" color="green" />
                     <Text>Sondages de dates</Text>
-                </Pressable>
+                </Pressable> */}
+
+                <View className="flex-1 border-b border-gray-200 my-2">
+                    <Text className="text-lg text-gray-600 dark:text-gray-200">
+                        Posez une question*
+                    </Text>
+                    <FormText control={control}
+                        name="question"
+                        placeholder="Quelles date?"
+                    />
+                </View>
 
                 {type === "HousingPoll" &&
                     <View className="flex-1 my-2">
                         <HousingOptionsForm control={control} />
                     </View>
                 }
-                {type !== "HousingPoll" &&
+                {type === "DatesPoll" && 
+                    <View className="flex-1 my-2">
+                        <DatesPollOptionsForm control={control}/>
+                    </View>
+                }
+                {type === "OtherPoll" &&
                     <View className="flex-1 gap-2 my-2">
-                        <View className="flex-1 border-b border-gray-200 my-2">
-                            <Text className="text-lg text-gray-600 dark:text-gray-200">Posez une question*</Text>
-                            <FormText control={control}
-                                name="question"
-                                placeholder="Quelles date?"
-                            />
-                        </View>
                         <Text className="text-lg text-gray-600 dark:text-gray-200">Options</Text>
                         <View className="gap-2 mx-2">
                             {options?.map((option, index) => (
@@ -198,8 +212,8 @@ export default function NewPoll() {
                 <Button className="flex-row  bg-blue-400 items-center justify-center rounded-full p-4 my-5"
                     onPress={handleSubmit(onSubmit)}
                     isLoading={postPoll?.isPending}>
-                    <Text className="text-white font-bold text-xl">Créér</Text>
                     <IconSymbol name="tray" color="white" />
+                    <Text className="text-white font-bold text-xl">Créér</Text>
                 </Button>
 
             </Animated.ScrollView>

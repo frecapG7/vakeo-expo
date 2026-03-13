@@ -128,14 +128,14 @@ export const EventForm = ({ control, }: {
     }, [startDate, endDate, pickDateTime])
 
     return (
-        <View>
+        <View className="mx-1">
             <View className="flex">
                 <Text className="text-lg font-bold  italic ml-5 dark:text-white">
                     Nom
                 </Text>
                 <FormText control={control} name="name" rules={{ required: true }} />
             </View>
-            <View className="my-2">
+            {/* <View className="my-2">
                 <Text className="text-lg font-bold italic ml-5 dark:text-white">
                     Dates
                 </Text>
@@ -154,7 +154,7 @@ export const EventForm = ({ control, }: {
                         <Text>{endDate ? getTime(endDate) : "-"}</Text>
                     </Pressable>
                 </View>
-            </View>
+            </View> */}
 
 
             <View className="flex-1 mt-1 gap-2">
@@ -164,35 +164,27 @@ export const EventForm = ({ control, }: {
                     </Text>
 
                 </View>
-                <View className="flex gap-5 bg-gray-200 rounded-lg py-2 ">
+                <View className="flex gap-2 bg-white dark:bg-gray-200 rounded-lg py-2 ">
                     {owners?.map((owner, index) => (
-                        <View key={owner._id} className="flex flex-row items-center justify-between px-5" >
+                        <View key={owner._id} 
+                            className={`flex flex-row items-center justify-between px-5`} >
                             <View className="flex-row gap-2 items-center">
                                 <Avatar src={owner.avatar} alt={owner.name.charAt(0)} size2="sm" />
                                 <Text className="text-lg font-bold">{owner.name}</Text>
                             </View>
                             <Button onPress={() => remove(index)} className="bg-red-500 dark:bg-gray-700 rounded-full p-1">
-                                <IconSymbol name="trash" size={20} color="black" />
+                                <IconSymbol name="trash" size={20} color="white" />
                             </Button>
                         </View>
                     ))}
-                    <Button className="p-2" onPress={() => setEditOwners(true)}>
-                        <Text className="font-bold text-xl text-blue-500">Ajouter un responsable</Text>
+                    <Button className="p-1" onPress={() => setEditOwners(true)}>
+                        <Text className="font-bold text-md text-blue-500">Ajouter un responsable</Text>
                     </Button>
 
                 </View>
             </View>
 
-            <View className="my-5">
-                <Text className="text-lg capitalize font-bold italic ml-5 dark:text-white">
-                    Détails
-                </Text>
-                <FormTextArea control={control}
-                    name="details"
-                    rules={{
-                        maxLength: 255
-                    }} />
-            </View>
+         
 
             <View className="flex-1 mt-5 ">
                 <View className="flex flex-row justify-between" >
@@ -207,12 +199,11 @@ export const EventForm = ({ control, }: {
                         <Text className="underline text-blue-400 font-bold">Sélectionner tous</Text>
                     </Button>
                 </View>
-                <View className="flex gap-5 bg-gray-200 rounded-lg py-2">
+                <View className="flex gap-2 bg-white dark:bg-gray-200 rounded-xl py-2">
                     {attendees?.map((attendee, index) => (
                         <Pressable key={attendee._id}
                             className="flex flex-row items-center justify-between px-5"
                             onPressOut={() => {
-                                debugger
                                 update(index, {
                                 ...attendee,
                                 checked: !attendee.checked
@@ -234,6 +225,17 @@ export const EventForm = ({ control, }: {
                     ))}
 
                 </View>
+            </View>
+
+               <View className="my-5">
+                <Text className="text-lg capitalize font-bold italic ml-5 dark:text-white">
+                    Détails
+                </Text>
+                <FormTextArea control={control}
+                    name="details"
+                    rules={{
+                        maxLength: 255
+                    }} />
             </View>
 
 

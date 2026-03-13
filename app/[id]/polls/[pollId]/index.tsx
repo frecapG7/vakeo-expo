@@ -10,30 +10,16 @@ import { TripContext } from "@/context/TripContext";
 import { useGetPoll, useUnvotePoll, useVotePoll } from "@/hooks/api/usePolls";
 import useI18nNumbers from "@/hooks/i18n/useI18nNumbers";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
+import dayjs from "@/lib/dayjs-config";
 import { useLocalSearchParams } from "expo-router";
 import { useContext, useState } from "react";
 import { Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 
 
-const getColorForPercent = (percent) => {
-    // Couleurs de départ et d'arrivée (orange clair → orange foncé)
-    const startColor = { r: 254, g: 215, b: 170 }; // #FED7AA
-    const endColor = { r: 234, g: 88, b: 12 };    // #EA580C
-
-    // Interpolation linéaire pour chaque composante RGB
-    const r = Math.round(startColor.r + (endColor.r - startColor.r) * (percent / 100));
-    const g = Math.round(startColor.g + (endColor.g - startColor.g) * (percent / 100));
-    const b = Math.round(startColor.b + (endColor.b - startColor.b) * (percent / 100));
-
-    return `rgb(${r}, ${g}, ${b})`;
-}
-
 
 
 export default function PollDetailsPage() {
-
-
     const { id, pollId } = useLocalSearchParams();
 
 
@@ -43,9 +29,9 @@ export default function PollDetailsPage() {
     const votePoll = useVotePoll(id, pollId);
     const unvotePoll = useUnvotePoll(id, pollId);
 
-    const { formatDuration } = useI18nTime();
+    const { formatDuration, formatRange } = useI18nTime();
 
-    const {formatPercent} = useI18nNumbers();
+    const { formatPercent } = useI18nNumbers();
 
     const [selectedOption, setSelectedOption] = useState(null);
 
@@ -76,9 +62,9 @@ export default function PollDetailsPage() {
                     </View>
                 </View>
                 <View className="gap-5 my-5">
-                    <Skeleton height={40}/>
-                    <Skeleton height={40}/>
-                    <Skeleton height={40}/>
+                    <Skeleton height={40} />
+                    <Skeleton height={40} />
+                    <Skeleton height={40} />
 
                 </View>
 
@@ -122,11 +108,10 @@ export default function PollDetailsPage() {
                             user={me}
                             onVote={(option) => handleClick(option, false)}
                             onUnVote={(option) => handleClick(option, true)}
-                            onSelected={(option) => setSelectedOption(option) } />
+                            onSelected={(option) => setSelectedOption(option)} />
                     </View>
                 }
                 {poll?.type !== "HousingPoll" &&
-
                     <View className="gap-5 mb-5">
                         {poll?.options?.map((option) => {
                             const includeMe = option?.selectedBy?.map(u => u._id).includes(me?._id);
@@ -137,12 +122,15 @@ export default function PollDetailsPage() {
                                     key={option?._id}
                                     onPress={() => handleClick(option, includeMe)}
                                     onLongPress={() => setSelectedOption(option)}
-                                    >
-                                <PollOption label={option.value} 
-                                    selectedBy={option.selectedBy}
-                                    percent={option.percent}
-                                    isAnonymous={poll.isAnonymous}
-                                    includeUser={includeMe}
+                                >
+                                    <PollOption
+                                        label={poll?.type === "DatesPoll" ? 
+                                            formatRange(dayjs(option.startDate), dayjs(option.endDate)) :
+                                             option.value}
+                                        selectedBy={option.selectedBy}
+                                        percent={option.percent}
+                                        isAnonymous={poll.isAnonymous}
+                                        includeUser={includeMe}
                                     />
                                 </Button>
                             );
@@ -177,6 +165,14 @@ export default function PollDetailsPage() {
                     </View>
                 </View>
             </View>
+
+            {/* <View className="mb-20 px-5">
+                <Pressable
+                    className="rounded-full bg-blue-400 py-4 flex items-center">
+                    <Text className="text-white font-bold">Modifier</Text>
+                </Pressable>
+            </View> */}
+
 
 
             <PickUsersModal open={!!selectedOption && !poll.isAnonymous}

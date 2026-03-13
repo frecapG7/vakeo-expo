@@ -57,7 +57,7 @@ export default function PollsPage() {
                                     pollId: item._id
                                 }
                             })}
-                            className={`rounded-xl shadow-lg dark:shadow-gray-200 bg-white dark:bg-gray-900  p-3 ${!containUser ? "border-l-4 border-orange-400" : ""}`}>
+                            className={`rounded-xl bg-white dark:bg-gray-900  p-3 ${!containUser ? "border-l-4 border-orange-400" : ""}`}>
                             <View className="flex-row items-center justify-between">
 
 
@@ -130,7 +130,7 @@ export default function PollsPage() {
                     )
 
                 }}
-                ItemSeparatorComponent={() => <View className="my-5" />}
+                ItemSeparatorComponent={() => <View className="my-2" />}
             />
             <Pressable className="absolute bottom-20 right-6 w-20 h-20 rounded-full border border-white bg-blue-400 items-center justify-center shadow"
                 onPress={() => router.push({

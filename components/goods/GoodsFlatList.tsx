@@ -18,7 +18,7 @@ export const GoodsFlatList = (
             refreshing={isRefreshing}
             className="flex-1"
             renderItem={({ item }) =>
-                <View className={`flex-row  items-center  ${item.checked ? "opacity-50" : ""}`}>
+                <View className={`flex-row  items-center rounded-xl py-2 ${item.checked ? "opacity-50" : ""}`}>
                     <Button className="px-5"
                         onPress={() => onCheck(item)}
                         disabled={disabled}>
@@ -29,7 +29,7 @@ export const GoodsFlatList = (
                     <Pressable
                         onPress={() => onClick(item)}
                         disabled={item?.checked}
-                        className="flex-1 border-b border-orange-200">
+                        className="flex-1 border-b border-orange-200 dark:border-gray-200">
                         <Text className={`dark:text-white capitalize  ${item.checked && "line-through"}`}>
                             <Text className="text-2xl">
 
@@ -66,9 +66,9 @@ export const GoodsFlatList = (
                     :
                     <View className="flex-1 items-center justify-center gap-2 mt-5">
                         <IconSymbol name="cart" size={45} color="gray" />
-                        <Text className="text-2xl dark:text-white">Votre liste est vide</Text>
+                        <Text className="text-2xl dark:text-white">Votre panier est vide</Text>
                         <Text className="text-lg dark:text-white mt-5">
-                            Commencez à ajouter des éléments à votre liste
+                            Commencez à ajouter des éléments à votre panier
                         </Text>
                     </View>
             }

@@ -7,7 +7,7 @@ export default function GoodsLayout() {
 
     return (
         <Stack screenOptions={{
-            title: "Courses",
+            title: "Panier",
             headerShadowVisible: false
         }}>
             <Stack.Screen name="index" options={{

@@ -2,7 +2,10 @@
 import dayjs from "dayjs";
 import 'dayjs/locale/fr';
 import relativeTime from "dayjs/plugin/relativeTime";
+import timeZone from "dayjs/plugin/timezone";
 dayjs.extend(relativeTime);
+dayjs.extend(timeZone);
+dayjs.tz.setDefault("Etc/GMT")
 // dayjs.locale("fr-FR")
 
 const formatDate = (
@@ -162,3 +165,4 @@ export default () => {
     formatDuration
   };
 };
+

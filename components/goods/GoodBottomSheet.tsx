@@ -67,13 +67,13 @@ export const GoodBottomSheet = ({ open, good, trip, onClose }: { open: boolean, 
             reset(good);
 
         }
-        Toast.success(data._id ? "Course modifiée" : "Course ajoutée");
+        Toast.success("Panier modifié");
 
     }
     const onDelete = async (data: Good) => {
         await deleteGood.mutateAsync(data);
         bottomSheetRef.current?.close();
-        Toast.success("Course supprimée");
+        Toast.success("Panier modifié");
     }
 
     useEffect(() => {
@@ -109,12 +109,12 @@ export const GoodBottomSheet = ({ open, good, trip, onClose }: { open: boolean, 
                         <View className="rounded-full">
                             <IconSymbol name="xmark.circle" color={colors?.text} />
                         </View>
-                        <Text className="text-2xl font-bold dark:text-white">{good?._id ? 'Modifier course' : 'Nouvel course'}</Text>
+                        <Text className="text-2xl font-bold dark:text-white">{good?._id ? 'Modifier' : 'Nouveau'}</Text>
                     </Pressable>
                     {!!good?._id &&
                         <Animated.View entering={FadeIn}>
                             <Button className="rounded-full border border-red-200 bg-white p-1 justify-center"
-                                onPress={() => Alert.alert("Voulez vous supprimer cette course ?",
+                                onPress={() => Alert.alert("Retirer du panier ?",
                                     "", [
                                     {
                                         text: "Annuler",
@@ -152,13 +152,12 @@ export const GoodBottomSheet = ({ open, good, trip, onClose }: { open: boolean, 
                                     onChangeText={(v) => {
                                         setName(v);
                                     }}
-                                    className="flex-grow placeholder-black"
+                                    className="flex-grow placeholder-black min-h-10"
                                     placeholderTextColor="#0000"
-                                    style={styles.textInput}
                                     ref={valueTextInputRef}
                                 />
                                 {value !== "" &&
-                                    <Animated.View entering={FadeIn} >
+                                    <Animated.View entering={FadeIn} className="" >
                                         <Button onPress={() => setName("")}>
                                             <IconSymbol name="xmark.circle" color="black" />
                                         </Button>

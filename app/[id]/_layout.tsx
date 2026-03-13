@@ -49,8 +49,8 @@ export default function TripDetailsLayout() {
 
                 <Stack.Screen name="dates"
                     options={{
-                        presentation: "modal",
-                        title: "Dates du séjour"
+                        title: "Dates du séjour",
+                        headerBackground:() => trip && <BackgroundHeader trip={trip} />
                     }} />
                 <Stack.Screen name="votes"
                     options={{
