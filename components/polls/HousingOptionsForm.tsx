@@ -43,7 +43,7 @@ export const HousingOptionsForm = ({ control }: { control: any }) => {
             <View className="flex-row bg-white rounded-xl items-center justify-between border border-gray-200 focus:border-blue-500 px-1 py-2">
                 <View className="flex-row items-center">
                     <IconSymbol name="link" color="gray" />
-                    <TextInput placeholder="Coller un lein Airbnb"
+                    <TextInput placeholder="Colle un lien Airbnb, Abritel, Booking..."
                         value={input}
                         onChangeText={(v) => setInput(v)}
                         maxLength={38}

@@ -10,10 +10,13 @@ import { TripContext } from "@/context/TripContext";
 import { useGetPoll, useUnvotePoll, useVotePoll } from "@/hooks/api/usePolls";
 import useI18nNumbers from "@/hooks/i18n/useI18nNumbers";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
+import dayjs from "@/lib/dayjs-config";
 import { useLocalSearchParams } from "expo-router";
 import { useContext, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import Animated from "react-native-reanimated";
+
+
 
 
 export default function PollDetailsPage() {
@@ -26,7 +29,7 @@ export default function PollDetailsPage() {
     const votePoll = useVotePoll(id, pollId);
     const unvotePoll = useUnvotePoll(id, pollId);
 
-    const { formatDuration } = useI18nTime();
+    const { formatDuration, formatRange } = useI18nTime();
 
     const { formatPercent } = useI18nNumbers();
 
@@ -109,7 +112,6 @@ export default function PollDetailsPage() {
                     </View>
                 }
                 {poll?.type !== "HousingPoll" &&
-
                     <View className="gap-5 mb-5">
                         {poll?.options?.map((option) => {
                             const includeMe = option?.selectedBy?.map(u => u._id).includes(me?._id);
@@ -121,7 +123,10 @@ export default function PollDetailsPage() {
                                     onPress={() => handleClick(option, includeMe)}
                                     onLongPress={() => setSelectedOption(option)}
                                 >
-                                    <PollOption label={option.value}
+                                    <PollOption
+                                        label={poll?.type === "DatesPoll" ? 
+                                            formatRange(dayjs(option.startDate), dayjs(option.endDate)) :
+                                             option.value}
                                         selectedBy={option.selectedBy}
                                         percent={option.percent}
                                         isAnonymous={poll.isAnonymous}
@@ -161,12 +166,12 @@ export default function PollDetailsPage() {
                 </View>
             </View>
 
-            <View className="mb-20 px-5">
+            {/* <View className="mb-20 px-5">
                 <Pressable
                     className="rounded-full bg-blue-400 py-4 flex items-center">
                     <Text className="text-white font-bold">Modifier</Text>
                 </Pressable>
-            </View>
+            </View> */}
 
 
 

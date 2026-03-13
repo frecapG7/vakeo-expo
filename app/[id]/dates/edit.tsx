@@ -36,6 +36,7 @@ LocaleConfig.locales['fr'] = {
 LocaleConfig.defaultLocale = 'fr';
 
 
+// deprecated
 export default function EditTripDatePage() {
 
 

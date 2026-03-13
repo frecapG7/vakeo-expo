@@ -36,7 +36,7 @@ export const PollOption = ({ label, selectedBy, percent, isAnonymous, includeUse
                     <View className={`rounded-full w-10 h-10 border-2 items-center justify-center border-white ${includeUser ? "bg-orange-600" : "bg-orange-100"}`} >
                         {includeUser && <IconSymbol name="checkmark" size={24} />}
                     </View>
-                    <Text className="text-lg">{label}</Text>
+                    <Text className="text-md capitalize max-w-40" numberOfLines={3}>{label}</Text>
                 </View>
                 <View className="flex-row items-center gap-1">
                     {!isAnonymous &&

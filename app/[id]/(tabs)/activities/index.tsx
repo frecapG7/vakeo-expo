@@ -149,7 +149,7 @@ export default function TripActivities() {
                             horizontal
                             showsHorizontalScrollIndicator={false}
                             className="flex-row my-2"
-                            contentContainerClassName="gap-5 flex-1">
+                            contentContainerClassName="gap-5">
                             {typeFilters.map(item => (
                                 <Pressable
                                     key={item.value}

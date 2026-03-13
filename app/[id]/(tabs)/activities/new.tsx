@@ -96,8 +96,8 @@ export default function NewTripActivity() {
                     <Button className="flex-row  bg-blue-600 items-center justify-center rounded-full p-4 my-5"
                         onPress={handleSubmit(onSubmit)}
                         isLoading={isPending}>
-                        <Text className="text-white font-bold text-xl">Ajouter</Text>
                         <IconSymbol name="plus" color="white" />
+                        <Text className="text-white font-bold text-xl">Ajouter</Text>
                     </Button>
                 </Animated.View>
             }

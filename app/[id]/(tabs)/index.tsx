@@ -9,6 +9,8 @@ import { useGetPolls } from "@/hooks/api/usePolls";
 import { useGetDashboard, useGetTrip, useShareTrip } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import useColors from "@/hooks/styles/useColors";
+import dayjs from "@/lib/dayjs-config";
+import { countDaysBetween } from "@/lib/utils";
 import { Trip } from "@/types/models";
 import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from "@gorhom/bottom-sheet";
 import * as Clipboard from 'expo-clipboard';
@@ -162,32 +164,40 @@ export default function ItemDetails() {
                                 maxLength={5}
                                 size2="sm"
                                 avatars={trip?.users?.filter(u => u._id !== me?._id).map(u => ({
-                                    avatar: u.avatar,
-                                    alt: u?.name.charAt(0)
+                                    avatar: u?.avatar,
+                                    alt: u?.name?.charAt(0)
                                 })
                                 )}
                             />
-                            <Text numberOfLines={1} className="max-w-25 dark:text-white">Avec {trip?.users
-                                ?.filter(u => u._id !== me?._id)
-                                .map(u => u.name)
-                                .join(",")}
+                            <Text numberOfLines={1} className="max-w-25 dark:text-white">
+                                Avec {trip?.users
+                                    ?.filter(u => u._id !== me?._id)
+                                    .map(u => u.name)
+                                    .join(",")}
                             </Text>
                         </View>
                     </View>
                     <View className="flex my-5 gap-2">
-                        <Button className="flex-row items-end border-b gap-2 border-gray-400 p-1" onPress={() => router.push({
+                        <Button className="flex-row items-center gap-2 rounded-xl border-gray-400 p-1" onPress={() => router.push({
                             pathname: "/[id]/dates",
                             params: {
                                 id: String(id)
                             }
                         })}>
-                            <IconSymbol name="calendar" size={32} color="gray" />
+                            <View className="rounded-xl bg-blue-100 p-1">
+                                <IconSymbol name="calendar" size={32} color="blue" />
+                            </View>
                             {trip?.startDate ?
-                                <Text className="capitalize text-md text-gray-400" numberOfLines={2} >
+                            <View>
+                                <Text className="capitalize text-md dark:text-white font-bold" numberOfLines={2} >
                                     {formatRange(trip?.startDate, trip?.endDate)}
                                 </Text>
+                                <Text className="text-sm text-gray-600 dark:text-gray-200">
+                                    {countDaysBetween(dayjs(trip?.startDate), dayjs(trip?.endDate))} jours
+                                </Text>
+                            </View>
                                 :
-                                <Text className="capitalize text-sm text-gray-400">
+                                <Text className="capitalize text-md font-bold dark:text-white">
                                     Saisir des dates
                                 </Text>
                             }

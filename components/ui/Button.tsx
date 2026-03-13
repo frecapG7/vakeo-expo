@@ -8,7 +8,7 @@ type ButtonVariant = 'none' | 'contained' | 'outlined';
 
 const variantToClassMap = {
     'none': '',
-    'contained': 'bg-blue-600 rounded-xl',
+    'contained': 'bg-blue-400 dark:bg-blue-600 rounded-full',
     'outlined': 'border border-blue-200 rounded-lg'
 }
 
@@ -25,7 +25,7 @@ const ButtonTitle = ({ title, isLoading }: { title: string, isLoading: boolean }
 
     return (
         <Animated.View entering={FadeIn} exiting={FadeOut} className="p-4 w-full">
-            <Text className="text-sm font-bold text-center dark:text-white" >{title}</Text>
+            <Text className="text-md font-bold text-center text-white" >{title}</Text>
         </Animated.View>
     );
 

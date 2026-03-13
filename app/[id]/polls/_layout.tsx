@@ -19,7 +19,6 @@ export default function PollsLayout() {
 
             <Stack.Screen name="new"
                 options={{
-                    presentation: "modal",
                     title: "Nouveau sondage",
                     headerBackTitle: "Annuler",
                 }} />

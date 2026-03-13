@@ -77,7 +77,7 @@ export default function ItemDetailsLayout() {
                     },
                     tabBarIcon: ({ color, size }) => <IconSymbol name="cart" size={size} color={color} />,
                     headerShown: true,
-                    title: "Liste",
+                    title: "Panier",
                 }} />
 
             <Tabs.Screen name="messages"
