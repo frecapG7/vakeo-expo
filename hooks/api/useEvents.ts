@@ -28,7 +28,7 @@ export const useGetEvents = (tripId: string, params?: any, options?: any) => {
         queryKey: ["trips", tripId, "events", params],
         queryFn: ({ pageParam }) => search(tripId, {
             cursor: String(pageParam),
-            limit: 25,
+            limit: params?.limit || 25,
             ...params
         }),
         initialPageParam: "",

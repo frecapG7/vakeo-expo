@@ -1,75 +1,116 @@
+import { EventIcon } from "@/components/events/EventIcon";
 import { Avatar, AvatarsGroup } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { LinearProgress } from "@/components/ui/LinearProgress";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { default as styles } from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
+import { useGetEvents } from "@/hooks/api/useEvents";
 import { useGetPolls } from "@/hooks/api/usePolls";
 import { useGetDashboard, useGetTrip, useShareTrip } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import useColors from "@/hooks/styles/useColors";
 import dayjs from "@/lib/dayjs-config";
 import { countDaysBetween } from "@/lib/utils";
-import { Trip } from "@/types/models";
+import { Poll, Trip, TripUser } from "@/types/models";
 import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from "@gorhom/bottom-sheet";
 import * as Clipboard from 'expo-clipboard';
 import { ImageBackground } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useContext, useRef } from "react";
+import { useContext, useMemo, useRef } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
 
-const PollsWidget = ({ trip }: { trip: Trip }) => {
 
-    const { data: page } = useGetPolls(trip._id);
+const EventsWidget = ({ trip, user, onClick, onNewClick }: { trip: Trip, user: TripUser, onClick: (event: Event) => void, onNewClick: () => void }) => {
+
+
+    const { data: eventsPage } = useGetEvents(trip._id, { limit: 3 });
+    const events = useMemo(() => eventsPage?.pages.flatMap((page) => page?.events), [eventsPage?.pages]);
 
     return (
-        <View className="gap-2">
-            {page?.polls.slice(0, 2).map((poll) =>
-                <View key={poll._id} className="pb-2 border-b border-gray-200">
-                    <Text className="dark:text-white text-lg">
-                        {poll.question}
+        <Animated.ScrollView horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerClassName="gap-5 justify-evenly">
+            {events?.map((event) => (
+                <Pressable
+                    key={event._id}
+                    onPress={() => onClick(event)}
+                    className="bg-white dark:bg-gray-900 rounded-xl p-4  flex items-center">
+                    <EventIcon name={event.type} size="md" />
+                    <Text className="dark:text-white font-bold text-sm max-w-40" numberOfLines={2}>
+                        {event.name}
                     </Text>
+                </Pressable>
+            ))}
+            <Pressable
+                className="bg-blue-400 rounded-xl p-4 w-100 h-100 items-center"
+                onPress={onNewClick}>
+                <IconSymbol name="plus" color="white" />
+                <Text className="dark:text-white text-sm">
+                    Ajouter
+                </Text>
 
-                    <View>
-                        {poll.options.slice(0, 3).map((option) =>
-                            <View className="gap-1 justify-start mt-2" key={option._id}>
-                                <View className="flex-row items-center justify-between ">
-                                    <Text className="dark:text-white text-xs max-w-[80%]" numberOfLines={3}>
-                                        {option?.title || option?.value}
-                                    </Text>
-                                    <Text className="font-bold text-orange-400">
-                                        {Number(option.percent).toFixed()} %
-                                    </Text>
-                                </View>
-                                <LinearProgress progress={option.percent / 100} />
-                                <View className="flex-row items-center gap-5">
-                                    {poll.isAnonymous ?
-                                        <Text className="text-gray-400">
-                                            {option.selectedBy?.length} votes
-                                        </Text>
-                                        :
-                                        <AvatarsGroup
-                                            avatars={option.selectedBy?.map(u => ({
-                                                avatar: u?.avatar,
-                                                alt: u?.name?.charAt(0)
-                                            }))}
-                                            size2="xs"
-                                            maxLength={5}
-                                        />
-                                    }
-                                </View>
-                            </View>
-                        )}
+            </Pressable>
+        </Animated.ScrollView>
+    )
+}
+
+const PollsWidget = ({ trip, user, onClick }: { trip: Trip, user: TripUser, onClick: (poll: Poll) => void }) => {
+
+    const { data: page } = useGetPolls(trip._id, {
+        excludeClosed: true,
+        excludeSelectedBy: user?._id
+    });
+
+    const now = dayjs();
+    return (
+        <View className="gap-2">
+            {page?.polls?.map((poll) => (
+                <Pressable
+                    key={poll._id}
+                    onPress={() => onClick(poll)}
+                    className="rounded-xl bg-white dark:bg-gray-900 p-2 gap-2 border-l-4 border-orange-400">
+                    <View className="flex-row border-b border-gray-400 justify-between items-center">
+                        <View className="flex-row fap-2 items-center">
+                            <IconSymbol name="chart.bar.fill" color="orange" />
+                            <Text className="font-bold text-lg dark:text-white">
+                                {poll?.question}
+                            </Text>
+
+                        </View>
+                        <View className="flex-row gap-1 items-center" >
+                            {/* <Text className="rounded-full border-orange-400 border bg-orange-200 p-2 text-orange-600 font-bold text-sm"> */}
+                            <Text className="text-orange-300 font-bold text-sm">
+                                {countDaysBetween(dayjs(poll?.createdAt), now)}j
+                            </Text>
+                            <IconSymbol name="exclamationmark.circle.fill" color="orange" />
+                        </View>
+
                     </View>
-                </View>
-            )}
+                    <View className="flex-row justify-between items-center" >
+                        <View className="flex-row items-center gap-2">
+                            <Avatar src={poll.createdBy?.avatar}
+                                alt={poll.createdBy?.name?.charAt(0)}
+                                size2="xs"
+                            />
+                            <Text className="dark:text-white">
+                                {poll.createdBy?.name}
+                            </Text>
+                        </View>
+                        <View className="flex-row items-center gap-5">
+                            <View className="flex-row items-center">
+                                <IconSymbol name="person.2.fill" color="gray" />
+                                <Text className="text-gray-400">
+                                    {poll.hasSelected.length}
+                                </Text>
+                            </View>
 
-            <Text className="dark:text-white text-center">
-                Voir tout
-            </Text>
+                        </View>
+                    </View>
+                </Pressable>
+            ))}
         </View>
 
     )
@@ -81,6 +122,7 @@ export default function ItemDetails() {
     const { data: trip } = useGetTrip(String(id));
     const { me } = useContext(TripContext);
     const { data: dashboard } = useGetDashboard(id, me?._id);
+
     const shareTrip = useShareTrip(String(id));
 
     const router = useRouter();
@@ -98,12 +140,11 @@ export default function ItemDetails() {
         bottomSheetModalRef.current?.close();
     }
 
-    if (!trip || !router)
+    if (!trip)
         return (
             <Animated.ScrollView style={styles.container}>
                 <View className="h-80 bg-gray-600">
                 </View>
-
                 <View className="shadow mx-4 -mt-10 bg-yellow-50 dark:bg-gray-400 rounded-lg p-2 pb-10">
                     <View className="flex w-40">
                         <Skeleton height={20} />
@@ -137,12 +178,15 @@ export default function ItemDetails() {
 
                                     <Pressable className="items-center"
                                         onPressOut={() => router.push({
-                                            pathname: "/[id]/(tabs)/settings",
+                                            pathname: "/[id]/(tabs)/messages",
                                             params: {
                                                 id: String(id)
                                             }
                                         })}>
-                                        <Avatar src={me?.avatar} alt={me?.name?.charAt(0)} size2="md" />
+                                        <Avatar src={me?.avatar}
+                                         alt={me?.name?.charAt(0)} 
+                                         size2="md"
+                                         badgeContent={0} />
                                         <Text className="text-white font-bold">{me?.name}</Text>
                                     </Pressable>
                                     <Pressable onPressOut={() => bottomSheetModalRef.current?.present()}
@@ -156,7 +200,7 @@ export default function ItemDetails() {
                 </View>
 
 
-                <View className="shadow mx-4 -mt-10 mb-5 p-2 rounded-lg bg-white dark:bg-gray-900 flex" >
+                <View className="shadow mx-4 -mt-10 mb-5 p-2 rounded-xl bg-white dark:bg-gray-900 flex" >
                     <View className="px-5 gap-2">
                         <Text className="text-4xl font-bold dark:text-white" numberOfLines={2}>{trip?.name}</Text>
                         <View className="flex gap-1 items-start justify-start">
@@ -177,104 +221,101 @@ export default function ItemDetails() {
                             </Text>
                         </View>
                     </View>
-                    <View className="flex my-5 gap-2">
-                        <Button className="flex-row items-center gap-2 rounded-xl border-gray-400 p-1" onPress={() => router.push({
+                    <View className="flex my-5 gap-5">
+                        <Pressable className="flex-row items-center gap-2" onPress={() => router.push({
                             pathname: "/[id]/dates",
                             params: {
                                 id: String(id)
                             }
                         })}>
                             <View className="rounded-xl bg-blue-100 p-1">
-                                <IconSymbol name="calendar" size={32} color="blue" />
+                                <IconSymbol name="calendar" size={32} color="orange" />
                             </View>
                             {trip?.startDate ?
-                            <View>
-                                <Text className="capitalize text-md dark:text-white font-bold" numberOfLines={2} >
-                                    {formatRange(trip?.startDate, trip?.endDate)}
-                                </Text>
-                                <Text className="text-sm text-gray-600 dark:text-gray-200">
-                                    {countDaysBetween(dayjs(trip?.startDate), dayjs(trip?.endDate))} jours
-                                </Text>
-                            </View>
+                                <View>
+                                    <Text className="capitalize text-md dark:text-white font-bold" numberOfLines={2} >
+                                        {formatRange(trip?.startDate, trip?.endDate)}
+                                    </Text>
+                                    <Text className="text-sm text-gray-600 dark:text-gray-200">
+                                        {countDaysBetween(dayjs(trip?.startDate), dayjs(trip?.endDate))} jours
+                                    </Text>
+                                </View>
                                 :
                                 <Text className="capitalize text-md font-bold dark:text-white">
                                     Saisir des dates
                                 </Text>
                             }
-                        </Button>
-                        {/* <Button className="flex-row items-end border-b border-gray-400 p-1" onPress={() => console.log("todo")}>
-                        <IconSymbol name="map" size={32} color="gray" />
-                        <Text className="text-sm text-gray-400" numberOfLines={2} >
-                            Saisir un lieu
-                        </Text>
-                    </Button> */}
-                    </View>
-
-                    <View>
-                        <Text className="dark:text-white text-lg font-bold">
-                            Lieu
-                        </Text>
-                        <View className="flex-row gap-2 items -end">
-                            <Text className="dark:text-white">
-                                Ajouter un lieu
-                            </Text>
-                            <View className="bg-blue-400 rounded-full">
-                                <IconSymbol name="plus" color="black" />
+                        </Pressable>
+                        <Pressable className="flex-row items-center gap-2" onPress={() =>
+                            router.push({
+                                pathname: "/[id]/location",
+                                params: {
+                                    id: String(id)
+                                }
+                            })
+                        }>
+                            <View className="rounded-xl bg-blue-100 p-1">
+                                <IconSymbol name="map" size={32} color="orange" />
                             </View>
-                        </View>
+                            <Text className="font-bold dark:text-white max-w-[80%]" numberOfLines={3}>
+                                {trip?.location?.displayName || "Ajouter un lieu"}
+                            </Text>
+                        </Pressable>
                     </View>
                 </View>
-
-
-
-                <View className="m-5">
+                {dashboard?.polls.pending > 0 &&
+                    <View className="mx-5 my-2">
+                        <View className="flex-row justify-between items-center">
+                            <Text className="font-bold text-2xl dark:text-white">
+                                Sondages
+                            </Text>
+                        </View>
+                        <PollsWidget
+                            trip={trip}
+                            user={me}
+                            onClick={(poll) => router.navigate({
+                                pathname: "/[id]/polls/[pollId]",
+                                params: {
+                                    id: String(id),
+                                    pollId: poll._id
+                                }
+                            })} />
+                    </View>
+                }
+                {/* <View className="m-5 mt-2 gap-1">
                     <View className="flex-row justify-between items-center">
                         <Text className="font-bold text-2xl dark:text-white">
-                            Sondages
+                            Planning
                         </Text>
-                        {dashboard?.polls?.pending > 0 &&
-                            <Animated.View className="rounded-full bg-orange-200 px-2 shadow">
-                                <Text className="text-orange-600 font-bold">
-                                    {dashboard?.polls?.pending} Actif
-                                </Text>
-
-                            </Animated.View>
-                        }
+                        <Pressable onPress={() => router.navigate({
+                            pathname: "/[id]/(tabs)/activities",
+                            params: {
+                                id: String(id)
+                            }
+                        })}>
+                            <Text className="text-orange-400 rounded-full bg-orange-200 p-1 border border-orange-400">
+                                Voir tout
+                            </Text>
+                        </Pressable>
                     </View>
+                    <EventsWidget trip={trip}
+                        user={me}
+                        onClick={(event) => router.navigate({
+                            pathname: "/[id]/(tabs)/activities/[activityId]",
+                            params: {
+                                id: String(id),
+                                activityId: event._id
+                            }
+                        })}
+                        onNewClick={() => router.navigate({
+                            pathname: "/[id]/(tabs)/activities/new",
+                            params: {
+                                id: String(id),
+                            }
+                        })}
+                    />
 
-                    <View
-                        className="p-2 py-4 rounded-xl bg-stone-50 dark:bg-gray-900 shadow">
-                        {dashboard?.polls.pending > 0 ?
-                            <Pressable onPress={() => router.push({
-                                pathname: "/[id]/polls",
-                                params: {
-                                    id: String(id)
-                                }
-                            })}>
-                                <PollsWidget trip={trip} />
-                            </Pressable>
-                            :
-                            <Pressable onPress={() => router.push({
-                                pathname: "/[id]/polls/new",
-                                params: {
-                                    id: String(id)
-                                }
-                            })}
-                                className="flex-row gap-2 items-end">
-
-                                <Text className="text-lg dark:text-white">
-                                    Démarrer un sondage
-                                </Text>
-                                <View className="bg-blue-400 rounded-full p-1" >
-                                    <IconSymbol name="tray" color="white" />
-
-                                </View>
-                            </Pressable>
-                        }
-
-
-                    </View>
-                </View>
+                </View> */}
 
                 <View className="m-5 mt-2 gap-2">
                     <Text className="text-xl font-bold dark:text-white">
@@ -294,8 +335,6 @@ export default function ItemDetails() {
                         </View>
                         <IconSymbol name="arrow.up.right" color="gray" />
                     </View>
-
-
                 </View>
 
                 <BottomSheetModal
@@ -305,19 +344,20 @@ export default function ItemDetails() {
                     }}>
                     <BottomSheetView style={{ flex: 1, padding: 10, minHeight: 150 }}>
                         <View className="flex flex-grow gap-5 p-1 divide-y-5 divide-solid dark:divide-white">
-                            {/* <Button onPress={() => router.navigate({
-                                pathname: "/[id]/polls",
-                                params: {
-                                    id
-                                }
-                            })}
-                                className="flex flex-row gap-5 items-center">
+                            <Button
+                                className="flex flex-row items-center gap-5"
+                                onPress={() => router.push({
+                                    pathname: "/[id]/goods",
+                                    params: {
+                                        id: String(id)
+                                    }
+                                })}>
                                 <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
-                                    <IconSymbol name="chart.bar.fill" size={30} />
+                                    <IconSymbol name="cart" size={30} />
                                 </View>
-                                <Text className="text-lg dark:text-white">Voir les sondages</Text>
+                                <Text className=" text-lg dark:text-white">Voir la liste de course</Text>
                             </Button>
-                            <View className="w-60% bg-black dark:bg-gray-200 h-0.5" /> */}
+                            <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
 
                             <Button onPress={handleShare} className="flex flex-row gap-5 items-center" isLoading={shareTrip.isPending}>
                                 <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">

@@ -13,8 +13,9 @@ import { useContext, useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function GoodPage() {
+export default function TripGoods() {
 
     const { id } = useLocalSearchParams();
     const { me } = useContext(TripContext);
@@ -48,7 +49,7 @@ export default function GoodPage() {
     });
 
     return (
-        <Animated.View style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1 }}>
             <GestureHandlerRootView style={styles.container}>
                 <Animated.View entering={ZoomIn} exiting={ZoomOut} className="border-b border-orange-400 dark:border-gray-400 pb-1 mb-5">
                     <View className="flex-row items-center my-2">
@@ -84,6 +85,6 @@ export default function GoodPage() {
                     open={!!selectedGood}
                     onClose={() => setSelectedGood(null)} />
             </GestureHandlerRootView>
-        </Animated.View>
+        </SafeAreaView>
     )
 }

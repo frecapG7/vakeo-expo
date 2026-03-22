@@ -44,12 +44,12 @@ export const useSearchTrips = (ids: string[], search: string) => {
   });
 }
 
-const updateTrip = async (tripId: string, data: Trip): Promise<Trip> => {
+const updateTrip = async (tripId: any, data: Trip): Promise<Trip> => {
   const response = await axios.put(`/trips/${tripId}`, data);
   return response.data;
 }
 
-export const useUpdateTrip = (tripId: string) => {
+export const useUpdateTrip = (tripId: any) => {
   const queryClient = useQueryClient();
   return useMutation<Trip, Error, Trip>({
     mutationFn: (data) => updateTrip(tripId, data),

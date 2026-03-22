@@ -1,4 +1,7 @@
-
+export interface Location {
+    coordinates: [Number],
+    displayName: string
+}
 
 
 export interface Trip {
@@ -6,9 +9,9 @@ export interface Trip {
     image: string,
     users: TripUser[],
     name: string,
-
     startDate?: Date | string,
-    endDate?: Date | string
+    endDate?: Date | string,
+    location ?: Location
 }
 
 export interface TripUser {

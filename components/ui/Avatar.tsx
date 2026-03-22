@@ -1,5 +1,7 @@
 import { Image } from "expo-image";
 import { Text, View } from "react-native";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { IconSymbol } from "./IconSymbol";
 
 const blurhash =
     '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
@@ -26,13 +28,15 @@ const sizeToMarginMap = {
 }
 
 
-export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src, ...props }: {
+export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src, badgeContent, badgeIcon, ...props }: {
     name?: string,
     size?: number,
     size2?: ImageSize
     color?: string,
     alt?: string,
     src?: string,
+    badgeContent ?: string | number,
+    badgeIcon?: string
 }) => {
 
 
@@ -48,7 +52,7 @@ export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src, ...prop
 
 
     return (
-        <View className={`justify-center items-center rounded-full ${sizeClass}`} {...props}>
+        <View className={`relative justify-center items-center rounded-full ${sizeClass}`} {...props}>
             <Image source={src}
                 style={{
                     flex: 1,
@@ -60,6 +64,22 @@ export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src, ...prop
                 contentFit="cover"
                 transition={1000}
             />
+            {badgeContent && (
+                <Animated.View 
+                    entering={FadeIn}
+                     exiting={FadeOut}
+                     className="absolute -top-1 -right-1 bg-orange-600 rounded-full w-6 h-6 justify-center items-center">
+                    <Text className="font-bold text-white">{badgeContent}</Text>
+                </Animated.View>
+            )}
+            {badgeIcon && (
+                <Animated.View 
+                    entering={FadeIn}
+                     exiting={FadeOut}
+                     className="absolute -bottom-1 -right-2 bg-blue-400 rounded-full w-6 h-6 justify-center items-center">
+                    <IconSymbol name={badgeIcon} size={10} color="white"/>
+                </Animated.View>
+            )}
         </View>
     )
 }

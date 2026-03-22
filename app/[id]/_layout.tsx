@@ -63,7 +63,20 @@ export default function TripDetailsLayout() {
                         title: "Sondages",
                         headerBackground:() => trip && <BackgroundHeader trip={trip} />
                     }}
-
+                />
+                <Stack.Screen name="location"
+                    options={{
+                        headerShown: true,
+                        title: "Le lieu",
+                        headerBackground:() => trip && <BackgroundHeader trip={trip} />
+                    }}
+                />
+                <Stack.Screen name="goods"
+                    options={{
+                        headerShown: true,
+                        title: "La liste de course",
+                        headerBackground:() => trip && <BackgroundHeader trip={trip} />
+                    }}
                 />
             </Stack>
 
