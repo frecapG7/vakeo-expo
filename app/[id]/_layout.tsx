@@ -65,6 +65,14 @@ export default function TripDetailsLayout() {
                     }}
 
                 />
+                 <Stack.Screen name="cagnotte"
+                    options={{
+                        headerShown: true,
+                        title: "Cagnotte",
+                        headerBackground:() => trip && <BackgroundHeader trip={trip} />
+                    }}
+
+                />
             </Stack>
 
         </TripContext.Provider>

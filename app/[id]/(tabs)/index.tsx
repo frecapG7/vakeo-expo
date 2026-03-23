@@ -270,7 +270,14 @@ export default function ItemDetails() {
                     <Text className="text-xl font-bold dark:text-white">
                         Cagnotte
                     </Text>
-                    <View className="flex-row bg-white dark:bg-gray-900 rounded-lg shadow p-5 justify-between items-center">
+                    <Pressable 
+                    onPress={()=>router.push({
+                        pathname:"/[id]/cagnotte",
+                        params:{
+                            id:String(id)
+                        }
+                    })}
+                    className="flex-row bg-white dark:bg-gray-900 rounded-lg shadow p-5 justify-between items-center">
                         <View className="rounded-full bg-blue-200 items-center p-1">
                             <IconSymbol name="eurosign.circle" color="blue" />
                         </View>
@@ -283,7 +290,7 @@ export default function ItemDetails() {
                             </Text>
                         </View>
                         <IconSymbol name="arrow.up.right" color="gray" />
-                    </View>
+                    </Pressable>
 
 
                 </View>
