@@ -6,8 +6,8 @@ import { IconSymbol } from "../ui/IconSymbol"
 
 const getColorForPercent = (percent: number) => {
     // Couleurs de départ et d'arrivée (orange clair → orange foncé)
-    const startColor = { r: 254, g: 215, b: 170 }; // #FED7AA
-    const endColor = { r: 234, g: 88, b: 12 };    // #EA580C
+    const startColor = { r: 254, g: 215, b: 170 }; // #fcad53
+    const endColor = { r: 234, g: 88, b: 12 };    // #f87833
 
     // Interpolation linéaire pour chaque composante RGB
     const r = Math.round(startColor.r + (endColor.r - startColor.r) * (percent / 100));
@@ -23,7 +23,7 @@ export const PollOption = ({ label, selectedBy, percent, isAnonymous, includeUse
 
     return (
 
-        <View className="flex-1 rounded-full py-2 bg-orange-50 dark:bg-gray-50 border border-orange-200 dark:border-gray-200">
+        <View className="flex-1 rounded-full py-3 bg-orange-50 dark:bg-gray-50 border border-orange-300 dark:border-gray-200">
             <View
                 className="absolute left-0 top-0 bottom-0 rounded-full"
                 style={{

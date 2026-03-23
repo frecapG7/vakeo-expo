@@ -1,18 +1,21 @@
 import axios from "@/lib/axios";
-import { Poll } from "@/types/models";
+import { Poll, PollType } from "@/types/models";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 
 interface IParams {
-    cursor: string,
-    limit: number,
+    cursor?: string,
+    limit?: number,
+    type?: PollType,
+    excludeClosed?: boolean,
+    excludeSelectedBy?: string
 }
 
 interface IPage {
     nextCursor: string,
     prevCursor: string,
     totalResults: number,
-    poll: Poll[]
+    polls: Poll[]
 }
 
 
@@ -34,20 +37,21 @@ export const usePostPoll = (tripId: any) => {
 
 
 
-const getPolls = async (tripId: any) => {
+const getPolls = async (tripId: any, params?: IParams) => {
     const response = await axios.get(`/trips/${tripId}/polls`, {
         params: {
-            limit: 25
+            ...params,
+            limit: params?.limit || 25
         }
     });
     return response.data;
 }
 
-export const useGetPolls = (tripId: any) => {
+export const useGetPolls = (tripId: any, params ?: IParams) => {
 
     return useQuery<IPage, Error>({
-        queryKey: ["trips", tripId, "polls"],
-        queryFn: () => getPolls(tripId)
+        queryKey: ["trips", tripId, "polls", params],
+        queryFn: () => getPolls(tripId, params)
     });
 }
 

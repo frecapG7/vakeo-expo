@@ -12,7 +12,7 @@ export default function ItemDetailsLayout() {
 
     const router = useRouter();
     const { id } = useLocalSearchParams();
-    const {me} = useContext(TripContext);
+    const { me } = useContext(TripContext);
     const { data: trip } = useGetTrip(String(id));
 
     return (
@@ -23,19 +23,19 @@ export default function ItemDetailsLayout() {
             headerRight: () => (
                 <View className="flex flex-row gap-2 justify-end items-center mx-10">
                     <Pressable className="flex-row gap-1 items-center"
-                     onPressOut={() => router.push({
-                        pathname: "/[id]/(tabs)/settings",
-                        params: {
-                            id: String(id)
-                        }
-                     })}>
+                        onPressOut={() => router.push({
+                            pathname: "/[id]/(tabs)/messages",
+                            params: {
+                                id: String(id)
+                            }
+                        })}>
                         <Text className="text-white font-bold text-sm">
                             {me?.name}
                         </Text>
-                        <Avatar src={me?.avatar} alt={me?.name?.charAt(0)} size2="sm"/>
+                        <Avatar src={me?.avatar} alt={me?.name?.charAt(0)} size2="sm" />
                     </Pressable>
 
-                    
+
                 </View>
             ),
         }}>
@@ -54,7 +54,7 @@ export default function ItemDetailsLayout() {
             <Tabs.Screen
                 name="activities"
                 options={{
-                
+
                     href: {
                         pathname: "/[id]/(tabs)/activities",
                         params: {
@@ -67,32 +67,29 @@ export default function ItemDetailsLayout() {
 
                 }}
             />
-            <Tabs.Screen name="goods"
-                options={{
-                    href: {
-                        pathname: "/[id]/(tabs)/goods",
-                        params: {
-                            id: String(id)
-                        }
-                    },
-                    tabBarIcon: ({ color, size }) => <IconSymbol name="cart" size={size} color={color} />,
-                    headerShown: true,
-                    title: "Panier",
-                }} />
-
             <Tabs.Screen name="messages"
                 options={{
-                    href: {
-                        pathname: "/[id]/(tabs)/messages",
-                        params: {
-                            id: String(id)
-                        }
-                    },
+                    href: null,
                     headerShown: true,
-                    title: "Messages",
+                    title: "Messagerie",
                     tabBarIcon: ({ color, size }) => (
                         <IconSymbol name="paperplane.fill" size={size} color={color} />
                     ),
+                    headerRight: () =>
+                        <View className="flex flex-row gap-2 justify-end items-center mx-10">
+                            <Pressable className="flex-row gap-1 items-center"
+                                onPressOut={() => router.navigate({
+                                    pathname: "/[id]/(tabs)/settings",
+                                    params: {
+                                        id: String(id)
+                                    }
+                                })}>
+                                <Text className="text-white font-bold text-sm">
+                                    {me?.name}
+                                </Text>
+                                <Avatar src={me?.avatar} alt={me?.name?.charAt(0)} size2="sm" badgeIcon="pencil" />
+                            </Pressable>
+                        </View>
                 }}
 
             />
@@ -110,7 +107,7 @@ export default function ItemDetailsLayout() {
 
             />
 
-        
+
 
             <Tabs.Screen name="calendar"
                 options={{

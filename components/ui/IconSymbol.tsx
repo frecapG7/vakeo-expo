@@ -36,6 +36,7 @@ const MAPPING = {
   "flame": "local-fire-department",
   "arrow.left": "arrow-back",
   "arrow.up.right" : "arrow-outward",
+  "arrow.up.left" : "subdirectory-arrow-right",
   "cart": "shopping-cart",
   "link": "insert-link",
   "trash": "delete-outline",
@@ -67,7 +68,9 @@ const MAPPING = {
   "eye": "visibility",
   "eye.slash": "visibility-off",
   "bag.fill":"shopping-bag",
-  "tray": "how-to-vote"
+  "tray": "how-to-vote",
+  "exclamationmark.circle.fill": "assignment-late",
+  "gear": "settings"
 } as IconMapping;
 
 /**
