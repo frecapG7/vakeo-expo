@@ -142,9 +142,6 @@ export default function TripLocation() {
                                 Votes pour ton choix d'hébergement préféré
                             </Text>
                         </View>
-                        {/* <Text className="font-bold text-2xl dark:text-white">
-                                            Sondages
-                                        </Text> */}
                         {pagePoll?.polls.map(poll => (
                             <Pressable
                                 key={poll._id}
