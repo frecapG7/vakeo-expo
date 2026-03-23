@@ -69,7 +69,8 @@ const MAPPING = {
   "eye.slash": "visibility-off",
   "bag.fill":"shopping-bag",
   "tray": "how-to-vote",
-  "exclamationmark.circle.fill": "assignment-late"
+  "exclamationmark.circle.fill": "assignment-late",
+  "gear": "settings"
 } as IconMapping;
 
 /**

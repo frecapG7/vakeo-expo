@@ -35,7 +35,7 @@ export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src, badgeCo
     color?: string,
     alt?: string,
     src?: string,
-    badgeContent ?: string | number,
+    badgeContent?: string | number,
     badgeIcon?: string
 }) => {
 
@@ -45,8 +45,28 @@ export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src, badgeCo
 
     if (!src)
         return (
-            <View className={`justify-center items-center rounded-full ${sizeClass} border dark:border-white bg-orange-200 dark:bg-gray-400`}>
-                <Text className="font-bold uppercase ">{alt}</Text>
+            <View className={`relative justify-center items-center rounded-full ${sizeClass} border dark:border-white bg-orange-200 dark:bg-gray-400`}>
+                <Text className="font-bold uppercase ">
+                    {alt}
+                </Text>
+                {!!badgeContent && (
+                    <Animated.View
+                        entering={FadeIn}
+                        exiting={FadeOut}
+                        className="absolute -top-1 -right-1 bg-orange-600 rounded-full w-6 h-6 justify-center items-center">
+                        <Text className="font-bold text-white">
+                            {badgeContent}
+                        </Text>
+                    </Animated.View>
+                )}
+                {badgeIcon && (
+                    <Animated.View
+                        entering={FadeIn}
+                        exiting={FadeOut}
+                        className="absolute -bottom-1 -right-2 bg-blue-400 rounded-full w-6 h-6 justify-center items-center">
+                        <IconSymbol name={badgeIcon} size={10} color="white" />
+                    </Animated.View>
+                )}
             </View>
         )
 
@@ -64,20 +84,20 @@ export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src, badgeCo
                 contentFit="cover"
                 transition={1000}
             />
-            {badgeContent && (
-                <Animated.View 
+            {!!badgeContent && (
+                <Animated.View
                     entering={FadeIn}
-                     exiting={FadeOut}
-                     className="absolute -top-1 -right-1 bg-orange-600 rounded-full w-6 h-6 justify-center items-center">
+                    exiting={FadeOut}
+                    className="absolute -top-1 -right-1 bg-orange-600 rounded-full w-6 h-6 justify-center items-center">
                     <Text className="font-bold text-white">{badgeContent}</Text>
                 </Animated.View>
             )}
             {badgeIcon && (
-                <Animated.View 
+                <Animated.View
                     entering={FadeIn}
-                     exiting={FadeOut}
-                     className="absolute -bottom-1 -right-2 bg-blue-400 rounded-full w-6 h-6 justify-center items-center">
-                    <IconSymbol name={badgeIcon} size={10} color="white"/>
+                    exiting={FadeOut}
+                    className="absolute -bottom-1 -right-2 bg-blue-400 rounded-full w-6 h-6 justify-center items-center">
+                    <IconSymbol name={badgeIcon} size={10} color="white" />
                 </Animated.View>
             )}
         </View>

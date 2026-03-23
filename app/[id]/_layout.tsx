@@ -31,6 +31,7 @@ export default function TripDetailsLayout() {
             <Stack screenOptions={{
                 headerTintColor: "white",
                 headerTitleStyle: styles.headerTitle,
+                headerBackground:() => trip && <BackgroundHeader trip={trip} />
             }}>
                 <Stack.Screen name="(tabs)" options={{
                     headerShown: false,
@@ -39,6 +40,7 @@ export default function TripDetailsLayout() {
                 <Stack.Screen name="pick-user" options={{
                     presentation: "modal",
                     title: "Choisis qui tu es",
+                    headerLeft: () => <></>
 
                 }} />
                 <Stack.Screen name="edit-user" options={{
@@ -50,7 +52,6 @@ export default function TripDetailsLayout() {
                 <Stack.Screen name="dates"
                     options={{
                         title: "Dates du séjour",
-                        headerBackground:() => trip && <BackgroundHeader trip={trip} />
                     }} />
                 <Stack.Screen name="votes"
                     options={{
@@ -61,21 +62,19 @@ export default function TripDetailsLayout() {
                     options={{
                         headerShown: true,
                         title: "Sondages",
-                        headerBackground:() => trip && <BackgroundHeader trip={trip} />
+                        
                     }}
                 />
                 <Stack.Screen name="location"
                     options={{
                         headerShown: true,
                         title: "Le lieu",
-                        headerBackground:() => trip && <BackgroundHeader trip={trip} />
                     }}
                 />
                 <Stack.Screen name="goods"
                     options={{
                         headerShown: true,
                         title: "La liste de course",
-                        headerBackground:() => trip && <BackgroundHeader trip={trip} />
                     }}
                 />
             </Stack>

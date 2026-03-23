@@ -98,17 +98,6 @@ export default function ItemDetailsLayout() {
                 options={{
                     href: null,
                     headerShown: true,
-                    headerLeft: () => <View>
-                        <Pressable className="mx-5"
-                            onPress={() => router.navigate({
-                                pathname: "/[id]/(tabs)/messages",
-                                params: {
-                                    id: String(id)
-                                }
-                            })}>
-                            <IconSymbol name="arrow.left" color="white" />
-                        </Pressable>
-                    </View>,
                     headerRight: () => <></>,
                     title: "Réglages",
                     tabBarIcon: ({ color, size }) => (

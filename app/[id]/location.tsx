@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { useController, useForm } from "react-hook-form";
 import { Pressable, Text, TextInput, View } from "react-native";
 import Animated, { FadeIn, FadeOut, SlideInLeft, SlideOutRight } from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 
 export default function TripLocation() {
@@ -70,11 +71,11 @@ export default function TripLocation() {
     const now = dayjs();
 
     return (
-        <Animated.ScrollView style={styles.container}>
-            <View className="m-2 justify-between ">
-                <View className="gap-10">
-                    <View className="gap-1">
+        <SafeAreaView style={styles.container}>
 
+            <Animated.ScrollView>
+                <View className="">
+                    <View className="gap-1">
                         <View className="flex-row bg-gray-200 dark:bg-gray-400 focus:border focus:border-blue-400 shadow items-center px-2 rounded-full">
                             <IconSymbol name="map" color="gray" />
                             <TextInput
@@ -87,7 +88,7 @@ export default function TripLocation() {
                                 <IconSymbol name="paperplane.fill" color="black" />
                             </Pressable>
                         </View>
-                        <View className="gap-2 mx-4">
+                        <View className="mx-4">
                             {geocode &&
                                 <Animated.View
                                     entering={SlideInLeft}
@@ -112,7 +113,7 @@ export default function TripLocation() {
                         <Pressable
                             disabled={!location}
                             onPress={onMapClick}
-                            className="flex border m-4 justify-center items-center h-[50%] rounded-xl bg-white">
+                            className="flex border m-4 justify-center items-center h-[200] rounded-xl bg-white">
                             <Text>
                                 {JSON.stringify(location)}
                             </Text>
@@ -132,7 +133,15 @@ export default function TripLocation() {
                 </View>
 
                 {pagePoll?.totalResults !== 0 &&
-                    <View className="">
+                    <View className="gap-2 my-5">
+                        <View>
+                            <Text className="text-xl font-bold dark:text-white">
+                                Sondage en cours
+                            </Text>
+                            <Text className="text-sm dark:text-gray-200">
+                                Votes pour ton choix d'hébergement préféré
+                            </Text>
+                        </View>
                         {/* <Text className="font-bold text-2xl dark:text-white">
                                             Sondages
                                         </Text> */}
@@ -191,8 +200,14 @@ export default function TripLocation() {
                                 <View className="flex-row justify-end my-2 items-center gap-2">
                                     <IconSymbol name="person.2.fill" color="gray" />
                                     <Text className="text-gray-400 ">
-                                        {poll.hasSelected.length} 
+                                        {poll.hasSelected.length}
                                     </Text>
+                                </View>
+                                <View className="border-t border-gray-200">
+                                    <Text className="dark:text-white text-center p-2">
+                                        Voir tout
+                                    </Text>
+
                                 </View>
                             </Pressable>
                         ))}
@@ -217,7 +232,7 @@ export default function TripLocation() {
                     </Button>
 
                 }
-            </View>
-        </Animated.ScrollView>
+            </Animated.ScrollView>
+        </SafeAreaView>
     )
 }

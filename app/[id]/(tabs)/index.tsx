@@ -184,9 +184,9 @@ export default function ItemDetails() {
                                             }
                                         })}>
                                         <Avatar src={me?.avatar}
-                                         alt={me?.name?.charAt(0)} 
-                                         size2="md"
-                                         badgeContent={0} />
+                                            alt={me?.name?.charAt(0)}
+                                            size2="md"
+                                            badgeContent={0} />
                                         <Text className="text-white font-bold">{me?.name}</Text>
                                     </Pressable>
                                     <Pressable onPressOut={() => bottomSheetModalRef.current?.present()}
@@ -265,9 +265,12 @@ export default function ItemDetails() {
                 </View>
                 {dashboard?.polls.pending > 0 &&
                     <View className="mx-5 my-2">
-                        <View className="flex-row justify-between items-center">
+                        <View className="">
                             <Text className="font-bold text-2xl dark:text-white">
                                 Sondages
+                            </Text>
+                            <Text className="text-md dark:text-white">
+                                On attend ta réponse sur des sondages
                             </Text>
                         </View>
                         <PollsWidget
@@ -358,6 +361,20 @@ export default function ItemDetails() {
                                 <Text className=" text-lg dark:text-white">Voir la liste de course</Text>
                             </Button>
                             <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
+                            <Button
+                                className="flex flex-row items-center gap-5"
+                                onPress={() => router.push({
+                                    pathname: "/[id]/settings",
+                                    params: {
+                                        id: String(id)
+                                    }
+                                })}>
+                                <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
+                                    <IconSymbol name="gear" size={30} />
+                                </View>
+                                <Text className=" text-lg dark:text-white">Réglages</Text>
+                            </Button>
+                            <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
 
                             <Button onPress={handleShare} className="flex flex-row gap-5 items-center" isLoading={shareTrip.isPending}>
                                 <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
@@ -379,7 +396,7 @@ export default function ItemDetails() {
                             </Button>
                             <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
                             <Button onPress={() => console.log("toto")} className="flex flex-row items-center gap-5">
-                                <View className="bg-red-400 dark:bg-gray-200 rounded-full p-2">
+                                <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
                                     <IconSymbol name="pencil" size={30} />
                                 </View>
                                 <Text className=" text-lg dark:text-white">Modifier le voyage</Text>
