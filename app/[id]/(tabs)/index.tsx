@@ -172,7 +172,7 @@ export default function ItemDetails() {
                             <View className="flex-row justify-between items-center">
                                 <Pressable className="rounded-full bg-gray-800 p-1 shadow"
                                     onPress={() => router.dismissAll()}>
-                                    <IconSymbol name="chevron.left" size={25} color="white" />
+                                    <IconSymbol name="arrow.left" size={25} color="white" />
                                 </Pressable>
                                 <View className="flex-row gap-5 items-center">
 
@@ -285,40 +285,7 @@ export default function ItemDetails() {
                             })} />
                     </View>
                 }
-                {/* <View className="m-5 mt-2 gap-1">
-                    <View className="flex-row justify-between items-center">
-                        <Text className="font-bold text-2xl dark:text-white">
-                            Planning
-                        </Text>
-                        <Pressable onPress={() => router.navigate({
-                            pathname: "/[id]/(tabs)/activities",
-                            params: {
-                                id: String(id)
-                            }
-                        })}>
-                            <Text className="text-orange-400 rounded-full bg-orange-200 p-1 border border-orange-400">
-                                Voir tout
-                            </Text>
-                        </Pressable>
-                    </View>
-                    <EventsWidget trip={trip}
-                        user={me}
-                        onClick={(event) => router.navigate({
-                            pathname: "/[id]/(tabs)/activities/[activityId]",
-                            params: {
-                                id: String(id),
-                                activityId: event._id
-                            }
-                        })}
-                        onNewClick={() => router.navigate({
-                            pathname: "/[id]/(tabs)/activities/new",
-                            params: {
-                                id: String(id),
-                            }
-                        })}
-                    />
 
-                </View> */}
 
                 <View className="m-5 mt-2 gap-2">
                     <Text className="text-xl font-bold dark:text-white">

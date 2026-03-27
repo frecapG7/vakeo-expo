@@ -36,10 +36,8 @@ export const HousingOptionsForm = ({ control }: { control: any }) => {
         }
     }
 
-
     return (
         <View>
-
             <View className="flex-row bg-white rounded-xl items-center justify-between border border-gray-200 focus:border-blue-500 px-1 py-2">
                 <View className="flex-row items-center">
                     <IconSymbol name="link" color="gray" />

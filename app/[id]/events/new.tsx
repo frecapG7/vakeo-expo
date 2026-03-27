@@ -14,11 +14,7 @@ import { Text, View } from "react-native";
 import Animated, { SlideInRight, SlideOutLeft } from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
 
-
-
-
-export default function NewTripActivity() {
-
+export default function NewTripEvent() {
 
     const { id } = useLocalSearchParams();
     const { data: trip } = useGetTrip(String(id));

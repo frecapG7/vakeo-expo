@@ -54,9 +54,19 @@ export default function ItemDetailsLayout() {
             <Tabs.Screen
                 name="activities"
                 options={{
+                    href: null,
+                    tabBarIcon: ({ color }) => <IconSymbol name="calendar" color={color} />,
+                    headerShown: true,
+                    title: "Planning",
+
+                }}
+            />
+            <Tabs.Screen
+                name="planning"
+                options={{
 
                     href: {
-                        pathname: "/[id]/(tabs)/activities",
+                        pathname: "/[id]/(tabs)/planning",
                         params: {
                             id: String(id)
                         }
