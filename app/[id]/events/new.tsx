@@ -52,13 +52,13 @@ export default function NewTripEvent() {
             attendees: data.attendees.filter(attendee => attendee.checked)
         });
         router.dismissTo({
-            pathname: "/[id]/(tabs)/activities/[activityId]",
+            pathname: "/[id]/events/[eventId]",
             params: {
                 id: String(id),
-                activityId: result._id
+                eventId: result._id
             }
         });
-        Toast.success("Nouvelle activité ajoutée");
+        Toast.success("Planning modifié");
 
     }
     return (
