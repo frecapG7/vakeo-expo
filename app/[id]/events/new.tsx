@@ -14,11 +14,7 @@ import { Text, View } from "react-native";
 import Animated, { SlideInRight, SlideOutLeft } from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
 
-
-
-
-export default function NewTripActivity() {
-
+export default function NewTripEvent() {
 
     const { id } = useLocalSearchParams();
     const { data: trip } = useGetTrip(String(id));
@@ -56,13 +52,13 @@ export default function NewTripActivity() {
             attendees: data.attendees.filter(attendee => attendee.checked)
         });
         router.dismissTo({
-            pathname: "/[id]/(tabs)/activities/[activityId]",
+            pathname: "/[id]/events/[eventId]",
             params: {
                 id: String(id),
-                activityId: result._id
+                eventId: result._id
             }
         });
-        Toast.success("Nouvelle activité ajoutée");
+        Toast.success("Planning modifié");
 
     }
     return (

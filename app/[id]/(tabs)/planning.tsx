@@ -102,7 +102,7 @@ const EventItem = ({ event, user }: { event: Event, user: TripUser }) => {
 
 
 
-export default function TripActivities() {
+export default function TripPlanning() {
 
     const { id } = useLocalSearchParams();
     const [search, setSearch] = useState("");
@@ -195,14 +195,14 @@ export default function TripActivities() {
                         fetchNextPage();
                 }}
             />
-            <Pressable className="absolute bottom-10 right-6 w-20 h-20 rounded-full border border-white bg-blue-400 items-center justify-center shadow"
+            <Pressable className="absolute bottom-10 right-6 p-2 rounded-full border border-white bg-orange-400 items-center justify-center shadow"
                 onPress={() => router.push({
-                    pathname: "/[id]/activities/new",
+                    pathname: "/[id]/events/new",
                     params: {
                         id: String(id)
                     }
                 })}>
-                <IconSymbol name="plus" color="white" size={40} />
+                <IconSymbol name="plus" color="white" size={26} />
             </Pressable>
         </Animated.View>
     )

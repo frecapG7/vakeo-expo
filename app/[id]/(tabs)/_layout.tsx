@@ -54,9 +54,19 @@ export default function ItemDetailsLayout() {
             <Tabs.Screen
                 name="activities"
                 options={{
+                    href: null,
+                    tabBarIcon: ({ color }) => <IconSymbol name="calendar" color={color} />,
+                    headerShown: true,
+                    title: "Planning",
+
+                }}
+            />
+            <Tabs.Screen
+                name="planning"
+                options={{
 
                     href: {
-                        pathname: "/[id]/(tabs)/activities",
+                        pathname: "/[id]/(tabs)/planning",
                         params: {
                             id: String(id)
                         }
@@ -87,7 +97,7 @@ export default function ItemDetailsLayout() {
                                 <Text className="text-white font-bold text-sm">
                                     {me?.name}
                                 </Text>
-                                <Avatar src={me?.avatar} alt={me?.name?.charAt(0)} size2="sm" badgeIcon="pencil" />
+                                <Avatar src={me?.avatar} alt={me?.name?.charAt(0)} size2="sm" badgeIcon="gear" />
                             </Pressable>
                         </View>
                 }}

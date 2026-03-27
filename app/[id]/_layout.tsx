@@ -77,6 +77,12 @@ export default function TripDetailsLayout() {
                         title: "La liste de course",
                     }}
                 />
+                <Stack.Screen name="events"
+                    options={{
+                        headerShown: false,
+                        title: "La liste de course",
+                    }}
+                />
             </Stack>
 
         </TripContext.Provider>

@@ -64,7 +64,7 @@ export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src, badgeCo
                         entering={FadeIn}
                         exiting={FadeOut}
                         className="absolute -bottom-1 -right-2 bg-blue-400 rounded-full w-6 h-6 justify-center items-center">
-                        <IconSymbol name={badgeIcon} size={10} color="white" />
+                        <IconSymbol name={badgeIcon} size={15} color="white" />
                     </Animated.View>
                 )}
             </View>
@@ -97,7 +97,7 @@ export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src, badgeCo
                     entering={FadeIn}
                     exiting={FadeOut}
                     className="absolute -bottom-1 -right-2 bg-blue-400 rounded-full w-6 h-6 justify-center items-center">
-                    <IconSymbol name={badgeIcon} size={10} color="white" />
+                    <IconSymbol name={badgeIcon} size={15} color="white" />
                 </Animated.View>
             )}
         </View>

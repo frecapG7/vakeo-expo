@@ -42,12 +42,12 @@ export default function TripEventsLayout() {
                 //     </Pressable>,
                 // headerBackground: () => <BackgroundHeader trip={trip} />,
             }} />
-            <Stack.Screen name="new" options={{
+            {/* <Stack.Screen name="new" options={{
                 title: "Nouvelle activité",
                 headerBackTitle: "Annuler",
                 presentation: "modal",
                 headerShown: true,
-            }} />
+            }} /> */}
             <Stack.Screen name="[activityId]" options={{
                 headerShown: false,
             }} />
