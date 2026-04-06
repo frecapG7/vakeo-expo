@@ -35,7 +35,9 @@ const styles = StyleSheet.create({
         // backgroundColor: "grey",
         color: "black",
         textAlign: "left",
-        minHeight: 10,
+        // minHeight: 20,
+        // maxHeight: 50,
+        // height: 140,
         width: "100%"
         // textTransform: "capitalize"
     }

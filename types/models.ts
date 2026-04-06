@@ -9,6 +9,7 @@ export interface Trip {
     image: string,
     users: TripUser[],
     name: string,
+    description: string,
     startDate?: Date | string,
     endDate?: Date | string,
     location ?: Location

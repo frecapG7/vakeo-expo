@@ -5,7 +5,7 @@ import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTim
 
 
 
-export const FormTextArea = ({ control, name, rules }: {
+export const FormTextArea = ({ control, name, label, placeholder, rules }: {
     control: any,
     name: string,
     label?: string,
@@ -42,11 +42,13 @@ export const FormTextArea = ({ control, name, rules }: {
     }, [error, shakeAnimation]);
 
     return (
-        <Animated.View style={animatedStyle} className="flex-1 flex-row bg-white dark:bg-gray-200 border border-gray-200 dark:border-gray-400 focus:border-blue-500 rounded-xl h-40">
+        <Animated.View style={animatedStyle} 
+        className="flex-row bg-stone-50 dark:bg-gray-400 border border-gray-400 dark:border-gray-200 focus:border-blue-500 rounded-xl h-40">
             <TextInput
                 onChangeText={onChange}
                 value={value}
-                placeholderTextColor="#000000"
+                placeholderTextColor="#575656"
+                placeholder={placeholder}
                 ref={ref}
                 numberOfLines={7}
                 multiline={true}

@@ -79,10 +79,12 @@ const RootNav = () => {
           headerShown: true,
           title: "Mes projets",
         }} />
-        <Stack.Screen name="new" options={{
-          title: "Nouveau voyage",
-          headerBackTitle: "Annuler"
-        }} />
+        <Stack.Screen name="new"
+          options={{
+            headerShown: false,
+            title: "Nouveau voyage",
+            headerBackTitle: "Annuler"
+          }} />
         <Stack.Screen name="join" options={{
           title: "Rejoins un voyage",
           headerBackTitle: "Annuler"

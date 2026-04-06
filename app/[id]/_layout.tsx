@@ -43,6 +43,11 @@ export default function TripDetailsLayout() {
                     headerLeft: () => <></>
 
                 }} />
+                <Stack.Screen name="edit-general" options={{
+                    presentation: "modal",
+                    title: "Modifier ",
+                    headerBackTitle: "Annuler"
+                }} />
                 <Stack.Screen name="edit-user" options={{
                     presentation: "modal",
                     title: "Modifier mon utilisateur",

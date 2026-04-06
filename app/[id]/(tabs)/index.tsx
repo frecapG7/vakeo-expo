@@ -362,7 +362,13 @@ export default function ItemDetails() {
                                 <Text className="text-lg dark:text-white">Partager le voyage</Text>
                             </Button>
                             <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
-                            <Button onPress={() => console.log("toto")} className="flex flex-row items-center gap-5">
+                            <Button onPress={() => router.push({
+                                pathname: "/[id]/edit-general",
+                                params: {
+                                    id: String(id)
+                                }
+                            })}
+                                className="flex flex-row items-center gap-5">
                                 <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
                                     <IconSymbol name="pencil" size={30} />
                                 </View>

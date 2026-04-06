@@ -1,4 +1,3 @@
-import styles from "@/constants/Styles";
 import { useEffect } from "react";
 import { useController } from "react-hook-form";
 import { TextInput, View } from "react-native";
@@ -42,15 +41,18 @@ export const FormText = ({ control, name, label, placeholder, rules, endAdornmen
     }, [error, shakeAnimation]);
 
     return (
-        <Animated.View style={animatedStyle} className="flex-1 flex-row items-center bg-stone-50 dark:bg-gray-200 border-2 border-gray-200 focus:border-blue-500 rounded-lg">
+        <Animated.View style={animatedStyle}
+            className="flex-row items-center bg-stone-50 dark:bg-gray-400 border border-gray-400 dark:border-gray-200 focus:border-blue-500 rounded-xl h-15">
             <TextInput
                 onChangeText={onChange}
                 value={value}
-                className="text-md flex-1 text-dark"
-                placeholderTextColor="#000000"
+                className="text-md flex-1 text-dark h-full items-start"
+                placeholderTextColor="#575656"
                 ref={ref}
                 placeholder={placeholder}
-                style={styles.textInput}
+                style={{
+                    textAlignVertical: "top",
+                }}
             />
             {endAdornment &&
                 <View
