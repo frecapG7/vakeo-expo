@@ -51,17 +51,6 @@ export default function EditTripGeneral() {
     return (
         <SafeAreaView style={styles.container}>
             <Animated.ScrollView>
-                <View className="flex-row justify-end">
-                    <Button variant="outlined"
-                        title="Modifier les utilisateurs"
-                        onPress={() => router.push({
-                            pathname: "/[id]/edit-users",
-                            params: {
-                                id: String(id)
-                            }
-                        })} />
-
-                </View>
                 <View className="mx-2">
                     <TripInfoForm control={control} />
                 </View>
@@ -75,8 +64,16 @@ export default function EditTripGeneral() {
                             title="Modifier"
                             onPress={handleSubmit(onSubmit)} />
                     </Animated.View>
-
                 }
+
+                <Button variant="outlined"
+                    title="Modifier les utilisateurs"
+                    onPress={() => router.push({
+                        pathname: "/[id]/edit-users",
+                        params: {
+                            id: String(id)
+                        }
+                    })} />
 
             </Animated.ScrollView>
         </SafeAreaView>
