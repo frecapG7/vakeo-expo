@@ -1,3 +1,4 @@
+import useColors from "@/hooks/styles/useColors";
 import { useEffect } from "react";
 import { useController } from "react-hook-form";
 import { TextInput } from "react-native";
@@ -41,13 +42,15 @@ export const FormTextArea = ({ control, name, label, placeholder, rules }: {
         }
     }, [error, shakeAnimation]);
 
+    const {inputPlaceHolder} = useColors();
+
     return (
         <Animated.View style={animatedStyle} 
         className="flex-row bg-stone-50 dark:bg-gray-400 border border-gray-400 dark:border-gray-200 focus:border-blue-500 rounded-xl h-40">
             <TextInput
                 onChangeText={onChange}
                 value={value}
-                placeholderTextColor="#575656"
+                placeholderTextColor={inputPlaceHolder}
                 placeholder={placeholder}
                 ref={ref}
                 numberOfLines={7}

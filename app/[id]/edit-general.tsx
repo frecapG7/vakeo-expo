@@ -66,15 +66,18 @@ export default function EditTripGeneral() {
                     </Animated.View>
                 }
 
-                
-                <Button variant="outlined"
-                    title="Modifier les utilisateurs"
-                    onPress={() => router.push({
-                        pathname: "/[id]/edit-users",
-                        params: {
-                            id: String(id)
-                        }
-                    })} />
+
+                <View className="m-5">
+
+                    <Button variant="outlined"
+                        title="Modifier les utilisateurs"
+                        onPress={() => router.push({
+                            pathname: "/[id]/edit-users",
+                            params: {
+                                id: String(id)
+                            }
+                        })} />
+                </View>
 
             </Animated.ScrollView>
         </SafeAreaView>

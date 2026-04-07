@@ -12,7 +12,8 @@ const lightColor = {
   neutral: "#rgb(241, 234, 222)",
   darkColor: "rgb(28, 28, 30)",
   calendarBackground: "#rgba(255, 255, 255, 1)",
-  calendarPrimary: "#rgb(248, 146, 29)"
+  calendarPrimary: "#rgb(248, 146, 29)",
+  inputPlaceHolder: "rgba(115, 114, 114, 0.61)"
 };
 const darkColor = {
   background: "#222121",
@@ -23,7 +24,8 @@ const darkColor = {
   notification: "#ffffff",
   neutral: "#3c3d3cff",
   calendarBackground: "#101828",
-  calendarPrimary: "#rgb(245, 193, 133)"
+  calendarPrimary: "#rgb(245, 193, 133)",
+  inputPlaceHolder: "rgba(255, 255, 255, 0.68)"
 }
 
 const useColors = () => {

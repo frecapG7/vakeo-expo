@@ -10,7 +10,7 @@ type ButtonSize = 'medium' | 'small';
 const variantToClassMap = {
     'none': '',
     'contained': 'bg-blue-400 dark:bg-blue-600 rounded-full',
-    'outlined': 'border border-blue-200 rounded-full'
+    'outlined': 'border border-blue-400 rounded-full'
 }
 
 const sizeToMap = {
@@ -33,7 +33,7 @@ const ButtonTitle = ({ title, variant, size, isLoading }: { title: string, varia
 
     return (
         <Animated.View entering={FadeIn} exiting={FadeOut} className="w-full">
-            <Text className={`${sizeClass} font-bold text-center ${variant === "contained" && "text-white"} `}
+            <Text className={`${sizeClass}  text-center ${variant === "contained" ? "text-white font-bold" : "text-blue-400"} `}
                 numberOfLines={1}>
                 {title}
             </Text>
