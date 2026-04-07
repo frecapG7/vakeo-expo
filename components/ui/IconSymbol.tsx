@@ -70,7 +70,13 @@ const MAPPING = {
   "bag.fill":"shopping-bag",
   "tray": "how-to-vote",
   "exclamationmark.circle.fill": "assignment-late",
-  "gear": "settings"
+  "gear": "settings",
+  "lock.open": "lock-open",
+  "lock.fill": "lock",
+  "lock": "lock-outline",
+  "number.circle": "add-circle-outline",
+  "number.circle.fill": "add-circle",
+
 } as IconMapping;
 
 /**

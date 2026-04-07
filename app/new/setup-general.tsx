@@ -6,9 +6,8 @@ import { Trip } from "@/types/models";
 import { useNavigation, useRouter } from "expo-router";
 import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
-import { Text, View } from "react-native";
+import { KeyboardAvoidingView, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const data = [
     {
@@ -85,9 +84,10 @@ export default function NewTripGeneral() {
     }, [navigation]);
 
     return (
-        <SafeAreaView style={styles.container}>
-            <Animated.ScrollView>
-
+        <KeyboardAvoidingView behavior="padding"
+            keyboardVerticalOffset={64}
+            style={styles.container}>
+            <Animated.ScrollView className="flex-1 pt-5 pb-20">
                 <View className="gap-2">
                     <Text className="text-2xl font-bold dark:text-white">
                         Donne un nom à ton projet
@@ -97,15 +97,11 @@ export default function NewTripGeneral() {
                         Tu peux également ajouter une description  et personnaliser le thème
 
                     </Text>
-
-
                 </View>
                 <View className="m-5">
                     <TripInfoForm control={control} />
                 </View>
             </Animated.ScrollView>
-
-
-        </SafeAreaView>
+        </KeyboardAvoidingView>
     )
 }

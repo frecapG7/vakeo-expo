@@ -10,7 +10,7 @@ type ButtonSize = 'medium' | 'small';
 const variantToClassMap = {
     'none': '',
     'contained': 'bg-blue-400 dark:bg-blue-600 rounded-full',
-    'outlined': 'border border-blue-200 rounded-lg'
+    'outlined': 'border border-blue-200 rounded-full'
 }
 
 const sizeToMap = {
@@ -19,7 +19,7 @@ const sizeToMap = {
 }
 
 
-const ButtonTitle = ({ title, size, isLoading }: { title: string, size: ButtonSize, isLoading: boolean }) => {
+const ButtonTitle = ({ title, variant, size, isLoading }: { title: string, variant: ButtonVariant, size: ButtonSize, isLoading: boolean }) => {
 
     const colors = useColors();
     const sizeClass = sizeToMap[size];
@@ -33,7 +33,10 @@ const ButtonTitle = ({ title, size, isLoading }: { title: string, size: ButtonSi
 
     return (
         <Animated.View entering={FadeIn} exiting={FadeOut} className="w-full">
-            <Text className={`${sizeClass} font-bold text-center text-white`} numberOfLines={1}>{title}</Text>
+            <Text className={`${sizeClass} font-bold text-center ${variant === "contained" && "text-white"} `}
+                numberOfLines={1}>
+                {title}
+            </Text>
         </Animated.View>
     );
 
@@ -77,7 +80,11 @@ export const Button = ({ title,
             disabled={disabled || isLoading}
             {...props}
         >
-            {title && <ButtonTitle title={title} size={size} isLoading={isLoading} />}
+            {title && <ButtonTitle
+                title={title}
+                size={size}
+                variant={variant}
+                isLoading={isLoading} />}
             {children}
         </Pressable >
     )

@@ -7,9 +7,9 @@ export const Checkbox = ({ checked = false }: { checked: boolean }) => {
     return (
         <AnimatedCheckbox
             checked={checked}
-            highlightColor="#4444ff"
+            highlightColor="#b5d4f7"
             checkmarkColor="#483AA0"
-            boxOutlineColor="#4444ff"
+            boxOutlineColor="#483AA0"
         />
     )
 }

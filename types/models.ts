@@ -12,7 +12,8 @@ export interface Trip {
     description: string,
     startDate?: Date | string,
     endDate?: Date | string,
-    location ?: Location
+    location ?: Location,
+    isPrivate ?: boolean
 }
 
 export interface TripUser {
