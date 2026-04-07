@@ -66,6 +66,7 @@ export default function EditTripGeneral() {
                     </Animated.View>
                 }
 
+                
                 <Button variant="outlined"
                     title="Modifier les utilisateurs"
                     onPress={() => router.push({
