@@ -72,7 +72,7 @@ export default function NewTripGeneral() {
                     size="small"
                     title="Suivant"
                     onPress={async () => {
-                        const valid = await trigger();
+                        const valid = await trigger(["name", "description", "image"]);
                         if (valid)
                             router.push({
                                 pathname: "/new/setup-users"

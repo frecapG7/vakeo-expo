@@ -1,7 +1,7 @@
 import useColors from "@/hooks/styles/useColors";
 import { useEffect } from "react";
 import { useController } from "react-hook-form";
-import { TextInput } from "react-native";
+import { Text, TextInput, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 
 
@@ -11,15 +11,16 @@ export const FormTextArea = ({ control, name, label, placeholder, rules }: {
     name: string,
     label?: string,
     placeholder?: string,
-    rules?: object,
+    rules?: any,
     endAdornment?: React.ReactNode,
 }) => {
 
-    const { field: { value, onChange, ref },
+    const { field: { value , onChange, ref },
         fieldState: { error } } = useController({
             name,
             control,
-            rules
+            rules,
+            defaultValue: ""
         });
 
     const shakeAnimation = useSharedValue(0);
@@ -42,24 +43,32 @@ export const FormTextArea = ({ control, name, label, placeholder, rules }: {
         }
     }, [error, shakeAnimation]);
 
-    const {inputPlaceHolder} = useColors();
+    const { inputPlaceHolder } = useColors();
 
     return (
-        <Animated.View style={animatedStyle} 
-        className="flex-row bg-stone-50 dark:bg-gray-400 border border-gray-400 dark:border-gray-200 focus:border-blue-500 rounded-xl h-40">
-            <TextInput
-                onChangeText={onChange}
-                value={value}
-                placeholderTextColor={inputPlaceHolder}
-                placeholder={placeholder}
-                ref={ref}
-                numberOfLines={7}
-                multiline={true}
-                className="flex-1 p-3 text-md "
-                style={{
-                    textAlignVertical: "top", // Alignement du texte en haut
-                }}
-            />
-        </Animated.View>
+        <View>
+
+            <Animated.View style={animatedStyle}
+                className="flex-row bg-stone-50 dark:bg-gray-400 border border-gray-400 dark:border-gray-200 focus:border-blue-500 rounded-xl h-40">
+                <TextInput
+                    onChangeText={onChange}
+                    value={value}
+                    placeholderTextColor={inputPlaceHolder}
+                    placeholder={placeholder}
+                    ref={ref}
+                    numberOfLines={7}
+                    multiline={true}
+                    className="flex-1 p-3 text-md "
+                    style={{
+                        textAlignVertical: "top", // Alignement du texte en haut
+                    }}
+                />
+            </Animated.View>
+            <View className="flex-row justify-end">
+                <Text className={`${value?.length  < rules?.maxLength ? "text-gray-400" : "text-red-400"}`}>
+                    {rules?.maxLength - value?.length}
+                </Text>
+            </View>
+        </View>
     )
 }

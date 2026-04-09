@@ -1,8 +1,9 @@
 import { TripUsersForm } from "@/components/trips/TripUsersForm";
 import { Button } from "@/components/ui/Button";
 import styles from "@/constants/Styles";
-import useColors from "@/hooks/styles/useColors";
-import { useNavigation } from "expo-router";
+import { usePostTrip } from "@/hooks/api/useTrips";
+import { useAddStorageTrip } from "@/hooks/storage/useStorageTrips";
+import { useNavigation, useRouter } from "expo-router";
 import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { KeyboardAvoidingView, Text, View } from "react-native";
@@ -11,11 +12,28 @@ import Animated from "react-native-reanimated";
 
 export default function NewTripUsers() {
 
+
     const { control, handleSubmit } = useFormContext();
 
     const navigation = useNavigation();
 
-    const onSubmit = (data: any) => console.log(JSON.stringify(data));
+    const addStorageTrip = useAddStorageTrip();
+    const postTrip = usePostTrip();
+
+    const router = useRouter();
+
+    const onSubmit = async (data: any) => {
+        const result = await postTrip.mutateAsync(data);
+        await addStorageTrip.mutateAsync({
+            _id: result._id,
+            name: result.name,
+            image: result.image,
+            user: result.users[0]
+        });
+        router.replace(`./${result._id}`);
+    };
+
+
     useEffect(() => {
         navigation.setOptions({
             headerRight: () =>
@@ -26,8 +44,6 @@ export default function NewTripUsers() {
                 </Button>
         })
     }, [navigation, onSubmit]);
-
-    const { text } = useColors();
 
     return (
         <KeyboardAvoidingView behavior="padding"
@@ -47,7 +63,7 @@ export default function NewTripUsers() {
                     </Text>
                 </View>
                 <View className="m-5">
-                    <TripUsersForm control={control} />
+                    <TripUsersForm control={control} selected={0} />
                 </View>
             </Animated.ScrollView>
 

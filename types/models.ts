@@ -9,7 +9,7 @@ export interface Trip {
     image: string,
     users: TripUser[],
     name: string,
-    description: string,
+    description?: string,
     startDate?: Date | string,
     endDate?: Date | string,
     location ?: Location,
@@ -19,8 +19,8 @@ export interface Trip {
 export interface TripUser {
     _id: string,
     name: string,
-    avatar: string,
-    restrictions: string[]
+    avatar?: string,
+    restrictions?: string[]
 }
 
 

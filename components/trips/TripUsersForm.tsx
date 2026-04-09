@@ -1,6 +1,5 @@
 import useColors from "@/hooks/styles/useColors";
 import { Trip } from "@/types/models";
-import { useState } from "react";
 import { Control, useController, useFieldArray } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import Animated, { FadeInDown, FadeOutDown, SlideInRight, SlideOutRight } from "react-native-reanimated";
@@ -11,7 +10,7 @@ import { IconSymbol } from "../ui/IconSymbol";
 
 const MAX_USERS_LENGTH = 20;
 
-export const TripUsersForm = ({ control }: { control: Control<Trip> }) => {
+export const TripUsersForm = ({ control, selected = -1  }: { control: Control<Trip>, selected?: Number }) => {
 
 
     const { fields: users, append, remove } = useFieldArray({
@@ -24,14 +23,13 @@ export const TripUsersForm = ({ control }: { control: Control<Trip> }) => {
         }
     });
 
-    const [me, setMe] = useState(0)
 
     const { field: { value: isPrivate, onChange: setIsPrivate } } = useController({
         control,
         name: "isPrivate"
     });
-
     const { text } = useColors();
+
 
     return (
         <View className="gap-4">
@@ -41,10 +39,10 @@ export const TripUsersForm = ({ control }: { control: Control<Trip> }) => {
                     <IconSymbol name={!isPrivate ? "number.circle.fill" : "number.circle"} size={24} color={text} />
                     <View className="max-w-[60%]">
                         <Text className="text-xl font-bold dark:text-white">
-                            Public
+                            Ouvert
                         </Text>
                         <Text numberOfLines={5} className="text-xs dark:text-gray-400">
-                            Tes amis à qui tu partagera le lien pourront ajouter leur utilisateur au projet
+                            Tes amis à qui tu partageras le lien pourront créer leur profil au moment de rejointre le projet.
                         </Text>
                     </View>
                     <View className="w-7 h-7">
@@ -57,10 +55,10 @@ export const TripUsersForm = ({ control }: { control: Control<Trip> }) => {
                     <IconSymbol name={isPrivate ? "lock.fill" : "lock"} size={24} color={text} />
                     <View className="max-w-[60%]">
                         <Text className="font-bold text-xl dark:text-white">
-                            Privé
+                            Fermé
                         </Text>
                         <Text numberOfLines={5} className="text-xs dark:text-gray-400">
-                            Tes amis à qui tu partagera le lien pourront ajouter leur utilisateur au projet
+                            Tu es le seul à pouvoir créer des profil d'utilisateurs. Tes amis à qui tu partageras le lien devront choisir un profil que tu auras créer.
                         </Text>
                     </View>
                     <View className="w-7 h-7">
@@ -90,8 +88,8 @@ export const TripUsersForm = ({ control }: { control: Control<Trip> }) => {
                                 endAdornment={
                                     <Pressable
                                         className="mx-2"
-                                        onPress={() => me !== index && remove(index)}>
-                                        {me === index ?
+                                        onPress={() => selected !== index && remove(index)}>
+                                        {selected === index ?
                                             <Text className="font-bold bg-blue-600 p-1 text-white">Moi</Text> :
                                             !item._id && <IconSymbol name="xmark.circle" size={24} color="black" />}
                                     </Pressable>}
@@ -101,7 +99,7 @@ export const TripUsersForm = ({ control }: { control: Control<Trip> }) => {
                     {users?.length < MAX_USERS_LENGTH &&
                         <Animated.View entering={FadeInDown}
                             exiting={FadeOutDown}
-                            >
+                        >
                             <Pressable className="rounded-b-lg"
                                 onPress={() => {
                                     append({ name: "" });

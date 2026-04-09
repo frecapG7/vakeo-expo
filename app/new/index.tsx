@@ -13,7 +13,7 @@ export default function NewTripIndex(){
         router.replace({
             pathname: "/new/setup-general"
         });
-    })
+    }, []);
 
     return (
         <>

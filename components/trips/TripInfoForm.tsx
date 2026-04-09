@@ -76,9 +76,12 @@ export const TripInfoForm = ({ control }: { control: Control<Trip> }) => {
                 </Text>
                 <FormTextArea
                     control={control}
-                    name="details"
-                    placeholder="Petit séjour pour se resourcer à la montagne autour d'une bonne raclette" />
-
+                    name="description"
+                    placeholder="Petit séjour pour se resourcer à la montagne autour d'une bonne raclette"
+                    rules={{
+                        maxLength: 500
+                    }}
+                />
             </View>
 
 

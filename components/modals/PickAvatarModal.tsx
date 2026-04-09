@@ -1,4 +1,5 @@
 import useColors from "@/hooks/styles/useColors";
+import { TripUser } from "@/types/models";
 import { Modal, Pressable, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -18,17 +19,24 @@ const avatars = [
 
 export const PickAvatarModal = ({
     open,
+    selected = "",
+    disabled = [],
     onClose,
     onClick,
 }
     :
     {
         open: boolean,
+        selected?: string,
+        disabled?: TripUser[]
         onClose: () => void,
         onClick: (avatar: string) => void,
     }) => {
 
     const colors = useColors();
+
+
+    const disabledAvatars = disabled?.map(user => user.avatar);
 
     return (
         <Modal visible={open}
@@ -45,21 +53,29 @@ export const PickAvatarModal = ({
                     <Pressable onPress={onClose}>
                         <Text className="dark:text-white text-xl mb-5">Fermer</Text>
                     </Pressable>
-
-
                     <Animated.FlatList
                         data={avatars}
                         keyExtractor={(i) => i}
-                        numColumns={4}
-                        contentContainerClassName="items-between gap-2"
-                        className="gap-2"
+                        numColumns={3}
+                        contentContainerClassName="items-center gap-2"
+                        className="mx-4"
 
                         renderItem={({ item: avatar }) => (
-                            <Pressable onPress={() => {
-                                onClick(avatar);
-                            }}>
-                                <Avatar src={avatar} size2="lg" />
-                            </Pressable>
+                            <View>
+
+                                <Pressable
+                                    disabled={disabledAvatars?.includes(avatar)}
+                                    className={`mx-2 ${avatar === selected ? "bg-blue-400 rounded-full p-1" : `${disabledAvatars?.includes(avatar) && "bg-gray-400 rounded-full opacity-50"}`} `}
+                                    onPress={() => {
+                                        onClick(avatar);
+                                    }}>
+                                    <Avatar src={avatar} size2="lg" />
+                                </Pressable>
+                                <Text className="dark:text-white text-xs text-center">
+                                    {disabled?.filter(u => u.avatar === avatar)?.[0]?.name}
+                                    {selected === avatar && "Moi"}
+                                </Text>
+                            </View>
                         )} />
 
                 </View>

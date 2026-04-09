@@ -228,8 +228,8 @@ export default function ItemDetails() {
                                 id: String(id)
                             }
                         })}>
-                            <View className="rounded-xl bg-blue-100 p-1">
-                                <IconSymbol name="calendar" size={32} color="orange" />
+                            <View className="rounded-full bg-orange-400 p-2">
+                                <IconSymbol name="calendar" size={32} color="white" />
                             </View>
                             {trip?.startDate ?
                                 <View>

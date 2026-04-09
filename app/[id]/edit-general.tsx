@@ -28,7 +28,8 @@ export default function EditTripGeneral() {
     const router = useRouter();
 
     useEffect(() => {
-        reset(trip);
+        if (trip)
+            reset(trip);
     }, [reset, trip]);
 
 
@@ -43,10 +44,6 @@ export default function EditTripGeneral() {
             }
         })
     }
-
-
-
-
 
     return (
         <SafeAreaView style={styles.container}>

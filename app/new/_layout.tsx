@@ -19,7 +19,7 @@ export default function NewTripLayout() {
             }, {
                 name: "",
             }],
-            // image: data[0].uri
+            isPrivate: false
         }
     });
 
