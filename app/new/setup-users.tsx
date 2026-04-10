@@ -50,17 +50,14 @@ export default function NewTripUsers() {
             keyboardVerticalOffset={64}
             style={styles.container}>
             <Animated.ScrollView className="flex-1 my-5">
-                <View>
+                <View className="m-2">
                     <Text className="text-2xl font-bold dark:text-white">
                         Choisis comment partager avec tes amis
                     </Text>
                     <Text className="text-md dark:text-gray-200">
-                        Décide de comment tes amis peuvent accéder au projet.
+                        Décide de comment tes amis peuvent accéder à ton projet.
                     </Text>
-                    <Text className="text-md dark:text-gray-200 gap-1">
-                        <Text className="font-bold">Important </Text>
-                        tu ne pourras plus modifier ce choix une fois que tu aura créer ton projet
-                    </Text>
+                  
                 </View>
                 <View className="m-5">
                     <TripUsersForm control={control} selected={0} />

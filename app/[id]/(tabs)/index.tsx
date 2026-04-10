@@ -200,8 +200,8 @@ export default function ItemDetails() {
                 </View>
 
 
-                <View className="shadow mx-4 -mt-10 mb-5 p-2 rounded-xl bg-white dark:bg-gray-900 flex" >
-                    <View className="px-5 gap-2">
+                <View className="shadow mx-4 -mt-10 mb-5 px-2 pt-4 rounded-xl gap-5 bg-white dark:bg-gray-900 flex" >
+                    <View className="px-5 gap-2 ">
                         <Text className="text-4xl font-bold dark:text-white" numberOfLines={2}>{trip?.name}</Text>
                         <View className="flex gap-1 items-start justify-start">
                             <AvatarsGroup
@@ -221,7 +221,7 @@ export default function ItemDetails() {
                             </Text>
                         </View>
                     </View>
-                    <View className="flex my-5 gap-5">
+                    <View className="flex my-5 gap-4">
                         <Pressable className="flex-row items-center gap-2" onPress={() => router.push({
                             pathname: "/[id]/dates",
                             params: {
@@ -254,14 +254,37 @@ export default function ItemDetails() {
                                 }
                             })
                         }>
-                            <View className="rounded-xl bg-blue-100 p-1">
+                            <View className="rounded-full bg-blue-100 p-2">
                                 <IconSymbol name="map" size={32} color="orange" />
                             </View>
                             <Text className="font-bold dark:text-white max-w-[80%]" numberOfLines={3}>
                                 {trip?.location?.displayName || "Ajouter un lieu"}
                             </Text>
                         </Pressable>
+                        <Pressable className="flex-row items-center gap-2" onPress={() => console.log("todo")}>
+                            <View className="rounded-full bg-blue-200 p-2 items-center">
+                                <IconSymbol name="eurosign.circle" size={32} color="blue" />
+                            </View>
+                            <View>
+                                <Text className="font-bold dark:text-white max-w-[80%]" numberOfLines={3}>
+                                    {trip?.splittingLink || "Ajouter une cagnotte"}
+                                </Text>
+                                <Text className="text-gray-400 text-sm">
+                                    Equilibre les dépenses du groupe
+                                </Text>
+                            </View>
+                        </Pressable>
                     </View>
+                </View>
+
+
+                <View className="mx-4 p-2 mb-5">
+                    <Text className="text-lg font-bold ml-4 dark:text-white">
+                        Description
+                    </Text>
+                    <Text className="dark:text-white">
+                        {trip?.description}
+                    </Text>
                 </View>
                 {dashboard?.polls.pending > 0 &&
                     <View className="mx-5 my-2">
@@ -285,27 +308,6 @@ export default function ItemDetails() {
                             })} />
                     </View>
                 }
-
-
-                <View className="m-5 mt-2 gap-2">
-                    <Text className="text-xl font-bold dark:text-white">
-                        Cagnotte
-                    </Text>
-                    <View className="flex-row bg-white dark:bg-gray-900 rounded-lg shadow p-5 justify-between items-center">
-                        <View className="rounded-full bg-blue-200 items-center p-1">
-                            <IconSymbol name="eurosign.circle" color="blue" />
-                        </View>
-                        <View>
-                            <Text className="text-lg font-bold dark:text-white">
-                                Consulter sur tricount
-                            </Text>
-                            <Text className="text-gray-400">
-                                Equilibre les dépenses du groupe
-                            </Text>
-                        </View>
-                        <IconSymbol name="arrow.up.right" color="gray" />
-                    </View>
-                </View>
 
                 <BottomSheetModal
                     ref={bottomSheetModalRef}

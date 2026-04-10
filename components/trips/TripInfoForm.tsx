@@ -67,7 +67,7 @@ export const TripInfoForm = ({ control }: { control: Control<Trip> }) => {
                         required: true,
                         maxLength: 50
                     }}
-                    placeholder="Voyage a la montagne*"
+                    placeholder="Nom de l'escapade*"
                 />
             </View>
             <View>
@@ -77,7 +77,7 @@ export const TripInfoForm = ({ control }: { control: Control<Trip> }) => {
                 <FormTextArea
                     control={control}
                     name="description"
-                    placeholder="Petit séjour pour se resourcer à la montagne autour d'une bonne raclette"
+                    placeholder="Description de l'escapade afin d'attirer le margoulins"
                     rules={{
                         maxLength: 500
                     }}

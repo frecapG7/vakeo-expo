@@ -88,14 +88,13 @@ export default function NewTripGeneral() {
             keyboardVerticalOffset={64}
             style={styles.container}>
             <Animated.ScrollView className="flex-1 pt-5 pb-20">
-                <View className="gap-2">
+                <View className="gap-2 m-2">
                     <Text className="text-2xl font-bold dark:text-white">
-                        Donne un nom à ton projet
+                        Donne un nom à ton escapade
                     </Text>
                     <Text className="text-md dark:text-gray-200">
-                        Indique un nom de projet qui définit le type de voyage que tu as en tête.
-                        Tu peux également ajouter une description  et personnaliser le thème
-
+                        Indique un nom d'escapade qui décrit ce que tu as en tête.
+                        Tu peux également ajouter une description et personnaliser le thème.
                     </Text>
                 </View>
                 <View className="m-5">
