@@ -15,7 +15,7 @@ export const FormTextArea = ({ control, name, label, placeholder, rules }: {
     endAdornment?: React.ReactNode,
 }) => {
 
-    const { field: { value , onChange, ref },
+    const { field: { value, onChange, ref },
         fieldState: { error } } = useController({
             name,
             control,
@@ -64,11 +64,13 @@ export const FormTextArea = ({ control, name, label, placeholder, rules }: {
                     }}
                 />
             </Animated.View>
-            <View className="flex-row justify-end">
-                <Text className={`${value?.length  < rules?.maxLength ? "text-gray-400" : "text-red-400"}`}>
-                    {rules?.maxLength - value?.length}
-                </Text>
-            </View>
+            {rules?.maxLength &&
+                <View className="flex-row justify-end">
+                    <Text className={`${value?.length < rules?.maxLength ? "text-gray-400" : "text-red-400"}`}>
+                        {rules?.maxLength - value?.length}
+                    </Text>
+                </View>
+            }
         </View>
     )
 }
