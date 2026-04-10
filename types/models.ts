@@ -9,16 +9,18 @@ export interface Trip {
     image: string,
     users: TripUser[],
     name: string,
+    description?: string,
     startDate?: Date | string,
     endDate?: Date | string,
-    location ?: Location
+    location ?: Location,
+    isPrivate ?: boolean
 }
 
 export interface TripUser {
     _id: string,
     name: string,
-    avatar: string,
-    restrictions: string[]
+    avatar?: string,
+    restrictions?: string[]
 }
 
 
@@ -27,14 +29,14 @@ export type EventType = "MEAL" | "RESTAURANT" | "SPORT" | "PARTY" | "VISITATION"
 
 export interface Event {
     _id: string,
-    startDate: Date,
-    endDate: Date,
+    startDate?: Date,
+    endDate?: Date,
     name: string,
-    attendees: TripUser[],
-    owners: TripUser[],
+    attendees?: TripUser[],
+    owners?: TripUser[],
     trip: string,
     details?: string,
-    type: EventType
+    type: EventType | string
 }
 
 

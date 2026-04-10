@@ -5,27 +5,38 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 type ButtonVariant = 'none' | 'contained' | 'outlined';
 
+type ButtonSize = 'medium' | 'small';
 
 const variantToClassMap = {
     'none': '',
     'contained': 'bg-blue-400 dark:bg-blue-600 rounded-full',
-    'outlined': 'border border-blue-200 rounded-lg'
+    'outlined': 'border border-blue-400 rounded-full'
+}
+
+const sizeToMap = {
+    'medium': "p-4 text-md",
+    'small': 'p-2 text-sm'
 }
 
 
-const ButtonTitle = ({ title, isLoading }: { title: string, isLoading: boolean }) => {
+const ButtonTitle = ({ title, variant, size, isLoading }: { title: string, variant: ButtonVariant, size: ButtonSize, isLoading: boolean }) => {
 
     const colors = useColors();
+    const sizeClass = sizeToMap[size];
+
     if (isLoading)
         return (
-            <Animated.View entering={FadeIn} exiting={FadeOut} className="p-4 w-full">
-                <ActivityIndicator size="large" color={colors.text} />
+            <Animated.View entering={FadeIn} exiting={FadeOut} className="w-full">
+                <ActivityIndicator size="large" color={colors.text} className={sizeClass} />
             </Animated.View>
         );
 
     return (
-        <Animated.View entering={FadeIn} exiting={FadeOut} className="p-4 w-full">
-            <Text className="text-md font-bold text-center text-white" >{title}</Text>
+        <Animated.View entering={FadeIn} exiting={FadeOut} className="w-full">
+            <Text className={`${sizeClass}  text-center ${variant === "contained" ? "text-white font-bold" : "text-blue-400"} `}
+                numberOfLines={1}>
+                {title}
+            </Text>
         </Animated.View>
     );
 
@@ -38,6 +49,7 @@ export const Button = ({ title,
     disabled,
     isLoading = false,
     variant = "none",
+    size = "medium",
     children,
     ...props
 }: {
@@ -48,6 +60,7 @@ export const Button = ({ title,
     disabled?: boolean,
     isLoading?: boolean,
     variant?: ButtonVariant,
+    size?: ButtonSize,
     children?: React.ReactNode
 }) => {
 
@@ -67,7 +80,11 @@ export const Button = ({ title,
             disabled={disabled || isLoading}
             {...props}
         >
-            {title && <ButtonTitle title={title} isLoading={isLoading} />}
+            {title && <ButtonTitle
+                title={title}
+                size={size}
+                variant={variant}
+                isLoading={isLoading} />}
             {children}
         </Pressable >
     )
