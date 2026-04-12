@@ -1,14 +1,13 @@
-import { EventForm, EventFormValues } from "@/components/events/EventForm";
+import { EventInfoForm } from "@/components/events/EventInfoForm";
 import { Button } from "@/components/ui/Button";
-import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
 import { useGetEvent, useUpdateEvent } from "@/hooks/api/useEvents";
 import { useGetTrip } from "@/hooks/api/useTrips";
+import { Event } from "@/types/models";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Text } from "react-native";
-import Animated from "react-native-reanimated";
+import Animated, { ZoomIn } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Toast } from "toastify-react-native";
 
@@ -25,41 +24,39 @@ export default function EditTripEvent() {
 
     const router = useRouter();
 
-    const { control, reset, handleSubmit } = useForm<EventFormValues>();
-
+    const { control, reset, handleSubmit, formState: { isDirty } } = useForm<Event>();
 
     const onSubmit = async (data: any) => {
-        await updateEvent.mutateAsync({
-            ...data,
-            attendees: data.attendees.filter(attendee => attendee.checked)
-        });
+        await updateEvent.mutateAsync(data);
         Toast.success("Activité modifiée");
-        router.dismissTo("..");
-
+        router.dismissTo({
+            pathname: "/[id]/events/[eventId]",
+            params: {
+                id: String(id),
+                eventId: String(event?._id)
+            }
+        });
     }
 
     useEffect(() => {
         if (event)
-            reset({
-                ...event,
-                attendees: trip?.users.map((user) => ({
-                    ...user,
-                    checked: event?.attendees.map(o => o._id).includes(user._id)
-                }))
-            });
-    }, [event, trip]);
+            reset(event);
+    }, [event]);
 
     return (
         <SafeAreaView style={styles.container}>
             <Animated.ScrollView style={{ flex: 1 }} className="flex flex-grow">
-                <EventForm control={control} />
+                <EventInfoForm control={control} />
 
-                <Button className="flex-row bg-blue-600 items-center justify-center rounded-full p-4 my-5"
-                    onPress={handleSubmit(onSubmit)}
-                    isLoading={updateEvent.isPending}>
-                    <IconSymbol name="pencil" color="white" />
-                    <Text className="text-white font-bold text-xl">Modifier</Text>
-                </Button>
+                {isDirty && <Animated.View entering={ZoomIn}>
+
+                    <Button
+                        variant="contained"
+                        title="Modifier"
+                        onPress={handleSubmit(onSubmit)}
+                        isLoading={updateEvent.isPending} />
+                </Animated.View>
+                }
             </Animated.ScrollView>
         </SafeAreaView>
     )

@@ -18,7 +18,7 @@ export const GoodsFlatList = (
             refreshing={isRefreshing}
             className="flex-1"
             renderItem={({ item }) =>
-                <View className={`flex-row  items-center rounded-xl py-2 ${item.checked ? "opacity-50" : ""}`}>
+                <View className={`flex-row items-center rounded-xl py-2 ${item.checked ? "opacity-50" : ""}`}>
                     <Button className="px-5"
                         onPress={() => onCheck(item)}
                         disabled={disabled}>

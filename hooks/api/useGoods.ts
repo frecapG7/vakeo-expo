@@ -2,7 +2,21 @@ import axios from "@/lib/axios";
 import { Good } from "@/types/models";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-const getGoods = async (tripId, params) => {
+
+interface IParams {
+    cursor: string,
+    limit: number,
+    type?: string
+}
+
+interface IPage {
+    nextCursor: string,
+    prevCursor: string,
+    totalResults: number,
+    goods: Event[]
+}
+
+const getGoods = async (tripId : any, params: IParams) : Promise<IPage> => {
     const response = await axios.get(`/trips/${tripId}/goods`, {
         params
     })
@@ -10,8 +24,8 @@ const getGoods = async (tripId, params) => {
 }
 
 
-export const useGetGoods = (tripId, params, options) => {
-    return useInfiniteQuery({
+export const useGetGoods = (tripId: any, params: any, options?: any) => {
+    return useInfiniteQuery<IPage, Error>({
         queryKey: ["trips", tripId, "goods", params],
         queryFn: ({ pageParam }) => getGoods(tripId, {
             cursor: pageParam,

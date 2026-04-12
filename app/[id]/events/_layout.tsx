@@ -15,7 +15,7 @@ export default function EventsLayout() {
                 }} />
             <Stack.Screen name="new"
                 options={{
-                    headerShown: true,
+                    headerShown: false,
                     title: "Nouvelle activité"
                 }}
             />
