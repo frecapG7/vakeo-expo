@@ -24,7 +24,9 @@ export default function EditTripEvent() {
 
     const router = useRouter();
 
-    const { control, reset, handleSubmit, formState: { isDirty } } = useForm<Event>();
+    const { control, reset, handleSubmit, formState: { isDirty } } = useForm<Event>({
+        reValidateMode: "onChange"
+    });
 
     const onSubmit = async (data: any) => {
         await updateEvent.mutateAsync(data);
@@ -48,14 +50,15 @@ export default function EditTripEvent() {
             <Animated.ScrollView style={{ flex: 1 }} className="flex flex-grow">
                 <EventInfoForm control={control} />
 
-                {isDirty && <Animated.View entering={ZoomIn}>
-
-                    <Button
-                        variant="contained"
-                        title="Modifier"
-                        onPress={handleSubmit(onSubmit)}
-                        isLoading={updateEvent.isPending} />
-                </Animated.View>
+                {isDirty &&
+                    <Animated.View entering={ZoomIn}
+                        className="my-10">
+                        <Button
+                            variant="contained"
+                            title="Modifier"
+                            onPress={handleSubmit(onSubmit)}
+                            isLoading={updateEvent.isPending} />
+                    </Animated.View>
                 }
             </Animated.ScrollView>
         </SafeAreaView>

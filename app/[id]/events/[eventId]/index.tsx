@@ -1,4 +1,5 @@
 import { EventIcon } from "@/components/events/EventIcon";
+import { EventInfo } from "@/components/events/EventInfo";
 import { EventsGoodsList } from "@/components/events/EventsGoodsList";
 import { EventUserList } from "@/components/events/EventsUsersList";
 import { IconSymbol } from "@/components/ui/IconSymbol";
@@ -6,9 +7,8 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetEvent, useUpdateEvent } from "@/hooks/api/useEvents";
-import useI18nTime from "@/hooks/i18n/useI18nTime";
 import { containsUser } from "@/lib/utils";
-import { Event, TripUser } from "@/types/models";
+import { Event } from "@/types/models";
 import { useLocalSearchParams } from "expo-router";
 import { useContext, useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
@@ -26,61 +26,6 @@ const buildRestrictions = (event: Event) => {
 
     return b;
 }
-
-
-const InfoTab = ({ event, me }: { event: Event, me: TripUser }) => {
-    const restrictions = useMemo(() => event ? buildRestrictions(event) : {}, [event]);
-    const [showAttendees, setShowAttendees] = useState(false);
-    const { formatRange } = useI18nTime();
-
-    return (
-
-        <Animated.ScrollView>
-            <View className="gap-2 mx-5 my-5 shadow-lg shadow-orange-200 bg-white dark:bg-gray-900 rounded-xl">
-                <View className="flex-row p-2 gap-2 items-center">
-                    <View className="rounded-full bg-orange-200 p-2">
-                        <IconSymbol name="calendar" size={30} color="gray" />
-                    </View>
-                    <View>
-                        <Text className="uppercase text-gray-600 dark:text-gray-400">
-                            Date & Heure
-                        </Text>
-                        <Text className="font-bold dark:text-white">
-                            Choisis une date pour l'activité
-                        </Text>
-                    </View>
-                </View>
-                <View className="flex-1 px-5  justify-center">
-                    <View className="flex-1 h-0.5 bg-orange-200" />
-                </View>
-                <View className="flex-row p-2 gap-2 items-center">
-                    <View className="rounded-full bg-blue-200 p-2">
-                        <IconSymbol name="map" size={30} color="gray" />
-                    </View>
-                    <View>
-                        <Text className="uppercase text-gray-600 dark:text-gray-400">
-                            lieu de rendez-vous
-                        </Text>
-                        <Text className="font-bold dark:text-white">
-                            Choisis un lieu
-                        </Text>
-                    </View>
-                </View>
-            </View>
-
-            <View className="m-2">
-                <Text className="text-xl capitalize font-bold ml-2 dark:text-white">
-                    Détails
-                </Text>
-                <Text className="dark:text-white">
-                    {event?.details ? event.details : "Pas de détails"}
-                </Text>
-            </View>
-        </Animated.ScrollView>
-    )
-}
-
-
 
 export default function EventDetails() {
 
@@ -165,7 +110,7 @@ export default function EventDetails() {
                 <View className="flex items-center gap-2">
                     <EventIcon name={event?.type} size="lg" />
                     <Text className="text-2xl font-bold dark:text-white">
-                        {event?.name} - {scrollY?.value}
+                        {event?.name}
                     </Text>
 
                     <View className="flex-row justify-center gap-1">
@@ -213,7 +158,7 @@ export default function EventDetails() {
 
                 {tabValue === "info" &&
                     <Animated.View entering={ZoomIn} className="m-2 flex-1">
-                        <InfoTab
+                        <EventInfo
                             event={event}
                             me={me} />
                     </Animated.View>

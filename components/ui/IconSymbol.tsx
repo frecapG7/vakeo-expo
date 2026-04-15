@@ -76,7 +76,7 @@ const MAPPING = {
   "lock": "lock-outline",
   "number.circle": "add-circle-outline",
   "number.circle.fill": "add-circle",
-  "doc.plaintext" : "notes"
+  "doc.plaintext" : "text-snippet"
 } as IconMapping;
 
 /**

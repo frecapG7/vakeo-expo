@@ -3,6 +3,7 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { TripContext } from "@/context/TripContext";
 import { useGetEvent } from "@/hooks/api/useEvents";
 import { useGetTrip } from "@/hooks/api/useTrips";
+import useColors from "@/hooks/styles/useColors";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useContext } from "react";
 
@@ -17,6 +18,7 @@ export default function EventDetailsLayout() {
     const { data: event } = useGetEvent(id, eventId);
 
 
+    const {text} = useColors();
     const router = useRouter();
 
     return (
@@ -43,7 +45,7 @@ export default function EventDetailsLayout() {
                             id: String(id)
                         }
                     })}>
-                        <IconSymbol name="arrow.left" color="gray" />
+                        <IconSymbol name="arrow.left" color={text} />
                     </Button>,
                     title: ""
                 }}

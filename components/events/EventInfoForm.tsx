@@ -1,6 +1,8 @@
+import useColors from "@/hooks/styles/useColors"
 import { Event } from "@/types/models"
-import { Control } from "react-hook-form"
+import { Control, useWatch } from "react-hook-form"
 import { Text, View } from "react-native"
+import { FormDateTimePickerV2 } from "../form/FormDateTimePickerV2"
 import { FormText } from "../form/FormText"
 import { FormTextArea } from "../form/FormTextArea"
 
@@ -8,8 +10,16 @@ import { FormTextArea } from "../form/FormTextArea"
 
 export const EventInfoForm = ({ control }: { control: Control<Event> }) => {
 
+    const { text } = useColors();
+
+
+    const startDate = useWatch({
+        control,
+        name: "startDate"
+    });
+
     return (
-        <View className="gap-10">
+        <View className="gap-5">
             <View>
                 <Text className="font-bold text-sm ml-3 dark:text-white">
                     Nom*
@@ -25,7 +35,7 @@ export const EventInfoForm = ({ control }: { control: Control<Event> }) => {
 
             </View>
 
-            <View>
+            <View className="">
                 <Text className="font-bold text-sm ml-3 dark:text-white">
                     Description
                 </Text>
@@ -39,6 +49,21 @@ export const EventInfoForm = ({ control }: { control: Control<Event> }) => {
                 />
             </View>
 
+
+            <View>
+                <Text className="ml-3 font-bold dark:text-white text-sm">
+                    Heure
+                </Text>
+
+                <View className="bg-white dark:bg-gray-400 border border border-gray-400 dark:border-gray-200 focus:border-blue-500 rounded-xl p-2 py-4 gap-4">
+                    <FormDateTimePickerV2
+                        control={control}
+                        rules={{
+                            required: false
+                        }}
+                    />
+                </View>
+            </View>
 
 
         </View>
