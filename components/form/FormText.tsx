@@ -46,7 +46,7 @@ export const FormText = ({ control, name, label, placeholder, rules, endAdornmen
 
     return (
         <Animated.View style={animatedStyle}
-            className="flex-row items-center bg-stone-50 dark:bg-gray-600  focus:border focus:border-blue-500 rounded-xl h-12">
+            className="flex-row items-center bg-gray-100 dark:bg-gray-600  border focus:border focus:border-blue-500 rounded-xl h-12">
             <TextInput
                 onChangeText={onChange}
                 value={value}

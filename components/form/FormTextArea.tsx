@@ -49,7 +49,7 @@ export const FormTextArea = ({ control, name, label, placeholder, rules }: {
         <View>
 
             <Animated.View style={animatedStyle}
-                className="flex-row bg-stone-50 dark:bg-gray-600 focus:border focus:border-blue-500 rounded-xl h-40">
+                className="flex-row bg-stone-50 dark:bg-gray-600 border focus:border-blue-500 rounded-xl h-40">
                 <TextInput
                     onChangeText={onChange}
                     value={value}
