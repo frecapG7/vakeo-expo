@@ -2,7 +2,8 @@ import useI18nTime from "@/hooks/i18n/useI18nTime";
 import useColors from "@/hooks/styles/useColors";
 import dayjs from "@/lib/dayjs-config";
 import { Event, TripUser } from "@/types/models";
-import { Text, View } from "react-native";
+import { router } from "expo-router";
+import { Pressable, Text, View } from "react-native";
 import { IconSymbol } from "../ui/IconSymbol";
 
 export const EventInfo = ({ event, me }: { event: Event, me: TripUser }) => {
@@ -57,6 +58,36 @@ export const EventInfo = ({ event, me }: { event: Event, me: TripUser }) => {
                         {event?.details ? event.details : "Pas de détails"}
                     </Text>
                 </View>
+            </View>
+
+
+
+            <View className="flex-row flex justify-evenly items-center mt-10">
+                <Pressable
+                    onPress={() => console.log("Supprimer")}
+                    className="flex-row border border-red-400 rounded-full p-4 items-center"
+                >
+                    <IconSymbol name="trash" color="red" />
+                    <Text className="text-red-600 font-bold text-lg">
+                        Supprimer
+                    </Text>
+                </Pressable>
+                <Pressable
+                    className="flex-row bg-blue-400  rounded-full p-4 items-center"
+                    onPress={() => router.push({
+                        pathname: "/[id]/events/[eventId]/edit",
+                        params: {
+                            id: event.trip,
+                            eventId: event._id
+                        }
+                    })}
+                >
+                    <IconSymbol name="pencil" color="white" />
+                    <Text className="text-white font-bold text-lg">
+                        Modifier
+                    </Text>
+                </Pressable>
+
             </View>
         </View>
     )

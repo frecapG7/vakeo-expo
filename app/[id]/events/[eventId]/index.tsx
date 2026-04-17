@@ -8,24 +8,12 @@ import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetEvent, useUpdateEvent } from "@/hooks/api/useEvents";
 import { containsUser } from "@/lib/utils";
-import { Event } from "@/types/models";
 import { useLocalSearchParams } from "expo-router";
 import { useContext, useMemo, useState } from "react";
 import { KeyboardAvoidingView, Pressable, Text, View } from "react-native";
-import Animated, { useAnimatedScrollHandler, useSharedValue, ZoomIn } from "react-native-reanimated";
+import Animated, { ZoomIn } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const buildRestrictions = (event: Event) => {
-
-    const a = event?.attendees?.flatMap(u => u.restrictions);
-    const b = a?.reduce((acc, restriction) => {
-        acc[restriction] = acc[restriction] || { name: restriction, count: 0 };
-        acc[restriction].count++;
-        return acc;
-    }, {});
-
-    return b;
-}
 
 export default function EventDetails() {
 
@@ -36,19 +24,10 @@ export default function EventDetails() {
     const updateEvent = useUpdateEvent(id, eventId);
 
 
-
     const isAttendee = useMemo(() => containsUser(me, event?.attendees), [me, event]);
-    const isOwner = useMemo(() => containsUser(me, event?.owners), [me, event])
 
     const [tabValue, setTabValue] = useState("info");
 
-    const scrollY = useSharedValue(0);
-
-    const scrollHandler = useAnimatedScrollHandler({
-        onScroll: (event) => {
-            scrollY.value = event.contentOffset.y;
-        },
-    });
 
     const onJoinClick = async () => {
         let newAttendees = event?.attendees;
@@ -62,19 +41,6 @@ export default function EventDetails() {
             attendees: newAttendees
         });
     }
-    const onOwnershipClick = async () => {
-        let newOwners = event?.owners;
-        if (isOwner) {
-            newOwners = newOwners?.filter(u => u._id !== me._id);
-        } else {
-            newOwners?.push(me);
-        }
-        await updateEvent.mutateAsync({
-            ...event,
-            owners: newOwners
-        });
-    }
-
 
     if (!event)
         return (
@@ -106,8 +72,7 @@ export default function EventDetails() {
     return (
         <SafeAreaView style={styles.container}>
             <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
-                <Animated.ScrollView onScroll={scrollHandler}
-                    contentContainerStyle={{ flexGrow: 1}}>
+                <Animated.ScrollView contentContainerStyle={{ flexGrow: 1}}>
 
                     <View className="flex items-center gap-2">
                         <EventIcon name={event?.type} size="lg" />
@@ -116,15 +81,6 @@ export default function EventDetails() {
                         </Text>
 
                         <View className="flex-row justify-center gap-1">
-                            {/* <Pressable
-                        disabled={updateEvent.isPending}
-                        onPress={onOwnershipClick}
-                        className={`flex items-center rounded-xl p-2  border  ${isOwner ? "bg-orange-200 border-orange-600" : "bg-white dark:bg-gray-900 border-gray-600"}`}>
-                        <Text className={` ${isOwner ? "text-orange-600 font-bold" : "dark:text-white"}`}>
-                            Responsable
-                        </Text>
-                    </Pressable> */}
-
                             <Pressable
                                 disabled={updateEvent.isPending}
                                 onPress={onJoinClick}

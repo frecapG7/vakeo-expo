@@ -58,7 +58,7 @@ export const FormTextArea = ({ control, name, label, placeholder, rules }: {
                     ref={ref}
                     numberOfLines={7}
                     multiline={true}
-                    className="flex-1 p-3 text-m dark:text-white "
+                    className="flex-1 p-3 text-base dark:text-white "
                     style={{
                         textAlignVertical: "top", // Alignement du texte en haut
                     }}

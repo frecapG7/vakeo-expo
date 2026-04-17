@@ -9,17 +9,13 @@ import { FormText } from "../form/FormText";
 import { Button } from "../ui/Button";
 import { IconSymbol } from "../ui/IconSymbol";
 
-
-
 const GoodFormV2 = ({ control, onSubmit, onDelete, isSubmitting, autoFocus }: {
     control: Control<Good>,
     onSubmit: () => Promise<void>,
-    onDelete: () => Promise<void>,
+    onDelete?: () => Promise<void>,
     isSubmitting?: boolean,
     autoFocus?: boolean
 }) => {
-
-
 
     const _id = useWatch({
         control,
@@ -49,7 +45,7 @@ const GoodFormV2 = ({ control, onSubmit, onDelete, isSubmitting, autoFocus }: {
                         required: true
                     }}
                     autoFocus={autoFocus}
-                    endAdornment={_id && <Pressable
+                    endAdornment={!!onDelete && <Pressable
                         onPress={() => Alert.alert("Retirer de la liste ?",
                             "", [
                             {
@@ -67,14 +63,12 @@ const GoodFormV2 = ({ control, onSubmit, onDelete, isSubmitting, autoFocus }: {
             </View>
         </View>
     )
-
 }
-
 
 
 export const EventsGoodsList = ({ event, user }: { event: Event, user?: TripUser }) => {
 
-    const { data, isLoading, isFetching, isFetchingNextPage, hasNextPage, fetchNextPage } = useGetGoods(
+    const { data } = useGetGoods(
         event.trip,
         {
             event: event._id
@@ -115,11 +109,12 @@ export const EventsGoodsList = ({ event, user }: { event: Event, user?: TripUser
         if (data._id) {
             await putGood.mutateAsync(data);
             setSelectedGood(null);
+            Toast.success("Liste modifiée");
         }
         else {
             await postGood.mutateAsync(data);
+            Toast.success("Article ajouté");
         }
-        Toast.success("Panier modifié");
     }
 
     useEffect(() => {
@@ -188,7 +183,6 @@ export const EventsGoodsList = ({ event, user }: { event: Event, user?: TripUser
                             entering={StretchInX}
                             exiting={StretchOutX}
                             className="pl-5">
-
                             <GoodFormV2 control={control}
                                 onSubmit={handleSubmit(onSubmit)}
                                 isSubmitting={putGood?.isPending}

@@ -177,9 +177,11 @@ export const GoodBottomSheet = ({ open, good, trip, onClose }: { open: boolean, 
                             ref={quantityTextInputRef}
                             style={styles.textInput}
                         />
-                        {value !== "" &&
-                            <Animated.View entering={FadeIn} className="" >
-                                <Button onPress={() => setName("")}>
+                        {quantity !== "" &&
+                            <Animated.View
+                                entering={FadeIn}
+                                className="">
+                                <Button onPress={() => setQuantity("")}>
                                     <IconSymbol name="xmark.circle" color="black" />
                                 </Button>
                             </Animated.View>

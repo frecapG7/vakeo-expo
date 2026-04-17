@@ -252,7 +252,7 @@ export const FormDateTimePickerV2 = ({ control, rules }:
                                 data={hoursItems}
                                 value={endDate && dayjs(endDate).hour()}
                                 onValueChanged={({ item: { value: hour } }) =>
-                                    setEndDate(dayjs(endDate).hour(hour).toISOString())
+                                    !!endDate && setEndDate(dayjs(endDate).hour(hour).toISOString())
                                 }
                                 enableScrollByTapOnItem={true}
                                 style={{
@@ -260,17 +260,15 @@ export const FormDateTimePickerV2 = ({ control, rules }:
                                 }}
                                 itemTextStyle={{
                                     color: colors.text,
-                                    // backgroundColor:colors.neutral
                                 }}
                                 overlayItemStyle={{
                                     backgroundColor: colors.neutral
-                                    // marHorizontal: 10
                                 }}
                             />
                             <WheelPicker
                                 data={minuteItems}
                                 value={endDate && dayjs(endDate).minute()}
-                                onValueChanged={({ item: { value: minute } }) =>
+                                onValueChanged={({ item: { value: minute } }) => endDate &&
                                     setEndDate(dayjs(endDate).minute(minute).toISOString())
                                 }
                                 enableScrollByTapOnItem={true}
@@ -279,11 +277,9 @@ export const FormDateTimePickerV2 = ({ control, rules }:
                                 }}
                                 itemTextStyle={{
                                     color: colors.text,
-                                    // backgroundColor:colors.neutral
                                 }}
                                 overlayItemStyle={{
                                     backgroundColor: colors.neutral
-                                    // marHorizontal: 10
                                 }}
                             />
                         </View>
