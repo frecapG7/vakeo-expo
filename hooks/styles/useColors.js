@@ -25,7 +25,7 @@ const darkColor = {
   neutral: "#3c3d3cff",
   calendarBackground: "#101828",
   calendarPrimary: "#rgb(245, 193, 133)",
-  inputPlaceHolder: "rgba(71, 70, 70, 0.79)"
+  inputPlaceHolder: "rgba(139, 135, 135, 0.98)"
 }
 
 const useColors = () => {

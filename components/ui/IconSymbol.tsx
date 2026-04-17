@@ -40,6 +40,7 @@ const MAPPING = {
   "cart": "shopping-cart",
   "link": "insert-link",
   "trash": "delete-outline",
+  "trash.fill": "delete",
   "suit.spade": "fastfood",
   "list.dash": "format-list-bulleted",
   "clock": "access-time",

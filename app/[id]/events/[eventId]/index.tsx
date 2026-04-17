@@ -11,7 +11,7 @@ import { containsUser } from "@/lib/utils";
 import { Event } from "@/types/models";
 import { useLocalSearchParams } from "expo-router";
 import { useContext, useMemo, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { KeyboardAvoidingView, Pressable, Text, View } from "react-native";
 import Animated, { useAnimatedScrollHandler, useSharedValue, ZoomIn } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -105,16 +105,18 @@ export default function EventDetails() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Animated.ScrollView onScroll={scrollHandler}>
+            <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+                <Animated.ScrollView onScroll={scrollHandler}
+                    contentContainerStyle={{ flexGrow: 1}}>
 
-                <View className="flex items-center gap-2">
-                    <EventIcon name={event?.type} size="lg" />
-                    <Text className="text-2xl font-bold dark:text-white">
-                        {event?.name}
-                    </Text>
+                    <View className="flex items-center gap-2">
+                        <EventIcon name={event?.type} size="lg" />
+                        <Text className="text-2xl font-bold dark:text-white">
+                            {event?.name}
+                        </Text>
 
-                    <View className="flex-row justify-center gap-1">
-                        {/* <Pressable
+                        <View className="flex-row justify-center gap-1">
+                            {/* <Pressable
                         disabled={updateEvent.isPending}
                         onPress={onOwnershipClick}
                         className={`flex items-center rounded-xl p-2  border  ${isOwner ? "bg-orange-200 border-orange-600" : "bg-white dark:bg-gray-900 border-gray-600"}`}>
@@ -123,62 +125,63 @@ export default function EventDetails() {
                         </Text>
                     </Pressable> */}
 
+                            <Pressable
+                                disabled={updateEvent.isPending}
+                                onPress={onJoinClick}
+                                className={`flex items-center rounded-xl p-2  border  ${isAttendee ? "bg-blue-200 border-blue-600" : "bg-white dark:bg-gray-900 border-blue-400"}`}>
+                                <Text className={` ${isAttendee ? "text-blue-600 font-bold" : "text-blue-200"} uppercase`}>
+                                    {isAttendee ? "Inscrit" : "S'inscrire"}
+                                </Text>
+                            </Pressable>
+
+                        </View>
+                    </View>
+
+                    {/* Tabs button */}
+                    <View className="flex-row mx-10 justify-center rounded-full my-2 bg-orange-200 rounded-full border border-orange-600si tu ">
                         <Pressable
-                            disabled={updateEvent.isPending}
-                            onPress={onJoinClick}
-                            className={`flex items-center rounded-xl p-2  border  ${isAttendee ? "bg-blue-200 border-blue-600" : "bg-white dark:bg-gray-900 border-blue-400"}`}>
-                            <Text className={` ${isAttendee ? "text-blue-600 font-bold" : "text-blue-200"} uppercase`}>
-                                {isAttendee ? "Inscrit" : "S'inscrire"}
-                            </Text>
+                            onPress={() => setTabValue("info")}
+                            className={`flex-1 flex-row rounded-l-full p-2 items-center justify-center ${tabValue === "info" && "bg-orange-400"}`}>
+                            <IconSymbol name="doc.plaintext" color={tabValue === "info" ? "white" : "black"} />
+                        </Pressable>
+                        <Pressable
+                            onPress={() => setTabValue("goods")}
+                            className={`flex-1 flex-row bg-orange-200 justify-center  items-center border-x ${tabValue === "goods" && "bg-orange-400"}`}>
+                            <IconSymbol name="list.dash" color={tabValue === "goods" ? "white" : "black"} />
+                        </Pressable>
+                        <Pressable
+                            onPress={() => setTabValue("users")}
+                            className={`flex-1 flex-row bg-orange-200 rounded-r-full justify-center  items-center ${tabValue === "users" && "bg-orange-400"}`}>
+                            <IconSymbol name="person.2.fill" color={tabValue === "users" ? "white" : "black"} />
                         </Pressable>
 
+
                     </View>
-                </View>
 
-                {/* Tabs button */}
-                <View className="flex-row mx-10 justify-center rounded-full my-2 bg-orange-200 rounded-full border border-orange-600si tu ">
-                    <Pressable
-                        onPress={() => setTabValue("info")}
-                        className={`flex-1 flex-row rounded-l-full p-2 items-center justify-center ${tabValue === "info" && "bg-orange-400"}`}>
-                        <IconSymbol name="doc.plaintext" color={tabValue === "info" ? "white" : "black"} />
-                    </Pressable>
-                    <Pressable
-                        onPress={() => setTabValue("goods")}
-                        className={`flex-1 flex-row bg-orange-200 justify-center  items-center border-x ${tabValue === "goods" && "bg-orange-400"}`}>
-                        <IconSymbol name="list.dash" color={tabValue === "goods" ? "white" : "black"} />
-                    </Pressable>
-                    <Pressable
-                        onPress={() => setTabValue("users")}
-                        className={`flex-1 flex-row bg-orange-200 rounded-r-full justify-center  items-center ${tabValue === "users" && "bg-orange-400"}`}>
-                        <IconSymbol name="person.2.fill" color={tabValue === "users" ? "white" : "black"} />
-                    </Pressable>
+                    {tabValue === "info" &&
+                        <Animated.View entering={ZoomIn} className="m-2 flex-1">
+                            <EventInfo
+                                event={event}
+                                me={me} />
+                        </Animated.View>
+                    }
+                    {tabValue === "goods" &&
+                        <Animated.View entering={ZoomIn}
+                            className="m-2">
+                            <EventsGoodsList event={event} user={me} />
+                        </Animated.View>
+                    }
+                    {tabValue === "users" &&
+                        <Animated.View entering={ZoomIn}
+                            className="m-2 flex-1">
+                            <EventUserList
+                                event={event}
+                                selected={me} />
+                        </Animated.View>
+                    }
 
-
-                </View>
-
-                {tabValue === "info" &&
-                    <Animated.View entering={ZoomIn} className="m-2 flex-1">
-                        <EventInfo
-                            event={event}
-                            me={me} />
-                    </Animated.View>
-                }
-                {tabValue === "goods" &&
-                    <Animated.View entering={ZoomIn}
-                        className="m-2 flex-1">
-                        <EventsGoodsList event={event} />
-                    </Animated.View>
-                }
-                {tabValue === "users" &&
-                    <Animated.View entering={ZoomIn}
-                        className="m-2 flex-1">
-                        <EventUserList
-                            event={event}
-                            selected={me} />
-                    </Animated.View>
-                }
-
-            </Animated.ScrollView>
+                </Animated.ScrollView>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     )
 }

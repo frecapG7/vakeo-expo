@@ -88,6 +88,7 @@ export const GoodBottomSheet = ({ open, good, trip, onClose }: { open: boolean, 
     const valueTextInputRef: React.RefObject<TextInput | null> = useRef<TextInput>(null);
     const quantityTextInputRef: React.RefObject<TextInput | null> = useRef<TextInput>(null);
 
+
     return (
         <BottomSheet ref={bottomSheetRef}
             index={-1}
@@ -135,53 +136,58 @@ export const GoodBottomSheet = ({ open, good, trip, onClose }: { open: boolean, 
                 </View>
 
                 <View className="my-1">
-                    <View className="flex-row px-5 justify-between">
-                        <Text className="italic font-bold dark:text-white">
-                            Nom
-                        </Text>
+                    <View>
+
+                        <View className="ml-4">
+                            <Text className="italic font-bold dark:text-white">
+                                Nom*
+                            </Text>
+                        </View>
+                        <View className="flex-row justify-between items-center bg-gray-200 flex-grow rounded-lg focus:border-2 focus:border-blue-400">
+
+                            <BottomSheetTextInput
+                                value={value}
+                                onChangeText={(v) => {
+                                    setName(v);
+                                }}
+                                className="flex-grow text-black capitalize h-12"
+                                placeholderTextColor={colors.inputPlaceHolder}
+                                ref={valueTextInputRef}
+                            />
+                            {value !== "" &&
+                                <Animated.View entering={FadeIn} className="" >
+                                    <Button onPress={() => setName("")}>
+                                        <IconSymbol name="xmark.circle" color="black" />
+                                    </Button>
+                                </Animated.View>
+                            }
+                        </View>
+                    </View>
+                    <View>
                         <Text className="italic font-bold dark:text-white">
                             Quantité
                         </Text>
                     </View>
-                    <View className="flex-row flex-1 bg-gray-200 flex-grow rounded-lg focus:border-2 focus:border-blue-400">
-                        
-                        <View className="flex-1 border-r border-black px-2">
-                            <View className="flex flex-row gap-2 bg-gray-200 justify-between items-center ">
-                                <BottomSheetTextInput
-                                    value={value}
-                                    onChangeText={(v) => {
-                                        setName(v);
-                                    }}
-                                    className="flex-grow placeholder-black min-h-10"
-                                    placeholderTextColor="#0000"
-                                    ref={valueTextInputRef}
-                                />
-                                {value !== "" &&
-                                    <Animated.View entering={FadeIn} className="" >
-                                        <Button onPress={() => setName("")}>
-                                            <IconSymbol name="xmark.circle" color="black" />
-                                        </Button>
-                                    </Animated.View>
-                                }
-                            </View>
-                        </View>
-
-                        <View className="flex-row items-center w-1/3 px-2">
-                            <Text>x</Text>
-                            <BottomSheetTextInput
-                                onChangeText={setQuantity}
-                                value={quantity}
-                                className="text-md flex-1 text-dark bg-gray-200 text-right min-h-5"
-                                placeholderTextColor="#0000"
-                                ref={quantityTextInputRef}
-                                style={styles.textInput}
-                            />
-                        </View>
+                    <View className="flex-row justify-between items-center bg-gray-200 flex-grow rounded-lg focus:border-2 focus:border-blue-400">
+                        <BottomSheetTextInput
+                            onChangeText={setQuantity}
+                            value={quantity}
+                            className="text-md h-12"
+                            placeholderTextColor={colors.inputPlaceHolder}
+                            ref={quantityTextInputRef}
+                            style={styles.textInput}
+                        />
+                        {value !== "" &&
+                            <Animated.View entering={FadeIn} className="" >
+                                <Button onPress={() => setName("")}>
+                                    <IconSymbol name="xmark.circle" color="black" />
+                                </Button>
+                            </Animated.View>
+                        }
                     </View>
 
                     <View className="px-10 mt-2">
                         <Button variant="contained"
-                            className="px-10"
                             title={good?._id ? "Modifier" : "Ajouter"}
                             onPress={handleSubmit(onSubmit)}
                             isLoading={postGood.isPending || putGood.isPending} />

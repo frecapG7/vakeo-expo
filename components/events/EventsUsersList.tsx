@@ -24,13 +24,6 @@ export const EventUserList = ({ event, selected }: { event: Event, selected?: Tr
     return (
         <View>
             <View className="m-2 gap-1">
-                <View className="flex-row justify-end items-end">
-                    <View className="bg-orange-200 p-2 rounded-full">
-                        <Text className="text-orange-600 font-bold">
-                            {event?.attendees?.length} inscrits
-                        </Text>
-                    </View>
-                </View>
                 <View className="gap-1 bg-white dark:bg-gray-900 rounded-xl">
                     {event?.attendees?.map((attendee) => (
                         <View

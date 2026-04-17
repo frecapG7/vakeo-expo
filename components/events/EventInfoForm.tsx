@@ -52,10 +52,10 @@ export const EventInfoForm = ({ control }: { control: Control<Event> }) => {
 
             <View>
                 <Text className="ml-3 font-bold dark:text-white text-sm">
-                    Heure
+                    Le jour et l'heure
                 </Text>
 
-                <View className="bg-white dark:bg-gray-400 border border border-gray-400 dark:border-gray-200 focus:border-blue-500 rounded-xl p-2 py-4 gap-4">
+                <View className="bg-white dark:bg-gray-600 border border border-gray-400 dark:border-gray-200 focus:border-blue-500 rounded-xl p-2 py-4 gap-4">
                     <FormDateTimePickerV2
                         control={control}
                         rules={{

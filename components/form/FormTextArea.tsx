@@ -49,7 +49,7 @@ export const FormTextArea = ({ control, name, label, placeholder, rules }: {
         <View>
 
             <Animated.View style={animatedStyle}
-                className="flex-row bg-stone-50 dark:bg-gray-400 border border-gray-400 dark:border-gray-200 focus:border-blue-500 rounded-xl h-40">
+                className="flex-row bg-stone-50 dark:bg-gray-600 focus:border focus:border-blue-500 rounded-xl h-40">
                 <TextInput
                     onChangeText={onChange}
                     value={value}
@@ -58,7 +58,7 @@ export const FormTextArea = ({ control, name, label, placeholder, rules }: {
                     ref={ref}
                     numberOfLines={7}
                     multiline={true}
-                    className="flex-1 p-3 text-md "
+                    className="flex-1 p-3 text-m dark:text-white "
                     style={{
                         textAlignVertical: "top", // Alignement du texte en haut
                     }}

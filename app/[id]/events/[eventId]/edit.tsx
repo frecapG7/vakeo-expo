@@ -35,7 +35,7 @@ export default function EditTripEvent() {
             pathname: "/[id]/events/[eventId]",
             params: {
                 id: String(id),
-                eventId: String(event?._id)
+                eventId: String(eventId)
             }
         });
     }
