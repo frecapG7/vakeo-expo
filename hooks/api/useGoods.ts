@@ -2,7 +2,21 @@ import axios from "@/lib/axios";
 import { Good } from "@/types/models";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-const getGoods = async (tripId, params) => {
+
+interface IParams {
+    cursor: string,
+    limit: number,
+    type?: string
+}
+
+interface IPage {
+    nextCursor: string,
+    prevCursor: string,
+    totalResults: number,
+    goods: Good[]
+}
+
+const getGoods = async (tripId: any, params: IParams): Promise<IPage> => {
     const response = await axios.get(`/trips/${tripId}/goods`, {
         params
     })
@@ -10,8 +24,8 @@ const getGoods = async (tripId, params) => {
 }
 
 
-export const useGetGoods = (tripId, params, options) => {
-    return useInfiniteQuery({
+export const useGetGoods = (tripId: any, params: any, options?: any) => {
+    return useInfiniteQuery<IPage, Error>({
         queryKey: ["trips", tripId, "goods", params],
         queryFn: ({ pageParam }) => getGoods(tripId, {
             cursor: pageParam,
@@ -25,69 +39,64 @@ export const useGetGoods = (tripId, params, options) => {
 }
 
 
-const postGood = async (tripId, good) => {
+const postGood = async (tripId: any, good: Good) => {
     const response = await axios.post(`/trips/${tripId}/goods`, good);
     return response.data
 }
 
-export const usePostGood = (tripId) => {
+export const usePostGood = (tripId: any) => {
     const queryClient = useQueryClient();
-    return useMutation({
+    return useMutation<Good, Error, Good>({
         mutationFn: (data) => postGood(tripId, data),
-        onSuccess: () => queryClient.invalidateQueries(["trips", tripId, "goods"])
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["trips", tripId, "goods"] })
     });
 }
 
-const putGood = async (tripId, data) => {
+const putGood = async (tripId: any, data: Good) => {
     const response = await axios.put(`/trips/${tripId}/goods/${data._id}`, data);
     return response.data;
 }
-export const usePutGood = (tripId) => {
+export const usePutGood = (tripId: any) => {
 
     const queryClient = useQueryClient();
-    return useMutation({
+    return useMutation<Good, Error, Good>({
         mutationFn: (data) => putGood(tripId, data),
-        onSuccess: () => queryClient.invalidateQueries(["trips", tripId, "goods"])
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["trips", tripId, "goods"] })
     });
 }
 
-const checkGood = async (tripId, goodId) => {
+const checkGood = async (tripId: any, goodId: any) => {
     const response = await axios.put(`/trips/${tripId}/goods/${goodId}/checked`);
     return response.data;
 }
 
-export const useCheckGood = (tripId) => {
+export const useCheckGood = (tripId: any) => {
     const queryClient = useQueryClient();
-    return useMutation({
+    return useMutation<Good, Error, Good>({
         mutationFn: (good) => checkGood(tripId, good._id),
-        onSuccess: () => queryClient.invalidateQueries(["trips", tripId, "goods"])
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["trips", tripId, "goods"] })
     })
 }
 
-
-
-const getNames = async (tripId, search) => {
-    const response = await axios.get(`/trips/${tripId}/goods/names`, {
-        params: {
-            search
-        }
-    });
+const deleteGood = async (tripId: any, goodId: any) => {
+    const response = await axios.delete(`/trips/${tripId}/goods/${goodId}`);
     return response.data;
 }
 
-const isEnabled = (search) => {
-    if (!search)
-        return false;
-    return search?.length > 2;
-}
+export const useDeleteGood = (tripId: any) => {
+    const queryClient = useQueryClient();
 
-export const useGetNames = (tripId, search) => {
-    return useQuery({
-        queryKey: ["trips", tripId, "goods", "names", search],
-        queryFn: () => getNames(tripId, search),
-        enabled: (!!tripId && isEnabled(search))
+    return useMutation<Good, Error, Good>({
+        mutationFn: (data) => deleteGood(tripId, data._id),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["trips", tripId, "goods"] })
     });
 }
+
+
+
+// DEPRECATED AREA BELOW
+
+
 
 
 const getCount = async (tripId, params) => {
@@ -106,19 +115,7 @@ export const useGetGoodsCount = (tripId, params) => {
 }
 
 
-const deleteGood = async (tripId, goodId) => {
-    const response = await axios.delete(`/trips/${tripId}/goods/${goodId}`);
-    return response.data;
-}
 
-export const useDeleteGood = (tripId) => {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: (data) => deleteGood(tripId, data._id),
-        onSuccess: () => queryClient.invalidateQueries(["trips", tripId, "goods"])
-    });
-}
 
 interface IGoodSummary {
     totalCount: number,
@@ -137,7 +134,7 @@ const getGoodSummary = async (tripId: string, event?: string): Promise<IGoodSumm
 }
 
 
-export const useGetGoodSummary = (tripId: string, event ?: string) => {
+export const useGetGoodSummary = (tripId: string, event?: string) => {
     return useQuery<IGoodSummary>({
         queryKey: ["trips", tripId, ...(event ? ["event", event] : [])],
         queryFn: () => getGoodSummary(tripId, event)

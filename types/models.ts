@@ -29,8 +29,8 @@ export type EventType = "MEAL" | "RESTAURANT" | "SPORT" | "PARTY" | "VISITATION"
 
 export interface Event {
     _id: string,
-    startDate?: Date,
-    endDate?: Date,
+    startDate?: Date | string,
+    endDate?: Date | string,
     name: string,
     attendees?: TripUser[],
     owners?: TripUser[],

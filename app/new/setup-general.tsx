@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { KeyboardAvoidingView, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const data = [
     {
@@ -84,23 +85,26 @@ export default function NewTripGeneral() {
     }, [navigation]);
 
     return (
-        <KeyboardAvoidingView behavior="padding"
-            keyboardVerticalOffset={64}
-            style={styles.container}>
-            <Animated.ScrollView className="flex-1 pt-5 pb-20">
-                <View className="gap-2 m-2">
-                    <Text className="text-2xl font-bold dark:text-white">
-                        Donne un nom à ton escapade
-                    </Text>
-                    <Text className="text-md dark:text-gray-200">
-                        Indique un nom d'escapade qui décrit ce que tu as en tête.
-                        Tu peux également ajouter une description et personnaliser le thème.
-                    </Text>
-                </View>
-                <View className="m-5">
-                    <TripInfoForm control={control} />
-                </View>
-            </Animated.ScrollView>
-        </KeyboardAvoidingView>
+        <SafeAreaView style={styles.container}>
+
+            <KeyboardAvoidingView behavior="padding"
+                keyboardVerticalOffset={64}
+                style={styles.container}>
+                <Animated.ScrollView className="flex-1">
+                    <View className="gap-2 m-2">
+                        <Text className="text-2xl font-bold dark:text-white">
+                            Donne un nom à ton escapade
+                        </Text>
+                        <Text className="text-md dark:text-gray-200">
+                            Indique un nom d'escapade qui décrit ce que tu as en tête.
+                            Tu peux également ajouter une description et personnaliser le thème.
+                        </Text>
+                    </View>
+                    <View className="m-5">
+                        <TripInfoForm control={control} />
+                    </View>
+                </Animated.ScrollView>
+            </KeyboardAvoidingView>
+        </SafeAreaView>
     )
 }

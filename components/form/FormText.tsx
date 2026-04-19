@@ -4,7 +4,7 @@ import { useController } from "react-hook-form";
 import { TextInput, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 
-export const FormText = ({ control, name, label, placeholder, rules, endAdornment, className }: {
+export const FormText = ({ control, name, label, placeholder, rules, endAdornment, className, autoFocus }: {
     control: any,
     name: string,
     label?: string,
@@ -12,6 +12,7 @@ export const FormText = ({ control, name, label, placeholder, rules, endAdornmen
     rules?: object,
     endAdornment?: React.ReactNode,
     className?: string,
+    autoFocus ?: boolean
 }) => {
 
     const { field: { value, onChange, ref },
@@ -45,17 +46,18 @@ export const FormText = ({ control, name, label, placeholder, rules, endAdornmen
 
     return (
         <Animated.View style={animatedStyle}
-            className="flex-row items-center bg-stone-50 dark:bg-gray-400 border border-gray-400 dark:border-gray-200 focus:border-blue-500 rounded-xl h-12">
+            className="flex-row items-center bg-gray-100 dark:bg-gray-600  border focus:border focus:border-blue-500 rounded-xl h-12">
             <TextInput
                 onChangeText={onChange}
                 value={value}
-                className="flex-1 text-dark h-full items-start"
+                className="flex-1 text-dark dark:text-white h-full items-start capitalize"
                 placeholderTextColor={inputPlaceHolder}
                 ref={ref}
                 placeholder={placeholder}
                 style={{
                     textAlignVertical: "top",
                 }}
+                autoFocus={autoFocus}
             />
             {endAdornment &&
                 <View

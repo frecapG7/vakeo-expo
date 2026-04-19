@@ -40,6 +40,7 @@ const MAPPING = {
   "cart": "shopping-cart",
   "link": "insert-link",
   "trash": "delete-outline",
+  "trash.fill": "delete",
   "suit.spade": "fastfood",
   "list.dash": "format-list-bulleted",
   "clock": "access-time",
@@ -76,7 +77,7 @@ const MAPPING = {
   "lock": "lock-outline",
   "number.circle": "add-circle-outline",
   "number.circle.fill": "add-circle",
-
+  "doc.plaintext" : "text-snippet"
 } as IconMapping;
 
 /**

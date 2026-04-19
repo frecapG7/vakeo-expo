@@ -27,7 +27,9 @@ const ButtonTitle = ({ title, variant, size, isLoading }: { title: string, varia
     if (isLoading)
         return (
             <Animated.View entering={FadeIn} exiting={FadeOut} className="w-full">
-                <ActivityIndicator size="large" color={colors.text} className={sizeClass} />
+                <ActivityIndicator size={size === "medium" ? "large" : "small"}
+                    color={colors.text}
+                    className={sizeClass} />
             </Animated.View>
         );
 
@@ -64,12 +66,9 @@ export const Button = ({ title,
     children?: React.ReactNode
 }) => {
 
-
     const variantClass = variantToClassMap[variant];
 
     const disableClass = (disabled || isLoading) ? "opacity-50 bg-gray-600" : ""
-
-
 
     //${disabled ? 'bg-neutral-200' : 'bg-blue-400'} 
     return (

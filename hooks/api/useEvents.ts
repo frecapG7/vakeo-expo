@@ -45,7 +45,7 @@ const postEvent = async (tripId: string, data: Omit<Event, '_id'>) : Promise<Eve
 }
 
 
-export const usePostEvent = (tripId: string) => {
+export const usePostEvent = (tripId: string | any) => {
     const queryClient = useQueryClient();
     return useMutation<Event, Error, Event>({
         mutationFn: (data) => postEvent(tripId, data),
