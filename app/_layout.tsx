@@ -1,10 +1,10 @@
 import useColors from "@/hooks/styles/useColors";
+import '@/lib/calendar-config';
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import * as Sentry from '@sentry/react-native';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect, useState } from "react";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import ToastManager from "toastify-react-native";
 import '../global.css';
@@ -73,7 +73,7 @@ const RootNav = () => {
 
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+  
       <Stack initialRouteName="index">
         <Stack.Screen name="index" options={{
           headerShown: true,
@@ -95,7 +95,6 @@ const RootNav = () => {
         }} />
         <Stack.Screen name="token" options={{ headerShown: false }} />
       </Stack>
-    </GestureHandlerRootView>
 
   );
 }

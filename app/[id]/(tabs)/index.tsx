@@ -19,6 +19,7 @@ import { ImageBackground } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext, useMemo, useRef } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
 
@@ -158,236 +159,238 @@ export default function ItemDetails() {
         );
 
     return (
-        <BottomSheetModalProvider>
-            <Animated.ScrollView style={{ flex: 1 }}>
-                <View className="h-80 w-full">
-                    <ImageBackground source={trip?.image}
-                        style={{
-                            height: "100%",
-                            width: "100%",
-                        }}
-                        contentFit="cover"
-                    >
-                        <View className="flex-1 justify-between mt-10 p-2">
-                            <View className="flex-row justify-between items-center">
-                                <Pressable className="rounded-full bg-gray-800 p-1 shadow"
-                                    onPress={() => router.dismissAll()}>
-                                    <IconSymbol name="arrow.left" size={25} color="white" />
-                                </Pressable>
-                                <View className="flex-row gap-5 items-center">
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <BottomSheetModalProvider>
+                <Animated.ScrollView style={{ flex: 1 }}>
+                    <View className="h-80 w-full">
+                        <ImageBackground source={trip?.image}
+                            style={{
+                                height: "100%",
+                                width: "100%",
+                            }}
+                            contentFit="cover"
+                        >
+                            <View className="flex-1 justify-between mt-10 p-2">
+                                <View className="flex-row justify-between items-center">
+                                    <Pressable className="rounded-full bg-gray-800 p-1 shadow"
+                                        onPress={() => router.dismissAll()}>
+                                        <IconSymbol name="arrow.left" size={25} color="white" />
+                                    </Pressable>
+                                    <View className="flex-row gap-5 items-center">
 
-                                    <Pressable className="items-center"
-                                        onPressOut={() => router.push({
-                                            pathname: "/[id]/(tabs)/messages",
-                                            params: {
-                                                id: String(id)
-                                            }
-                                        })}>
-                                        <Avatar src={me?.avatar}
-                                            alt={me?.name?.charAt(0)}
-                                            size2="md"
-                                            badgeContent={0} />
-                                        <Text className="text-white font-bold">{me?.name}</Text>
-                                    </Pressable>
-                                    <Pressable onPressOut={() => bottomSheetModalRef.current?.present()}
-                                        className="bg-gray-800 rounded-full p-2">
-                                        <IconSymbol name="ellipsis.circle" color="white" />
-                                    </Pressable>
+                                        <Pressable className="items-center"
+                                            onPressOut={() => router.push({
+                                                pathname: "/[id]/(tabs)/messages",
+                                                params: {
+                                                    id: String(id)
+                                                }
+                                            })}>
+                                            <Avatar src={me?.avatar}
+                                                alt={me?.name?.charAt(0)}
+                                                size2="md"
+                                                badgeContent={0} />
+                                            <Text className="text-white font-bold">{me?.name}</Text>
+                                        </Pressable>
+                                        <Pressable onPressOut={() => bottomSheetModalRef.current?.present()}
+                                            className="bg-gray-800 rounded-full p-2">
+                                            <IconSymbol name="ellipsis.circle" color="white" />
+                                        </Pressable>
+                                    </View>
                                 </View>
                             </View>
+                        </ImageBackground>
+                    </View>
+
+
+                    <View className="shadow mx-4 -mt-10 mb-5 px-2 pt-4 rounded-xl gap-5 bg-white dark:bg-gray-900 flex" >
+                        <View className="px-5 gap-2 ">
+                            <Text className="text-4xl font-bold dark:text-white" numberOfLines={2}>{trip?.name}</Text>
+                            <View className="flex gap-1 items-start justify-start">
+                                <AvatarsGroup
+                                    maxLength={5}
+                                    size2="sm"
+                                    avatars={trip?.users?.filter(u => u._id !== me?._id).map(u => ({
+                                        avatar: u?.avatar,
+                                        alt: u?.name?.charAt(0)
+                                    })
+                                    )}
+                                />
+                                <Text numberOfLines={1} className="max-w-25 dark:text-white">
+                                    Avec {trip?.users
+                                        ?.filter(u => u._id !== me?._id)
+                                        .map(u => u.name)
+                                        .join(",")}
+                                </Text>
+                            </View>
                         </View>
-                    </ImageBackground>
-                </View>
-
-
-                <View className="shadow mx-4 -mt-10 mb-5 px-2 pt-4 rounded-xl gap-5 bg-white dark:bg-gray-900 flex" >
-                    <View className="px-5 gap-2 ">
-                        <Text className="text-4xl font-bold dark:text-white" numberOfLines={2}>{trip?.name}</Text>
-                        <View className="flex gap-1 items-start justify-start">
-                            <AvatarsGroup
-                                maxLength={5}
-                                size2="sm"
-                                avatars={trip?.users?.filter(u => u._id !== me?._id).map(u => ({
-                                    avatar: u?.avatar,
-                                    alt: u?.name?.charAt(0)
+                        <View className="flex my-5 gap-4">
+                            <Pressable className="flex-row items-center gap-2" onPress={() => router.push({
+                                pathname: "/[id]/dates",
+                                params: {
+                                    id: String(id)
+                                }
+                            })}>
+                                <View className="rounded-full bg-orange-400 p-2">
+                                    <IconSymbol name="calendar" size={32} color="white" />
+                                </View>
+                                {trip?.startDate ?
+                                    <View>
+                                        <Text className="capitalize text-md dark:text-white font-bold" numberOfLines={2} >
+                                            {formatRange(trip?.startDate, trip?.endDate)}
+                                        </Text>
+                                        <Text className="text-sm text-gray-600 dark:text-gray-200">
+                                            {countDaysBetween(dayjs(trip?.startDate), dayjs(trip?.endDate))} jours
+                                        </Text>
+                                    </View>
+                                    :
+                                    <Text className="capitalize text-md font-bold dark:text-white">
+                                        Saisir des dates
+                                    </Text>
+                                }
+                            </Pressable>
+                            <Pressable className="flex-row items-center gap-2" onPress={() =>
+                                router.push({
+                                    pathname: "/[id]/location",
+                                    params: {
+                                        id: String(id)
+                                    }
                                 })
-                                )}
-                            />
-                            <Text numberOfLines={1} className="max-w-25 dark:text-white">
-                                Avec {trip?.users
-                                    ?.filter(u => u._id !== me?._id)
-                                    .map(u => u.name)
-                                    .join(",")}
-                            </Text>
-                        </View>
-                    </View>
-                    <View className="flex my-5 gap-4">
-                        <Pressable className="flex-row items-center gap-2" onPress={() => router.push({
-                            pathname: "/[id]/dates",
-                            params: {
-                                id: String(id)
-                            }
-                        })}>
-                            <View className="rounded-full bg-orange-400 p-2">
-                                <IconSymbol name="calendar" size={32} color="white" />
-                            </View>
-                            {trip?.startDate ?
-                                <View>
-                                    <Text className="capitalize text-md dark:text-white font-bold" numberOfLines={2} >
-                                        {formatRange(trip?.startDate, trip?.endDate)}
-                                    </Text>
-                                    <Text className="text-sm text-gray-600 dark:text-gray-200">
-                                        {countDaysBetween(dayjs(trip?.startDate), dayjs(trip?.endDate))} jours
-                                    </Text>
+                            }>
+                                <View className="rounded-full bg-blue-100 p-2">
+                                    <IconSymbol name="map" size={32} color="orange" />
                                 </View>
-                                :
-                                <Text className="capitalize text-md font-bold dark:text-white">
-                                    Saisir des dates
-                                </Text>
-                            }
-                        </Pressable>
-                        <Pressable className="flex-row items-center gap-2" onPress={() =>
-                            router.push({
-                                pathname: "/[id]/location",
-                                params: {
-                                    id: String(id)
-                                }
-                            })
-                        }>
-                            <View className="rounded-full bg-blue-100 p-2">
-                                <IconSymbol name="map" size={32} color="orange" />
-                            </View>
-                            <Text className="font-bold dark:text-white max-w-[80%]" numberOfLines={3}>
-                                {trip?.location?.displayName || "Ajouter un lieu"}
-                            </Text>
-                        </Pressable>
-                        <Pressable className="flex-row items-center gap-2" onPress={() => console.log("todo")}>
-                            <View className="rounded-full bg-blue-200 p-2 items-center">
-                                <IconSymbol name="eurosign.circle" size={32} color="blue" />
-                            </View>
-                            <View>
                                 <Text className="font-bold dark:text-white max-w-[80%]" numberOfLines={3}>
-                                    {trip?.splittingLink || "Ajouter une cagnotte"}
+                                    {trip?.location?.displayName || "Ajouter un lieu"}
                                 </Text>
-                                <Text className="text-gray-400 text-sm">
-                                    Equilibre les dépenses du groupe
+                            </Pressable>
+                            <Pressable className="flex-row items-center gap-2" onPress={() => console.log("todo")}>
+                                <View className="rounded-full bg-blue-200 p-2 items-center">
+                                    <IconSymbol name="eurosign.circle" size={32} color="blue" />
+                                </View>
+                                <View>
+                                    <Text className="font-bold dark:text-white max-w-[80%]" numberOfLines={3}>
+                                        {trip?.splittingLink || "Ajouter une cagnotte"}
+                                    </Text>
+                                    <Text className="text-gray-400 text-sm">
+                                        Equilibre les dépenses du groupe
+                                    </Text>
+                                </View>
+                            </Pressable>
+                        </View>
+                    </View>
+
+
+                    <View className="mx-4 p-2 mb-5">
+                        <Text className="text-lg font-bold ml-4 dark:text-white">
+                            Description
+                        </Text>
+                        <Text className="dark:text-white">
+                            {trip?.description}
+                        </Text>
+                    </View>
+                    {dashboard?.polls.pending > 0 &&
+                        <View className="mx-5 my-2">
+                            <View className="">
+                                <Text className="font-bold text-2xl dark:text-white">
+                                    Sondages
+                                </Text>
+                                <Text className="text-md dark:text-white">
+                                    On attend ta réponse sur des sondages
                                 </Text>
                             </View>
-                        </Pressable>
-                    </View>
-                </View>
-
-
-                <View className="mx-4 p-2 mb-5">
-                    <Text className="text-lg font-bold ml-4 dark:text-white">
-                        Description
-                    </Text>
-                    <Text className="dark:text-white">
-                        {trip?.description}
-                    </Text>
-                </View>
-                {dashboard?.polls.pending > 0 &&
-                    <View className="mx-5 my-2">
-                        <View className="">
-                            <Text className="font-bold text-2xl dark:text-white">
-                                Sondages
-                            </Text>
-                            <Text className="text-md dark:text-white">
-                                On attend ta réponse sur des sondages
-                            </Text>
+                            <PollsWidget
+                                trip={trip}
+                                user={me}
+                                onClick={(poll) => router.navigate({
+                                    pathname: "/[id]/polls/[pollId]",
+                                    params: {
+                                        id: String(id),
+                                        pollId: poll._id
+                                    }
+                                })} />
                         </View>
-                        <PollsWidget
-                            trip={trip}
-                            user={me}
-                            onClick={(poll) => router.navigate({
-                                pathname: "/[id]/polls/[pollId]",
-                                params: {
-                                    id: String(id),
-                                    pollId: poll._id
-                                }
-                            })} />
-                    </View>
-                }
+                    }
 
-                <BottomSheetModal
-                    ref={bottomSheetModalRef}
-                    backgroundStyle={{
-                        backgroundColor: colors.background
-                    }}>
-                    <BottomSheetView style={{ flex: 1, padding: 10, minHeight: 150 }}>
-                        <View className="flex flex-grow gap-5 p-1 divide-y-5 divide-solid dark:divide-white">
-                            <Button
-                                className="flex flex-row items-center gap-5"
-                                onPress={() => router.push({
-                                    pathname: "/[id]/goods",
+                    <BottomSheetModal
+                        ref={bottomSheetModalRef}
+                        backgroundStyle={{
+                            backgroundColor: colors.background
+                        }}>
+                        <BottomSheetView style={{ flex: 1, padding: 10, minHeight: 150 }}>
+                            <View className="flex flex-grow gap-5 p-1 divide-y-5 divide-solid dark:divide-white">
+                                <Button
+                                    className="flex flex-row items-center gap-5"
+                                    onPress={() => router.push({
+                                        pathname: "/[id]/goods",
+                                        params: {
+                                            id: String(id)
+                                        }
+                                    })}>
+                                    <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
+                                        <IconSymbol name="cart" size={30} />
+                                    </View>
+                                    <Text className=" text-lg dark:text-white">Voir la liste de course</Text>
+                                </Button>
+                                <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
+                                <Button
+                                    className="flex flex-row items-center gap-5"
+                                    onPress={() => router.push({
+                                        pathname: "/[id]/settings",
+                                        params: {
+                                            id: String(id)
+                                        }
+                                    })}>
+                                    <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
+                                        <IconSymbol name="gear" size={30} />
+                                    </View>
+                                    <Text className=" text-lg dark:text-white">Réglages</Text>
+                                </Button>
+                                <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
+
+                                <Button onPress={handleShare} className="flex flex-row gap-5 items-center" isLoading={shareTrip.isPending}>
+                                    <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
+                                        {shareTrip.isPending ?
+                                            (
+                                                <Animated.View entering={FadeIn} exiting={FadeOut}>
+                                                    <ActivityIndicator size={30} color="black" />
+                                                </Animated.View>
+                                            )
+                                            :
+                                            (
+                                                <Animated.View entering={FadeIn} exiting={FadeOut}>
+                                                    <IconSymbol name="doc.on.doc" size={30} />
+                                                </Animated.View>
+                                            )
+                                        }
+                                    </View>
+                                    <Text className="text-lg dark:text-white">Partager le voyage</Text>
+                                </Button>
+                                <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
+                                <Button onPress={() => router.push({
+                                    pathname: "/[id]/edit-general",
                                     params: {
                                         id: String(id)
                                     }
-                                })}>
-                                <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
-                                    <IconSymbol name="cart" size={30} />
-                                </View>
-                                <Text className=" text-lg dark:text-white">Voir la liste de course</Text>
-                            </Button>
-                            <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
-                            <Button
-                                className="flex flex-row items-center gap-5"
-                                onPress={() => router.push({
-                                    pathname: "/[id]/settings",
-                                    params: {
-                                        id: String(id)
-                                    }
-                                })}>
-                                <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
-                                    <IconSymbol name="gear" size={30} />
-                                </View>
-                                <Text className=" text-lg dark:text-white">Réglages</Text>
-                            </Button>
-                            <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
-
-                            <Button onPress={handleShare} className="flex flex-row gap-5 items-center" isLoading={shareTrip.isPending}>
-                                <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
-                                    {shareTrip.isPending ?
-                                        (
-                                            <Animated.View entering={FadeIn} exiting={FadeOut}>
-                                                <ActivityIndicator size={30} color="black" />
-                                            </Animated.View>
-                                        )
-                                        :
-                                        (
-                                            <Animated.View entering={FadeIn} exiting={FadeOut}>
-                                                <IconSymbol name="doc.on.doc" size={30} />
-                                            </Animated.View>
-                                        )
-                                    }
-                                </View>
-                                <Text className="text-lg dark:text-white">Partager le voyage</Text>
-                            </Button>
-                            <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
-                            <Button onPress={() => router.push({
-                                pathname: "/[id]/edit-general",
-                                params: {
-                                    id: String(id)
-                                }
-                            })}
-                                className="flex flex-row items-center gap-5">
-                                <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
-                                    <IconSymbol name="pencil" size={30} />
-                                </View>
-                                <Text className=" text-lg dark:text-white">Modifier le voyage</Text>
-                            </Button>
-                            <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
-                            <Button onPress={() => console.log("toto")} className="flex flex-row items-center gap-5">
-                                <View className="bg-red-400 dark:bg-gray-200 rounded-full p-2">
-                                    <IconSymbol name="trash" size={30} />
-                                </View>
-                                <Text className=" text-lg dark:text-white">Supprimer le voyage</Text>
-                            </Button>
-                        </View>
-                    </BottomSheetView>
-                </BottomSheetModal>
-            </Animated.ScrollView>
-        </BottomSheetModalProvider>
+                                })}
+                                    className="flex flex-row items-center gap-5">
+                                    <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
+                                        <IconSymbol name="pencil" size={30} />
+                                    </View>
+                                    <Text className=" text-lg dark:text-white">Modifier le voyage</Text>
+                                </Button>
+                                <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
+                                <Button onPress={() => console.log("toto")} className="flex flex-row items-center gap-5">
+                                    <View className="bg-red-400 dark:bg-gray-200 rounded-full p-2">
+                                        <IconSymbol name="trash" size={30} />
+                                    </View>
+                                    <Text className=" text-lg dark:text-white">Supprimer le voyage</Text>
+                                </Button>
+                            </View>
+                        </BottomSheetView>
+                    </BottomSheetModal>
+                </Animated.ScrollView>
+            </BottomSheetModalProvider>
+        </GestureHandlerRootView>
     )
 
 }

@@ -50,7 +50,7 @@ export const FormText = ({ control, name, label, placeholder, rules, endAdornmen
             <TextInput
                 onChangeText={onChange}
                 value={value}
-                className="flex-1 text-dark dark:text-white h-full items-start capitalize"
+                className="flex-1 text-dark dark:text-white h-full items-start normal-case"
                 placeholderTextColor={inputPlaceHolder}
                 ref={ref}
                 placeholder={placeholder}

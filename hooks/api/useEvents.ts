@@ -23,7 +23,6 @@ const search = async (tripId: string, params?: IParams): Promise<IPage> => {
 }
 
 export const useGetEvents = (tripId: string, params?: any, options?: any) => {
-
     return useInfiniteQuery<IPage, Error>({
         queryKey: ["trips", tripId, "events", params],
         queryFn: ({ pageParam }) => search(tripId, {

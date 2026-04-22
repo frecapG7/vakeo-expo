@@ -135,7 +135,7 @@ export const EventsGoodsList = ({ event, user }: { event: Event, user?: TripUser
                     Liste partagée de l'activité.
                 </Text>
                 <Text className="text-gray-400">
-                    Tu peux partager ici des choses à acheter pour l'activité.
+                    Tu peux partager ici des choses pour l'activité.
                 </Text>
             </View>
             <View className="gap-2">

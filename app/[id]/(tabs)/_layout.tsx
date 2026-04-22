@@ -64,7 +64,6 @@ export default function ItemDetailsLayout() {
             <Tabs.Screen
                 name="planning"
                 options={{
-
                     href: {
                         pathname: "/[id]/(tabs)/planning",
                         params: {
@@ -119,11 +118,11 @@ export default function ItemDetailsLayout() {
 
 
 
-            <Tabs.Screen name="calendar"
+            {/* <Tabs.Screen name="calendar"
                 options={{
                     href: null,
-                    title: "Calendrier",
-                }} />
+                    title: "Planning",
+                }} /> */}
 
             <Tabs.Screen name="links"
                 options={{

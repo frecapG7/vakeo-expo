@@ -6,14 +6,14 @@ import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetEvents } from "@/hooks/api/useEvents";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
+import dayjs from "@/lib/dayjs-config";
 import { Event, TripUser } from "@/types/models";
-import dayjs from "dayjs";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext, useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 
-const showDay = (previous?: any, current?: any) => {
+const showDay = (previous?: Event, current?: Event) => {
     if (!current?.startDate)
         return false;
     if (!previous?.startDate)
@@ -57,8 +57,8 @@ const typeFilters = [
 const EventItem = ({ event, user }: { event: Event, user: TripUser }) => {
 
 
-    const isAttendee = useMemo(() => event.attendees.map(u => u._id).includes(user?._id), [user, event]);
-    const isOwner = useMemo(() => event.owners.map(u => u._id).includes(user?._id), [user, event])
+    const isAttendee = useMemo(() => event.attendees?.map(u => u._id).includes(user?._id), [user, event]);
+    const isOwner = useMemo(() => event.owners?.map(u => u._id).includes(user?._id), [user, event])
 
     return (
         <View className={`py-3 pr-1 bg-white dark:bg-gray-900 rounded-xl ${isOwner ? "border-l-4 border-orange-400" : ""}`} >
@@ -77,8 +77,10 @@ const EventItem = ({ event, user }: { event: Event, user: TripUser }) => {
                                 </Animated.View>}
                         </View>
                         <View className="flex-row items-center ">
-                            <IconSymbol name="person.2.fill" color="gray" />
-                            <Text className="text-gray-600 dark:text-gray-400">{event?.attendees?.length} inscrit{event?.attendees?.length > 0 && "s"} </Text>
+                            <IconSymbol name="person.2.fill" color="gray" size={16} />
+                            <Text className="text-gray-600 dark:text-gray-400 text-sm">
+                                {event?.attendees?.length} inscrit{event?.attendees?.length > 0 && "s"}
+                            </Text>
                         </View>
                     </View>
 
@@ -87,8 +89,8 @@ const EventItem = ({ event, user }: { event: Event, user: TripUser }) => {
 
                     {isAttendee &&
                         <Animated.View className="flex-row bg-green-200 rounded-lg items-center p-1">
-                            <IconSymbol name="checkmark" color="green" size={15} />
-                            <Text className="text-xm font-bold text-green-600">Inscrit</Text>
+                            <IconSymbol name="checkmark" color="green" size={14} />
+                            <Text className="text-xs font-bold text-green-600">Inscrit</Text>
                         </Animated.View>
 
                     }
@@ -113,7 +115,7 @@ export default function TripPlanning() {
 
     const router = useRouter();
     const { me } = useContext(TripContext);
-    const { formatDate } = useI18nTime();
+    const { formatDate, formatDay , formatHour} = useI18nTime();
 
     const { data, hasNextPage, fetchNextPage, isLoading } = useGetEvents(String(id), {
         type: typeFilter,
@@ -133,6 +135,7 @@ export default function TripPlanning() {
                 ListHeaderComponent={
                     <View className="gap-2 mb-5">
                         {/* <Search value={search} onChange={setSearch} /> */}
+
                         <View className="flex-row justify-between gap-5">
                             <Pressable className={`flex-1 shadow flex-row rounded-lg justify-center items-center p-2 ${onlyAttendee ? "bg-orange-200 dark:bg-orange-600 border border-orange-300" : "bg-white dark:bg-gray-900 dark:border dark:border-gray-600"}`}
                                 onPress={() => setOnlyAttendee(!onlyAttendee)}>
@@ -165,14 +168,31 @@ export default function TripPlanning() {
                     </View>
                 }
                 renderItem={({ item, index, }) =>
-                    <Button className="min-h-50 "
-                        onPress={() => router.navigate({
-                            pathname: "/[id]/events/[eventId]",
-                            params: { id: String(id), eventId: item._id }
-                        })}>
-                        <EventItem event={item}
-                            user={me} />
-                    </Button>
+                    <View>
+                        {showDay(events[index - 1], item) &&
+                            <View className="border-b border-gray-200 p-1 mb-2">
+                                <Text className="text-xl font-bold uppercase dark:text-white">
+                                    {formatDay(item.startDate)}
+                                </Text>
+                            </View>
+                        }
+                        <View className="flex flex-row">
+                            <View className="p-1 justify-around">
+                                <Text className="text-gray-400">{formatHour(item.startDate)}</Text>
+                                <Text className="text-gray-400">{formatHour(item.endDate)}</Text>
+                            </View>
+                            <Button className="flex-1 min-h-50 "
+                                onPress={() => router.navigate({
+                                    pathname: "/[id]/events/[eventId]",
+                                    params: { id: String(id), eventId: item._id }
+                                })}>
+                                <EventItem event={item}
+                                    user={me} />
+                            </Button>
+                        </View>
+
+                    </View>
+
                 }
                 ItemSeparatorComponent={() => <View className="my-2" />}
                 keyExtractor={(item) => item?._id}
