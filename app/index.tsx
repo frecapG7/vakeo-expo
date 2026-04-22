@@ -8,6 +8,7 @@ import { useSearchTrips } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import { useGetStorageTrips } from "@/hooks/storage/useStorageTrips";
 import useColors from "@/hooks/styles/useColors";
+import '@/lib/calendar-config';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { ImageBackground } from "expo-image";
 import { useNavigation, useRouter } from "expo-router";

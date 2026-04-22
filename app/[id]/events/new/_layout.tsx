@@ -8,17 +8,21 @@ import { FormProvider, useForm } from "react-hook-form";
 import { View } from "react-native";
 
 
+const firstParam = (value: string | string[] | undefined) : string =>
+    Array.isArray(value) ? value?.[0] : value || "";
+
+
 
 
 export default function NewEventLayout() {
 
     const { id, startDate, endDate } = useLocalSearchParams();
-    const methods = useForm<Event>({
+    const methods = useForm<Omit<Event, "_id">>({
         defaultValues: {
             name: "",
             type: "",
-            ...(startDate && {startDate}),
-            ...(endDate && {endDate})
+            ...(startDate && {startDate: firstParam(startDate)}),
+            ...(endDate && {endDate: firstParam(endDate)})
         }
     });
 
@@ -37,16 +41,6 @@ export default function NewEventLayout() {
             }
         });
     }
-
-    // useEffect(() => {
-    //     if (startDate && endDate)
-    //         methods.reset({
-    //             name: "",
-    //             type: "",
-    //             startDate,
-    //             endDate
-    //         })
-    // }, [startDate, endDate]);
 
     return (
         <FormProvider {...methods}>

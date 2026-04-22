@@ -5,15 +5,13 @@ import useColors from "@/hooks/styles/useColors";
 import dayjs from "@/lib/dayjs-config";
 import { Event } from "@/types/models";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useMemo, useState } from "react";
-import { Pressable, Text, View } from "react-native";
-import { CalendarProvider, CalendarUtils, ExpandableCalendar, TimelineList, TimelineProps } from "react-native-calendars";
+import { useEffect, useMemo, useState } from "react";
+import { Pressable, Text } from "react-native";
+import { CalendarProvider, CalendarUtils, ExpandableCalendar, TimelineList } from "react-native-calendars";
+import { Event as TimelineEvent } from 'react-native-calendars/src/timeline/EventBlock';
 import Animated from "react-native-reanimated";
 
-
-
-
-const groupBy = (events: Event[]): Record<string, TimelineProps[]> => {
+const groupBy = (events: Event[]): Record<string, TimelineEvent[]> => {
     return events.reduce((acc, event) => {
         // Ignore if startDate undefined
         if (!event.startDate)
@@ -23,16 +21,15 @@ const groupBy = (events: Event[]): Record<string, TimelineProps[]> => {
         if (!acc[date])
             acc[date] = [];
         acc[date].push(({
-            _id: event._id,
+            id: event?._id,
             title: event.name,
             start: dayjs(event.startDate).format("YYYY-MM-DD HH:mm"),
             end: dayjs(event.endDate).format("YYYY-MM-DD HH:mm"),
-            type: event.type
+            summary: event.type
         }));
 
-
         return acc;
-    }, {} as Record<string, TimelineProps[]>);
+    }, {} as Record<string, TimelineEvent[]>);
 }
 
 
@@ -49,12 +46,18 @@ export default function TripCalendar() {
 
     const colors = useColors();
 
-    const { data, hasNextPage, fetchNextPage, isLoading } = useGetEvents(String(id), {
+    const { data, hasNextPage, fetchNextPage, isFetchingNextPage } = useGetEvents(String(id), {
         startDate: dayjs(currentDate).startOf("day").toISOString(),
-        endDate: dayjs(currentDate).add(5, "day").endOf("day").toISOString(),
+        endDate: dayjs(currentDate).add(4, "day").endOf("day").toISOString(),
     }, {
         enabled: !!id,
     });
+    useEffect(() => {
+        if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+        }
+    }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
     const events = useMemo(() => data?.pages.flatMap((page) => page?.events) || [], [data?.pages]);
 
 
@@ -105,38 +108,32 @@ export default function TripCalendar() {
                     timelineProps={{
                         renderEvent: (event) =>
                             <Pressable
+                                key={event.id}
                                 onPress={() => router.push({
                                     pathname: "/[id]/events/[eventId]",
                                     params: {
                                         id: String(id),
-                                        eventId: String(event._id)
+                                        eventId: String(event.id)
                                     }
                                 })}
                                 className="flex flex-col w-full items-around ">
-                                <View className="flex flex-row items-center justify-around gap-2">
-                                    {/* <EventIcon name={event.type} size={16} /> */}
-                                    <Text className="text-xs font-bold text-secondary">
-                                        {event.title}
-                                    </Text>
-                                </View>
-
-                                {/* <UsersList users={event.users} size={34} max={2} /> */}
+                                {/* <View className="flex flex-row items-center justify-around gap-2"> */}
+                                {/* <EventIcon name={event.type} size={16} /> */}
+                                <Text className="text-xs font-bold text-secondary">
+                                    {event.title}
+                                </Text>
+                                {/* </View> */}
                             </Pressable>,
                         overlapEventsSpacing: 8,
                         rightEdgeSpacing: 24,
-                        onEventPress: (events) =>
-                            router.push({
-                                pathname: "/[id]/events/[eventId]",
-                                params: {
-                                    id: String(id),
-                                    eventId: String(events?._id)
-                                }
-                            }),
                         onBackgroundLongPress: (timeString, time) => {
                             setNewEvent({
+                                _id: "",
                                 startDate: dayjs(timeString).toISOString(),
                                 endDate: dayjs(timeString).add(2, "hour").toISOString(),
-                                name: "Nouvelle activité"
+                                name: "Nouvelle activité",
+                                trip: String(id),
+                                type: ""
                             })
                         },
                         onBackgroundLongPressOut: (timeString, time) => {
@@ -144,8 +141,8 @@ export default function TripCalendar() {
                                 pathname: "/[id]/events/new",
                                 params: {
                                     id: String(id),
-                                    startDate: dayjs(timeString).subtract(2, "hour").toISOString(),
-                                    endDate: dayjs(timeString).toISOString(),
+                                    startDate: String(newEvent?.startDate),
+                                    endDate: String(newEvent?.endDate),
                                 }
                             });
                             setNewEvent(null);
@@ -167,9 +164,9 @@ export default function TripCalendar() {
                             disabledArrowColor: '#d9e1e8',
                             monthTextColor: colors.text,
                             indicatorColor: colors.text,
-                        }
+                        },
+
                     }}
-                    numberOfDays={5}
 
 
                 />
