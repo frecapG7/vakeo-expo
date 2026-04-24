@@ -47,6 +47,7 @@ export interface Good {
     createdBy: TripUser,
     event?: Event,
     checked: boolean
+    trip: string
 }
 
 

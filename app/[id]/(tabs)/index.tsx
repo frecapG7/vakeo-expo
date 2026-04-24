@@ -1,11 +1,9 @@
-import { EventIcon } from "@/components/events/EventIcon";
 import { Avatar, AvatarsGroup } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { default as styles } from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
-import { useGetEvents } from "@/hooks/api/useEvents";
 import { useGetPolls } from "@/hooks/api/usePolls";
 import { useGetDashboard, useGetTrip, useShareTrip } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
@@ -17,46 +15,13 @@ import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from "@go
 import * as Clipboard from 'expo-clipboard';
 import { ImageBackground } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useContext, useMemo, useRef } from "react";
+import { useContext, useRef } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
 
 
-const EventsWidget = ({ trip, user, onClick, onNewClick }: { trip: Trip, user: TripUser, onClick: (event: Event) => void, onNewClick: () => void }) => {
-
-
-    const { data: eventsPage } = useGetEvents(trip._id, { limit: 3 });
-    const events = useMemo(() => eventsPage?.pages.flatMap((page) => page?.events), [eventsPage?.pages]);
-
-    return (
-        <Animated.ScrollView horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerClassName="gap-5 justify-evenly">
-            {events?.map((event) => (
-                <Pressable
-                    key={event._id}
-                    onPress={() => onClick(event)}
-                    className="bg-white dark:bg-gray-900 rounded-xl p-4  flex items-center">
-                    <EventIcon name={event.type} size="md" />
-                    <Text className="dark:text-white font-bold text-sm max-w-40" numberOfLines={2}>
-                        {event.name}
-                    </Text>
-                </Pressable>
-            ))}
-            <Pressable
-                className="bg-blue-400 rounded-xl p-4 w-100 h-100 items-center"
-                onPress={onNewClick}>
-                <IconSymbol name="plus" color="white" />
-                <Text className="dark:text-white text-sm">
-                    Ajouter
-                </Text>
-
-            </Pressable>
-        </Animated.ScrollView>
-    )
-}
 
 const PollsWidget = ({ trip, user, onClick }: { trip: Trip, user: TripUser, onClick: (poll: Poll) => void }) => {
 
@@ -327,9 +292,9 @@ export default function ItemDetails() {
                                         }
                                     })}>
                                     <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
-                                        <IconSymbol name="cart" size={30} />
+                                        <IconSymbol name="list.dash" size={30} />
                                     </View>
-                                    <Text className=" text-lg dark:text-white">Voir la liste de course</Text>
+                                    <Text className=" text-lg dark:text-white">Voir la liste partagée</Text>
                                 </Button>
                                 <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
                                 <Button
