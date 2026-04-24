@@ -234,7 +234,7 @@ export default function TripGoods() {
                             onDelete={() => console.log("todo")}
                             onCancel={() => {
                                 reset(defaultValues);
-                                bottomSheetRef.current?.close();
+                                bottomSheetRef.current?.snapToIndex(1);
                             }}
                             isSubmitting={false}
                         />
