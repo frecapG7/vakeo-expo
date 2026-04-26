@@ -129,7 +129,7 @@ export const EventsGoodsList = ({ event, user }: { event: Event, user?: TripUser
                             entering={StretchInX}
                             exiting={StretchOutX}
                             className="pl-5">
-                            <GoodFormV2 control={control}
+                            <GoodForm control={control}
                                 onSubmit={handleSubmit(onSubmit)}
                                 isSubmitting={putGood?.isPending}
                                 autoFocus

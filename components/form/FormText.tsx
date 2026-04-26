@@ -1,21 +1,19 @@
 import useColors from "@/hooks/styles/useColors";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useController } from "react-hook-form";
 import { TextInput, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 
-export const FormText = ({ control, name, label, placeholder, rules, endAdornment, className, autoFocus }: {
+export const FormText = ({ control, name,  placeholder, rules, endAdornment,  autoFocus }: {
     control: any,
     name: string,
-    label?: string,
     placeholder?: string,
     rules?: object,
     endAdornment?: React.ReactNode,
-    className?: string,
-    autoFocus ?: boolean
+    autoFocus?: boolean
 }) => {
 
-    const { field: { value, onChange, ref },
+    const { field: { value, onChange },
         fieldState: { error } } = useController({
             name,
             control,
@@ -42,7 +40,14 @@ export const FormText = ({ control, name, label, placeholder, rules, endAdornmen
         }
     }, [error, shakeAnimation]);
 
-    const {inputPlaceHolder} = useColors();
+    const { inputPlaceHolder } = useColors();
+
+    const textInputRef = useRef<TextInput>(null);
+    useEffect(() => {
+        if (error)
+            textInputRef.current?.focus();
+    }, [error, textInputRef]);
+
 
     return (
         <Animated.View style={animatedStyle}
@@ -52,12 +57,13 @@ export const FormText = ({ control, name, label, placeholder, rules, endAdornmen
                 value={value}
                 className="flex-1 text-dark dark:text-white h-full items-start normal-case"
                 placeholderTextColor={inputPlaceHolder}
-                ref={ref}
+                ref={textInputRef}
                 placeholder={placeholder}
                 style={{
                     textAlignVertical: "top",
                 }}
                 autoFocus={autoFocus}
+
             />
             {endAdornment &&
                 <View

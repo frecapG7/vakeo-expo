@@ -40,7 +40,7 @@ export const GoodForm = ({ control, onSubmit, onDelete, isSubmitting, autoFocus 
                     rules={{
                         required: true
                     }}
-                    placeholder="Ajoute un élémént"
+                    placeholder="Ajoute un élément"
                     autoFocus={autoFocus}
                     endAdornment={!!onDelete && 
                     <Pressable

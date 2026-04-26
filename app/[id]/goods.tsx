@@ -12,9 +12,9 @@ import BottomSheet, { BottomSheetFlatList, BottomSheetView } from "@gorhom/botto
 import { useLocalSearchParams } from "expo-router";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { Pressable, Text, View } from "react-native";
+import { Alert, Pressable, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import Animated from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Toast } from "toastify-react-native";
 
@@ -78,7 +78,7 @@ export default function TripGoods() {
 
 
     const [unchecked, setUnchecked] = useState(false);
-    const { data, isLoading, isFetching, isFetchingNextPage, hasNextPage, fetchNextPage } = useGetGoods(id, {
+    const { data, isLoading, isFetching, isFetchingNextPage, hasNextPage, fetchNextPage, refetch } = useGetGoods(id, {
         ...(unchecked && { unchecked: true })
     });
 
@@ -120,17 +120,25 @@ export default function TripGoods() {
             Toast.success("Article ajouté");
         }
     }
+    const onDelete = async (data: Good) => {
+
+        await deleteGood.mutateAsync(data);
+        reset(defaultValues);
+        Toast.success("Élément supprimé")
+        bottomSheetRef.current?.snapToIndex(0)
+    }
 
     useEffect(() => {
         if (isSubmitSuccessful)
             reset({
                 name: "",
                 quantity: "",
-                event,
                 trip: String(id),
                 createdBy: me
             })
     }, [isSubmitSuccessful, reset, id, me])
+
+
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -190,7 +198,7 @@ export default function TripGoods() {
                                 </Text>
                             </View>
                     }
-                    // onRefresh={onRefresh}
+                    onRefresh={refetch}
                     onEndReached={() => {
                         if (hasNextPage)
                             fetchNextPage();
@@ -205,12 +213,6 @@ export default function TripGoods() {
                     }
                     ListFooterComponent={<View className="my-5" />}
                 />
-                {/* <GoodBottomSheet good={selectedGood}
-                    trip={{
-                        _id: id
-                    }}
-                    open={!!selectedGood}
-                    onClose={() => setSelectedGood(null)} /> */}
                 <BottomSheet ref={bottomSheetRef}
                     index={1}
                     backgroundStyle={{
@@ -229,18 +231,40 @@ export default function TripGoods() {
                     }}
                 >
                     <BottomSheetView style={{ flex: 1 }} className="gap-2 py-5 px-2">
+
+                        {(currentGood?._id && bottomSheetIndex > 2) &&
+
+                            <Animated.View
+                                entering={FadeIn}
+                                exiting={FadeOut}
+                                className="flex-row justify-end">
+                                <Button
+                                    className="rounded-full bg-red-200 p-1"
+                                    onPress={() => Alert.alert("Retirer de la liste ?",
+                                        "", [
+                                        {
+                                            text: "Annuler",
+                                        },
+                                        {
+                                            text: "Supprimer",
+                                            onPress: () => onDelete(currentGood)
+                                        }
+                                    ])}>
+                                    <IconSymbol name="trash" color="red" />
+                                </Button>
+                            </Animated.View>
+                        }
                         <GoodBottomForm control={control}
                             onSubmit={handleSubmit(onSubmit)}
-                            onDelete={() => console.log("todo")}
                             onCancel={() => {
                                 reset(defaultValues);
                                 bottomSheetRef.current?.snapToIndex(1);
                             }}
-                            isSubmitting={false}
+                            isSubmitting={postGood.isPending || putGood.isPending}
                         />
 
-                        {bottomSheetIndex > 1 &&
-                            <Animated.View>
+                        {bottomSheetIndex > 2 &&
+                            <Animated.View entering={FadeIn} exiting={FadeOut}>
                                 <GoodEvents id={id} good={currentGood} />
                             </Animated.View>
 

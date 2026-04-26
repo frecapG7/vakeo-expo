@@ -1,17 +1,17 @@
 import useColors from "@/hooks/styles/useColors";
 import { Good } from "@/types/models";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
+import { useEffect, useRef } from "react";
 import { Control, useController, useWatch } from "react-hook-form";
 import { View } from "react-native";
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 import { Button } from "../ui/Button";
 
-export const GoodBottomForm = ({ control, onSubmit, onDelete, onCancel, isSubmitting,  autoFocus }: {
+export const GoodBottomForm = ({ control, onSubmit, onCancel, isSubmitting }: {
     control: Control<Good>,
     onSubmit: () => Promise<void>,
-    onDelete?: () => Promise<void>,
-    onCancel ?: () => void,
+    onCancel: () => void,
     isSubmitting?: boolean,
-    autoFocus?: boolean
 }) => {
 
     const _id = useWatch({
@@ -20,7 +20,7 @@ export const GoodBottomForm = ({ control, onSubmit, onDelete, onCancel, isSubmit
     });
 
 
-    const { field: { value, onChange: setName }, fieldState: { error, isDirty } } = useController({
+    const { field: { value, onChange: setName }, fieldState: { error } } = useController({
         control,
         name: "name",
         rules: {
@@ -28,11 +28,41 @@ export const GoodBottomForm = ({ control, onSubmit, onDelete, onCancel, isSubmit
         }
     });
 
+
+    const shakeAnimation = useSharedValue(0);
+    const animatedStyle = useAnimatedStyle(() => {
+        return {
+            transform: [
+                {
+                    translateX: shakeAnimation?.value
+                }
+            ]
+        }
+    });
+
+    useEffect(() => {
+        if (error) {
+            shakeAnimation.value = withRepeat(withTiming(20, {
+                duration: 100,
+                easing: Easing.linear,
+            }), 4, true);
+        }
+    }, [error, shakeAnimation]);
+
+    const textInputRef = useRef(null);
+    useEffect(() => {
+        if (error)
+            textInputRef.current?.focus();
+    }, [error, textInputRef?.current]);
+
     const { inputPlaceHolder } = useColors();
+    // Référence pour le BottomSheetTextInput
 
     return (
         <View className="gap-4 items-center">
-            <View className={`flex flex-row items-center bg-gray-100 dark:bg-gray-600  border focus:border focus:border-blue-500 rounded-xl h-12 ${error && "border border-red-400"}`} >
+            <Animated.View
+                style={animatedStyle}
+                className={`flex flex-row items-center bg-gray-100 dark:bg-gray-600  border focus:border focus:border-blue-500 rounded-xl h-12 ${error && "border border-red-400"}`} >
                 <BottomSheetTextInput
                     value={value}
                     onChangeText={(v) => {
@@ -44,17 +74,16 @@ export const GoodBottomForm = ({ control, onSubmit, onDelete, onCancel, isSubmit
                     style={{
                         flexGrow: 1
                     }}
-                // ref={valueTextInputRef}
+                    ref={textInputRef}
                 />
-            </View>
+            </Animated.View>
             <View className="flex-row gap-4 items-center justify-center">
                 <Button variant="outlined"
                     title="Annuler"
                     onPress={onCancel}
-                    />
+                />
                 <Button variant="contained"
                     title={_id ? "Modifier" : "Ajouter"}
-                    disabled={!isDirty}
                     onPress={onSubmit}
                     isLoading={isSubmitting}
                 />
