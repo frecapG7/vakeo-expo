@@ -46,7 +46,7 @@ export const FormText = ({ control, name,  placeholder, rules, endAdornment,  au
     useEffect(() => {
         if (error)
             textInputRef.current?.focus();
-    }, [error, textInputRef]);
+    }, [error]);
 
 
     return (

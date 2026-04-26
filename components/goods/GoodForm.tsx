@@ -38,7 +38,8 @@ export const GoodForm = ({ control, onSubmit, onDelete, isSubmitting, autoFocus 
                     control={control}
                     name="name"
                     rules={{
-                        required: true
+                        required: true,
+                        maxLength: 255
                     }}
                     placeholder="Ajoute un élément"
                     autoFocus={autoFocus}

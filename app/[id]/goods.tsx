@@ -117,7 +117,7 @@ export default function TripGoods() {
         }
         else {
             await postGood.mutateAsync(data);
-            Toast.success("Article ajouté");
+            Toast.success("Élément ajouté");
         }
     }
     const onDelete = async (data: Good) => {

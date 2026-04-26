@@ -4,6 +4,7 @@ import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import { useEffect, useRef } from "react";
 import { Control, useController, useWatch } from "react-hook-form";
 import { View } from "react-native";
+import { TextInput } from "react-native-gesture-handler";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 import { Button } from "../ui/Button";
 
@@ -24,7 +25,8 @@ export const GoodBottomForm = ({ control, onSubmit, onCancel, isSubmitting }: {
         control,
         name: "name",
         rules: {
-            required: true
+            required: true,
+            maxLength: 255
         }
     });
 
@@ -49,11 +51,11 @@ export const GoodBottomForm = ({ control, onSubmit, onCancel, isSubmitting }: {
         }
     }, [error, shakeAnimation]);
 
-    const textInputRef = useRef(null);
+    const textInputRef = useRef<TextInput>(null);
     useEffect(() => {
         if (error)
             textInputRef.current?.focus();
-    }, [error, textInputRef?.current]);
+    }, [error]);
 
     const { inputPlaceHolder } = useColors();
     // Référence pour le BottomSheetTextInput
@@ -62,7 +64,7 @@ export const GoodBottomForm = ({ control, onSubmit, onCancel, isSubmitting }: {
         <View className="gap-4 items-center">
             <Animated.View
                 style={animatedStyle}
-                className={`flex flex-row items-center bg-gray-100 dark:bg-gray-600  border focus:border focus:border-blue-500 rounded-xl h-12 ${error && "border border-red-400"}`} >
+                className={`flex flex-row items-center bg-gray-100 dark:bg-gray-600  border focus:border focus:border-blue-500 rounded-xl h-12`} >
                 <BottomSheetTextInput
                     value={value}
                     onChangeText={(v) => {

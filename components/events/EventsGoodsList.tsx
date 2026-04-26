@@ -59,7 +59,7 @@ export const EventsGoodsList = ({ event, user }: { event: Event, user?: TripUser
         }
         else {
             await postGood.mutateAsync(data);
-            Toast.success("Article ajouté");
+            Toast.success("Élément ajouté");
         }
     }
 
