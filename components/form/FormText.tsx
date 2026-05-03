@@ -4,7 +4,7 @@ import { useController } from "react-hook-form";
 import { TextInput, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 
-export const FormText = ({ control, name,  placeholder, rules, endAdornment,  autoFocus }: {
+export const FormText = ({ control, name, placeholder, rules, endAdornment, autoFocus }: {
     control: any,
     name: string,
     placeholder?: string,

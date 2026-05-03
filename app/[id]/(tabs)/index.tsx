@@ -296,20 +296,7 @@ export default function ItemDetails() {
                                     </View>
                                     <Text className=" text-lg dark:text-white">Voir la liste partagée</Text>
                                 </Button>
-                                <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
-                                <Button
-                                    className="flex flex-row items-center gap-5"
-                                    onPress={() => router.push({
-                                        pathname: "/[id]/settings",
-                                        params: {
-                                            id: String(id)
-                                        }
-                                    })}>
-                                    <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
-                                        <IconSymbol name="gear" size={30} />
-                                    </View>
-                                    <Text className=" text-lg dark:text-white">Réglages</Text>
-                                </Button>
+                                
                                 <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
 
                                 <Button onPress={handleShare} className="flex flex-row gap-5 items-center" isLoading={shareTrip.isPending}>
@@ -344,12 +331,20 @@ export default function ItemDetails() {
                                     <Text className=" text-lg dark:text-white">Modifier le voyage</Text>
                                 </Button>
                                 <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
-                                <Button onPress={() => console.log("toto")} className="flex flex-row items-center gap-5">
-                                    <View className="bg-red-400 dark:bg-gray-200 rounded-full p-2">
-                                        <IconSymbol name="trash" size={30} />
+                                <Button
+                                    className="flex flex-row items-center gap-5"
+                                    onPress={() => router.push({
+                                        pathname: "/[id]/settings",
+                                        params: {
+                                            id: String(id)
+                                        }
+                                    })}>
+                                    <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
+                                        <IconSymbol name="person" size={30} />
                                     </View>
-                                    <Text className=" text-lg dark:text-white">Supprimer le voyage</Text>
+                                    <Text className=" text-lg dark:text-white">Modifier mon profil</Text>
                                 </Button>
+                                
                             </View>
                         </BottomSheetView>
                     </BottomSheetModal>
