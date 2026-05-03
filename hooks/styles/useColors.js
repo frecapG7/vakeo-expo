@@ -1,5 +1,4 @@
-import { useColorScheme } from "nativewind";
-
+import { useColorScheme } from "react-native";
 
 const lightColor = {
   //   background: "rgba(196, 235, 187, 1)",
@@ -29,7 +28,7 @@ const darkColor = {
 }
 
 const useColors = () => {
-  const { colorScheme } = useColorScheme();
+  const colorScheme  = useColorScheme();
   return colorScheme === "dark" ? darkColor : lightColor;
 };
 

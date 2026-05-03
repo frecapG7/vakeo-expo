@@ -1,235 +1,216 @@
-import { AvatarsGroup } from "@/components/ui/Avatar";
+import DownArrowIcon from "@/assets/icons/down-arrow.png";
+import TripStopNameForm from "@/components/trips/TripStopNameForm";
+import { TripStopLocationWizard } from "@/components/tripStops/TripStopLocationWizard";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { LinearProgress } from "@/components/ui/LinearProgress";
 import styles from "@/constants/Styles";
-import { useGeocode } from "@/hooks/api/useGeocode";
-import { useGetPolls } from "@/hooks/api/usePolls";
-import { useGetTrip, useUpdateTrip } from "@/hooks/api/useTrips";
+import { useGetTrip } from "@/hooks/api/useTrips";
+import { useDeleteTripStop, useGetTripStops, usePostTripStop, usePutTripStop } from "@/hooks/api/useTripStop";
+import useColors from "@/hooks/styles/useColors";
 import dayjs from "@/lib/dayjs-config";
-import { countDaysBetween } from "@/lib/utils";
-import * as Linking from 'expo-linking';
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
-import { useController, useForm } from "react-hook-form";
-import { Pressable, Text, TextInput, View } from "react-native";
-import Animated, { FadeIn, FadeOut, SlideInLeft, SlideOutRight } from "react-native-reanimated";
+import { TripStop } from "@/types/models";
+import { Image } from "expo-image";
+import { useLocalSearchParams } from "expo-router";
+import { useState } from "react";
+import { Alert, Modal, Pressable, Text, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import Animated, { SlideInRight, SlideOutRight } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+const defaultValues = {
+    name: "",
+    location: { displayName: "" },
+    accommodation: { title: "", url: "" }
+}
 
 export default function TripLocation() {
 
 
     const { id } = useLocalSearchParams();
     const { data: trip } = useGetTrip(id);
-    const updateTrip = useUpdateTrip(id);
-    const { data: pagePoll } = useGetPolls(id, { type: "HousingPoll" });
 
 
-    const [input, setInput] = useState<string>("");
-    const router = useRouter();
+    const [selectedTripStop, setSelectedTripStop] = useState<TripStop | undefined>();
 
-    const [enableQuery, setEnableQuery] = useState<boolean>(false);
-
-    const { data: geocode, isSuccess } = useGeocode(input, enableQuery);
-
-    useEffect(() => {
-        setEnableQuery(false);
-    }, [setEnableQuery, input, isSuccess]);
-
-
-    const { control, handleSubmit, reset, formState: { isDirty } } = useForm();
-    useEffect(() => {
-        reset(trip);
-    }, [reset, trip]);
-
-
-    const { field: { value: location, onChange }, fieldState: { isTouched } } = useController({
-        control,
-        name: "location"
-    });
-
-
-    const onSubmit = async (data) => {
-        updateTrip.mutateAsync(data);
-        router.dismissTo({
-            pathname: "/[id]/(tabs)",
-            params: {
-                id: String(id)
-            }
-        })
-    }
-
-    const onMapClick = () => {
-        const encodedDisplayName = encodeURIComponent(location.displayName);
-        const longitude = location.coordinates[0];
-        const latitude = location.coordinates[1];
-        const url = `geo:${latitude},${longitude}?q=${latitude},${longitude}`
-        Linking.openURL(url);
-    }
 
     const now = dayjs();
 
+    const [openModal, setOpenModal] = useState(false);
+    const [openLocationWizard, setOpenLocationWizard] = useState(false);
+
+    const { data: tripStops } = useGetTripStops(id);
+    const postTripStop = usePostTripStop(id);
+    const putTripStop = usePutTripStop(id);
+    const deleteTripStop = useDeleteTripStop(id);
+
+    const colors = useColors();
+
+
+    const onDelete = (tripStop: TripStop) => {
+        Alert.alert(`Supprimer l'étape ${tripStop.name} ?`,
+            "", [
+            {
+                text: "Annuler",
+            },
+            {
+                text: "Supprimer",
+                onPress: async () => await deleteTripStop.mutateAsync(tripStop?._id)
+            }
+        ]
+        );
+    }
+
     return (
         <SafeAreaView style={styles.container}>
-
-            <Animated.ScrollView>
-                <View className="">
-                    <View className="gap-1">
-                        <View className="flex-row bg-gray-200 dark:bg-gray-400 focus:border focus:border-blue-400 shadow items-center px-2 rounded-full">
-                            <IconSymbol name="map" color="gray" />
-                            <TextInput
-                                value={input}
-                                onChangeText={setInput}
-                                className="flex-grow placeholder-black"
-                                placeholder="Rechercher une addresse"
-                            />
-                            <Pressable onPress={() => setEnableQuery(true)}>
-                                <IconSymbol name="paperplane.fill" color="black" />
-                            </Pressable>
-                        </View>
-                        <View className="mx-4">
-                            {geocode &&
-                                <Animated.View
-                                    entering={SlideInLeft}
-                                    exiting={SlideOutRight}>
-                                    <Pressable onPress={() => {
-                                        onChange(geocode)
-                                        setInput("");
-                                    }}
-                                        className="flex-row rounded-xl bg-white dark:bg-gray-900 items-center py-2">
-                                        <IconSymbol name="map" color="gray" />
-                                        <Text className="font-bold text-md max-w-[80%] dark:text-white" numberOfLines={4}>
-                                            {geocode.displayName}
-                                        </Text>
-                                        <IconSymbol name="arrow.up.left" color="gray" />
+            <GestureHandlerRootView style={{ flex: 1 }}>
+                <Animated.FlatList
+                    className="flex-1"
+                    data={tripStops}
+                    keyExtractor={(i) => i?._id}
+                    renderItem={({ item, index }) =>
+                        <Animated.View className="m-2 ">
+                            <View className="flex-row justify-between items-end">
+                                <Text className="text-2xl dark:text-white ml-4 font-bold"
+                                    onLongPress={() => {
+                                        setSelectedTripStop(item);
+                                        setOpenModal(true);
+                                    }}>
+                                    {item.name}
+                                </Text>
+                                <View className="flex-row gap-2 mx-5 items-center">
+                                    <Pressable
+                                        onPress={() => {
+                                            setSelectedTripStop(item);
+                                            setOpenModal(true);
+                                        }}
+                                        className="p-1 rounded-full border border-blue-400 bg-blue-50 ">
+                                        <IconSymbol name="pencil" color="black" size={14} />
                                     </Pressable>
-                                </Animated.View>
-                            }
+                                    <Pressable
+                                        onPress={() => onDelete(item)}
+                                        className="p-1 rounded-full bg-red-600">
+                                        <IconSymbol
+                                            name="trash.fill"
+                                            color="white"
+                                            size={14} />
+                                    </Pressable>
+                                </View>
+                            </View>
+                            <View className="border-l-4 border-orange-400 bg-white  dark:bg-gray-900 rounded-xl">
+                                <Pressable onPress={() => {
+                                    setSelectedTripStop(item);
+                                    setOpenLocationWizard(true)
+                                }}>
+                                    <Animated.View
+                                        entering={SlideInRight}
+                                        exiting={SlideOutRight}
+                                        className="flex-row p-2 items-center gap-4"
+                                    >
+                                        <IconSymbol name="mappin" size={24} color="gray" />
+                                        <View className="flex-1 flex-shrink py-2 border-b border-gray-200">
+                                            <Text className="text-gray-400" numberOfLines={4} ellipsizeMode="tail">
+                                                {item?.location ? item?.location?.displayName : "Ajouter un lieu"}
+                                            </Text>
+                                        </View>
+                                    </Animated.View>
+                                </Pressable>
+                                <Pressable onPress={() => {
+                                    setSelectedTripStop(item);
+                                    setOpenLocationWizard(true)
+                                }}>
+                                    <Animated.View
+                                        entering={SlideInRight}
+                                        exiting={SlideOutRight}
+                                        className="flex-row p-2 items-center gap-4"
+                                    >
+                                        <IconSymbol name="house.fill" size={24} color="gray" />
+                                        <View className="flex-shrink py-2 items-center">
+                                            <Text className="text-gray-400" numberOfLines={4} ellipsizeMode="tail">
+                                                {item?.accommodation ? item?.accommodation?.title : "Ajouter un hébergement"}
+                                            </Text>
+                                        </View>
+                                    </Animated.View>
+                                </Pressable>
+                            </View>
+                        </Animated.View>
+                    }
+                    ItemSeparatorComponent={
+                        <View className="flex h-10">
+                            <Image
+                                source={DownArrowIcon}
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    borderRadius: 100,
+                                }}
+                                contentFit="contain"
+                            />
                         </View>
-                    </View>
-
-                    <View className="gap-1 flex">
-                        <Pressable
-                            disabled={!location}
-                            onPress={onMapClick}
-                            className="flex border m-4 justify-center items-center h-[200] rounded-xl bg-white">
-                            <Text>
-                                {JSON.stringify(location)}
+                    }
+                    ListHeaderComponent={
+                        <View className="gap-2">
+                            <Text className="text-2xl font-bold dark:text-white">
+                                Étapes de l'escapade
                             </Text>
-                        </Pressable>
-                        {isDirty &&
-                            <Animated.View entering={FadeIn} exiting={FadeOut}>
-                                <Button
-                                    variant="contained"
-                                    title="Modifier"
-                                    onPress={handleSubmit(onSubmit)}
-                                    isLoading={updateTrip.isPending}
-                                />
-                            </Animated.View>
-                        }
-                    </View>
-
+                            <View className="flex-row items-center gap-2">
+                                <IconSymbol name="info.circle" size={16} color="gray" />
+                                <Text className="text-md dark:text-gray-200">
+                                    Ajoute des noms, lieus et hébergements
+                                </Text>
+                            </View>
+                        </View>
+                    }
+                    ListEmptyComponent={<View className="flex-1 justify-center items-center p-8">
+                        <IconSymbol name="map" size={48} color="gray" />
+                        <Text className="text-lg text-gray-500 dark:text-gray-400 text-center mt-4">
+                            Aucune étape ajoutée
+                        </Text>
+                    </View>}
+                // contentContainerClassName="flex p-4"
+                />
+                <View className="m-4 ">
+                    <Button
+                        variant="contained"
+                        title="Ajouter une étape"
+                        onPress={() => setOpenModal(true)}>
+                    </Button>
                 </View>
 
-                {pagePoll?.totalResults !== 0 &&
-                    <View className="gap-2 my-5">
-                        <View>
-                            <Text className="text-xl font-bold dark:text-white">
-                                Sondage en cours
-                            </Text>
-                            <Text className="text-sm dark:text-gray-200">
-                                Votes pour ton choix d'hébergement préféré
-                            </Text>
+                <Modal
+                    transparent={true}
+                    visible={openModal}
+                    animationType="slide"
+                >
+                    <View
+                        className="flex-1 justify-center items-center bg-gray-50/50 dark:bg-black/50"
+                    >
+                        <View className="w-4/5 bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200">
+                            <TripStopNameForm
+                                onCancel={() => setOpenModal(false)}
+                                onSubmit={async (data) => {
+                                    if (data._id)
+                                        await putTripStop.mutateAsync(data);
+                                    else
+                                        await postTripStop.mutateAsync(data);
+                                    setOpenModal(false);
+                                    setSelectedTripStop(undefined);
+                                }}
+                                tripStop={selectedTripStop}
+                            />
                         </View>
-                        {pagePoll?.polls.map(poll => (
-                            <Pressable
-                                key={poll._id}
-                                onPress={() => router.navigate({
-                                    pathname: "/[id]/polls/[pollId]",
-                                    params: {
-                                        id: String(id),
-                                        pollId: poll._id
-                                    }
-                                })}
-                                className="p-2 bg-white dark:bg-gray-900 rounded-xl">
-                                <View className="flex-row justify-between">
-                                    <View className="flex-row">
-                                        <IconSymbol name="chart.bar.fill" color="orange" />
-                                        <Text className="dark:text-white text-lg font-bold">
-                                            {poll.question}
-                                        </Text>
-                                    </View>
-                                    <Text className="text-orange-600 border border-orange-600 rounded-full px-2 bg-orange-200">
-                                        {countDaysBetween(dayjs(poll.createdAt), now)}j
-                                    </Text>
-                                </View>
-                                <View>
-                                    {poll.options.slice(0, 3).map((option) =>
-                                        <View className="gap-1 justify-start mt-2" key={option._id}>
-                                            <View className="flex-row items-center justify-between ">
-                                                <Text className="dark:text-white text-xs max-w-[80%] capitalize" numberOfLines={3}>
-                                                    {option.title}                                                </Text>
-                                                <Text className="font-bold text-orange-400">
-                                                    {Number(option.percent).toFixed()} %
-                                                </Text>
-                                            </View>
-                                            <LinearProgress progress={option.percent / 100} />
-                                            <View className="flex-row items-center gap-5">
-                                                {poll.isAnonymous ?
-                                                    <Text className="text-gray-400">
-                                                        {option.selectedBy?.length} votes
-                                                    </Text>
-                                                    :
-                                                    <AvatarsGroup
-                                                        avatars={option.selectedBy?.map(u => ({
-                                                            avatar: u?.avatar,
-                                                            alt: u?.name?.charAt(0)
-                                                        }))}
-                                                        size2="xs"
-                                                        maxLength={5}
-                                                    />
-                                                }
-                                            </View>
-                                        </View>
-                                    )}
-                                </View>
-                                <View className="flex-row justify-end my-2 items-center gap-2">
-                                    <IconSymbol name="person.2.fill" color="gray" />
-                                    <Text className="text-gray-400 ">
-                                        {poll.hasSelected.length}
-                                    </Text>
-                                </View>
-                                <View className="border-t border-gray-200">
-                                    <Text className="dark:text-white text-center p-2">
-                                        Voir tout
-                                    </Text>
-
-                                </View>
-                            </Pressable>
-                        ))}
                     </View>
-                }
+                </Modal>
+                <TripStopLocationWizard
+                    visible={openLocationWizard}
+                    onClose={() => {
+                        setSelectedTripStop(undefined);
+                        setOpenLocationWizard(false)
+                    }}
+                    trip={trip}
+                    tripStop={selectedTripStop}
+                />
 
-
-                {pagePoll?.totalResults === 0 &&
-                    <Button
-                        onPress={() => router.push({
-                            pathname: "/[id]/polls/new",
-                            params: {
-                                id: String(id),
-                                type: "HousingPoll"
-                            }
-                        })}
-                        className="rounded-full bg-blue-400 py-4 flex-row justify-center items-center mx-5 mt-10">
-                        <IconSymbol name="chart.bar.fill" color="white" />
-                        <Text className="font-bold text-white">
-                            Lancer un sondage
-                        </Text>
-                    </Button>
-
-                }
-            </Animated.ScrollView>
+            </GestureHandlerRootView>
         </SafeAreaView>
     )
 }
