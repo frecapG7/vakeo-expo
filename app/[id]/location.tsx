@@ -138,7 +138,7 @@ export default function TripLocation() {
                             </View>
                         </Animated.View>
                     }
-                    ItemSeparatorComponent={
+                    ItemSeparatorComponent={() =>
                         <View className="flex h-14">
                             <Image
                                 source={DownArrowIcon}
