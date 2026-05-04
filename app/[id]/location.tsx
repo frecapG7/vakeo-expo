@@ -3,6 +3,7 @@ import TripStopNameForm from "@/components/trips/TripStopNameForm";
 import { TripStopLocationWizard } from "@/components/tripStops/TripStopLocationWizard";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
 import { useGetTrip } from "@/hooks/api/useTrips";
 import { useDeleteTripStop, useGetTripStops, usePostTripStop, usePutTripStop } from "@/hooks/api/useTripStop";
@@ -38,7 +39,7 @@ export default function TripLocation() {
     const [openModal, setOpenModal] = useState(false);
     const [openLocationWizard, setOpenLocationWizard] = useState(false);
 
-    const { data: tripStops } = useGetTripStops(id);
+    const { data: tripStops, isLoading, isRefetching, refetch } = useGetTripStops(id);
     const postTripStop = usePostTripStop(id);
     const putTripStop = usePutTripStop(id);
     const deleteTripStop = useDeleteTripStop(id);
@@ -68,32 +69,35 @@ export default function TripLocation() {
                     data={tripStops}
                     keyExtractor={(i) => i?._id}
                     renderItem={({ item, index }) =>
-                        <Animated.View className="m-2 ">
-                            <View className="flex-row justify-between items-end">
-                                <Text className="text-2xl dark:text-white ml-4 font-bold"
+                        <Animated.View className="">
+                            <View className="flex-row justify-between items-end my-1 ">
+                                <Text className="text-2xl dark:text-white ml-4 font-bold "
                                     onLongPress={() => {
                                         setSelectedTripStop(item);
                                         setOpenModal(true);
                                     }}>
                                     {item.name}
                                 </Text>
-                                <View className="flex-row gap-2 mx-5 items-center">
-                                    <Pressable
+                                <View className="flex-row gap-4 mx-5 items-center">
+                                    <Button
                                         onPress={() => {
                                             setSelectedTripStop(item);
                                             setOpenModal(true);
                                         }}
-                                        className="p-1 rounded-full border border-blue-400 bg-blue-50 ">
-                                        <IconSymbol name="pencil" color="black" size={14} />
-                                    </Pressable>
-                                    <Pressable
+                                        className="p-1 rounded-full border border-blue-400 bg-blue-100 ">
+                                        <IconSymbol
+                                            name="pencil"
+                                            color="blue"
+                                            size={18} />
+                                    </Button>
+                                    <Button
                                         onPress={() => onDelete(item)}
-                                        className="p-1 rounded-full bg-red-600">
+                                        className="p-1 rounded-full border border-red-400 bg-white dark:bg-gray-900">
                                         <IconSymbol
                                             name="trash.fill"
-                                            color="white"
-                                            size={14} />
-                                    </Pressable>
+                                            color="red"
+                                            size={18} />
+                                    </Button>
                                 </View>
                             </View>
                             <View className="border-l-4 border-orange-400 bg-white  dark:bg-gray-900 rounded-xl">
@@ -108,7 +112,7 @@ export default function TripLocation() {
                                     >
                                         <IconSymbol name="mappin" size={24} color="gray" />
                                         <View className="flex-1 flex-shrink py-2 border-b border-gray-200">
-                                            <Text className="text-gray-400" numberOfLines={4} ellipsizeMode="tail">
+                                            <Text className="text-gray-600 dark:text-gray-400" numberOfLines={4} ellipsizeMode="tail">
                                                 {item?.location ? item?.location?.displayName : "Ajouter un lieu"}
                                             </Text>
                                         </View>
@@ -125,7 +129,7 @@ export default function TripLocation() {
                                     >
                                         <IconSymbol name="house.fill" size={24} color="gray" />
                                         <View className="flex-shrink py-2 items-center">
-                                            <Text className="text-gray-400" numberOfLines={4} ellipsizeMode="tail">
+                                            <Text className="text-gray-600 dark:text-gray-400" numberOfLines={4} ellipsizeMode="tail">
                                                 {item?.accommodation ? item?.accommodation?.title : "Ajouter un hébergement"}
                                             </Text>
                                         </View>
@@ -135,13 +139,14 @@ export default function TripLocation() {
                         </Animated.View>
                     }
                     ItemSeparatorComponent={
-                        <View className="flex h-10">
+                        <View className="flex h-14">
                             <Image
                                 source={DownArrowIcon}
                                 style={{
                                     width: "100%",
                                     height: "100%",
                                     borderRadius: 100,
+                                    tintColor: "orange"
                                 }}
                                 contentFit="contain"
                             />
@@ -150,7 +155,7 @@ export default function TripLocation() {
                     ListHeaderComponent={
                         <View className="gap-2">
                             <Text className="text-2xl font-bold dark:text-white">
-                                Étapes de l'escapade
+                                Étapes de l&apos;escapade
                             </Text>
                             <View className="flex-row items-center gap-2">
                                 <IconSymbol name="info.circle" size={16} color="gray" />
@@ -160,13 +165,22 @@ export default function TripLocation() {
                             </View>
                         </View>
                     }
-                    ListEmptyComponent={<View className="flex-1 justify-center items-center p-8">
-                        <IconSymbol name="map" size={48} color="gray" />
-                        <Text className="text-lg text-gray-500 dark:text-gray-400 text-center mt-4">
-                            Aucune étape ajoutée
-                        </Text>
-                    </View>}
-                // contentContainerClassName="flex p-4"
+                    ListEmptyComponent={isLoading ?
+                        <View className="my-2 gap-2">
+                            <View className="ml-4 w-20">
+                                <Skeleton height={5} />
+                            </View>
+                            <Skeleton height={40} />
+                        </View>
+                        :
+                        <View className="flex-1 justify-center items-center p-8">
+                            <IconSymbol name="map" size={48} color="gray" />
+                            <Text className="text-lg text-gray-500 dark:text-gray-400 text-center mt-4">
+                                Aucune étape ajoutée
+                            </Text>
+                        </View>}
+                    onRefresh={refetch}
+                    refreshing={isRefetching}
                 />
                 <View className="m-4 ">
                     <Button
@@ -182,11 +196,14 @@ export default function TripLocation() {
                     animationType="slide"
                 >
                     <View
-                        className="flex-1 justify-center items-center bg-gray-50/50 dark:bg-black/50"
+                        className="flex-1 justify-center items-center bg-gray-50/50 dark:bg-gray-900/50"
                     >
                         <View className="w-4/5 bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200">
                             <TripStopNameForm
-                                onCancel={() => setOpenModal(false)}
+                                onCancel={() => {
+                                    setOpenModal(false)
+                                    setSelectedTripStop(undefined)
+                                }}
                                 onSubmit={async (data) => {
                                     if (data._id)
                                         await putTripStop.mutateAsync(data);
@@ -200,15 +217,17 @@ export default function TripLocation() {
                         </View>
                     </View>
                 </Modal>
-                <TripStopLocationWizard
-                    visible={openLocationWizard}
-                    onClose={() => {
-                        setSelectedTripStop(undefined);
-                        setOpenLocationWizard(false)
-                    }}
-                    trip={trip}
-                    tripStop={selectedTripStop}
-                />
+                {trip &&
+                    <TripStopLocationWizard
+                        visible={openLocationWizard}
+                        onClose={() => {
+                            setSelectedTripStop(undefined);
+                            setOpenLocationWizard(false)
+                        }}
+                        trip={trip}
+                        tripStop={selectedTripStop}
+                    />
+                }
 
             </GestureHandlerRootView>
         </SafeAreaView>

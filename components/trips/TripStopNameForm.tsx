@@ -27,6 +27,10 @@ export default function TripStopNameForm({
     useEffect(() => {
         if (tripStop)
             reset(tripStop);
+        else
+            reset({
+                name: ""
+            })
     }, [tripStop, reset]);
 
 
@@ -48,7 +52,7 @@ export default function TripStopNameForm({
             </View>
             <View>
                 <Text className='font-bold ml-2 dark:text-white text-sm'>
-                    Nom de l'étape*
+                    Nom de l&apos;étape*
                 </Text>
                 <FormText
                     control={control}

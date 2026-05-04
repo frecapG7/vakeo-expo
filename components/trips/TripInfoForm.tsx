@@ -67,7 +67,7 @@ export const TripInfoForm = ({ control }: { control: Control<Trip> }) => {
                         required: true,
                         maxLength: 50
                     }}
-                    placeholder="Nom de l'escapade*"
+                    placeholder="Nom de l\'escapade*"
                 />
             </View>
             <View>

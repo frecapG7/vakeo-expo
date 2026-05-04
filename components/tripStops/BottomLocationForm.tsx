@@ -33,18 +33,27 @@ export const BottomLocationForm = ({ control, onCancel, onSubmit }: LocationSear
     const { inputPlaceHolder } = useColors();
     const { data: geocode, isSuccess } = useGeocode(input, enableQuery);
 
-
-
     useEffect(() => {
         setEnableQuery(false);
     }, [input, isSuccess]);
 
-    const onMapClick = () => {
+    const onMapClick = async () => {
         if (location?.coordinates) {
             const encodedDisplayName = encodeURIComponent(location.displayName);
             const [longitude, latitude] = location.coordinates;
+            // Universal geo URI that works on both iOS and Android
             const url = `geo:${latitude},${longitude}?q=${encodedDisplayName}`;
-            Linking.openURL(url);
+            try {
+                await Linking.openURL(url);
+            } catch {
+                // Fallback for platforms that don't support geo: URI
+                const fallbackUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}&query_place_id=${encodedDisplayName}`;
+                try {
+                    await Linking.openURL(fallbackUrl);
+                } catch (err) {
+                    console.error("Failed to open maps:", err);
+                }
+            }
         }
     };
 
@@ -54,13 +63,17 @@ export const BottomLocationForm = ({ control, onCancel, onSubmit }: LocationSear
         onSubmit();
     };
 
+    useEffect(() => {
+        setEditMode(!location);
+    }, [setEditMode, location]);
+
 
     if (!editMode)
         return (
             <Animated.View entering={SlideInLeft} exiting={SlideOutRight}>
                 <Pressable
                     onPress={onMapClick}
-                    className="flex-row items-center py-2 gap-4"
+                    className="flex-row items-center py-2 gap-4 rounded-xl border border-gray-200"
                 >
                     <IconSymbol name="mappin" color="gray" />
                     <Text className="text-lg font-bold flex-1 dark:text-white" numberOfLines={3}>
@@ -81,7 +94,7 @@ export const BottomLocationForm = ({ control, onCancel, onSubmit }: LocationSear
     return (
         <View className="gap-1">
             <View className="flex-row bg-gray-100 dark:bg-gray-600 border focus:border-blue-400 items-center px-2 rounded-xl h-12">
-                <IconSymbol name="mappin" color="gray" size={16}/>
+                <IconSymbol name="mappin" color="gray" size={16} />
                 <BottomSheetTextInput
                     value={editMode ? input : location?.displayName}
                     onChangeText={setInput}

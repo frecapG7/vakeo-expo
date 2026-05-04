@@ -11,7 +11,8 @@ const getTripStops = async (id: any) : Promise<TripStop[]> => {
 export const useGetTripStops = (id: any) => {
     return useQuery<TripStop[]>({
         queryKey: ["trip", id, "stops"],
-        queryFn: () => getTripStops(id)
+        queryFn: () => getTripStops(id),
+        enabled: !!id
     });
 }
 
