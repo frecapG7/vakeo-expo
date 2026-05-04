@@ -22,21 +22,6 @@ import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
 
-// LA FORMULE MAGIQUE UNIVERSELLE (La même que sur l'autre page)
-const getDynamicPlatformInfo = (urlString) => {
-    if (!urlString) return { name: "Cagnotte", logo: null };
-    try {
-        const validUrl = urlString.startsWith('http') ? urlString : `https://${urlString}`;
-        const domain = new URL(validUrl).hostname; 
-        const logo = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
-        let name = domain.replace('www.', '').split('.')[0];
-        name = name.charAt(0).toUpperCase() + name.slice(1);
-        return { name, logo };
-    } catch (e) {
-        return { name: "Consulter la cagnotte", logo: null };
-    }
-};
-
 const EventsWidget = ({ trip, user, onClick, onNewClick }: { trip: Trip, user: TripUser, onClick: (event: Event) => void, onNewClick: () => void }) => {
     const { data: eventsPage } = useGetEvents(trip._id, { limit: 3 });
     const events = useMemo(() => eventsPage?.pages.flatMap((page) => page?.events), [eventsPage?.pages]);
@@ -144,13 +129,16 @@ export default function ItemDetails() {
         );
 
     // --- LE TROMPE-L'ŒIL (MOCK) ---
-    // On simule une donnée pour que tu puisses voir le design final
-    // Quand le backend marchera, tu changeras ça par : const urlCagnotte = trip?.expensesList?.[0]?.url;
-    const urlCagnotte = "https://www.tricount.com/fr/ton-voyage"; 
-    
-    // On passe le lien à la formule pour extraire "Tricount" et son beau logo
-    const { name: displayName, logo: displayLogo } = getDynamicPlatformInfo(urlCagnotte);
-    // ------------------------------
+    // TODO: Remove mock when backend supports expensesList
+    // Replace with: const firstCagnotte = trip?.expensesList?.[0] || trip?.cagnottes?.[0];
+    const firstCagnotte = {
+        url: "https://www.tricount.com/fr/ton-voyage",
+        siteName: "Tricount",
+        image: "https://www.google.com/s2/favicons?domain=tricount.com&sz=128" 
+    };
+
+    const displayName = firstCagnotte?.siteName || "Consulter la cagnotte";
+    const displayLogo = firstCagnotte?.image;
 
     return (
         <BottomSheetModalProvider>
@@ -232,7 +220,6 @@ export default function ItemDetails() {
                     </View>
                 }
 
-                {/* --- TUILE CAGNOTTE AVEC LE DESIGN DEMANDÉ --- */}
                 <View className="m-5 mt-2 gap-2">
                     <Text className="text-xl font-bold dark:text-white">
                         Cagnotte
@@ -244,7 +231,6 @@ export default function ItemDetails() {
                             params: { id: String(id) }
                         })}
                     >
-                        {/* Affichage du Logo généré */}
                         {displayLogo ? (
                             <Image 
                                 source={{ uri: displayLogo }} 
@@ -257,7 +243,6 @@ export default function ItemDetails() {
                         )}
                         
                         <View className="flex-1 ml-4">
-                            {/* Affichage du Nom généré (Tricount) */}
                             <Text className="text-lg font-bold dark:text-white capitalize" numberOfLines={1}>
                                 Consulter sur {displayName}
                             </Text>
@@ -296,14 +281,19 @@ export default function ItemDetails() {
                                 <Text className="text-lg dark:text-white">Partager le voyage</Text>
                             </Button>
                             <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
-                            <Button onPress={() => console.log("toto")} className="flex flex-row items-center gap-5">
+                            
+                            {/* TODO: Implémenter la fonction d'édition du voyage */}
+                            <Button disabled onPress={() => console.log("toto")} className="flex flex-row items-center gap-5 opacity-50">
                                 <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
                                     <IconSymbol name="pencil" size={30} />
                                 </View>
                                 <Text className=" text-lg dark:text-white">Modifier le voyage</Text>
                             </Button>
+                            
                             <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
-                            <Button onPress={() => console.log("toto")} className="flex flex-row items-center gap-5">
+                            
+                            {/* TODO: Implémenter la fonction de suppression du voyage */}
+                            <Button disabled onPress={() => console.log("toto")} className="flex flex-row items-center gap-5 opacity-50">
                                 <View className="bg-red-400 dark:bg-gray-200 rounded-full p-2">
                                     <IconSymbol name="trash" size={30} />
                                 </View>
