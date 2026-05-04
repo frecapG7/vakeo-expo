@@ -4,6 +4,18 @@ export interface Location {
 }
 
 
+export interface TripStop {
+    _id: string,
+    name: String,
+    location?: Location,
+    accommodation?: {
+        image: string,
+        icon: string,
+        url: string,
+        title: string,
+    },
+}
+
 export interface Trip {
     _id: string,
     image: string,
@@ -12,8 +24,9 @@ export interface Trip {
     description?: string,
     startDate?: Date | string,
     endDate?: Date | string,
-    location ?: Location,
-    isPrivate ?: boolean
+    location?: Location, // marked as deprecated
+    tripStops?: TripStop[]
+    isPrivate?: boolean
 }
 
 export interface TripUser {
@@ -90,7 +103,7 @@ export interface Poll {
 };
 
 
-export interface DatesPoll extends Poll{
+export interface DatesPoll extends Poll {
     options: [
         {
             startDate: Date,
@@ -107,7 +120,7 @@ export interface HousingPoll extends Poll {
         {
             image: string,
             icon: string,
-            url : string,
+            url: string,
             title: string,
             selectedBy: TripUser[],
             percent: number
@@ -118,7 +131,7 @@ export interface HousingPoll extends Poll {
 export interface OtherPoll extends Poll {
     options: [
         {
-            value : string,
+            value: string,
             selectedBy: TripUser[],
             percent: number
         }
