@@ -66,14 +66,6 @@ export const TripStopDetailsEditor = ({
     }, [tripStop, reset]);
 
 
-    // useEffect(() => {
-    //     if (tripStop?.location)
-    //         setCurrentStep("form");
-    //     else
-    //         setCurrentStep("choice")
-    // }, [tripStop]);
-
-
 
     useEffect(() => {
         if (isSubmitSuccessful)

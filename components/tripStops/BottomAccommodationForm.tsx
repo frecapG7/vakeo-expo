@@ -63,21 +63,26 @@ export const BottomAccommodationForm = ({ control, onCancel, onSubmit }: Accommo
             return;
         }
         setEditMode(false);
-        const response = await postLinkPreview.mutateAsync(text);
-        if (response.success && response.data) {
-            // Full link preview available
-            handleSubmitLink(response.data);
-        } else {
-            // Fallback when preview fails but URL is valid
-            const urlObj = new URL(text);
-            handleSubmitLink({
-                title: urlObj.hostname,
-                url: text,
-                image: "",
-                icon: ""
-            });
-            Toast.warn("Prévisualisation non disponible");
+        try {
+            const response = await postLinkPreview.mutateAsync(text);
+            if (response.success && response.data) {
+                // Full link preview available
+                handleSubmitLink(response.data);
+            } else {
+                // Fallback when preview fails but URL is valid
+                const urlObj = new URL(text);
+                handleSubmitLink({
+                    title: urlObj.hostname,
+                    url: text,
+                    image: "",
+                    icon: ""
+                });
+                Toast.warn("Prévisualisation non disponible");
+            }
+        } catch {
+            setEditMode(true);
         }
+
     }
 
     useEffect(() => {
