@@ -3,7 +3,7 @@ import useColors from "@/hooks/styles/useColors";
 import { TripStop } from "@/types/models";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import React, { useEffect, useState } from "react";
-import { Control, useController } from "react-hook-form";
+import { Control, useController, useFormState } from "react-hook-form";
 import { Linking, Pressable, Text, View } from "react-native";
 import Animated, { SlideInLeft, SlideOutRight } from "react-native-reanimated";
 import { Button } from "../ui/Button";
@@ -20,6 +20,9 @@ export const BottomLocationForm = ({ control, onCancel, onSubmit }: LocationSear
     const [enableQuery, setEnableQuery] = useState<boolean>(false);
 
 
+    const {isDirty, isSubmitting} = useFormState({
+        control
+    });
     const { field: { value: location, onChange: setLocation } } = useController({
         control,
         name: "location",
@@ -73,7 +76,7 @@ export const BottomLocationForm = ({ control, onCancel, onSubmit }: LocationSear
             <Animated.View entering={SlideInLeft} exiting={SlideOutRight}>
                 <Pressable
                     onPress={onMapClick}
-                    className="flex-row items-center py-2 gap-4 rounded-xl border border-gray-200"
+                    className="flex-row items-center py-2 gap-4 rounded-xl border border-gray-400 dark:border-gray-200"
                 >
                     <IconSymbol name="mappin" color="gray" />
                     <Text className="text-lg font-bold flex-1 dark:text-white" numberOfLines={3}>
@@ -84,6 +87,10 @@ export const BottomLocationForm = ({ control, onCancel, onSubmit }: LocationSear
                 <View className="flex-row justify-center items-center my-4 gap-4" >
                     <Button
                         variant="outlined"
+                        title="Annuler"
+                        onPress={onCancel} />
+                    <Button
+                        variant="contained"
                         title="Modifier"
                         onPress={() => setEditMode(true)} />
                 </View>
@@ -125,6 +132,13 @@ export const BottomLocationForm = ({ control, onCancel, onSubmit }: LocationSear
                     </Pressable>
                 </Animated.View>
             )}
+            <View className="flex-row justify-center items-center my-4 gap-4" >
+                <Button
+                    variant="outlined"
+                    title="Annuler"
+                    isLoading={isSubmitting}
+                    onPress={onCancel} />
+            </View>
         </View>
     );
 };

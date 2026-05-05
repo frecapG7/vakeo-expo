@@ -9,7 +9,7 @@ type ButtonSize = 'medium' | 'small';
 
 const variantToClassMap = {
     'none': '',
-    'contained': 'bg-blue-400 dark:bg-blue-600 rounded-full',
+    'contained': 'bg-blue-400 dark:bg-blue-600 rounded-full shadow-lg',
     'outlined': 'border border-blue-400 rounded-full'
 }
 
