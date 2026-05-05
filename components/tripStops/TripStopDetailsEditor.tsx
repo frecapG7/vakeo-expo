@@ -99,7 +99,7 @@ export const TripStopDetailsEditor = ({
             onClose={onClose}
         >
             <BottomSheetView style={{ flex: 1 }}>
-                <View className="flex-row items-between justify-between p-4">
+                <View className="flex-row items-end justify-between p-4">
                     <Text className="text-2xl font-bold dark:text-white">
                         Étape {tripStop?.name}
                     </Text>
@@ -107,9 +107,6 @@ export const TripStopDetailsEditor = ({
                         onPress={onClose}
                         className="flex-row items-center">
                         <IconSymbol name="xmark.circle" color="gray" size={24} />
-                        {/* <Text className="text-xs text-gray-400">
-                            Fermer
-                        </Text> */}
                     </Button>
                 </View>
 

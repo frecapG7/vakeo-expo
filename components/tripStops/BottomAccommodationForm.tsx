@@ -23,8 +23,6 @@ interface AccommodationFormProps {
 export const BottomAccommodationForm = ({ control, onCancel, onSubmit }: AccommodationFormProps) => {
     const [input, setInput] = useState<string>("");
 
-
-
     const { isDirty, isSubmitting } = useFormState({
         control
     });
@@ -141,13 +139,9 @@ export const BottomAccommodationForm = ({ control, onCancel, onSubmit }: Accommo
                         <Text className="font-bold text-lg dark:text-white">
                             {accommodation?.title}
                         </Text>
-                        <Button className="py-2" onPress={() => onLinkClick()}>
-                            <Text className="text-red-400 italic underline text-sm">
-                                Voir le détail
-                            </Text>
-
-                        </Button>
-
+                        <Text className="text-red-400 italic underline text-sm py-2">
+                            Voir le détail
+                        </Text>
                     </View>
                 </Pressable>
 
@@ -188,7 +182,7 @@ export const BottomAccommodationForm = ({ control, onCancel, onSubmit }: Accommo
 
             />
             <View>
-                {!accommodation ? <Animated.View
+                <Animated.View
                     entering={BounceIn}
                     exiting={BounceOut}>
                     <Button
@@ -199,10 +193,6 @@ export const BottomAccommodationForm = ({ control, onCancel, onSubmit }: Accommo
                         <IconSymbol name="doc.on.doc" size={16} color="blue" />
                     </Button>
                 </Animated.View>
-                    :
-                    <Button onPress={onLinkClick}>
-                        <IconSymbol name="xmark.circle" color="gray" size={16} />
-                    </Button>}
             </View>
         </View>
     </View>
