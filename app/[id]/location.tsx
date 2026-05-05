@@ -1,13 +1,12 @@
 import DownArrowIcon from "@/assets/icons/down-arrow.png";
 import TripStopNameForm from "@/components/trips/TripStopNameForm";
-import { TripStopLocationWizard } from "@/components/tripStops/TripStopLocationWizard";
+import { TripStopDetailsEditor } from "@/components/tripStops/TripStopDetailsEditor";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
 import { useGetTrip } from "@/hooks/api/useTrips";
 import { useDeleteTripStop, useGetTripStops, usePostTripStop, usePutTripStop } from "@/hooks/api/useTripStop";
-import useColors from "@/hooks/styles/useColors";
 import dayjs from "@/lib/dayjs-config";
 import { TripStop } from "@/types/models";
 import { Image } from "expo-image";
@@ -18,11 +17,6 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { SlideInRight, SlideOutRight } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const defaultValues = {
-    name: "",
-    location: { displayName: "" },
-    accommodation: { title: "", url: "" }
-}
 
 export default function TripLocation() {
 
@@ -43,8 +37,6 @@ export default function TripLocation() {
     const postTripStop = usePostTripStop(id);
     const putTripStop = usePutTripStop(id);
     const deleteTripStop = useDeleteTripStop(id);
-
-    const colors = useColors();
 
 
     const onDelete = (tripStop: TripStop) => {
@@ -69,8 +61,8 @@ export default function TripLocation() {
                     data={tripStops}
                     keyExtractor={(i) => i?._id}
                     renderItem={({ item, index }) =>
-                        <Animated.View className="">
-                            <View className="flex-row justify-between items-end my-1 ">
+                        <Animated.View className="mx-2 mb-3">
+                            <View className="flex-row justify-between items-end my-2 ">
                                 <Text className="text-2xl dark:text-white ml-4 font-bold "
                                     onLongPress={() => {
                                         setSelectedTripStop(item);
@@ -153,7 +145,7 @@ export default function TripLocation() {
                         </View>
                     }
                     ListHeaderComponent={
-                        <View className="gap-2">
+                        <View className="gap-2 mb-6 ml-4">
                             <Text className="text-2xl font-bold dark:text-white">
                                 Étapes de l&apos;escapade
                             </Text>
@@ -218,7 +210,7 @@ export default function TripLocation() {
                     </View>
                 </Modal>
                 {trip &&
-                    <TripStopLocationWizard
+                    <TripStopDetailsEditor
                         visible={openLocationWizard}
                         onClose={() => {
                             setSelectedTripStop(undefined);

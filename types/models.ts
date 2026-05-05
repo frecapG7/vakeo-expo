@@ -3,17 +3,19 @@ export interface Location {
     displayName: string
 }
 
+export interface Link {
+    image: string,
+    icon: string,
+    url: string,
+    title: string
+}
+
 
 export interface TripStop {
     _id: string,
     name: String,
     location?: Location,
-    accommodation?: {
-        image: string,
-        icon: string,
-        url: string,
-        title: string,
-    },
+    accommodation?: Link
 }
 
 export interface Trip {

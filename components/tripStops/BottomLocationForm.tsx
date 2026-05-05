@@ -3,8 +3,8 @@ import useColors from "@/hooks/styles/useColors";
 import { TripStop } from "@/types/models";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import React, { useEffect, useState } from "react";
-import { Control, useController } from "react-hook-form";
-import { Linking, Pressable, Text, View } from "react-native";
+import { Control, useController, useFormState } from "react-hook-form";
+import { ActivityIndicator, Linking, Pressable, Text, View } from "react-native";
 import Animated, { SlideInLeft, SlideOutRight } from "react-native-reanimated";
 import { Button } from "../ui/Button";
 import { IconSymbol } from "../ui/IconSymbol";
@@ -20,6 +20,9 @@ export const BottomLocationForm = ({ control, onCancel, onSubmit }: LocationSear
     const [enableQuery, setEnableQuery] = useState<boolean>(false);
 
 
+    const { isDirty, isSubmitting } = useFormState({
+        control
+    });
     const { field: { value: location, onChange: setLocation } } = useController({
         control,
         name: "location",
@@ -73,7 +76,7 @@ export const BottomLocationForm = ({ control, onCancel, onSubmit }: LocationSear
             <Animated.View entering={SlideInLeft} exiting={SlideOutRight}>
                 <Pressable
                     onPress={onMapClick}
-                    className="flex-row items-center py-2 gap-4 rounded-xl border border-gray-200"
+                    className="flex-row items-center py-2 gap-4 rounded-xl border border-gray-400 dark:border-gray-200"
                 >
                     <IconSymbol name="mappin" color="gray" />
                     <Text className="text-lg font-bold flex-1 dark:text-white" numberOfLines={3}>
@@ -84,6 +87,10 @@ export const BottomLocationForm = ({ control, onCancel, onSubmit }: LocationSear
                 <View className="flex-row justify-center items-center my-4 gap-4" >
                     <Button
                         variant="outlined"
+                        title="Annuler"
+                        onPress={onCancel} />
+                    <Button
+                        variant="contained"
                         title="Modifier"
                         onPress={() => setEditMode(true)} />
                 </View>
@@ -91,27 +98,35 @@ export const BottomLocationForm = ({ control, onCancel, onSubmit }: LocationSear
         )
 
 
+
+
     return (
         <View className="gap-1">
-            <View className="flex-row bg-gray-100 dark:bg-gray-600 border focus:border-blue-400 items-center px-2 rounded-xl h-12">
-                <IconSymbol name="mappin" color="gray" size={16} />
-                <BottomSheetTextInput
-                    value={editMode ? input : location?.displayName}
-                    onChangeText={setInput}
-                    className="flex-1 text-dark dark:text-white h-full normal-case"
-                    placeholderTextColor={inputPlaceHolder}
-                    placeholder="Saisir le lieu ou le code postal"
-                />
-                {editMode ? (
-                    <Pressable onPress={() => setEnableQuery(true)}>
-                        <IconSymbol name="magnifyingglass" color="blue" />
-                    </Pressable>
-                ) : (
-                    <Pressable onPress={onMapClick}>
-                        <IconSymbol name="map" color="blue" />
-                    </Pressable>
-                )}
-            </View>
+            {isSubmitting ?
+                <View>
+                    <ActivityIndicator size="large" />
+                </View>
+                :
+                <View className="flex-row bg-gray-100 dark:bg-gray-600 border focus:border-blue-400 items-center px-2 rounded-xl h-12">
+                    <IconSymbol name="mappin" color="gray" size={16} />
+                    <BottomSheetTextInput
+                        value={editMode ? input : location?.displayName}
+                        onChangeText={setInput}
+                        className="flex-1 text-dark dark:text-white h-full normal-case"
+                        placeholderTextColor={inputPlaceHolder}
+                        placeholder="Saisir le lieu ou le code postal"
+                    />
+                    {editMode ? (
+                        <Pressable onPress={() => setEnableQuery(true)}>
+                            <IconSymbol name="magnifyingglass" color="blue" />
+                        </Pressable>
+                    ) : (
+                        <Pressable onPress={onMapClick}>
+                            <IconSymbol name="map" color="blue" />
+                        </Pressable>
+                    )}
+                </View>
+            }
             {editMode && geocode && (
                 <Animated.View entering={SlideInLeft} exiting={SlideOutRight}>
                     <Pressable
@@ -125,6 +140,13 @@ export const BottomLocationForm = ({ control, onCancel, onSubmit }: LocationSear
                     </Pressable>
                 </Animated.View>
             )}
+            <View className="flex-row justify-center items-center my-4 gap-4" >
+                <Button
+                    variant="outlined"
+                    title="Annuler"
+                    disabled={isSubmitting}
+                    onPress={onCancel} />
+            </View>
         </View>
     );
 };
