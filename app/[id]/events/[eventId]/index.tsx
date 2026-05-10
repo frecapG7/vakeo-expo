@@ -2,18 +2,19 @@ import { EventIcon } from "@/components/events/EventIcon";
 import { EventInfo } from "@/components/events/EventInfo";
 import { EventsGoodsList } from "@/components/events/EventsGoodsList";
 import { EventUserList } from "@/components/events/EventsUsersList";
+import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetEvent, useUpdateEvent } from "@/hooks/api/useEvents";
 import { containsUser } from "@/lib/utils";
-import { useLocalSearchParams } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import { router, useLocalSearchParams } from "expo-router";
 import { useContext, useMemo, useState } from "react";
-import { KeyboardAvoidingView, Pressable, Text, View } from "react-native";
-import Animated, { ZoomIn } from "react-native-reanimated";
+import { KeyboardAvoidingView, Text, View } from "react-native";
+import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 
 export default function EventDetails() {
 
@@ -28,6 +29,17 @@ export default function EventDetails() {
 
     const [tabValue, setTabValue] = useState("info");
 
+
+    // const router = useRouter();
+    // useEffect(() => {
+    //     router.replace({
+    //         pathname: "/[id]/events/[eventId]/details",
+    //         params: {
+    //             id: String(id),
+    //             eventId: String(eventId)
+    //         }
+    //     })
+    // }, [event]);
 
     const onJoinClick = async () => {
         let newAttendees = event?.attendees;
@@ -70,74 +82,90 @@ export default function EventDetails() {
         );
 
     return (
-        <SafeAreaView style={styles.container}>
-            <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
-                <Animated.ScrollView contentContainerStyle={{ flexGrow: 1}}>
-
-                    <View className="flex items-center gap-2">
-                        <EventIcon name={event?.type} size="lg" />
-                        <Text className="text-2xl font-bold dark:text-white">
-                            {event?.name}
-                        </Text>
-
-                        <View className="flex-row justify-center gap-1">
-                            <Pressable
-                                disabled={updateEvent.isPending}
-                                onPress={onJoinClick}
-                                className={`flex items-center rounded-xl p-2  border  ${isAttendee ? "bg-blue-200 border-blue-600" : "bg-white dark:bg-gray-900 border-blue-400"}`}>
-                                <Text className={` ${isAttendee ? "text-blue-600 font-bold" : "text-blue-200"} uppercase`}>
-                                    {isAttendee ? "Inscrit" : "S'inscrire"}
-                                </Text>
-                            </Pressable>
+        <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+            <Animated.ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                <LinearGradient
+                    colors={['#FF4500',
+                        '#FF6B00',
+                        '#FF8C00',
+                    ]} // Orange gradient colors
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={{
+                        padding: 8,
+                        borderRadius: 5
+                    }}
+                    className="m-2 rounded-xl p-1"
+                >
+                    <View className="flex flex-row justify-end">
+                        <Button variant={isAttendee ? "contained" : "outlined"}
+                            title={isAttendee ? "REJOINT" : "REJOINDRE"}
+                            onPress={onJoinClick}
+                            isLoading={updateEvent.isPending}
+                        />
+                    </View>
+                    <View className="flex-row justify-center -mb-10">
+                        <View className="rounded-full bg-orange-600 p-3">
+                            <EventIcon name={event?.type} size="lg" />
 
                         </View>
                     </View>
+                </LinearGradient>
+                <SafeAreaView style={styles.container}>
+                    <View className="flex-row flex-wrap justify-between my-4">
+                        {/* Number of participants */}
+                        <View className="w-[48%] mb-4 bg-white dark:bg-gray-900 rounded-xl p-4 items-center">
+                            <IconSymbol name="person.2.fill" color="orange" size={24} />
+                            <Text className="text-lg font-bold dark:text-white mt-2">
+                                {event.attendees?.length || 0} Participants
+                            </Text>
+                        </View>
 
-                    {/* Tabs button */}
-                    <View className="flex-row mx-10 justify-center rounded-full my-2 bg-orange-200 rounded-full border border-orange-600si tu ">
-                        <Pressable
-                            onPress={() => setTabValue("info")}
-                            className={`flex-1 flex-row rounded-l-full p-2 items-center justify-center ${tabValue === "info" && "bg-orange-400"}`}>
-                            <IconSymbol name="doc.plaintext" color={tabValue === "info" ? "white" : "black"} />
-                        </Pressable>
-                        <Pressable
-                            onPress={() => setTabValue("goods")}
-                            className={`flex-1 flex-row bg-orange-200 justify-center  items-center border-x ${tabValue === "goods" && "bg-orange-400"}`}>
-                            <IconSymbol name="list.dash" color={tabValue === "goods" ? "white" : "black"} />
-                        </Pressable>
-                        <Pressable
-                            onPress={() => setTabValue("users")}
-                            className={`flex-1 flex-row bg-orange-200 rounded-r-full justify-center  items-center ${tabValue === "users" && "bg-orange-400"}`}>
-                            <IconSymbol name="person.2.fill" color={tabValue === "users" ? "white" : "black"} />
-                        </Pressable>
-
-
+                        {/* Number of goods */}
+                        <View className="w-[48%] mb-4 bg-white dark:bg-gray-900 rounded-xl p-4 items-center">
+                            <IconSymbol name="list.bullet" color="orange" size={24} />
+                            <Text className="text-lg font-bold dark:text-white mt-2">
+                                0 Goods
+                            </Text>
+                        </View>
                     </View>
 
-                    {tabValue === "info" &&
-                        <Animated.View entering={ZoomIn} className="m-2 flex-1">
-                            <EventInfo
-                                event={event}
-                                me={me} />
-                        </Animated.View>
-                    }
-                    {tabValue === "goods" &&
-                        <Animated.View entering={ZoomIn}
-                            className="m-2">
-                            <EventsGoodsList event={event} user={me} />
-                        </Animated.View>
-                    }
-                    {tabValue === "users" &&
-                        <Animated.View entering={ZoomIn}
-                            className="m-2 flex-1">
-                            <EventUserList
-                                event={event}
-                                selected={me} />
-                        </Animated.View>
-                    }
+                    <View>
+                        <EventInfo event={event} />
+                    </View>
 
-                </Animated.ScrollView>
-            </KeyboardAvoidingView>
-        </SafeAreaView>
+
+                    <View className="">
+                        <View className="flex-row justify-between px-4">
+                            <Text className="text-lg font-bold dark:text-white">
+                                Participants
+                            </Text>
+                            <Button onPress={() => router.push({
+                                pathname: "/[id]/events/[eventId]/edit-users",
+                                params: {
+                                    id: String(id),
+                                    eventId: String(eventId)
+                                }
+                            })}>
+                                <Text className="text-blue-400">
+                                    Modifier
+                                </Text>
+                            </Button>
+                        </View>
+                        <EventUserList event={event}
+                            selected={me}
+                        />
+                    </View>
+
+                    <View className="px-4 my-2">
+                        <EventsGoodsList
+                            event={event}
+                            user={me}
+                        />
+                    </View>
+                </SafeAreaView>
+
+            </Animated.ScrollView>
+        </KeyboardAvoidingView>
     )
 }
