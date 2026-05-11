@@ -3,7 +3,6 @@ import { EventInfo } from "@/components/events/EventInfo";
 import { EventsGoodsList } from "@/components/events/EventsGoodsList";
 import { EventUserList } from "@/components/events/EventsUsersList";
 import { Button } from "@/components/ui/Button";
-import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
@@ -11,7 +10,7 @@ import { useGetEvent, useUpdateEvent } from "@/hooks/api/useEvents";
 import { containsUser } from "@/lib/utils";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
-import { useContext, useMemo, useState } from "react";
+import { useContext, useMemo } from "react";
 import { KeyboardAvoidingView, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -24,22 +23,7 @@ export default function EventDetails() {
     const { data: event } = useGetEvent(id, eventId);
     const updateEvent = useUpdateEvent(id, eventId);
 
-
     const isAttendee = useMemo(() => containsUser(me, event?.attendees), [me, event]);
-
-    const [tabValue, setTabValue] = useState("info");
-
-
-    // const router = useRouter();
-    // useEffect(() => {
-    //     router.replace({
-    //         pathname: "/[id]/events/[eventId]/details",
-    //         params: {
-    //             id: String(id),
-    //             eventId: String(eventId)
-    //         }
-    //     })
-    // }, [event]);
 
     const onJoinClick = async () => {
         let newAttendees = event?.attendees;
@@ -95,13 +79,13 @@ export default function EventDetails() {
                         padding: 8,
                         borderRadius: 5
                     }}
-                    className="m-2 rounded-xl p-1"
                 >
                     <View className="flex flex-row justify-end">
                         <Button variant={isAttendee ? "contained" : "outlined"}
                             title={isAttendee ? "REJOINT" : "REJOINDRE"}
                             onPress={onJoinClick}
                             isLoading={updateEvent.isPending}
+                            size="small"
                         />
                     </View>
                     <View className="flex-row justify-center -mb-10">
@@ -112,30 +96,12 @@ export default function EventDetails() {
                     </View>
                 </LinearGradient>
                 <SafeAreaView style={styles.container}>
-                    <View className="flex-row flex-wrap justify-between my-4">
-                        {/* Number of participants */}
-                        <View className="w-[48%] mb-4 bg-white dark:bg-gray-900 rounded-xl p-4 items-center">
-                            <IconSymbol name="person.2.fill" color="orange" size={24} />
-                            <Text className="text-lg font-bold dark:text-white mt-2">
-                                {event.attendees?.length || 0} Participants
-                            </Text>
-                        </View>
-
-                        {/* Number of goods */}
-                        <View className="w-[48%] mb-4 bg-white dark:bg-gray-900 rounded-xl p-4 items-center">
-                            <IconSymbol name="list.bullet" color="orange" size={24} />
-                            <Text className="text-lg font-bold dark:text-white mt-2">
-                                0 Goods
-                            </Text>
-                        </View>
-                    </View>
-
-                    <View>
+                    <View className="">
                         <EventInfo event={event} />
                     </View>
 
 
-                    <View className="">
+                    <View className="my-10">
                         <View className="flex-row justify-between px-4">
                             <Text className="text-lg font-bold dark:text-white">
                                 Participants

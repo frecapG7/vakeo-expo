@@ -86,7 +86,6 @@ export const EventsGoodsList = ({ event, user }: { event: Event, user?: TripUser
             </View>
             <View className="gap-2">
                 {(!selectedGood && goods?.length < 40 ) &&
-
                     <Animated.View
                         entering={SlideInRight}
                         exiting={SlideOutRight}
@@ -103,7 +102,7 @@ export const EventsGoodsList = ({ event, user }: { event: Event, user?: TripUser
                             className={`flex-row  items-center rounded-xl py-2 gap-4 ${good.checked ? "opacity-50" : ""}`}>
                             <Button className=""
                                 onPress={() => onCheck(good)}
-                                disabled={false}>
+                                isLoading={checkGood.isPending}>
                                 <IconSymbol name={good.checked ? "checkmark.circle.fill" : "circle"}
                                     color={good.checked ? "green" : "gray"}
                                     size={24} />

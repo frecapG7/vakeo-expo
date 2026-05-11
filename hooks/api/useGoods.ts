@@ -6,7 +6,8 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tansta
 interface IParams {
     cursor: string,
     limit: number,
-    type?: string
+    type?: string,
+    event?: string,
 }
 
 interface IPage {
@@ -94,20 +95,22 @@ export const useDeleteGood = (tripId: any) => {
 
 
 
-// DEPRECATED AREA BELOW
+
+interface ICount {
+    checkedCount: Number,
+    totalCount: Number
+}
 
 
-
-
-const getCount = async (tripId, params) => {
+const getCount = async (tripId: any, params: IParams): Promise<ICount> => {
     const response = await axios.get(`/trips/${tripId}/goods/count`, {
         params
     });
     return response.data;
 }
 
-export const useGetGoodsCount = (tripId, params) => {
-    return useQuery({
+export const useGetGoodsCount = (tripId: any, params: any) => {
+    return useQuery<ICount,Error> ({
         queryKey: ["trips", tripId, "goods", "count", params],
         queryFn: () => getCount(tripId, params),
         enabled: !!tripId
@@ -115,6 +118,7 @@ export const useGetGoodsCount = (tripId, params) => {
 }
 
 
+// DEPRECATED AREA BELOW
 
 
 interface IGoodSummary {
