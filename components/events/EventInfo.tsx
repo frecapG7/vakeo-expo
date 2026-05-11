@@ -82,7 +82,7 @@ export const EventInfo = ({ event }: { event: Event }) => {
                 </View>
                 <View className="">
                     <Text className="dark:text-white">
-                        {event?.details ? event.details : "Pas de détails"}
+                        {event?.details ? event.details : "Pas de description"}
                     </Text>
                 </View>
             </View>

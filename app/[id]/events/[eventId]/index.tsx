@@ -3,6 +3,7 @@ import { EventInfo } from "@/components/events/EventInfo";
 import { EventsGoodsList } from "@/components/events/EventsGoodsList";
 import { EventUserList } from "@/components/events/EventsUsersList";
 import { Button } from "@/components/ui/Button";
+import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
@@ -103,9 +104,12 @@ export default function EventDetails() {
 
                     <View className="my-10">
                         <View className="flex-row justify-between px-4">
-                            <Text className="text-lg font-bold dark:text-white">
-                                Participants
-                            </Text>
+                            <View className="flex-row items-center gap-2">
+                                <IconSymbol name="person.2.fill" size={18} color="orange" />
+                                <Text className="text-xl font-bold dark:text-white">
+                                    Participants
+                                </Text>
+                            </View>
                             <Button onPress={() => router.push({
                                 pathname: "/[id]/events/[eventId]/edit-users",
                                 params: {

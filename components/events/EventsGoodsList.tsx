@@ -27,7 +27,7 @@ export const EventsGoodsList = ({ event, user }: { event: Event, user?: TripUser
     const goods = useMemo(() => data?.pages.flatMap((page) => page?.goods), [data]);
 
 
-    const onCheck = async (good: Good) => await checkGood.mutateAsync(good); 
+    const onCheck = async (good: Good) => await checkGood.mutateAsync(good);
 
     const [selectedGood, setSelectedGood] = useState<Good | null>();
 
@@ -77,15 +77,18 @@ export const EventsGoodsList = ({ event, user }: { event: Event, user?: TripUser
     return (
         <View style={{ flex: 1 }}>
             <View className="mb-4">
-                <Text className="dark:text-white text-lg font-bold ">
-                    Liste partagée de l'activité.
-                </Text>
+                <View className="flex-row items-center gap-2">
+                    <IconSymbol name="list.bullet" size={18} color="orange" />
+                    <Text className="dark:text-white text-xl font-bold ">
+                        Liste partagée de l'activité
+                    </Text>
+                </View>
                 <Text className="text-gray-400">
                     Tu peux partager ici des choses pour l'activité.
                 </Text>
             </View>
             <View className="gap-2">
-                {(!selectedGood && goods?.length < 40 ) &&
+                {(!selectedGood && goods?.length < 40) &&
                     <Animated.View
                         entering={SlideInRight}
                         exiting={SlideOutRight}
