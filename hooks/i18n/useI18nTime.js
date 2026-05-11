@@ -1,10 +1,12 @@
 
 import dayjs from "dayjs";
 import 'dayjs/locale/fr';
+import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
 import timeZone from "dayjs/plugin/timezone";
 dayjs.extend(relativeTime);
 dayjs.extend(timeZone);
+dayjs.extend(duration);
 dayjs.tz.setDefault("Etc/GMT")
 // dayjs.locale("fr-FR")
 
@@ -147,6 +149,32 @@ const formatDuration = (startDate, endDate = new Date()) => {
   return dayjs(startDate).from(dayjs(endDate))
 };
 
+/**
+ * Simple duration formatter that works across all languages
+ * Format: "2h 30min" or "45min"
+ * @param {Date|string} startDate - Start date/time
+ * @param {Date|string} endDate - End date/time (default: now)
+ * @returns {string} Formatted duration string
+ * Compact version without space: "2h30min"
+ */
+const formatDurationCompact = (startDate, endDate = new Date()) => {
+  if (!startDate || !endDate) return "";
+
+  const start = dayjs(startDate);
+  const end = dayjs(endDate);
+  const duration = dayjs.duration(end.diff(start));
+
+  const hours = Math.floor(duration.asHours());
+  const minutes = duration.minutes();
+
+  if (hours > 0) {
+    return minutes > 0
+      ? `${hours}h${minutes}min`
+      : `${hours}h`;
+  }
+  return `${minutes}min`;
+};
+
 
 
 export default () => {
@@ -162,7 +190,8 @@ export default () => {
     getDayNumber,
     getMonthName,
     getTime,
-    formatDuration
+    formatDuration,
+    formatDurationCompact
   };
 };
 

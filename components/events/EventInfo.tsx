@@ -1,93 +1,90 @@
+import { useGetGoodsCount } from "@/hooks/api/useGoods";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
-import useColors from "@/hooks/styles/useColors";
 import dayjs from "@/lib/dayjs-config";
-import { Event, TripUser } from "@/types/models";
-import { router } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Event } from "@/types/models";
+import { Text, View } from "react-native";
 import { IconSymbol } from "../ui/IconSymbol";
+import { InfoCard } from "./InfoCard";
 
-export const EventInfo = ({ event, me }: { event: Event, me: TripUser }) => {
-    // const restrictions = useMemo(() => event ? buildRestrictions(event) : {}, [event]);
-    // const [showAttendees, setShowAttendees] = useState(false);
-    const { formatDate, formatHour } = useI18nTime();
 
-    const { text } = useColors();
+
+export const EventInfo = ({ event }: { event: Event }) => {
+    const { formatHour, formatDurationCompact } = useI18nTime();
+
+    const { data: count } = useGetGoodsCount(event.trip, {
+        event: event._id
+    });
 
     return (
-        <View>
+        <View className="gap-2">
+            <View className="flex-row flex-wrap justify-between">
+                {/* Number of participants */}
+                <View className="w-[48%]">
+                    <InfoCard icon="person.2.fill"
+                        label={`${event.attendees?.length || 0} Participants`}
+                    />
+                </View>
+                {/* Number of goods */}
+                <View className="w-[48%]">
+                    <InfoCard
+                        icon="list.bullet"
+                        label={`${count?.totalCount || 0} Éléments`}
+                        // badge={{
+                        //     text: `${count?.checkedCount} ✔️`,
+                        //     variant: "success"
+                        // }}
+                    />
+                </View>
+            </View>
+
             {event?.startDate &&
                 <View className="flex-row gap-2">
-                    <View className="flex-1 rounded-xl bg-white dark:bg-gray-900 justify-center items-center ">
+                    <View className="w-[48%] rounded-xl bg-white dark:bg-gray-900 justify-center items-center p-4 ">
                         <IconSymbol name="calendar" color="orange" />
-                        <View className="items-center">
+                        <View className="flex-row  gap-2 items-center">
                             <Text className="text-lg dark:text-white capitalize">
-                                {event.startDate && dayjs(event.startDate).format("dddd")}
+                                {dayjs(event.startDate).format("dddd")}
                             </Text>
                             <Text className="text-2xl font-bold dark:text-white">
-                                {event.startDate && dayjs(event.startDate).date()}
+                                {dayjs(event.startDate).date()}
                             </Text>
                             <Text className="text-lg dark:text-white capitalize">
-                                {event.startDate && dayjs(event.startDate).format("MMMM")}
+                                {dayjs(event.startDate).format("MMMM")}
                             </Text>
                         </View>
+                        <Text className="text-center text-xs dark:text-white">
+                            {dayjs(event.startDate).year()}
+                        </Text>
                     </View>
-                    <View className="flex-1 rounded-xl bg-white dark:bg-gray-900 items-center py-2">
+                    <View className="w-[48%] rounded-xl bg-white dark:bg-gray-900 items-center justify-center py-4">
                         <IconSymbol name="clock" color="orange" />
-                        <View className="items-center">
+                        <View className="flex-row gap-2 items-center">
                             <Text className="text-xl font-bold dark:text-white">
-                                {event?.startDate && formatHour(event.startDate)}
+                                {formatHour(event.startDate)}
                             </Text>
                             <Text className="dark:text-white">-</Text>
                             <Text className="text-xl font-bold dark:text-white">
                                 {event?.endDate && formatHour(event.endDate)}
                             </Text>
                         </View>
+                        <Text className="text-sm dark:text-white text-center">
+                            {formatDurationCompact(event?.startDate, event?.endDate)}
+                        </Text>
                     </View>
                 </View>
             }
 
-            <View className="mx-2 my-5 gap-1">
-                <View className="flex-row ml-3 items-end gap-1">
-                    <IconSymbol name="doc.plaintext" color="orange" />
-                    <Text className="capitalize font-bold ml-2 dark:text-white">
-                        Détails
+            <View className="mx-2 gap-1">
+                <View className="">
+                    <Text className="capitalize font-bold ml-2 dark:text-white text-lg">
+                        Description
                     </Text>
                 </View>
-                <View className="rounded-xl p-2">
-                    <Text className="dark:text-white text-sm">
-                        {event?.details ? event.details : "Pas de détails"}
+                <View className="">
+                    <Text className="dark:text-white">
+                        {event?.details ? event.details : "Pas de description"}
                     </Text>
                 </View>
-            </View>
-
-
-
-            <View className="flex-row flex justify-evenly items-center mt-10">
-                <Pressable
-                    onPress={() => console.log("Supprimer")}
-                    className="flex-row border border-red-400 rounded-full p-4 items-center"
-                >
-                    <IconSymbol name="trash" color="red" />
-                    <Text className="text-red-600 font-bold text-lg">
-                        Supprimer
-                    </Text>
-                </Pressable>
-                <Pressable
-                    className="flex-row bg-blue-400  rounded-full p-4 items-center"
-                    onPress={() => router.push({
-                        pathname: "/[id]/events/[eventId]/edit",
-                        params: {
-                            id: event.trip,
-                            eventId: event._id
-                        }
-                    })}
-                >
-                    <IconSymbol name="pencil" color="white" />
-                    <Text className="text-white font-bold text-lg">
-                        Modifier
-                    </Text>
-                </Pressable>
-
             </View>
         </View>
     )

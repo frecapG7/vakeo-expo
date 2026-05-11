@@ -61,7 +61,7 @@ const EventItem = ({ event, user }: { event: Event, user: TripUser }) => {
     const isOwner = useMemo(() => event.owners?.map(u => u._id).includes(user?._id), [user, event])
 
     return (
-        <View className={`py-3 pr-1 bg-white dark:bg-gray-900 rounded-xl ${isOwner ? "border-l-4 border-orange-400" : ""}`} >
+        <View className={`py-3 pr-1 bg-white dark:bg-gray-900 rounded-xl border-l-4 border-orange-400 }`} >
             <View className="flex-row gap-2 items-center justify-between">
                 <View className="flex-row items-center" >
                     <EventIcon name={event.type} size="md" />
@@ -168,10 +168,10 @@ export default function TripPlanning() {
                     </View>
                 }
                 renderItem={({ item, index, }) =>
-                    <View>
+                    <View className="gap-2">
                         {showDay(events[index - 1], item) &&
-                            <View className="border-b border-gray-200 p-1 mb-2">
-                                <Text className="text-xl font-bold uppercase dark:text-white">
+                            <View className="border-b border-orange-400 dark:border-gray-200 p-1 ">
+                                <Text className="text-xl font-bold uppercase text-orange-400 dark:text-white">
                                     {formatDay(item.startDate)}
                                 </Text>
                             </View>
@@ -181,7 +181,7 @@ export default function TripPlanning() {
                                 <Text className="text-gray-400">{formatHour(item.startDate)}</Text>
                                 <Text className="text-gray-400">{formatHour(item.endDate)}</Text>
                             </View>
-                            <Button className="flex-1 min-h-50 "
+                            <Button className="flex-1 "
                                 onPress={() => router.navigate({
                                     pathname: "/[id]/events/[eventId]",
                                     params: { id: String(id), eventId: item._id }

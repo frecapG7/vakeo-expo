@@ -27,7 +27,7 @@ export const EventsGoodsList = ({ event, user }: { event: Event, user?: TripUser
     const goods = useMemo(() => data?.pages.flatMap((page) => page?.goods), [data]);
 
 
-    const onCheck = async (good: Good) => await checkGood.mutateAsync(good); 
+    const onCheck = async (good: Good) => await checkGood.mutateAsync(good);
 
     const [selectedGood, setSelectedGood] = useState<Good | null>();
 
@@ -77,20 +77,22 @@ export const EventsGoodsList = ({ event, user }: { event: Event, user?: TripUser
     return (
         <View style={{ flex: 1 }}>
             <View className="mb-4">
-                <Text className="dark:text-white text-lg">
-                    Liste partagée de l'activité.
-                </Text>
+                <View className="flex-row items-center gap-2">
+                    <IconSymbol name="list.bullet" size={18} color="orange" />
+                    <Text className="dark:text-white text-xl font-bold ">
+                        Liste partagée de l&apos;activité
+                    </Text>
+                </View>
                 <Text className="text-gray-400">
-                    Tu peux partager ici des choses pour l'activité.
+                    Tu peux partager ici des choses pour l&apos;activité.
                 </Text>
             </View>
             <View className="gap-2">
-                {(!selectedGood && goods?.length < 40 ) &&
-
+                {(!selectedGood && goods?.length < 40) &&
                     <Animated.View
                         entering={SlideInRight}
                         exiting={SlideOutRight}
-                        className="flex-row gap-2 pl-5 items-center">
+                        className="flex-row gap-2  items-center">
                         <GoodForm control={control}
                             onSubmit={handleSubmit(onSubmit)}
                             isSubmitting={postGood.isPending}
@@ -100,10 +102,10 @@ export const EventsGoodsList = ({ event, user }: { event: Event, user?: TripUser
                 {goods?.map((good) =>
                     selectedGood?._id !== good._id ?
                         <View key={good._id}
-                            className={`flex-row  items-center rounded-xl py-2 ${good.checked ? "opacity-50" : ""}`}>
-                            <Button className="px-5"
+                            className={`flex-row  items-center rounded-xl py-2 gap-4 ${good.checked ? "opacity-50" : ""}`}>
+                            <Button className=""
                                 onPress={() => onCheck(good)}
-                                disabled={false}>
+                                isLoading={checkGood.isPending}>
                                 <IconSymbol name={good.checked ? "checkmark.circle.fill" : "circle"}
                                     color={good.checked ? "green" : "gray"}
                                     size={24} />
