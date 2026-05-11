@@ -164,7 +164,7 @@ const formatDurationCompact = (startDate, endDate = new Date()) => {
   const end = dayjs(endDate);
   const duration = dayjs.duration(end.diff(start));
 
-  const hours = duration.hours();
+  const hours = Math.floor(duration.asHours());
   const minutes = duration.minutes();
 
   if (hours > 0) {

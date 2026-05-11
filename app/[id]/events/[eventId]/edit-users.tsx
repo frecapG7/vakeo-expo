@@ -2,6 +2,7 @@ import { EventsUsersForm } from "@/components/events/EventUsersForm";
 import { Button } from "@/components/ui/Button";
 import { useGetEvent, useUpdateEvent } from "@/hooks/api/useEvents";
 import { useGetTrip } from "@/hooks/api/useTrips";
+import { Event } from "@/types/models";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -20,7 +21,7 @@ export default function EditEventUsers() {
 
     const router = useRouter();
 
-    const { control, reset, handleSubmit, formState: { isDirty } } = useForm<Event>({
+    const { control, reset, handleSubmit } = useForm<Event>({
         reValidateMode: "onChange"
     });
 
@@ -48,7 +49,7 @@ export default function EditEventUsers() {
                 <EventsUsersForm trip={trip} control={control} />
             </View>
 
-            <View className="my-5">
+            <View className="m-10">
                 <Button variant="contained"
                     title="Modifier"
                     onPress={handleSubmit(onSubmit)}

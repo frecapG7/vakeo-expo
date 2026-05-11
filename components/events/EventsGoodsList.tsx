@@ -80,11 +80,11 @@ export const EventsGoodsList = ({ event, user }: { event: Event, user?: TripUser
                 <View className="flex-row items-center gap-2">
                     <IconSymbol name="list.bullet" size={18} color="orange" />
                     <Text className="dark:text-white text-xl font-bold ">
-                        Liste partagée de l'activité
+                        Liste partagée de l&apos;activité
                     </Text>
                 </View>
                 <Text className="text-gray-400">
-                    Tu peux partager ici des choses pour l'activité.
+                    Tu peux partager ici des choses pour l&apos;activité.
                 </Text>
             </View>
             <View className="gap-2">

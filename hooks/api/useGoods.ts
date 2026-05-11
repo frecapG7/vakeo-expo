@@ -97,8 +97,8 @@ export const useDeleteGood = (tripId: any) => {
 
 
 interface ICount {
-    checkedCount: Number,
-    totalCount: Number
+    checkedCount: number,
+    totalCount: number
 }
 
 
@@ -110,7 +110,7 @@ const getCount = async (tripId: any, params: IParams): Promise<ICount> => {
 }
 
 export const useGetGoodsCount = (tripId: any, params: any) => {
-    return useQuery<ICount,Error> ({
+    return useQuery<ICount, Error>({
         queryKey: ["trips", tripId, "goods", "count", params],
         queryFn: () => getCount(tripId, params),
         enabled: !!tripId
