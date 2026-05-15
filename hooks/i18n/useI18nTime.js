@@ -65,47 +65,50 @@ const formatRange = (startDate, endDate, options) => {
   const months = Math.floor(diff / (1000 * 60 * 60 * 24 * 30));
   const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
 
+  const weekdayFormat = options?.compactWeekday ? "short" : "long";
+  const monthFormat = options?.compactMonth ? "short" : "long";
+
 
   if (days < 1)
     return formatDate2(start, {
-      weekday: "long",
+      weekday: weekdayFormat,
       day: "numeric",
-      month: "long",
+      month: monthFormat,
       ...(!options?.hideYear && { year: "numeric" })
     })
   if (months < 1)
     return `${formatDate2(start, {
-      weekday: "long",
+      weekday: weekdayFormat,
       day: "numeric"
     })} - ${formatDate2(end, {
-      weekday: "long",
+      weekday: weekdayFormat,
       day: "numeric",
-      month: "long",
+      month: monthFormat,
       ...(!options?.hideYear && { year: "numeric" })
     })}`;
 
   if (years < 1)
     return `${formatDate2(start, {
-      weekday: "long",
+      weekday: weekdayFormat,
       day: "numeric",
-      month: "long"
+      month: monthFormat
     })} - ${formatDate2(end, {
-      weekday: "long",
+      weekday: weekdayFormat,
       day: "numeric",
-      month: "long",
+      month: monthFormat,
       ...(!options?.hideYear && { year: "numeric" })
     })}`;
 
 
   return `${formatDate2(start, {
-    weekday: "long",
+    weekday: weekdayFormat,
     day: "numeric",
-    month: "long",
+    month: monthFormat,
     ...(!options?.hideYear && { year: "numeric" })
   })} - ${formatDate2(end, {
-    weekday: "long",
+    weekday: weekdayFormat,
     day: "numeric",
-    month: "long",
+    month: monthFormat,
     ...(!options?.hideYear && { year: "numeric" })
   })}`;
 

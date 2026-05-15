@@ -88,6 +88,11 @@ export default function TripDetailsLayout() {
                         title: "La liste de course",
                     }}
                 />
+                <Stack.Screen name="attendees"
+                    options={{
+                        title: "Participants",
+                    }}
+                />
             </Stack>
 
         </TripContext.Provider>

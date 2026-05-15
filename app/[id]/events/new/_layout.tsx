@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { usePostEvent } from "@/hooks/api/useEvents";
+import useColors from "@/hooks/styles/useColors";
 import { Event } from "@/types/models";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { FormProvider, useForm } from "react-hook-form";
@@ -28,6 +29,7 @@ export default function NewEventLayout() {
 
     const router = useRouter();
 
+    const {text} = useColors();
     const postEvent = usePostEvent(id);
 
 
@@ -45,13 +47,22 @@ export default function NewEventLayout() {
     return (
         <FormProvider {...methods}>
             <Stack screenOptions={{
-                headerShown: true
+                headerShown: true,
+                headerRight: () => 
+                <Button onPress={() => router.dismissTo({
+                    pathname: "/[id]/(tabs)/planning",
+                    params: {
+                        id: String(id)
+                    }
+                })}>
+                    <IconSymbol name="xmark" color={text} size={24} />
+                </Button>
             }}>
                 <Stack.Screen name="index"
                     options={{
                         headerLeft: () => (
                             <View className="flex-row items-center">
-                                <Button onPress={() => router.dismissAll()}>
+                                <Button onPress={() => router.back()}>
                                     <IconSymbol name="arrow.left" color="gray" />
                                 </Button>
                                 <Chip text="1 sur 3" size="xsmall" />
@@ -63,12 +74,7 @@ export default function NewEventLayout() {
                     options={{
                         headerLeft: () => (
                             <View className="flex-row items-center">
-                                <Button onPress={() => router.dismissTo({
-                                    pathname: "/[id]/events/new",
-                                    params: {
-                                        id: String(id)
-                                    }
-                                })}>
+                                <Button onPress={() => router.back()}>
                                     <IconSymbol name="arrow.left" color="gray" />
                                 </Button>
                                 <Chip text="2 sur 3" size="xsmall" />
@@ -80,25 +86,20 @@ export default function NewEventLayout() {
                     options={{
                         headerLeft: () => (
                             <View className="flex-row items-center">
-                                <Button onPress={() => router.dismissTo({
-                                    pathname: "/[id]/events/new/setup-event-info",
-                                    params: {
-                                        id: String(id)
-                                    }
-                                })}>
+                                <Button onPress={() => router.back()}>
                                     <IconSymbol name="arrow.left" color="gray" />
                                 </Button>
                                 <Chip text="3 sur 3" size="xsmall" />
                             </View>
                         ),
                         title: "",
-                        headerRight: () =>
-                            <Button variant="contained"
-                                size="small"
-                                title="Créer l'activité"
-                                onPress={methods.handleSubmit(onSubmit)}
-                                isLoading={postEvent.isPending}
-                            />
+                        // headerRight: () =>
+                        //     <Button variant="contained"
+                        //         size="small"
+                        //         title="Créer l'activité"
+                        //         onPress={methods.handleSubmit(onSubmit)}
+                        //         isLoading={postEvent.isPending}
+                        //     />
 
                     }}
 

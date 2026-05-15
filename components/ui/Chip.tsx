@@ -1,4 +1,5 @@
 import { Pressable, Text } from "react-native";
+import { IconSymbol } from "./IconSymbol";
 
 
 
@@ -10,7 +11,7 @@ const sizeToMap = {
 }
 
 
-export const Chip = ({ text, variant = "outlined", size = "medium", onPress }: { text: string, variant?: string, size?: ChipSize, onPress?: () => void }) => {
+export const Chip = ({ text, variant = "outlined", size = "medium", icon , onPress }: { text: string, variant?: string, size?: ChipSize, icon ?: string, onPress?: () => void }) => {
 
 
     const sizeClass = sizeToMap[size];
@@ -19,6 +20,7 @@ export const Chip = ({ text, variant = "outlined", size = "medium", onPress }: {
     return (
         <Pressable className={`rounded-full border dark:border-white mx-1 ${variant === "contained" && "bg-blue-100"}`}
             onPress={onPress} >
+            {icon && <IconSymbol name={icon} size={10}/>}
             <Text className={`${variant === "contained" ? "font-bold" : "dark:text-white"} ${sizeClass}`}>
                 {text}
             </Text>

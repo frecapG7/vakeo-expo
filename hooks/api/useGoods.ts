@@ -109,7 +109,7 @@ const getCount = async (tripId: any, params: IParams): Promise<ICount> => {
     return response.data;
 }
 
-export const useGetGoodsCount = (tripId: any, params: any) => {
+export const useGetGoodsCount = (tripId: any, params?: any) => {
     return useQuery<ICount, Error>({
         queryKey: ["trips", tripId, "goods", "count", params],
         queryFn: () => getCount(tripId, params),

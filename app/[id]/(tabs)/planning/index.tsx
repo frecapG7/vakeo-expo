@@ -11,7 +11,7 @@ import { Event, TripUser } from "@/types/models";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext, useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import Animated from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 const showDay = (previous?: Event, current?: Event) => {
     if (!current?.startDate)
@@ -25,6 +25,10 @@ const showDay = (previous?: Event, current?: Event) => {
 
 
 const typeFilters = [
+    {
+        value: "",
+        label: "Tous"
+    },
     {
         value: "ACTIVITY",
         icon: "flame",
@@ -52,57 +56,62 @@ const typeFilters = [
     }
 ]
 
-
-
-const EventItem = ({ event, user }: { event: Event, user: TripUser }) => {
-
-
+const EventItem = ({ event, user, onPress }: { event: Event, user: TripUser, onPress: () => void }) => {
     const isAttendee = useMemo(() => event.attendees?.map(u => u._id).includes(user?._id), [user, event]);
     const isOwner = useMemo(() => event.owners?.map(u => u._id).includes(user?._id), [user, event])
 
     return (
-        <View className={`py-3 pr-1 bg-white dark:bg-gray-900 rounded-xl border-l-4 border-orange-400 }`} >
-            <View className="flex-row gap-2 items-center justify-between">
-                <View className="flex-row items-center" >
+        <Button
+            onPress={onPress}
+            className="py-3 px-1 border-b border-orange-400 dark:border-gray-400 bg-gray-100 dark:bg-gray-800/50">
+            <View className="flex-row gap-3">
+                <View className="mt-1">
                     <EventIcon name={event.type} size="md" />
-                    <View className="flex gap-1">
-                        <View className="flex-row items-start gap-1">
-                            <Text className="text-lg text-gray-800 max-w-50 dark:text-white font-bold"
+                </View>
+                <View className="flex-1 gap-2 justify-between">
+                    <View className="flex-row items-center justify-between">
+                        <View className="flex-row items-center gap-2 flex-1">
+                            <Text className="text-lg text-gray-800 dark:text-white font-bold flex-1"
                                 numberOfLines={2}>
                                 {event.name}
                             </Text>
-                            {isOwner &&
-                                <Animated.View className="bg-orange-200 items-center rounded-lg p-1">
-                                    <Text className="text-sm upper-case text-orange-600 font-bold">RESP.</Text>
-                                </Animated.View>}
                         </View>
-                        <View className="flex-row items-center ">
-                            <IconSymbol name="person.2.fill" color="gray" size={16} />
-                            <Text className="text-gray-600 dark:text-gray-400 text-sm">
-                                {event?.attendees?.length} inscrit{event?.attendees?.length > 0 && "s"}
+                        {isAttendee &&
+                            <Animated.View className="flex-row bg-green-200 rounded-lg items-center px-2 py-1">
+                                <IconSymbol name="checkmark" color="green" size={14} />
+                                <Text className="text-xs font-bold text-green-600">Inscrit</Text>
+                            </Animated.View>}
+                    </View>
+                    {event.details &&
+                        <Text className="text-sm text-gray-500 dark:text-gray-400" numberOfLines={2}>
+                            {event.details}
+                        </Text>}
+                    <View className="flex-row items-center justify-around ">
+                        <View className="flex-row items-center gap-1">
+                            <IconSymbol name="clock" color="gray" size={14} />
+                            {event?.startDate &&
+                                <Text className="text-sm text-gray-500 dark:text-gray-400">
+                                    {dayjs(event?.startDate).format("HH:mm")}-{dayjs(event?.endDate).format("HH:mm")}
+                                </Text>}
+                        </View>
+                        <View className="flex-row items-center gap-1">
+                            <IconSymbol name="person.2.fill" color="gray" size={14} />
+                            <Text className="text-sm text-gray-500 dark:text-gray-400">
+                                {event?.attendees?.length}
+                            </Text>
+                        </View>
+                        <View className="flex-row items-center gap-1">
+                            <IconSymbol name="list.bullet" color="gray" size={14} />
+                            <Text className="text-sm text-gray-500 dark:text-gray-400">
+                                10
                             </Text>
                         </View>
                     </View>
-
-                </View>
-                <View>
-
-                    {isAttendee &&
-                        <Animated.View className="flex-row bg-green-200 rounded-lg items-center p-1">
-                            <IconSymbol name="checkmark" color="green" size={14} />
-                            <Text className="text-xs font-bold text-green-600">Inscrit</Text>
-                        </Animated.View>
-
-                    }
                 </View>
             </View>
-
-        </View>
+        </Button>
     )
-
 }
-
-
 
 export default function TripPlanning() {
 
@@ -115,9 +124,9 @@ export default function TripPlanning() {
 
     const router = useRouter();
     const { me } = useContext(TripContext);
-    const { formatDate, formatDay , formatHour} = useI18nTime();
+    const { formatDate, formatDay, formatHour } = useI18nTime();
 
-    const { data, hasNextPage, fetchNextPage, isLoading } = useGetEvents(String(id), {
+    const { data, hasNextPage, fetchNextPage, isLoading, refetch, isRefetching } = useGetEvents(String(id), {
         type: typeFilter,
         search,
         ...(onlyAttendee && { attendee: String(me?._id) }),
@@ -133,68 +142,58 @@ export default function TripPlanning() {
             <Animated.FlatList
                 data={events || []}
                 ListHeaderComponent={
-                    <View className="gap-2 mb-5">
-                        {/* <Search value={search} onChange={setSearch} /> */}
-
-                        <View className="flex-row justify-between gap-5">
-                            <Pressable className={`flex-1 shadow flex-row rounded-lg justify-center items-center p-2 ${onlyAttendee ? "bg-orange-200 dark:bg-orange-600 border border-orange-300" : "bg-white dark:bg-gray-900 dark:border dark:border-gray-600"}`}
+                    <View className="gap-4 mb-5">
+                        <View className="">
+                            <Animated.ScrollView
+                                horizontal
+                                showsHorizontalScrollIndicator={false}
+                                className="flex-row "
+                                contentContainerClassName="gap-5">
+                                {typeFilters.map(item => (
+                                    <Pressable
+                                        key={item.value}
+                                        className={`py-2 px-4 items-center rounded-full ${typeFilter === item.value ? "bg-orange-600 border-orange-400 " : "bg-white dark:bg-gray-900 border border-gray-600"}`}
+                                        onPress={() => setTypeFilter(typeFilter === item?.value ? "" : item.value)}
+                                    >
+                                        <Text className={`${typeFilter === item.value ? "font-bold text-white" : "dark:text-white"}`}>
+                                            {item.label}
+                                        </Text>
+                                    </Pressable>
+                                ))}
+                            </Animated.ScrollView>
+                        </View>
+                        <View className="flex-row justify-start gap-5">
+                            <Pressable className={`w-[48%] shadow flex-row rounded-full justify-center items-center gap-1 p-2 ${onlyAttendee ? "bg-orange-200 dark:bg-orange-600 border border-orange-300" : "bg-white dark:bg-gray-900 dark:border dark:border-gray-600"}`}
                                 onPress={() => setOnlyAttendee(!onlyAttendee)}>
-                                <IconSymbol name="checkmark" color="orange" />
+                                {onlyAttendee &&
+                                    <Animated.View entering={FadeIn} exiting={FadeOut} className="rounded-full bg-orange-400 p-1">
+                                        <IconSymbol name="checkmark" color="white" size={14} />
+                                    </Animated.View>
+                                }
                                 <Text className={`${onlyAttendee ? "font-bold" : ""} text-sm dark:text-white`}>Mes participations</Text>
                             </Pressable>
-                            <Pressable className={`flex-1 shadow flex-row rounded-lg justify-center items-center p-2 ${onlyOwner ? "bg-orange-200 dark:bg-orange-600 border border-orange-300" : "bg-white dark:bg-gray-900 dark:border dark:border-gray-600"}`}
-                                onPress={() => setOnlyOwner(!onlyOwner)}>
-                                <IconSymbol name="bookmark.fill" color="orange" />
-                                <Text className={`${onlyOwner ? "font-bold" : ""} text-sm dark:text-white`}>Mes responsabilités</Text>
-                            </Pressable>
                         </View>
-                        <Animated.ScrollView
-                            horizontal
-                            showsHorizontalScrollIndicator={false}
-                            className="flex-row my-2"
-                            contentContainerClassName="gap-5">
-                            {typeFilters.map(item => (
-                                <Pressable
-                                    key={item.value}
-                                    className={`py-2 px-4 items-center rounded-full ${typeFilter === item.value ? "bg-orange-600 border-orange-400 " : "bg-white dark:bg-gray-900 border border-gray-600"}`}
-                                    onPress={() => setTypeFilter(typeFilter === item?.value ? "" : item.value)}
-                                >
-                                    <Text className={`${typeFilter === item.value ? "font-bold text-white" : "dark:text-white"}`}>
-                                        {item.label}
-                                    </Text>
-                                </Pressable>
-                            ))}
-                        </Animated.ScrollView>
                     </View>
                 }
                 renderItem={({ item, index, }) =>
                     <View className="gap-2">
                         {showDay(events[index - 1], item) &&
-                            <View className="border-b border-orange-400 dark:border-gray-200 p-1 ">
+                            <View className="border-b border-orange-400 dark:border-gray-200 p-1 mt-6">
                                 <Text className="text-xl font-bold uppercase text-orange-400 dark:text-white">
                                     {formatDay(item.startDate)}
                                 </Text>
                             </View>
                         }
-                        <View className="flex flex-row">
-                            <View className="p-1 justify-around">
-                                <Text className="text-gray-400">{formatHour(item.startDate)}</Text>
-                                <Text className="text-gray-400">{formatHour(item.endDate)}</Text>
-                            </View>
-                            <Button className="flex-1 "
-                                onPress={() => router.navigate({
-                                    pathname: "/[id]/events/[eventId]",
-                                    params: { id: String(id), eventId: item._id }
-                                })}>
-                                <EventItem event={item}
-                                    user={me} />
-                            </Button>
-                        </View>
-
+                        <EventItem event={item}
+                            user={me}
+                            onPress={() => router.navigate({
+                                pathname: "/[id]/events/[eventId]",
+                                params: { id: String(id), eventId: item._id }
+                            })} />
                     </View>
 
                 }
-                ItemSeparatorComponent={() => <View className="my-2" />}
+                ItemSeparatorComponent={() => <View className="my-0" />}
                 keyExtractor={(item) => item?._id}
                 contentContainerClassName="p-2"
                 ListEmptyComponent={
@@ -214,6 +213,9 @@ export default function TripPlanning() {
                     if (hasNextPage)
                         fetchNextPage();
                 }}
+                refreshing={isRefetching}
+                onRefresh={refetch}
+
             />
             <Pressable className="absolute bottom-10 right-6 p-2 rounded-full border border-white bg-orange-400 items-center justify-center shadow"
                 onPress={() => router.push({
