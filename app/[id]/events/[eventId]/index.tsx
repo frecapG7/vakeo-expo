@@ -83,8 +83,10 @@ export default function EventDetails() {
                     className="h-30"
                 >
                     <View className="flex flex-row justify-end">
-                        <Button variant={isAttendee ? "contained" : "outlined"}
-                            title={isAttendee ? "REJOINT" : "REJOINDRE"}
+                        <Button
+                            key={isAttendee ? "attending-button" : "attend-button"}
+                            variant={isAttendee ? "contained" : "outlined"}
+                            title={isAttendee ? "PARTICIPANT" : "PARTICIPER"}
                             onPress={onJoinClick}
                             isLoading={updateEvent.isPending}
                             size="small"

@@ -63,7 +63,7 @@ const EventItem = ({ event, user, onPress }: { event: Event, user: TripUser, onP
     return (
         <Button
             onPress={onPress}
-            className="py-3 px-1 border-b border-orange-400 dark:border-gray-400 bg-gray-100 dark:bg-gray-800/50">
+            className="pt-3 p-1 border-b border-orange-400 dark:border-gray-400 bg-gray-100 dark:bg-gray-800/50">
             <View className="flex-row gap-3">
                 <View className="mt-1">
                     <EventIcon name={event.type} size="md" />
@@ -79,7 +79,7 @@ const EventItem = ({ event, user, onPress }: { event: Event, user: TripUser, onP
                         {isAttendee &&
                             <Animated.View className="flex-row bg-green-200 rounded-lg items-center px-2 py-1">
                                 <IconSymbol name="checkmark" color="green" size={14} />
-                                <Text className="text-xs font-bold text-green-600">Inscrit</Text>
+                                <Text className="text-xs font-bold text-green-600">Participant</Text>
                             </Animated.View>}
                     </View>
                     {event.details &&
