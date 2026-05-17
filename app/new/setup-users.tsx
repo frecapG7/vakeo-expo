@@ -54,7 +54,8 @@ export default function NewTripUsers() {
                 <View>
                     <Button variant="contained"
                         title="Suivant"
-                        onPress={handleSubmit(onSubmit)}>
+                        onPress={handleSubmit(onSubmit)}
+                        isLoading={postTrip.isPending}>
                     </Button>
                 </View>
             </Animated.ScrollView>

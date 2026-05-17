@@ -93,14 +93,6 @@ export default function NewEventLayout() {
                             </View>
                         ),
                         title: "",
-                        // headerRight: () =>
-                        //     <Button variant="contained"
-                        //         size="small"
-                        //         title="Créer l'activité"
-                        //         onPress={methods.handleSubmit(onSubmit)}
-                        //         isLoading={postEvent.isPending}
-                        //     />
-
                     }}
 
                 />

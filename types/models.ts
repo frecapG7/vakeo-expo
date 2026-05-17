@@ -51,7 +51,8 @@ export interface Event {
     owners?: TripUser[],
     trip: string,
     details?: string,
-    type: EventType | string
+    type: EventType | string,
+    goodsCount?: number
 }
 
 

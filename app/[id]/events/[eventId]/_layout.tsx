@@ -50,13 +50,13 @@ export default function EventDetailsLayout() {
             <Stack.Screen name="edit"
                 options={{
                     presentation: "modal",
-                    title: "Modifier",
+                    title: "Modifier l'activité",
                     headerBackTitle: "Annuler"
                 }} />
             <Stack.Screen name="edit-users"
                 options={{
                     presentation: "modal",
-                    title: "Modifier"
+                    title: "Modifier les participants"
                 }} />
         </Stack>
     )

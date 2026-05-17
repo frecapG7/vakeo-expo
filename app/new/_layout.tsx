@@ -6,10 +6,7 @@ import { Stack, useRouter } from "expo-router";
 import { FormProvider, useForm } from "react-hook-form";
 import { View } from "react-native";
 
-
 export default function NewTripLayout() {
-
-
 
     const methods = useForm({
         defaultValues: {
@@ -24,9 +21,7 @@ export default function NewTripLayout() {
         }
     });
 
-
     const router = useRouter();
-
 
     return (
         <FormProvider {...methods}>

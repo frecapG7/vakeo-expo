@@ -9,6 +9,7 @@ import { useContext, useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { KeyboardAvoidingView, View } from "react-native";
 import Animated, { ZoomIn } from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function EditAttendees() {
     const { id } = useLocalSearchParams();
@@ -30,7 +31,7 @@ export default function EditAttendees() {
         control,
         name: "users"
     });
-    const selected = users?.map(u => u?._id).indexOf(me?._id);
+    const selected = users?.map(u => u?._id).indexOf(me?._id) ?? -1;
 
 
     const router = useRouter();
@@ -40,24 +41,27 @@ export default function EditAttendees() {
     }
 
     return (
-        <KeyboardAvoidingView
-            style={styles.container}
-            behavior="padding">
-            <Animated.ScrollView className="py-10">
-                <View className="m-5">
-                    <TripUsersForm control={control} selected={selected} />
-                </View>
-                <Animated.View
-                    entering={ZoomIn}
-                    className="m-5">
-                    <Button
-                        variant="contained"
-                        size="medium"
-                        title="Modifier"
-                        isLoading={updateTrip?.isPending}
-                        onPress={handleSubmit(onSubmit)} />
-                </Animated.View>
-            </Animated.ScrollView>
-        </KeyboardAvoidingView >
+        <SafeAreaView style={{flex: 1}}>
+
+            <KeyboardAvoidingView
+                style={styles.container}
+                behavior="padding">
+                <Animated.ScrollView className="">
+                    <View className="mx-2">
+                        <TripUsersForm control={control} selected={selected} />
+                    </View>
+                    <Animated.View
+                        entering={ZoomIn}
+                        className="m-5 mt-auto">
+                        <Button
+                            variant="contained"
+                            size="medium"
+                            title="Modifier"
+                            isLoading={updateTrip?.isPending}
+                            onPress={handleSubmit(onSubmit)} />
+                    </Animated.View>
+                </Animated.ScrollView>
+            </KeyboardAvoidingView >
+        </SafeAreaView>
     )
 }

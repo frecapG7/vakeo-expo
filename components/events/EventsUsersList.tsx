@@ -24,7 +24,7 @@ export const EventUserList = ({ event, selected }: { event: Event, selected?: Tr
                 {event?.attendees?.map((attendee) => (
                     <View
                         key={attendee._id}
-                        className="flex-row p-2 rounded-xl gap-2 p-2 items-center bg-white dark:bg-gray-900 border border-orange-200 dark:border-gray-600" >
+                        className="flex-row p-2 rounded-xl gap-2 items-center bg-white dark:bg-gray-900 border border-orange-200 dark:border-gray-600" >
                         <Avatar size2="sm"
                             alt={attendee.name.charAt(0)}
                             src={attendee?.avatar} />

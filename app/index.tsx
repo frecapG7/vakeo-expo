@@ -90,7 +90,7 @@ export default function HomePage() {
                       )}
                       {item?.users?.length > 5 &&
                         <View className="items-center">
-                          <Avatar alt="..." size2="md" />
+                          <Avatar alt="..." size2="sm" />
                           <Text className="font-bold text-white">+{item?.users.length - 5}</Text>
                         </View>}
                     </View>

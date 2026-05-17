@@ -63,8 +63,8 @@ const EventItem = ({ event, user, onPress }: { event: Event, user: TripUser, onP
     return (
         <Button
             onPress={onPress}
-            className="pt-3 p-1 border-b border-orange-400 dark:border-gray-400 bg-gray-100 dark:bg-gray-800/50">
-            <View className="flex-row gap-3">
+            className="pt-3 p-1 border-b border-orange-400 dark:border-gray-400 bg-gray-100 dark:bg-gray-800/50 ">
+            <View className="flex-row gap-3 items-center">
                 <View className="mt-1">
                     <EventIcon name={event.type} size="md" />
                 </View>
@@ -103,7 +103,7 @@ const EventItem = ({ event, user, onPress }: { event: Event, user: TripUser, onP
                         <View className="flex-row items-center gap-1">
                             <IconSymbol name="list.bullet" color="gray" size={14} />
                             <Text className="text-sm text-gray-500 dark:text-gray-400">
-                                10
+                                {event?.goodsCount ?? 0}
                             </Text>
                         </View>
                     </View>

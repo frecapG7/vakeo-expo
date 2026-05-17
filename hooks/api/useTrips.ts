@@ -14,15 +14,15 @@ export const usePostTrip = () => {
 };
 
 const getTrip = async (tripId: string, params?: any): Promise<Trip> => {
-  const response = await axios.get(`/trips/${tripId}`,
+  const response = await axios.get(`/trips/${tripId}`, {
     params
-  );
+  });
   return response.data;
 };
 
 export const useGetTrip = (tripId: any, includeStops?: boolean) => {
   return useQuery<Trip>({
-    queryKey: ["trips", tripId, includeStops],
+    queryKey: ["trips", tripId, { includeStops: !!includeStops }],
     queryFn: () => getTrip(tripId, {
       ...(!!includeStops && { includeStops: "true" })
     }),
@@ -57,7 +57,7 @@ export const useUpdateTrip = (tripId: any) => {
   const queryClient = useQueryClient();
   return useMutation<Trip, Error, Trip>({
     mutationFn: (data) => updateTrip(tripId, data),
-    onSuccess: async (data) => await queryClient.setQueryData(['trips', tripId], data)
+    onSuccess: async (data) => await queryClient.invalidateQueries({ queryKey: ["trips"] })
   })
 }
 

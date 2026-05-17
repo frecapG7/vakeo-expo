@@ -1,6 +1,6 @@
 import { containsUser } from "@/lib/utils";
 import { Trip } from "@/types/models";
-import { Control, useFieldArray } from "react-hook-form";
+import { Control, useFieldArray, useFormState } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import AnimatedCheckbox from "react-native-checkbox-reanimated";
 import { Avatar } from "../ui/Avatar";
@@ -17,6 +17,10 @@ export const EventsUsersForm = ({ trip, control }: { trip: Trip, control: Contro
         // de: trip?.users.map(user => ({ id: user.id, name: user.name, value: true })) || []
     })
 
+    const {isSubmitting} = useFormState({
+        control
+    });
+
     return (
         <View className="flex m-5 gap-2">
             <View className="flex flex-row justify-end " >
@@ -31,7 +35,8 @@ export const EventsUsersForm = ({ trip, control }: { trip: Trip, control: Contro
                     return (
                         <Pressable key={user._id}
                             className="flex flex-row items-center justify-between px-5 py-2 active:opacity-50"
-                            onPressOut={() => checked ? remove(attendees?.map(u => u._id)?.indexOf(user._id)) : append(user)}>
+                            disabled={isSubmitting}
+                            onPress={() => checked ? remove(attendees?.map(u => u._id)?.indexOf(user._id)) : append(user)}>
                             <View className="flex-row gap-1 items-center">
                                 <Avatar src={user.avatar}
                                     alt={user.name.charAt(0)}

@@ -48,12 +48,7 @@ export default function TripDetailsLayout() {
                     title: "Modifier",
                     headerBackTitle: "Annuler"
                 }} />
-                <Stack.Screen name="edit-users" options={{
-                    presentation: "modal",
-                    title: "Modifier",
-                    headerBackTitle: "Annuler"
-                }} />
-
+               
                 <Stack.Screen name="dates"
                     options={{
                         title: "Dates du séjour",
