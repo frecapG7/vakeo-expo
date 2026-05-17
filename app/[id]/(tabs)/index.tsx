@@ -231,7 +231,7 @@ export default function ItemDetails() {
                                     name: "list.bullet"
                                 }}
                                 title="Voir la liste partagée"
-                                subtitle={`${goodsCount?.totalCount ?? 0}  élément(s) - ${goodsCount?.checkedCount ?? 0} validé(s)`}
+                                subtitle={`${goodsCount?.totalCount ?? 0} élément(s) - ${goodsCount?.checkedCount ?? 0} validé(s)`}
                                 onPress={() => router.push({
                                     pathname: "/[id]/goods",
                                     params: {

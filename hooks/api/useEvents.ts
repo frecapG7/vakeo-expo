@@ -38,7 +38,7 @@ export const useGetEvents = (tripId: string, params?: any, options?: any) => {
 }
 
 
-const postEvent = async (tripId: string, data: Omit<Event, '_id'>) : Promise<Event> => {
+const postEvent = async (tripId: string, data: Omit<Event, '_id'>): Promise<Event> => {
     const response = await axios.post(`/trips/${tripId}/events`, data);
     return response.data;
 }
@@ -46,14 +46,14 @@ const postEvent = async (tripId: string, data: Omit<Event, '_id'>) : Promise<Eve
 
 export const usePostEvent = (tripId: string | any) => {
     const queryClient = useQueryClient();
-    return useMutation<Event, Error, Event>({
+    return useMutation<Event, Error, Omit<Event, "_id">>({
         mutationFn: (data) => postEvent(tripId, data),
-        onSuccess: () => queryClient.invalidateQueries({queryKey: ["trips", tripId, "events"]})
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["trips", tripId, "events"] })
     })
 }
 
 
-const getEvent = async (tripId : string, eventId: string): Promise<Event> => {
+const getEvent = async (tripId: string, eventId: string): Promise<Event> => {
     const response = await axios.get(`/trips/${tripId}/events/${eventId}`);
     return response.data;
 }
@@ -77,7 +77,7 @@ export const useUpdateEvent = (tripId: any, eventId: any) => {
     return useMutation<Event, Error, Event>({
         mutationFn: (data) => updateEvent(tripId, eventId, data),
         onSuccess: async () => {
-            await queryClient.invalidateQueries({queryKey: ["trips", tripId, "events"]});
+            await queryClient.invalidateQueries({ queryKey: ["trips", tripId, "events"] });
         }
     })
 }

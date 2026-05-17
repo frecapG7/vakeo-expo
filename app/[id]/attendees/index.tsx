@@ -43,7 +43,7 @@ export default function TripAttendees() {
                     <View className="gap-4">
                         <View className="">
                             <Text className="text-xl font-bold mb-4 dark:text-white">
-                                Niveau d'accessibilité: {trip.isPrivate ? 'Privé 🔒' : 'Public 🌐'}
+                                Niveau d&apos;accessibilité: {trip.isPrivate ? 'Privé 🔒' : 'Public 🌐'}
                             </Text>
                         </View>
 

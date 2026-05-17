@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/Button";
 import styles from "@/constants/Styles";
 import { usePostEvent } from "@/hooks/api/useEvents";
 import { useGetTrip } from "@/hooks/api/useTrips";
+import { Event } from "@/types/models";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useFormContext } from "react-hook-form";
 import { Text, View } from "react-native";
@@ -41,7 +42,7 @@ export default function NewEventUsers() {
                         Ajoute des participants
                     </Text>
                     <Text className="text-gray-400">
-                        Ajoute tout de suite tes amis qui participeront à l'activité. Tu n'es pas obligé de faire ça dès maintenant, tes amis
+                        Ajoute tout de suite tes amis qui participeront à l&apos;activité. Tu n'es pas obligé de faire ça dès maintenant, tes amis
                         pourront également choisir de participer à ton activité.
                     </Text>
                 </View>
