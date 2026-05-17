@@ -3,8 +3,7 @@ import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
 import { toLabel } from "@/lib/eventUtils";
-import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import { useEffect } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useController, useFormContext } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
@@ -31,28 +30,6 @@ export default function NewEventType() {
 
 
     const router = useRouter();
-    const navigation = useNavigation();
-
-    useEffect(() => {
-        navigation.setOptions({
-            headerRight: () =>
-                <Button variant="contained"
-                    size="small"
-                    title="Suivant"
-                    disabled={type === ""}
-                    onPress={async () => {
-                        router.push({
-                            pathname: "/[id]/events/new/setup-event-info",
-                            params: {
-                                id: String(id)
-                            }
-                        })
-                    }}>
-
-                </Button>
-        })
-    }, [navigation, type])
-
 
 
 
@@ -68,7 +45,7 @@ export default function NewEventType() {
 
 
             </View>
-            <View className="gap-5 flex-wrap items-center flex-row">
+            <View className="flex-1 gap-5 flex-wrap items-center flex-row">
                 {eventType.map((eventType) => (
 
                     <Pressable
@@ -89,6 +66,22 @@ export default function NewEventType() {
                     </Pressable>
 
                 ))}
+            </View>
+
+            <View className="my-4">
+                <Button variant="contained"
+                    title="Continuer"
+                    disabled={type === ""}
+                    onPress={async () => {
+                        router.push({
+                            pathname: "/[id]/events/new/setup-event-info",
+                            params: {
+                                id: String(id)
+                            }
+                        })
+                    }}>
+
+                </Button>
             </View>
         </Animated.ScrollView>
     )

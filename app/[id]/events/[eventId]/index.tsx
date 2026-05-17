@@ -78,24 +78,27 @@ export default function EventDetails() {
                     end={{ x: 1, y: 1 }}
                     style={{
                         padding: 8,
-                        borderRadius: 5
+                        borderRadius: 5,
                     }}
+                    className="h-30"
                 >
                     <View className="flex flex-row justify-end">
-                        <Button variant={isAttendee ? "contained" : "outlined"}
-                            title={isAttendee ? "REJOINT" : "REJOINDRE"}
+                        <Button
+                            key={isAttendee ? "attending-button" : "attend-button"}
+                            variant={isAttendee ? "contained" : "outlined"}
+                            title={isAttendee ? "PARTICIPANT" : "PARTICIPER"}
                             onPress={onJoinClick}
                             isLoading={updateEvent.isPending}
                             size="small"
                         />
                     </View>
-                    <View className="flex-row justify-center -mb-10">
-                        <View className="rounded-full bg-orange-600 p-3">
-                            <EventIcon name={event?.type} size="lg" />
-
-                        </View>
-                    </View>
                 </LinearGradient>
+                <View className="flex-row justify-center -mt-18">
+                    <View className="rounded-full bg-orange-600 p-3">
+                        <EventIcon name={event?.type} size="lg" />
+
+                    </View>
+                </View>
                 <SafeAreaView style={styles.container}>
                     <View className="">
                         <EventInfo event={event} />

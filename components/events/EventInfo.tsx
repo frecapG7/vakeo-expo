@@ -3,20 +3,19 @@ import useI18nTime from "@/hooks/i18n/useI18nTime";
 import dayjs from "@/lib/dayjs-config";
 import { Event } from "@/types/models";
 import { Text, View } from "react-native";
-import { IconSymbol } from "../ui/IconSymbol";
 import { InfoCard } from "./InfoCard";
 
 
 
 export const EventInfo = ({ event }: { event: Event }) => {
-    const { formatHour, formatDurationCompact } = useI18nTime();
+    const { formatHour, formatDurationCompact, formatDate } = useI18nTime();
 
     const { data: count } = useGetGoodsCount(event.trip, {
         event: event._id
     });
 
     return (
-        <View className="gap-2">
+        <View className="gap-2 mx-1">
             <View className="flex-row flex-wrap justify-between">
                 {/* Number of participants */}
                 <View className="w-[48%]">
@@ -29,50 +28,37 @@ export const EventInfo = ({ event }: { event: Event }) => {
                     <InfoCard
                         icon="list.bullet"
                         label={`${count?.totalCount || 0} Éléments`}
-                        // badge={{
-                        //     text: `${count?.checkedCount} ✔️`,
-                        //     variant: "success"
-                        // }}
+                    // badge={{
+                    //     text: `${count?.checkedCount} ✔️`,
+                    //     variant: "success"
+                    // }}
                     />
                 </View>
+                {event?.startDate &&
+                    <View className="w-[48%]">
+                        <InfoCard
+                            icon="calendar"
+                            label={formatDate(event.startDate, {
+                                weekday: "short",
+                                day: "numeric",
+                                month: "short"
+                            })}
+                            subtitle={String(dayjs(event.startDate).year())}
+                        />
+                    </View>
+                }
+                {event?.startDate &&
+                      <View className="w-[48%]">
+                        <InfoCard
+                            icon="clock"
+                            label={`${formatHour(event.startDate)} - ${formatHour(event.endDate)}`}
+                            subtitle={String(formatDurationCompact(event?.startDate, event?.endDate))}
+                        />
+                    </View>
+                }
             </View>
 
-            {event?.startDate &&
-                <View className="flex-row gap-2">
-                    <View className="w-[48%] rounded-xl bg-white dark:bg-gray-900 justify-center items-center p-4 ">
-                        <IconSymbol name="calendar" color="orange" />
-                        <View className="flex-row  gap-2 items-center">
-                            <Text className="text-lg dark:text-white capitalize">
-                                {dayjs(event.startDate).format("dddd")}
-                            </Text>
-                            <Text className="text-2xl font-bold dark:text-white">
-                                {dayjs(event.startDate).date()}
-                            </Text>
-                            <Text className="text-lg dark:text-white capitalize">
-                                {dayjs(event.startDate).format("MMMM")}
-                            </Text>
-                        </View>
-                        <Text className="text-center text-xs dark:text-white">
-                            {dayjs(event.startDate).year()}
-                        </Text>
-                    </View>
-                    <View className="w-[48%] rounded-xl bg-white dark:bg-gray-900 items-center justify-center py-4">
-                        <IconSymbol name="clock" color="orange" />
-                        <View className="flex-row gap-2 items-center">
-                            <Text className="text-xl font-bold dark:text-white">
-                                {formatHour(event.startDate)}
-                            </Text>
-                            <Text className="dark:text-white">-</Text>
-                            <Text className="text-xl font-bold dark:text-white">
-                                {event?.endDate && formatHour(event.endDate)}
-                            </Text>
-                        </View>
-                        <Text className="text-sm dark:text-white text-center">
-                            {formatDurationCompact(event?.startDate, event?.endDate)}
-                        </Text>
-                    </View>
-                </View>
-            }
+           
 
             <View className="mx-2 gap-1">
                 <View className="">
