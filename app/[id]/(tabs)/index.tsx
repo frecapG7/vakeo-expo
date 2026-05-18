@@ -87,7 +87,7 @@ const PollsWidget = ({ trip, user, onClick }: { trip: Trip, user: TripUser, onCl
 export default function ItemDetails() {
 
     const { id } = useLocalSearchParams();
-    const { data: trip } = useGetTrip(String(id), true);
+    const { data: trip } = useGetTrip(id, true);
     const { me } = useContext(TripContext);
     const { data: goodsCount } = useGetGoodsCount(id);
     const { data: dashboard } = useGetDashboard(id, me?._id);
