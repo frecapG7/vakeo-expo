@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/Button";
 import styles from "@/constants/Styles";
 import { usePostTrip } from "@/hooks/api/useTrips";
 import { useAddStorageTrip } from "@/hooks/storage/useStorageTrips";
-import { useNavigation, useRouter } from "expo-router";
-import { useEffect } from "react";
+import { Trip } from "@/types/models";
+import { useRouter } from "expo-router";
 import { useFormContext } from "react-hook-form";
 import { KeyboardAvoidingView, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
@@ -13,9 +13,7 @@ import Animated from "react-native-reanimated";
 export default function NewTripUsers() {
 
 
-    const { control, handleSubmit } = useFormContext();
-
-    const navigation = useNavigation();
+    const { control, handleSubmit } = useFormContext<Trip>();
 
     const addStorageTrip = useAddStorageTrip();
     const postTrip = usePostTrip();
@@ -34,16 +32,6 @@ export default function NewTripUsers() {
     };
 
 
-    useEffect(() => {
-        navigation.setOptions({
-            headerRight: () =>
-                <Button variant="contained"
-                    size="small"
-                    title="Suivant"
-                    onPress={handleSubmit(onSubmit)}>
-                </Button>
-        })
-    }, [navigation, onSubmit]);
 
     return (
         <KeyboardAvoidingView behavior="padding"
@@ -57,10 +45,18 @@ export default function NewTripUsers() {
                     <Text className="text-md dark:text-gray-200">
                         Décide de comment tes amis peuvent accéder à ton projet.
                     </Text>
-                  
+
                 </View>
                 <View className="m-5">
                     <TripUsersForm control={control} selected={0} />
+                </View>
+
+                <View>
+                    <Button variant="contained"
+                        title="Suivant"
+                        onPress={handleSubmit(onSubmit)}
+                        isLoading={postTrip.isPending}>
+                    </Button>
                 </View>
             </Animated.ScrollView>
 

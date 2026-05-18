@@ -1,14 +1,12 @@
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
+import { HeaderTitle } from "@/components/ui/HeaderTitle";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Stack, useRouter } from "expo-router";
 import { FormProvider, useForm } from "react-hook-form";
 import { View } from "react-native";
 
-
 export default function NewTripLayout() {
-
-
 
     const methods = useForm({
         defaultValues: {
@@ -23,14 +21,13 @@ export default function NewTripLayout() {
         }
     });
 
-
     const router = useRouter();
-
 
     return (
         <FormProvider {...methods}>
             <Stack screenOptions={{
-                headerShown: true
+                headerShown: true,
+                headerRight: () => <View className="w-18"/>
             }}>
                 <Stack.Screen name="index" />
                 <Stack.Screen name="setup-general"
@@ -43,7 +40,7 @@ export default function NewTripLayout() {
                                 <Chip text="1 sur 2" size="small" />
                             </View>
                         ),
-                        title: "Nouvelle escapade"
+                        headerTitle: () => <HeaderTitle title="Nouvelle escapade" subtitle="Informations générales"/>,
                     }}
                 />
                 <Stack.Screen name="setup-users"
@@ -58,7 +55,7 @@ export default function NewTripLayout() {
                                 <Chip text="2 sur 2" size="small" />
                             </View>
                         ),
-                        title: "Nouvelle escapade"
+                        headerTitle: () => <HeaderTitle title="Nouvelle escapade" subtitle="Ajouter des invités"/>,
                     }} />
             </Stack>
         </FormProvider>

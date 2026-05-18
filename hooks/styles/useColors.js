@@ -2,7 +2,7 @@ import { useColorScheme } from "react-native";
 
 const lightColor = {
   //   background: "rgba(196, 235, 187, 1)",
-  background: "rgb(250, 247, 220)",
+  background: "rgb(250, 250, 250)",
   primary: "#rgb(43, 139, 248)",
   card: 'rgb(255, 255, 255)',
   text: 'rgb(28, 28, 30)',

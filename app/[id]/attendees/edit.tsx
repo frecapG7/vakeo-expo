@@ -7,11 +7,11 @@ import { Trip } from "@/types/models";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext, useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { KeyboardAvoidingView, Text, View } from "react-native";
+import { KeyboardAvoidingView, View } from "react-native";
 import Animated, { ZoomIn } from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function EditTripUsers() {
-
+export default function EditAttendees() {
     const { id } = useLocalSearchParams();
 
     const { me } = useContext(TripContext);
@@ -21,8 +21,7 @@ export default function EditTripUsers() {
 
     const { control,
         handleSubmit,
-        reset,
-        formState: { isDirty } } = useForm<Trip>();
+        reset } = useForm<Trip>();
 
     useEffect(() => {
         reset(trip);
@@ -32,7 +31,7 @@ export default function EditTripUsers() {
         control,
         name: "users"
     });
-    const selected = users?.map(u => u?._id).indexOf(me?._id);
+    const selected = users?.map(u => u?._id).indexOf(me?._id) ?? -1;
 
 
     const router = useRouter();
@@ -42,20 +41,18 @@ export default function EditTripUsers() {
     }
 
     return (
-        <KeyboardAvoidingView
-            style={styles.container}
-            behavior="padding">
-            <Animated.ScrollView className="py-10">
-                <Text className="font-bold text-2xl dark:text-white" >
-                    Accès et utilisateurs
-                </Text>
-                <View className="m-5">
-                    <TripUsersForm control={control} selected={selected} />
-                </View>
-                {isDirty &&
+        <SafeAreaView style={{flex: 1}}>
+
+            <KeyboardAvoidingView
+                style={styles.container}
+                behavior="padding">
+                <Animated.ScrollView className="">
+                    <View className="mx-2">
+                        <TripUsersForm control={control} selected={selected} />
+                    </View>
                     <Animated.View
                         entering={ZoomIn}
-                        className="m-5">
+                        className="m-5 mt-auto">
                         <Button
                             variant="contained"
                             size="medium"
@@ -63,15 +60,8 @@ export default function EditTripUsers() {
                             isLoading={updateTrip?.isPending}
                             onPress={handleSubmit(onSubmit)} />
                     </Animated.View>
-                }
-            </Animated.ScrollView>
-        </KeyboardAvoidingView >
+                </Animated.ScrollView>
+            </KeyboardAvoidingView >
+        </SafeAreaView>
     )
-
 }
-
-
-
-
-
-

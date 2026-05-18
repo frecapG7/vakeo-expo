@@ -1,7 +1,6 @@
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { Search } from "@/components/ui/Search";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { default as styles } from "@/constants/Styles";
 import { useSearchTrips } from "@/hooks/api/useTrips";
@@ -12,7 +11,7 @@ import useColors from "@/hooks/styles/useColors";
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { ImageBackground } from "expo-image";
 import { useNavigation, useRouter } from "expo-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { LinearTransition } from "react-native-reanimated";
@@ -22,7 +21,6 @@ export default function HomePage() {
 
   const router = useRouter();
 
-  const [search, setSearch] = useState<string>("");
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const navigation = useNavigation();
@@ -31,7 +29,7 @@ export default function HomePage() {
   const ids = useMemo(() => storageTrips?.map(trip => trip._id) || [], [storageTrips]);
 
 
-  const { data: trips, isLoading } = useSearchTrips(ids, search);
+  const { data: trips, isLoading } = useSearchTrips(ids);
 
   const { formatRange, formatDate, formatDuration } = useI18nTime();
 
@@ -54,16 +52,11 @@ export default function HomePage() {
     <SafeAreaView style={{ flex: 1 }}>
       <GestureHandlerRootView style={styles.container}>
         <Animated.FlatList
-          ListHeaderComponent={
-            <View className="mx-5 mb-5">
-              <Search value={search} onChange={setSearch} />
-            </View>
-          }
           data={trips}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) =>
             <Button
-              className="rounded-xl h-60 p-1 shadow bg-blue-100 dark:bg-gray-600"
+              className="rounded-xl h-60 border-l border-r border-b-4 border-orange-400"
               onPress={() => router.push(`./${item._id}`)}>
 
               <ImageBackground source={item.image}
@@ -97,7 +90,7 @@ export default function HomePage() {
                       )}
                       {item?.users?.length > 5 &&
                         <View className="items-center">
-                          <Avatar alt="..." size2="md" />
+                          <Avatar alt="..." size2="sm" />
                           <Text className="font-bold text-white">+{item?.users.length - 5}</Text>
                         </View>}
                     </View>
