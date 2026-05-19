@@ -27,7 +27,7 @@ export interface Trip {
     startDate?: Date | string,
     endDate?: Date | string,
     location?: Location, // marked as deprecated
-    tripStops?: TripStop[]
+    stops?: TripStop[]
     isPrivate?: boolean
 }
 

@@ -14,7 +14,7 @@ import { useContext, useEffect, useMemo } from "react";
 import { useController, useForm } from "react-hook-form";
 import { Text, View } from "react-native";
 import { Calendar, CalendarUtils } from "react-native-calendars";
-import Animated from "react-native-reanimated";
+import Animated, { SlideInDown, SlideOutUp } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 
@@ -81,14 +81,20 @@ export default function DatesPage() {
     const updateTrip = useUpdateTrip(id);
     const { me } = useContext(TripContext);
 
-    const { control, reset, formState: { isDirty }, handleSubmit } = useForm<Trip>();
+    const { control, reset, formState: { isDirty, errors }, handleSubmit } = useForm<Trip>();
     const { field: { value: startDate, onChange: setStartDate } } = useController({
         control,
+        rules: {
+            required: true
+        },
         name: "startDate",
     });
 
     const { field: { value: endDate, onChange: setEndDate } } = useController({
         control,
+        rules: {
+            required: true
+        },
         name: "endDate",
     });
 
@@ -136,6 +142,7 @@ export default function DatesPage() {
     const { formatRange } = useI18nTime();
 
 
+    const hasError = Object.keys(errors)?.length > 0;
     const disableCalendar = useMemo(() => Boolean(startDate && endDate && !isDirty), [startDate, endDate, isDirty]);
 
 
@@ -157,7 +164,7 @@ export default function DatesPage() {
                                 </Text>
                             </View>
                         ) : (
-                            <Text className="text-lg font-bold dark:text-white">Aucune date séléctionnée</Text>
+                            <Text className="text-lg font-bold dark:text-white">Aucune date sélectionnée</Text>
                         )}
                     </View>
                     <PollStatus id={id}
@@ -186,7 +193,7 @@ export default function DatesPage() {
                             textInactiveColor: colors.textInactiveColor,
                             monthTextColor: colors.text,
                             indicatorColor: colors.text,
-                        
+
                         }}
                         initialDate={startDate ? CalendarUtils.getCalendarDateString(startDate) : undefined}
                         markingType="period"
@@ -209,23 +216,32 @@ export default function DatesPage() {
                                 : {}
                         }
                     />
+                    {hasError &&
+                        <Animated.View entering={SlideInDown} exiting={SlideOutUp}>
+                            <Text className="text-red-400 mt-4">
+                                Une date de début et de fin est requise
+                            </Text>
+                        </Animated.View>
+
+                    }
                 </View>
 
                 {/* Action bar below calendar */}
-                <View className="flex-rowjustify-center gap-2 mx-2 my-4">
-                    {endDate && startDate && isDirty && (
+                <View className="gap-2 mx-2 my-4">
+                    {disableCalendar ? (
                         <Button
-                            variant="contained"
-                            title="Modifier"
-                            onPress={handleSubmit(onSubmit)} />
-                    )}
-                    {endDate && startDate && !isDirty && (
-                        <Button variant="outlined"
+                            key="clear-button"
+                            variant="outlined"
                             title="Réinitialiser"
                             onPress={() => { setStartDate(""); setEndDate(""); }}>
 
                         </Button>
-                    )}
+                    ) :
+                        <Button
+                            key="edit-button"
+                            variant="contained"
+                            title="Modifier"
+                            onPress={handleSubmit(onSubmit)} />}
                 </View>
 
 

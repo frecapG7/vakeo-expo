@@ -126,6 +126,18 @@ export default function ItemDetails() {
             </Animated.ScrollView>
         );
 
+
+    const stopsCount = trip?.stops?.length || 0;
+    const isSingleStop = stopsCount === 1;
+    const hasStops = stopsCount > 0;
+
+    const title = hasStops
+        ? isSingleStop
+            ? "Voir le lieu"
+            : `Voir les ${stopsCount} étapes`
+        : "Choisir un lieu";
+
+
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <BottomSheetModalProvider>
@@ -204,7 +216,7 @@ export default function ItemDetails() {
                                 icon={{
                                     name: "calendar"
                                 }}
-                                title={trip?.startDate ? formatRange(trip?.startDate, trip?.endDate, {compactWeekday : true, compactMonth: true}) : "Choisir des dates"}
+                                title={trip?.startDate ? formatRange(trip?.startDate, trip?.endDate, { compactWeekday: true, compactMonth: true }) : "Choisir des dates"}
                                 capitalizeTitle
                                 subtitle={trip?.startDate && `${countDaysBetween(dayjs(trip?.startDate), dayjs(trip?.endDate))} jours`}
                                 onPress={() => router.push({
@@ -218,7 +230,12 @@ export default function ItemDetails() {
                                 icon={{
                                     name: "map"
                                 }}
-                                title={Number(trip?.tripStops?.length) > 0 ? "Voir les étapes" : "Choisir un lieu"}
+                                title={Number(trip?.stops?.length) > 0 ? `${Number(trip.stops?.length) > 1 ? `Voir les ${trip.stops?.length} étapes` : "Voir le lieux"}` : "Choisir un lieu"}
+                                subtitle={hasStops
+                                    ? isSingleStop
+                                        ? trip.stops?.[0].name
+                                        : `De ${trip.stops?.[0].name} à ${String(trip.stops?.[stopsCount - 1].name)}`
+                                    : ""}
                                 onPress={() => router.push({
                                     pathname: "/[id]/location",
                                     params: {
