@@ -131,12 +131,6 @@ export default function ItemDetails() {
     const isSingleStop = stopsCount === 1;
     const hasStops = stopsCount > 0;
 
-    const title = hasStops
-        ? isSingleStop
-            ? "Voir le lieu"
-            : `Voir les ${stopsCount} étapes`
-        : "Choisir un lieu";
-
 
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
