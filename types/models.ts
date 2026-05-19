@@ -13,7 +13,7 @@ export interface Link {
 
 export interface TripStop {
     _id: string,
-    name: String,
+    name: string,
     location?: Location,
     accommodation?: Link
 }
