@@ -32,6 +32,8 @@ export const BottomLocationForm = ({ control, onCancel, onSubmit }: LocationSear
     });
     const [editMode, setEditMode] = useState(!location);
 
+    useEffect(() => setEditMode(!location), [location]);
+
 
     const { inputPlaceHolder } = useColors();
     const { data: geocode, isSuccess } = useGeocode(input, enableQuery);
@@ -66,38 +68,40 @@ export const BottomLocationForm = ({ control, onCancel, onSubmit }: LocationSear
         onSubmit();
     };
 
-    useEffect(() => {
-        setEditMode(!location);
-    }, [setEditMode, location]);
-
 
     if (!editMode)
         return (
             <Animated.View entering={SlideInLeft} exiting={SlideOutRight}>
-                <Pressable
+                <Button
                     onPress={onMapClick}
-                    className="flex-row items-center py-2 gap-4 rounded-xl border border-gray-400 dark:border-gray-200"
+                    className="flex-row items-center gap-4 p-4 rounded-xl bg-white dark:bg-gray-800 shadow-sm dark:shadow-gray-900/20"
                 >
-                    <IconSymbol name="mappin" color="gray" />
-                    <Text className="text-lg font-bold flex-1 dark:text-white" numberOfLines={3}>
-                        {location?.displayName}
-                    </Text>
-                </Pressable>
+                    <View className="p-2 rounded-full bg-orange-100 dark:bg-orange-900/30">
+                        <IconSymbol name="mappin" color="orange" />
+                    </View>
+                    <View className="flex-1">
+                        <View className="flex-row items-center justify-between">
+                            <Text className="text-sm text-gray-500 dark:text-gray-400">Lieu</Text>
+                            <Button
+                                onPress={() => setLocation(null)}
+                                className="p-1 bg-red-300 dark:bg-red-900/50 w-10 rounded-full items-center">
+                                <IconSymbol name="trash" />
+                            </Button>
+                        </View>
+                        <Text className="text-lg font-bold flex-1 dark:text-white" numberOfLines={3}>
+                            {location?.displayName}
+                        </Text>
+                    </View>
+                </Button>
 
                 <View className="flex-row justify-center items-center my-4 gap-4" >
                     <Button
                         variant="outlined"
                         title="Annuler"
                         onPress={onCancel} />
-                    <Button
-                        variant="contained"
-                        title="Modifier"
-                        onPress={() => setEditMode(true)} />
                 </View>
             </Animated.View>
         )
-
-
 
 
     return (

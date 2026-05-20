@@ -35,12 +35,7 @@ export const TripStopDetailsEditor = ({
 
     const colors = useColors();
     const bottomSheetRef = useRef<BottomSheet>(null);
-
-
-
     const [tabValue, setTabValue] = useState("location");
-    const [currentStep, setCurrentStep] = useState<WizardStep>('choice');
-
 
     useEffect(() => {
         if (visible)
@@ -67,10 +62,6 @@ export const TripStopDetailsEditor = ({
 
 
 
-    useEffect(() => {
-        if (isSubmitSuccessful)
-            setCurrentStep("choice");
-    }, [isSubmitSuccessful]);
 
 
 
@@ -114,28 +105,15 @@ export const TripStopDetailsEditor = ({
                 <View className="flex-row border-b border-gray-200 dark:border-gray-700 mt-2">
                     <Pressable
                         className={`flex-1 py-2 ${tabValue === 'location' ? 'border-b-2 border-blue-500' : ''}`}
-                        onPress={() => {
-                            setTabValue('location');
-                            if (tripStop?.location) {
-                                setCurrentStep("form");
-                            } else {
-                                setCurrentStep("choice");
-                            }
-                        }}
+                        onPress={() => setTabValue('location')}
                     >
                         <Text className={`text-center font-medium ${tabValue === 'location' ? 'text-blue-500' : 'text-gray-500 dark:text-gray-400'}`}>
-                            Lieu
+                            Adresse
                         </Text>
                     </Pressable>
                     <Pressable
                         className={`flex-1 py-2 ${tabValue === 'accommodation' ? 'border-b-2 border-blue-500' : ''}`}
-                        onPress={() => {
-                            setTabValue('accommodation');
-                            if (tripStop?.accommodation)
-                                setCurrentStep("form");
-                            else
-                                setCurrentStep("choice");
-                        }}
+                        onPress={() => setTabValue('accommodation')}
                     >
                         <Text className={`text-center font-medium ${tabValue === 'accommodation' ? 'text-blue-500' : 'text-gray-500 dark:text-gray-400'}`}>
                             Hébergement
@@ -143,77 +121,30 @@ export const TripStopDetailsEditor = ({
                     </Pressable>
                 </View>
 
+                <Animated.View
+                    key={tabValue}
+                    entering={SlideInRight}
+                    exiting={SlideOutLeft}
+                    className="flex my-5 gap-4">
+                    {tabValue === "location" ?
 
-
-                {currentStep === "choice" &&
-
-                    <Animated.View entering={SlideInRight}
-                        exiting={SlideOutLeft}
-                        className="flex m-5 gap-4">
-                        <Pressable
-                            onPress={() => setCurrentStep("form")}
-                            className="flex-row items-center gap-2 rounded-xl px-2 py-4 border border-gray-400  dark:border-gray-200 active:border-blue-400">
-                            <IconSymbol
-                                name="mappin"
-                                size={24}
-                                color={colors.text} />
-                            <View>
-                                <Text className="text-lg font-bold dark:text-white">
-                                    Saisis {tabValue === "location" ? "un lieu" : "un lien vers l'hebergement"}
-                                </Text>
-                                <Text className="text-xs text-gray-400">
-                                    {tabValue === "location" ? "Si tu connais déja le lieu." : "Colles le lien vers l'hébergement."}
-                                </Text>
-
-                            </View>
-
-                        </Pressable>
-
-                        <Pressable
-                            onPress={() => setCurrentStep("pollCreation")}
-                            className="flex-row items-center gap-2 rounded-xl px-2 py-4 border border-gray-400 dark:border-gray-200 active:border-blue-400 active:bg-blue-50"
-                            disabled>
-                            <IconSymbol name="chart.bar.fill" size={24} color={colors.text} />
-                            <View>
-                                <Text className="text-xl dark:text-white">
-                                    Créer un sondage
-                                </Text>
-                                <Text className="text-xs text-gray-400">
-                                    Demande l&apos;avis de la communauté en créant un sondage.
-                                </Text>
-
-                            </View>
-
-                        </Pressable>
-
-                    </Animated.View>
-
-                }
-
-                {currentStep === "form" &&
-                    <Animated.View entering={SlideInRight}
-                        exiting={SlideOutLeft}
-                        className="flex my-5 gap-4">
-                        {tabValue === "location" ?
-
-                            <View className="m-4">
-                                <BottomLocationForm
-                                    control={control}
-                                    onCancel={() => setCurrentStep("choice")}
-                                    onSubmit={handleSubmit(onSubmit)}
-                                />
-                            </View>
-                            :
-                            <View className="m-4">
-                                <BottomAccommodationForm
-                                    control={control}
-                                    onCancel={() => setCurrentStep("choice")}
-                                    onSubmit={handleSubmit(onSubmit)}
-                                />
-                            </View>
-                        }
-                    </Animated.View>
-                }
+                        <View className="mx-4 gap-3">
+                            <BottomLocationForm
+                                control={control}
+                                onCancel={onClose}
+                                onSubmit={handleSubmit(onSubmit)}
+                            />
+                        </View>
+                        :
+                        <View className="m-4">
+                            <BottomAccommodationForm
+                                control={control}
+                                onCancel={onClose}
+                                onSubmit={handleSubmit(onSubmit)}
+                            />
+                        </View>
+                    }
+                </Animated.View>
 
             </BottomSheetView>
 
