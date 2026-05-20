@@ -13,7 +13,7 @@ export interface Link {
 
 export interface TripStop {
     _id: string,
-    name: String,
+    name: string,
     location?: Location,
     accommodation?: Link
 }
@@ -27,7 +27,7 @@ export interface Trip {
     startDate?: Date | string,
     endDate?: Date | string,
     location?: Location, // marked as deprecated
-    tripStops?: TripStop[]
+    stops?: TripStop[]
     isPrivate?: boolean
 }
 

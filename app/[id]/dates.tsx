@@ -1,42 +1,124 @@
-import { AvatarsGroup } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
-import { IconSymbol } from "@/components/ui/IconSymbol";
-import { LinearProgress } from "@/components/ui/LinearProgress";
+import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
+import { TripContext } from "@/context/TripContext";
 import { useGetPolls } from "@/hooks/api/usePolls";
 import { useGetTrip, useUpdateTrip } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import useColors from "@/hooks/styles/useColors";
 import dayjs from "@/lib/dayjs-config";
-import { countDaysBetween, getDatesBetween } from "@/lib/utils";
-import { Trip } from "@/types/models";
+import { countDaysBetween } from "@/lib/utils";
+import { Trip, TripUser } from "@/types/models";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect } from "react";
+import { useContext, useEffect, useMemo } from "react";
 import { useController, useForm } from "react-hook-form";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { Calendar, CalendarUtils } from "react-native-calendars";
-import Animated, { FadeIn, FadeOut, SlideInUp, SlideOutDown } from "react-native-reanimated";
+import Animated, { SlideInDown, SlideOutUp } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+
+const PollStatus = ({ id, selectedUser }: { id: any, selectedUser?: TripUser }) => {
+    const { data: pagePoll } = useGetPolls(id, { type: "DatesPoll" });
+    const hasPoll = pagePoll?.totalResults !== 0;
+    const hasVoted = pagePoll?.polls[0]?.hasSelected?.some(v => v._id === selectedUser?._id);
+
+    const router = useRouter();
+
+    if (!pagePoll)
+        return (
+            <View className="w-40">
+                <Skeleton height={14} />
+            </View>);
+
+    if (!hasPoll) return (
+        <Button
+            onPress={() => router.push({
+                pathname: "/[id]/polls/new",
+                params: {
+                    id: String(id),
+                    type: "DatesPoll"
+                }
+            })}>
+            <Text className="text-blue-600 font-medium">+ Créer un sondage</Text>
+        </Button>
+    );
+    if (hasVoted) return (
+        <Button className="flex-row items-center gap-2"
+            onPress={() => router.push({
+                pathname: "/[id]/polls/[pollId]",
+                params: {
+                    id: String(id),
+                    pollId: pagePoll.polls[0]._id
+                }
+            })}>
+            <Text className="text-xl">✅</Text>
+            <Text className="text-green-600 font-medium">Vous avez voté</Text>
+        </Button>
+    );
+    return (
+        <Button className="flex-row items-center gap-1"
+            onPress={() => router.push({
+                pathname: "/[id]/polls/[pollId]",
+                params: {
+                    id: String(id),
+                    pollId: pagePoll.polls[0]._id
+                }
+            })}>
+            <Text className="text-xl">⏳</Text>
+            <Text className="text-orange-600 font-medium">Voter maintenant</Text>
+        </Button>
+    );
+};
+
 
 export default function DatesPage() {
 
     const colors = useColors();
-    const router = useRouter();
 
     const { id } = useLocalSearchParams();
     const { data: trip } = useGetTrip(id);
     const updateTrip = useUpdateTrip(id);
-    const { data: pagePoll } = useGetPolls(id, { type: "DatesPoll" });
-    const { control, reset, formState: { isDirty }, handleSubmit } = useForm<Trip>();
+    const { me } = useContext(TripContext);
+
+    const { control, reset, formState: { isDirty, errors }, handleSubmit } = useForm<Trip>();
     const { field: { value: startDate, onChange: setStartDate } } = useController({
         control,
+        rules: {
+            required: true
+        },
         name: "startDate",
     });
 
     const { field: { value: endDate, onChange: setEndDate } } = useController({
         control,
+        rules: {
+            required: true
+        },
         name: "endDate",
     });
+
+    const handleDateSelection = (dateString: string) => {
+        const isCurrentSingleDay = startDate === dateString && endDate === dateString;
+
+        if (isCurrentSingleDay) {
+            setStartDate("");
+            setEndDate("");
+        } else if (startDate && endDate && startDate !== endDate) {
+            setStartDate(dateString);
+            setEndDate(dateString);
+        } else if (startDate) {
+            if (dayjs(dateString).isBefore(dayjs(startDate))) {
+                setEndDate(startDate);
+                setStartDate(dateString);
+            } else {
+                setEndDate(dateString);
+            }
+        } else {
+            setStartDate(dateString);
+            setEndDate(dateString);
+        }
+    }
 
     useEffect(() => {
         reset({
@@ -60,12 +142,37 @@ export default function DatesPage() {
     const { formatRange } = useI18nTime();
 
 
+    const hasError = Object.keys(errors)?.length > 0;
+    const disableCalendar = useMemo(() => Boolean(startDate && endDate && !isDirty), [startDate, endDate, isDirty]);
+
+
     return (
         <SafeAreaView style={styles.container} >
 
             <Animated.ScrollView  >
+                {/* // Above calendar */}
+                <View className="mx-2 mb-4 p-4 gap-4 bg-white dark:bg-gray-900 rounded-xl shadow-sm">
+                    <View className="flex-row items-center gap-2">
+                        <Text className="text-xl">📅</Text>
+                        {startDate && endDate ? (
+                            <View>
+                                <Text className="text-lg font-bold capitalize dark:text-white">
+                                    {formatRange(dayjs(startDate), dayjs(endDate))}
+                                </Text>
+                                <Text className="text-base font-normal text-gray-500">
+                                    {countDaysBetween(dayjs(startDate), dayjs(endDate))} jours
+                                </Text>
+                            </View>
+                        ) : (
+                            <Text className="text-lg font-bold dark:text-white">Aucune date sélectionnée</Text>
+                        )}
+                    </View>
+                    <PollStatus id={id}
+                        selectedUser={me}
+                    />
+                </View>
 
-                <View className="flex-1 m-2 py-5 rounded-xl bg- dark:bg-gray-900">
+                <View className="flex-1 m-2 py-5 rounded-xl bg-white dark:bg-gray-900">
                     <Calendar
                         enableSwipeMonths
                         theme={{
@@ -83,202 +190,61 @@ export default function DatesPage() {
                             selectedDotColor: '#ffffff',
                             arrowColor: 'orange',
                             disabledArrowColor: '#d9e1e8',
+                            textInactiveColor: colors.textInactiveColor,
                             monthTextColor: colors.text,
                             indicatorColor: colors.text,
+
                         }}
-                        initialDate={startDate}
+                        initialDate={startDate ? CalendarUtils.getCalendarDateString(startDate) : undefined}
                         markingType="period"
-                        onDayPress={({ dateString }) => {
-                            if (!startDate) {
-                                setEndDate("");
-                                setStartDate(dateString);
-                            } else if (endDate) {
-                                setEndDate("");
-                                setStartDate(dateString);
-                            } else {
-                                setEndDate(dateString)
-                            }
-                        }}
-                        markedDates={{
-                            ...(startDate && {
-                                [startDate]: {
-                                    startingDay: true,
-                                    color: colors.calendarPrimary,
-                                    textColor: colors.neutral,
-                                    selected: true,
-                                    disableTouchEvent: true
-                                }
-                            }),
-                            ...(endDate && {
-                                [endDate]: {
-                                    endingDay: true,
-                                    color: colors.calendarPrimary,
-                                    textColor: colors.neutral,
-                                    selected: true,
-                                    disableTouchEvent: true
-                                }
-                            }),
-                            ...(getDatesBetween(dayjs(startDate), dayjs(endDate))
-                                .reduce((acc: Record<string, any>, date) => {
-                                    acc[date] = {
-                                        color: colors.neutral,
-                                        textColor: colors.text,
-                                        selected: true,
-                                        disableTouchEvent: true
-                                    }
-                                    return acc;
-                                }, {} as Record<string, any>))
-                        }}
-                        minDate={startDate && CalendarUtils.getCalendarDateString(startDate)}
+                        onDayPress={({ dateString }) => !disableCalendar && handleDateSelection(dateString)}
+                        markedDates={
+                            startDate && endDate
+                                ? Array.from({ length: dayjs(endDate).diff(dayjs(startDate), 'day') + 1 }, (_, i) =>
+                                    dayjs(startDate).add(i, 'day').format('YYYY-MM-DD'))
+                                    .reduce((acc, date) => ({
+                                        ...acc,
+                                        [date]: {
+                                            startingDay: date === startDate,
+                                            endingDay: date === endDate,
+                                            color: date === startDate || date === endDate ? colors.calendarPrimary : colors.neutral,
+                                            textColor: date === startDate || date === endDate ? colors.neutral : colors.text,
+                                            selected: true,
+                                            disableTouchEvent: true
+                                        }
+                                    }), {})
+                                : {}
+                        }
                     />
+                    {hasError &&
+                        <Animated.View entering={SlideInDown} exiting={SlideOutUp}>
+                            <Text className="text-red-400 mt-4">
+                                Une date de début et de fin est requise
+                            </Text>
+                        </Animated.View>
+
+                    }
                 </View>
 
-                <View className="flex gap-5 mx-2 mt-10 mb-20">
-                    <View>
-                        <Text className="font-bold text-2xl dark:text-white ml-2">
-                            Dates séléctionnées
-                        </Text>
-                        <View className="flex-row justify-between items-center bg-white dark:bg-gray-900 rounded-xl p-2 py-4 gap-2">
-                            <View className="flex-row gap-1 items-center max-w-[80%] overflow-hidden">
-                                <View className="p-1 bg-blue-100 rounded-xl">
-                                    <IconSymbol name="calendar" color="blue" size={34} />
-                                </View>
-                                <View>
-                                    {(startDate && endDate) &&
-                                        <Animated.View entering={SlideInUp} exiting={SlideOutDown} >
-                                            <Text className="capitalize font-bold dark:text-white" numberOfLines={3}>
-                                                {formatRange(dayjs(startDate), dayjs(endDate))}
-                                            </Text>
-                                            <Text className="text-gray-400">
-                                                {countDaysBetween(dayjs(startDate), dayjs(endDate))} jours
-                                            </Text>
-                                        </Animated.View>
-                                    }
-                                </View>
-                            </View>
-                            {(endDate && startDate) &&
-                                <Animated.View
-                                    entering={FadeIn}
-                                    exiting={FadeOut}
-                                    className="flex">
-                                    {isDirty ?
-                                        <Pressable
-                                            disabled={updateTrip.isPending}
-                                            onPress={handleSubmit(onSubmit)}
-                                            className="bg-blue-400 rounded-xl p-2">
-                                            {updateTrip.isPending ?
-                                                <ActivityIndicator /> :
-                                                <Text className="text-white text-xs">
-                                                    Modifier
-                                                </Text>
-                                            }
-                                        </Pressable>
-                                        :
-                                        <Pressable
-                                            className="bg-gray-400 rounded-xl p-2 items-center flex-0"
-                                            onPress={() => {
-                                                setEndDate("");
-                                                setStartDate("");
-                                            }}>
-                                            <IconSymbol name="trash" color="white" />
-                                        </Pressable>
-                                    }
-                                </Animated.View>
-                            }
-                            {/* </View> */}
-                        </View>
-                    </View>
-                    {pagePoll?.totalResults !== 0 &&
-                        <View className="my-5">
-                            <Text className="font-bold text-2xl dark:text-white">
-                                Sondage en cours
-                            </Text>
-                            <Text className="text-sm text-gray-200">
-                                Vote pour tes dates préférés
-                            </Text>
-                            {pagePoll?.polls.map(poll => (
-                                <Pressable
-                                    key={poll._id}
-                                    onPress={() => router.navigate({
-                                        pathname: "/[id]/polls/[pollId]",
-                                        params: {
-                                            id: String(id),
-                                            pollId: poll._id
-                                        }
-                                    })}
-                                    className="p-2 bg-white dark:bg-gray-900 rounded-xl">
-                                    <View className="flex-row justify-between">
-                                        <View className="flex-row">
-                                            <IconSymbol name="chart.bar.fill" color="orange" />
-                                            <Text className="dark:text-white text-lg font-bold">
-                                                {poll.question}
-                                            </Text>
-                                        </View>
-                                        <Text className="text-orange-600 border border-orange-600 rounded-full px-2 bg-orange-200">
-                                            {countDaysBetween(dayjs(poll.createdAt), now)}j
-                                        </Text>
-                                    </View>
-                                    <View>
-                                        {poll.options.slice(0, 3).map((option) =>
-                                            <View className="gap-1 justify-start mt-2" key={option._id}>
-                                                <View className="flex-row items-center justify-between ">
-                                                    <Text className="dark:text-white text-xs max-w-[80%] capitalize" numberOfLines={3}>
-                                                        {formatRange(dayjs(option.startDate), dayjs(option.endDate))}
-                                                    </Text>
-                                                    <Text className="font-bold text-orange-400">
-                                                        {Number(option.percent).toFixed()} %
-                                                    </Text>
-                                                </View>
-                                                <LinearProgress progress={option.percent / 100} />
-                                                <View className="flex-row items-center gap-5">
-                                                    {poll.isAnonymous ?
-                                                        <Text className="text-gray-400">
-                                                            {option.selectedBy?.length} votes
-                                                        </Text>
-                                                        :
-                                                        <AvatarsGroup
-                                                            avatars={option.selectedBy?.map(u => ({
-                                                                avatar: u?.avatar,
-                                                                alt: u?.name?.charAt(0)
-                                                            }))}
-                                                            size2="xs"
-                                                            maxLength={5}
-                                                        />
-                                                    }
-                                                </View>
-                                            </View>
-                                        )}
-                                    </View>
-                                    <View className="flex-row justify-end my-2 items-center gap-2">
-                                        <IconSymbol name="person.2.fill" color="gray" />
-                                        <Text className="text-gray-400">
-                                            {poll.hasSelected.length}
-                                        </Text>
-                                    </View>
-                                    <Text className="dark:text-white text-center p-2 border-t border-gray-200">
-                                        Voir tout
-                                    </Text>
-                                </Pressable>
-                            ))}
-                        </View>
-                    }
-                    {pagePoll?.totalResults === 0 &&
+                {/* Action bar below calendar */}
+                <View className="gap-2 mx-2 my-4">
+                    {disableCalendar ? (
                         <Button
-                            onPress={() => router.push({
-                                pathname: "/[id]/polls/new",
-                                params: {
-                                    id: String(id),
-                                    type: "DatesPoll"
-                                }
-                            })}
-                            className="rounded-full bg-blue-400 py-4 flex-row justify-center  items-center mx-5">
-                            <IconSymbol name="chart.bar.fill" color="white" />
-                            <Text className="font-bold text-white">
-                                Lancer un sondage
-                            </Text>
+                            key="clear-button"
+                            variant="outlined"
+                            title="Réinitialiser"
+                            onPress={() => { setStartDate(""); setEndDate(""); }}>
+
                         </Button>
-                    }
+                    ) :
+                        <Button
+                            key="edit-button"
+                            variant="contained"
+                            title="Modifier"
+                            onPress={handleSubmit(onSubmit)} />}
                 </View>
+
+
             </Animated.ScrollView>
         </SafeAreaView>
     )
