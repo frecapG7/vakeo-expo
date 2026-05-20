@@ -155,8 +155,8 @@ export default function TripLocation() {
                                 Étapes de l&apos;escapade
                             </Text>
                             <View className="flex-row items-center gap-2">
-                                <Text className="text-sm dark:text-gray-200">
-                                    Ajoute pour chaque étape l&apos;adresse et hébergement
+                                <Text className="text-sm dark:text-gray-200" numberOfLines={4}>
+                                    Ajoute pour chaque étape une adresse et un hébergement.
                                 </Text>
                             </View>
                         </View>
