@@ -92,7 +92,7 @@ export default function TripLocation() {
                                     </Button>
                                 </View>
                             </View>
-                            <View className="border-l-4 border-orange-400 bg-white  dark:bg-gray-900 rounded-xl">
+                            <View className="p-2 border-b-2 border-l-1 border-r-1 border-orange-400 bg-white  dark:bg-gray-900 rounded-xl">
                                 <Pressable onPress={() => {
                                     setSelectedTripStop(item);
                                     setOpenLocationWizard(true)
@@ -102,10 +102,13 @@ export default function TripLocation() {
                                         exiting={SlideOutRight}
                                         className="flex-row p-2 items-center gap-4"
                                     >
-                                        <IconSymbol name="mappin" size={24} color="gray" />
+                                        <View className="p-2 rounded-full bg-orange-100 dark:bg-orange-900/30">
+                                            <IconSymbol name="mappin" size={24} color="orange" />
+
+                                        </View>
                                         <View className="flex-1 flex-shrink py-2 border-b border-gray-200">
                                             <Text className="text-gray-600 dark:text-gray-400" numberOfLines={4} ellipsizeMode="tail">
-                                                {item?.location ? item?.location?.displayName : "Ajouter un lieu"}
+                                                {item?.location ? item?.location?.displayName : "Ajouter une adresse"}
                                             </Text>
                                         </View>
                                     </Animated.View>
@@ -119,7 +122,9 @@ export default function TripLocation() {
                                         exiting={SlideOutRight}
                                         className="flex-row p-2 items-center gap-4"
                                     >
-                                        <IconSymbol name="house.fill" size={24} color="gray" />
+                                        <View className="p-2 rounded-full bg-orange-100 dark:bg-orange-900/30">
+                                            <IconSymbol name="house.fill" size={24} color="orange" />
+                                        </View>
                                         <View className="flex-shrink py-2 items-center">
                                             <Text className="text-gray-600 dark:text-gray-400" numberOfLines={4} ellipsizeMode="tail">
                                                 {item?.accommodation ? item?.accommodation?.title : "Ajouter un hébergement"}
@@ -146,13 +151,12 @@ export default function TripLocation() {
                     }
                     ListHeaderComponent={
                         <View className="gap-2 mb-6 ml-4">
-                            <Text className="text-2xl font-bold dark:text-white">
+                            <Text className="text-3xl font-bold dark:text-white">
                                 Étapes de l&apos;escapade
                             </Text>
                             <View className="flex-row items-center gap-2">
-                                <IconSymbol name="info.circle" size={16} color="gray" />
-                                <Text className="text-md dark:text-gray-200">
-                                    Ajoute des noms, lieus et hébergements
+                                <Text className="text-sm dark:text-gray-200">
+                                    Ajoute pour chaque étape l&apos;adresse et hébergement
                                 </Text>
                             </View>
                         </View>
@@ -165,22 +169,29 @@ export default function TripLocation() {
                             <Skeleton height={40} />
                         </View>
                         :
-                        <View className="flex-1 justify-center items-center p-8">
+                        <View className="flex-1 justify-center items-center p-8 ">
                             <IconSymbol name="map" size={48} color="gray" />
                             <Text className="text-lg text-gray-500 dark:text-gray-400 text-center mt-4">
-                                Aucune étape ajoutée
+                                Aucuné étapes
                             </Text>
+                            <View className="mt-5">
+                                <Button variant="contained"
+                                    title="Ajouter une étape"
+                                    onPress={() => setOpenModal(true)} />
+                            </View>
                         </View>}
                     onRefresh={refetch}
                     refreshing={isRefetching}
                 />
-                <View className="m-4 ">
-                    <Button
-                        variant="contained"
-                        title="Ajouter une étape"
-                        onPress={() => setOpenModal(true)}>
-                    </Button>
-                </View>
+                {Number(tripStops?.length) > 0 &&
+                    <View className="m-4 ">
+                        <Button
+                            className="absolute bottom-10 right-6 p-2 rounded-full border border-white bg-orange-400 items-center justify-center shadow"
+                            onPress={() => setOpenModal(true)}>
+                            <IconSymbol name="plus" color="white" size={26} />
+                        </Button>
+                    </View>
+                }
 
                 <Modal
                     transparent={true}

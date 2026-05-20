@@ -12,7 +12,7 @@ export default function TripDetailsLayout() {
     const { id } = useLocalSearchParams();
 
     const { data: storageTrip } = useGetStorageTrip(String(id));
-    const { data: trip } = useGetTrip(String(id));
+    const { data: trip } = useGetTrip(String(id), true);
 
     const { data: me } = useGetTripUser(id, storageTrip?.user, {
         enabled: !!storageTrip?.user
@@ -68,7 +68,7 @@ export default function TripDetailsLayout() {
                 <Stack.Screen name="location"
                     options={{
                         headerShown: true,
-                        title: "Le lieu",
+                        title: "Les étapes",
                     }}
                 />
                 <Stack.Screen name="goods"

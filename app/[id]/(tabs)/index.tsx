@@ -224,7 +224,7 @@ export default function ItemDetails() {
                                 icon={{
                                     name: "map"
                                 }}
-                                title={Number(trip?.stops?.length) > 0 ? `${Number(trip.stops?.length) > 1 ? `Voir les ${trip.stops?.length} étapes` : "Voir le lieux"}` : "Choisir un lieu"}
+                                title={Number(trip?.stops?.length) > 0 ? `${Number(trip.stops?.length) > 1 ? `Voir les ${trip.stops?.length} étapes` : "Voir le lieu"}` : "Choisir un lieu"}
                                 subtitle={hasStops
                                     ? isSingleStop
                                         ? trip.stops?.[0].name

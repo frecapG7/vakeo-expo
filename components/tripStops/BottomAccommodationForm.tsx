@@ -7,7 +7,7 @@ import * as Clipboard from 'expo-clipboard';
 import { Image, ImageBackground } from "expo-image";
 import React, { useEffect, useState } from "react";
 import { Control, useController, useFormState } from "react-hook-form";
-import { Linking, Pressable, Text, View } from "react-native";
+import { Linking, Text, View } from "react-native";
 import Animated, { BounceIn, BounceOut, SlideInLeft, SlideOutRight } from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
 import { Button } from "../ui/Button";
@@ -38,9 +38,10 @@ export const BottomAccommodationForm = ({ control, onCancel, onSubmit }: Accommo
     const { inputPlaceHolder } = useColors();
     const postLinkPreview = usePostLinkPreview();
 
-    const handleSubmitLink = (data: Link) => {
+    const handleSubmitLink = async (data: Link) => {
         setAccommodation(data);
         setInput("");
+        await onSubmit();
     };
 
     const onLinkClick = async () => {
@@ -65,11 +66,11 @@ export const BottomAccommodationForm = ({ control, onCancel, onSubmit }: Accommo
             const response = await postLinkPreview.mutateAsync(text);
             if (response.success && response.data) {
                 // Full link preview available
-                handleSubmitLink(response.data);
+                await handleSubmitLink(response.data);
             } else {
                 // Fallback when preview fails but URL is valid
                 const urlObj = new URL(text);
-                handleSubmitLink({
+                await handleSubmitLink({
                     title: urlObj.hostname,
                     url: text,
                     image: "",
@@ -100,10 +101,11 @@ export const BottomAccommodationForm = ({ control, onCancel, onSubmit }: Accommo
                 entering={SlideInLeft}
                 exiting={SlideOutRight}
                 className="">
-                <Pressable
+                <Button
                     onPress={onLinkClick}
-                    className="bg-white dark:bg-gray-900 rounded-xl gap-1 pb-2 overflow-hidden border dark:border-gray-200 "
+                    className="rounded-xl bg-white dark:bg-gray-800 shadow-sm dark:shadow-gray-900/20  gap-1 pb-2 overflow-hidden"
                 >
+
                     <ImageBackground
                         source={accommodation?.image}
                         style={{
@@ -118,11 +120,11 @@ export const BottomAccommodationForm = ({ control, onCancel, onSubmit }: Accommo
                     >
                         <View className="flex-1 items-end p-3 w-full">
                             <View className="flex-1 justify-between">
-                                <Pressable
+                                <Button
                                     onPress={() => setAccommodation(null)}
-                                    className="p-1 bg-gray-400 w-10 rounded-full items-center">
+                                    className="p-1 bg-red-300 dark:bg-red-900/50 w-10 rounded-full items-center">
                                     <IconSymbol name="trash" />
-                                </Pressable>
+                                </Button>
                                 <View>
                                     <Image source={accommodation?.icon}
                                         style={{
@@ -143,19 +145,14 @@ export const BottomAccommodationForm = ({ control, onCancel, onSubmit }: Accommo
                             Voir le détail
                         </Text>
                     </View>
-                </Pressable>
+
+                </Button>
 
                 <View className="flex-row justify-center items-center my-4 gap-4" >
                     <Button
                         variant="outlined"
                         title="Annuler"
                         onPress={onCancel} />
-                    <Button
-                        variant="contained"
-                        title="Modifier"
-                        disabled={!isDirty}
-                        isLoading={isSubmitting}
-                        onPress={onSubmit} />
                 </View>
             </Animated.View>
         )
@@ -194,6 +191,14 @@ export const BottomAccommodationForm = ({ control, onCancel, onSubmit }: Accommo
                     </Button>
                 </Animated.View>
             </View>
+
+        </View>
+        <View className="flex-row justify-center items-center my-4 gap-4" >
+            <Button
+                variant="outlined"
+                title="Annuler"
+                disabled={isSubmitting}
+                onPress={onCancel} />
         </View>
     </View>
     );
