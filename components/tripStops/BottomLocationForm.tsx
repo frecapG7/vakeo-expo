@@ -68,10 +68,6 @@ export const BottomLocationForm = ({ control, onCancel, onSubmit }: LocationSear
         onSubmit();
     };
 
-    useEffect(() => {
-        setEditMode(!location);
-    }, [setEditMode, location]);
-
 
     if (!editMode)
         return (

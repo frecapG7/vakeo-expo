@@ -172,7 +172,7 @@ export default function TripLocation() {
                         <View className="flex-1 justify-center items-center p-8 ">
                             <IconSymbol name="map" size={48} color="gray" />
                             <Text className="text-lg text-gray-500 dark:text-gray-400 text-center mt-4">
-                                Aucuné étapes
+                                Aucune étapes
                             </Text>
                             <View className="mt-5">
                                 <Button variant="contained"
