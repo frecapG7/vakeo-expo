@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";  
 import { TripContext } from "@/context/TripContext";  
 import { useGetEvents } from "@/hooks/api/useEvents";  
-import useI18nTime from "@/hooks/i18n/useI18nTime";
+import useI18nTime from "@/hooks/i18n/useI18nTime";  
 import useColors from "@/hooks/styles/useColors";  
 import dayjs from "@/lib/dayjs-config";  
 import { Event, TripUser } from "@/types/models";  
@@ -44,7 +44,7 @@ const EventItem = ({ event, user, colors }: { event: Event, user: TripUser, colo
  </Text>  
  {isOwner &&  
  <Animated.View className="items-center rounded-lg p-1" style={{ backgroundColor: colors.neutral }}>  
- <Text className="text-sm upper-case font-bold" style={{ color: colors.primary }}>RESP.</Text>  
+ <Text className="text-sm uppercase font-bold" style={{ color: colors.primary }}>RESP.</Text>  
  </Animated.View>}  
  </View>  
  <View className="flex-row items-center ">  
@@ -90,40 +90,63 @@ export default function TripPlanning() {
  const events = useMemo(() => data?.pages.flatMap((page) => page?.events), [data?.pages]);  
   
  return (  
- <Animated.View style={[styles.container, { backgroundColor: colors.background }]}>  
+ <Animated.View className="flex-1" style={{ backgroundColor: colors.background }}>  
  <Animated.FlatList  
  data={events || []}  
  ListHeaderComponent={  
  <View className="gap-2 mb-5">  
  <View className="flex-row justify-between gap-5">  
- <Pressable className="flex-1 shadow flex-row rounded-lg justify-center items-center p-2 border"  
- style={{ backgroundColor: onlyAttendee ? colors.neutral : colors.card, borderColor: colors.border }}
- onPress={() => setOnlyAttendee(!onlyAttendee)}>  
- <IconSymbol name="checkmark" color={onlyAttendee ? colors.primary : colors.inputPlaceHolder} />  
- <Text className="text-sm ml-1 font-bold" style={{ color: colors.text }}>Mes participations</Text>  
+ <Pressable 
+   className="flex-1 shadow flex-row rounded-lg justify-center items-center p-2 border"  
+   style={({ pressed }) => [
+     { 
+       backgroundColor: onlyAttendee ? colors.neutral : colors.card, 
+       borderColor: colors.border,
+       opacity: pressed ? 0.7 : 1 
+     }
+   ]}
+   onPress={() => setOnlyAttendee(!onlyAttendee)}
+ >  
+   <IconSymbol name="checkmark" color={onlyAttendee ? colors.primary : colors.inputPlaceHolder} />  
+   <Text className="text-sm ml-1 font-bold" style={{ color: colors.text }}>Mes participations</Text>  
  </Pressable>  
- <Pressable className="flex-1 shadow flex-row rounded-lg justify-center items-center p-2 border" 
- style={{ backgroundColor: onlyOwner ? colors.neutral : colors.card, borderColor: colors.border }} 
- onPress={() => setOnlyOwner(!onlyOwner)}>  
- <IconSymbol name="bookmark.fill" color={onlyOwner ? colors.primary : colors.inputPlaceHolder} />  
- <Text className="text-sm ml-1 font-bold" style={{ color: colors.text }}>Mes responsabilités</Text>  
+ <Pressable 
+   className="flex-1 shadow flex-row rounded-lg justify-center items-center p-2 border" 
+   style={({ pressed }) => [
+     { 
+       backgroundColor: onlyOwner ? colors.neutral : colors.card, 
+       borderColor: colors.border,
+       opacity: pressed ? 0.7 : 1 
+     }
+   ]} 
+   onPress={() => setOnlyOwner(!onlyOwner)}
+ >  
+   <IconSymbol name="bookmark.fill" color={onlyOwner ? colors.primary : colors.inputPlaceHolder} />  
+   <Text className="text-sm ml-1 font-bold" style={{ color: colors.text }}>Mes responsabilités</Text>  
  </Pressable>  
  </View>  
  <Animated.ScrollView  
- horizontal  
- showsHorizontalScrollIndicator={false}  
- className="flex-row my-2"  
- contentContainerClassName="gap-5">  
+   horizontal  
+   showsHorizontalScrollIndicator={false}  
+   className="flex-row my-2"  
+   contentContainerClassName="gap-5"
+ >  
  {typeFilters.map(item => (  
  <Pressable  
- key={item.value}  
- className="py-2 px-4 items-center rounded-full border"  
- style={{ backgroundColor: typeFilter === item.value ? colors.primary : colors.card, borderColor: colors.border }}
- onPress={() => setTypeFilter(typeFilter === item?.value ? "" : item.value)}  
+   key={item.value}  
+   className="py-2 px-4 items-center rounded-full border"  
+   style={({ pressed }) => [
+     { 
+       backgroundColor: typeFilter === item.value ? colors.primary : colors.card, 
+       borderColor: colors.border,
+       opacity: pressed ? 0.7 : 1
+     }
+   ]}
+   onPress={() => setTypeFilter(typeFilter === item?.value ? "" : item.value)}  
  >  
- <Text className="font-bold" style={{ color: typeFilter === item.value ? colors.card : colors.text }}>  
- {item.label}  
- </Text>  
+   <Text className="font-bold" style={{ color: typeFilter === item.value ? colors.card : colors.text }}>  
+     {item.label}  
+   </Text>  
  </Pressable>  
  ))}  
  </Animated.ScrollView>  
@@ -138,7 +161,7 @@ export default function TripPlanning() {
  </Text>  
  </View>  
  }  
- <View className="flex flex-row">  
+ <View className="flex-row">  
  <View className="p-1 justify-around">  
  <Text className="font-medium" style={{ color: colors.text }}>{formatHour(item.startDate)}</Text>  
  <Text style={{ color: colors.inputPlaceHolder }}>{formatHour(item.endDate)}</Text>  
@@ -163,7 +186,7 @@ export default function TripPlanning() {
  <Skeleton height={40} />  
  </View>  
  :  
- <View className="my-5 flex-1 flex-grow justify-center">  
+ <View className="my-5 flex-1 justify-center">  
  <Text className="text-2xl text-center font-bold" style={{ color: colors.inputPlaceHolder }}>  
  Aucune activité  
  </Text>  
@@ -173,13 +196,21 @@ export default function TripPlanning() {
  if (hasNextPage) fetchNextPage();  
  }}  
  />  
- <Pressable className="absolute bottom-6 right-6 p-3 rounded-full border items-center justify-center shadow-lg"  
- style={{ backgroundColor: colors.primary, borderColor: colors.border }}
- onPress={() => router.push({  
- pathname: "/[id]/events/new",  
- params: { id: String(id) }  
- })}>  
- <IconSymbol name="plus" color={colors.card} size={28} />  
+ <Pressable 
+   className="absolute bottom-6 right-6 p-3 rounded-full border items-center justify-center shadow-lg"  
+   style={({ pressed }) => [
+     { 
+       backgroundColor: colors.primary, 
+       borderColor: colors.border,
+       opacity: pressed ? 0.7 : 1
+     }
+   ]}
+   onPress={() => router.push({  
+     pathname: "/[id]/events/new",  
+     params: { id: String(id) }  
+   })}
+ >  
+   <IconSymbol name="plus" color={colors.card} size={28} />  
  </Pressable>  
  </Animated.View>  
  )  

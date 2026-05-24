@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, Pressable, Dimensions, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 
 // --- Imports de l'architecture Vakéo ---
@@ -35,7 +35,7 @@ const getDaysInMonth = (baseDate: dayjs.Dayjs) => {
 export default function CalendarView() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const colors = useColors(); // <-- Branchement direct sur le fichier de ton pote
+  const colors = useColors(); 
   
   const scrollViewRef = useRef<ScrollView>(null);
   
@@ -91,39 +91,47 @@ export default function CalendarView() {
 
   if (isTripLoading || !currentMonth) {
     return (
-      <View style={[styles.container, styles.loadingCenter, { backgroundColor: colors.calendarBackground }]}>
+      <View className="flex-1 justify-center items-center" style={{ backgroundColor: colors.calendarBackground }}>
         <ActivityIndicator size="large" color={colors.calendarPrimary} />
       </View>
     );
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.calendarBackground }]}>
+    <View className="flex-1" style={{ backgroundColor: colors.calendarBackground }}>
       
       {/* NAVIGATION DU MOIS */}
-      <View style={styles.monthNavigator}>
-        <TouchableOpacity onPress={() => setCurrentMonth(currentMonth.subtract(1, 'month'))}>
+      <View className="flex-row justify-between items-center px-8 py-4">
+        <Pressable 
+          onPress={() => setCurrentMonth(currentMonth.subtract(1, 'month'))}
+          style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
+        >
             <IconSymbol name="chevron.left" size={24} color={colors.calendarPrimary} />
-        </TouchableOpacity>
-        <Text style={[styles.monthText, { color: colors.text }]}>{currentMonth.format('MMMM YYYY')}</Text>
-        <TouchableOpacity onPress={() => setCurrentMonth(currentMonth.add(1, 'month'))}>
+        </Pressable>
+        <Text className="text-lg font-bold capitalize" style={{ color: colors.text }}>{currentMonth.format('MMMM YYYY')}</Text>
+        <Pressable 
+          onPress={() => setCurrentMonth(currentMonth.add(1, 'month'))}
+          style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
+        >
             <IconSymbol name="chevron.right" size={24} color={colors.calendarPrimary} />
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {/* GRILLE DU CALENDRIER */}
-      <View style={styles.calendarContainer}>
+      <View className="flex-1">
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={{ flexDirection: 'row' }}>
+          <View className="flex-row">
             
-            <View style={[styles.timeColumn, { borderRightColor: colors.border }]}>
+            {/* Colonne des heures fixe */}
+            <View className="border-r" style={{ width: TIME_COL_WIDTH, borderRightColor: colors.border }}>
               {hours.map(h => (
-                <View key={h} style={styles.hourCell}>
-                  <Text style={[styles.hourLabel, { color: colors.inputPlaceHolder }]}>{h}:00</Text>
+                <View key={h} className="items-center" style={{ height: HOUR_HEIGHT }}>
+                  <Text className="text-xs -mt-2" style={{ color: colors.inputPlaceHolder }}>{h}:00</Text>
                 </View>
               ))}
             </View>
 
+            {/* Grille défilante des jours */}
             <ScrollView 
               ref={scrollViewRef}
               horizontal 
@@ -137,18 +145,20 @@ export default function CalendarView() {
                 return (
                   <View key={day.id} style={{ width: DAY_WIDTH }}>
                     
-                    <View style={[styles.dayHeader, { borderBottomColor: colors.border }]}>
-                      <Text style={[styles.dayName, { color: colors.inputPlaceHolder }]}>{day.name}</Text>
-                      <View style={[styles.dayCircle, day.isToday && { backgroundColor: colors.calendarPrimary }]}>
-                        <Text style={[styles.dayNum, { color: colors.text }, day.isToday && { color: colors.background }]}>
+                    {/* En-tête de colonne jour */}
+                    <View className="h-[70px] items-center border-b" style={{ borderBottomColor: colors.border }}>
+                      <Text className="text-xs mb-1" style={{ color: colors.inputPlaceHolder }}>{day.name}</Text>
+                      <View className="w-[35px] h-[35px] justify-center items-center rounded-full" style={[day.isToday && { backgroundColor: colors.calendarPrimary }]}>
+                        <Text className="text-lg font-medium" style={[{ color: colors.text }, day.isToday && { color: colors.background }]}>
                           {day.number}
                         </Text>
                       </View>
                     </View>
 
-                    <View style={[styles.gridColumn, { borderRightColor: colors.border }]}>
+                    {/* Conteneur des cellules du jour */}
+                    <View className="border-r relative" style={{ borderRightColor: colors.border }}>
                       {hours.map(h => (
-                        <View key={`grid-${day.id}-${h}`} style={[styles.gridCell, { borderBottomColor: colors.neutral }]} />
+                        <View key={`grid-${day.id}-${h}`} className="border-b" style={{ height: HOUR_HEIGHT, borderBottomColor: colors.neutral }} />
                       ))}
                       
                       {dayEvents.map((event: any) => {
@@ -163,15 +173,16 @@ export default function CalendarView() {
                          const eventHeight = duration * HOUR_HEIGHT;
 
                          return (
-                           <TouchableOpacity 
+                           <Pressable 
                              key={event.id || event._id} 
-                             style={[
-                               styles.eventBlock, 
+                             className="absolute left-1 right-1 rounded-g p-1.5 border-l-4 justify-between shadow-sm"
+                             style={({ pressed }) => [
                                { 
                                  top: topPosition, 
                                  height: eventHeight,
                                  backgroundColor: colors.card,
-                                 borderLeftColor: colors.calendarPrimary
+                                 borderLeftColor: colors.calendarPrimary,
+                                 opacity: pressed ? 0.7 : 1
                                }
                              ]}
                              onPress={() => {
@@ -182,13 +193,13 @@ export default function CalendarView() {
                                });
                              }}
                            >
-                              <Text style={[styles.eventTitle, { color: colors.text }]} numberOfLines={2}>
+                              <Text className="text-[11px] font-bold" style={{ color: colors.text }} numberOfLines={2}>
                                 {event.name || event.title}
                               </Text>
-                              <Text style={[styles.eventTimeLabel, { color: colors.text }]} numberOfLines={1}>
+                              <Text className="text-[9px] font-semibold" style={{ color: colors.text }} numberOfLines={1}>
                                 {startObj.format('HH:mm')}
                               </Text>
-                           </TouchableOpacity>
+                           </Pressable>
                          );
                       })}
                     </View>
@@ -202,23 +213,3 @@ export default function CalendarView() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  loadingCenter: { justifyContent: 'center', alignItems: 'center' },
-  monthNavigator: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 30, paddingVertical: 15 },
-  monthText: { fontSize: 18, fontWeight: '700', textTransform: 'capitalize' },
-  calendarContainer: { flex: 1 },
-  timeColumn: { width: TIME_COL_WIDTH, borderRightWidth: 1 },
-  hourCell: { height: HOUR_HEIGHT, alignItems: 'center' },
-  hourLabel: { fontSize: 12, marginTop: -8 },
-  dayHeader: { height: 70, alignItems: 'center', borderBottomWidth: 1 },
-  dayName: { fontSize: 13, marginBottom: 5 },
-  dayCircle: { width: 35, height: 35, justifyContent: 'center', alignItems: 'center', borderRadius: 20 },
-  dayNum: { fontSize: 18, fontWeight: '500' },
-  gridColumn: { borderRightWidth: 1, position: 'relative' },
-  gridCell: { height: HOUR_HEIGHT, borderBottomWidth: 1 },
-  eventBlock: { position: 'absolute', left: 4, right: 4, borderRadius: 8, padding: 6, borderLeftWidth: 4, zIndex: 5, justifyContent: 'space-between', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 2 },
-  eventTitle: { fontSize: 11, fontWeight: 'bold' },
-  eventTimeLabel: { fontSize: 9, fontWeight: '600' },
-});
