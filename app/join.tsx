@@ -43,14 +43,15 @@ export default function JoinTrip() {
                 <Text className="text-2xl font-bold dark:text-white text-center mb-2">
                     Rejoindre un voyage
                 </Text>
-                <Text className="text-md text-gray-500 dark:text-gray-400 text-center mb-8">
-                    Collez le lien pour rejoindre l'aventure
+                <Text className="text-md text-gray-50 dark:text-gray-400 text-center mb-8">
+                    Collez le lien pour rejoindre l&apos;aventure
                 </Text>
 
                 <FormLink
                     control={control}
                     name="value"
                     required
+                    pattern={/^(?:https?:\/\/[^/\s]+\/token|vakeoexpo:\/\/token)\/[A-Za-z0-9_-]+\/?$/}
                 />
                 <View className="m-5">
                     <Button title="Rejoindre le voyage"

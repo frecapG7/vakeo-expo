@@ -1,10 +1,10 @@
+import { IconSymbol } from "@/components/ui/IconSymbol";
 import useColors from "@/hooks/styles/useColors";
 import * as Clipboard from 'expo-clipboard';
 import { useEffect, useRef } from "react";
 import { useController } from "react-hook-form";
-import { Pressable, TextInput, View } from "react-native";
+import { Pressable, TextInput } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
-import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Toast } from "toastify-react-native";
 
 const urlRegex = /^(https?:\/\/|vakeoexpo:\/\/)([\w\.-]+)(\/[\w\.-]*)*$/;
@@ -14,13 +14,15 @@ export const FormLink = ({
     name,
     placeholder = "vakeoexpo://token/...",
     required = true,
-    autoFocus = false
+    autoFocus = false,
+    pattern = /^(https?:\/\/)[\w\.-]+(\/[\w\.-]*)*$/
 }: {
     control: any;
     name: string;
     placeholder?: string;
     required?: boolean;
     autoFocus?: boolean;
+    pattern ?: RegExp
 }) => {
     const {
         field: { value, onChange },
@@ -31,7 +33,7 @@ export const FormLink = ({
         rules: {
             required: required ? "Le lien est requis" : false,
             pattern: {
-                value: urlRegex,
+                value: pattern,
                 message: "Format de lien invalide"
             }
         }
