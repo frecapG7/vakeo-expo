@@ -40,7 +40,7 @@ export default function ShareTripPage() {
                 Partager "{trip?.name}"
             </Text>
             <Text className="text-md text-gray-500 dark:text-gray-400 text-center mb-8">
-                Invitez vos amis à rejoindre l'aventure
+                Invitez vos amis à rejoindre l&apos;aventure
             </Text>
             <View className="items-center mt-4 ">
                 {/* QR Code placeholder */}

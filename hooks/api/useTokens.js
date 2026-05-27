@@ -20,7 +20,7 @@ export const useVerifyToken = () => {
 
 
 const getToken = async (token) => {
-    const response = await axios.get(`/token/${token}`);
+    const response = await axios.get(`/token/v2/${token}`);
     return response.data;
 }
 
