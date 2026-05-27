@@ -19,7 +19,7 @@ export default function ShareTripPage() {
 
 
     const { data: trip } = useGetTrip(id);
-    const { data: share } = useShareTrip(id);
+    const { data: share } = useShareTrip(Array.isArray(id) ? id[0] : id);
 
     const link = useMemo(() => {
         if (!share?.value) return "";
@@ -58,6 +58,7 @@ export default function ShareTripPage() {
             </View>
             <View className="w-full gap-4 mt-10">
                 <Button
+                    disabled={!link}
                     onPress={() => Linking.openURL(`https://wa.me/?text=${encodeURIComponent(link)}`)}
                     className="w-full flex-row justify-between items-center gap-2 bg-green-500 rounded-xl p-4"
                 >
@@ -68,6 +69,18 @@ export default function ShareTripPage() {
                     <IconSymbol name="chevron.right" color="white" />
                 </Button>
                 <Button
+                    disabled={!link}
+                    onPress={() => Linking.openURL(`https://m.me/?link=${encodeURIComponent(link)}`)}
+                    className="w-full flex-row justify-between items-center gap-2 bg-blue-600 rounded-xl p-4"
+                >
+                    <View className="flex-row items-center gap-3">
+                        <FontAwesome5 name="facebook-messenger" size={24} color="white" />
+                        <Text className="text-white font-medium">Partager sur Messenger</Text>
+                    </View>
+                    <IconSymbol name="chevron.right" color="white" />
+                </Button>
+                <Button
+                    disabled={!link}
                     onPress={handleCopy}
                     className="w-full flex-row justify-between items-center bg-white dark:bg-gray-900 p-4 rounded-xl shadow-sm"
                 >

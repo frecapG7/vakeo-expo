@@ -95,10 +95,11 @@ const shareTrip = async (id: any) => {
   return response.data;
 }
 
-export const useShareTrip = (id: any) => {
+export const useShareTrip = (id: string) => {
   return useQuery({
     queryKey: ["trips", id, "share"],
-    queryFn: () => shareTrip(id)
+    queryFn: () => shareTrip(id),
+    enabled: !!id
   });
 }
 
