@@ -8,8 +8,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TokenRedirectionPage() {
 
-
-
     const { token } = useLocalSearchParams();
     const { data: trip, isError } = useGetToken(String(token));
     const { mutate: addStorageTrip } = useAddStorageTrip();
@@ -19,12 +17,11 @@ export default function TokenRedirectionPage() {
     useEffect(() => {
         if (isError)
             router.dismissAll();
-    }, [isError, router])
+    }, [isError])
 
     useEffect(() => {
         if (!trip)
             return;
-
         addStorageTrip(trip, {
             onSuccess: () => router.dismissTo({
                 pathname: "/[id]",
@@ -33,7 +30,6 @@ export default function TokenRedirectionPage() {
                 }
             })
         });
-
     }, [trip, router, addStorageTrip]);
 
     return (
@@ -41,7 +37,6 @@ export default function TokenRedirectionPage() {
             <View className='flex flex-grow items-center justify-center'>
                 <ActivityIndicator size={50} />
             </View>
-
         </SafeAreaView>
     )
 }

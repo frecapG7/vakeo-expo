@@ -7,12 +7,11 @@ import { Pressable, TextInput } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
 
-const urlRegex = /^(https?:\/\/|vakeoexpo:\/\/)([\w\.-]+)(\/[\w\.-]*)*$/;
 
 export const FormLink = ({
     control,
     name,
-    placeholder = "vakeoexpo://token/...",
+    placeholder = "https://www.example...",
     required = true,
     autoFocus = false,
     pattern = /^(https?:\/\/)[\w\.-]+(\/[\w\.-]*)*$/
@@ -63,7 +62,7 @@ export const FormLink = ({
 
     const handlePaste = async () => {
         const text = await Clipboard.getStringAsync();
-        if (urlRegex.test(text)) {
+        if (pattern.test(text)) {
             onChange(text);
             Toast.info("Lien collé !");
         } else {

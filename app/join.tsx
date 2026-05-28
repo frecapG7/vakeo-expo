@@ -35,7 +35,6 @@ export default function JoinTrip() {
 
     return (
         <SafeAreaView style={styles.container}>
-
             <View className="flex items-center mt-10 gap-5">
                 <View className="w-20 h-20 rounded-full bg-blue-100 dark:bg-blue-900/30 justify-center items-center mb-2">
                     <IconSymbol name="link" size={40} color="blue" />
@@ -51,6 +50,7 @@ export default function JoinTrip() {
                     control={control}
                     name="value"
                     required
+                    placeholder="vakeoexpo://token/..."
                     pattern={/^(?:https?:\/\/[^/\s]+\/token|vakeoexpo:\/\/token)\/[A-Za-z0-9_-]+\/?$/}
                 />
                 <View className="m-5">
