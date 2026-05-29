@@ -9,7 +9,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function TokenRedirectionPage() {
 
     const { token } = useLocalSearchParams();
-    const { data: trip, isError } = useGetToken(String(token));
+    const { data: trip, isError } = useGetToken(token);
     const { mutate: addStorageTrip } = useAddStorageTrip();
 
     const router = useRouter();
