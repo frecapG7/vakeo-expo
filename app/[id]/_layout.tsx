@@ -88,6 +88,13 @@ export default function TripDetailsLayout() {
                         title: "Participants",
                     }}
                 />
+                <Stack.Screen name="share"
+                    options={{
+                        headerShown: true,
+                        presentation: "modal",
+                        title: "",
+                    }}
+                />
             </Stack>
 
         </TripContext.Provider>

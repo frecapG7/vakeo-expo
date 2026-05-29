@@ -14,14 +14,12 @@ import dayjs from "@/lib/dayjs-config";
 import { countDaysBetween } from "@/lib/utils";
 import { Poll, Trip, TripUser } from "@/types/models";
 import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from "@gorhom/bottom-sheet";
-import * as Clipboard from 'expo-clipboard';
 import { ImageBackground } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext, useRef } from "react";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-import { Toast } from "toastify-react-native";
 
 
 
@@ -103,10 +101,8 @@ export default function ItemDetails() {
     const { formatDate, formatRange } = useI18nTime();
 
     const handleShare = async () => {
-        const { value } = await shareTrip.mutateAsync();
-        await Clipboard.setStringAsync(`https://todo.com/token/${value}`);
-        Toast.info("Lien copié dans le presse papier");
         bottomSheetModalRef.current?.close();
+        router.push({ pathname: "/[id]/share", params: { id: String(id) } })
     }
 
     if (!trip)
@@ -294,19 +290,9 @@ export default function ItemDetails() {
                             <View className="flex flex-grow gap-5 p-1 divide-y-5 divide-solid dark:divide-white">
                                 <Button onPress={handleShare} className="flex flex-row gap-5 items-center" isLoading={shareTrip.isPending}>
                                     <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
-                                        {shareTrip.isPending ?
-                                            (
-                                                <Animated.View entering={FadeIn} exiting={FadeOut}>
-                                                    <ActivityIndicator size={30} color="black" />
-                                                </Animated.View>
-                                            )
-                                            :
-                                            (
-                                                <Animated.View entering={FadeIn} exiting={FadeOut}>
-                                                    <IconSymbol name="doc.on.doc" size={30} />
-                                                </Animated.View>
-                                            )
-                                        }
+                                        <Animated.View entering={FadeIn} exiting={FadeOut}>
+                                            <IconSymbol name="doc.on.doc" size={30} />
+                                        </Animated.View>
                                     </View>
                                     <Text className="text-lg dark:text-white">Partager le voyage</Text>
                                 </Button>

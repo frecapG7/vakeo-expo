@@ -1,88 +1,62 @@
-import { FormText } from "@/components/form/FormText";
+import { FormLink } from "@/components/form/FormLink";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
 import { useVerifyToken } from "@/hooks/api/useTokens";
-import * as Clipboard from 'expo-clipboard';
 import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Toast } from "toastify-react-native";
-
-
-const urlRegex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
 
 export default function JoinTrip() {
 
-    const { control, handleSubmit, setValue, reset } = useForm();
+    const { control, handleSubmit } = useForm({
+        defaultValues: {
+            value: ""
+        }
+    });
 
     const router = useRouter();
 
 
     const verifyToken = useVerifyToken()
-    const onSubmit = async (data) => {
+    const onSubmit = async (data: any) => {
         const parts = data?.value?.split("/");
         const token = parts[parts.length - 1];
-        const response = await verifyToken.mutateAsync(token);
 
-        if (response?.valid) {
-            router.push({
-                pathname: '/token/[token]',
-                params: {
-                    token
-                }
-            });
-            reset();
-        } else {
-            Toast.warn("Ce lien n'est plus valide");
-        }
+        router.push({
+            pathname: '/token/[token]',
+            params: {
+                token
+            }
+        });
     }
 
 
     return (
         <SafeAreaView style={styles.container}>
-
             <View className="flex items-center mt-10 gap-5">
-                <View className="flex items-center">
-                    <IconSymbol name="link" size={50} color="blue" />
-                    <Text className="text-xl font-bold dark:text-white">Rejoins un voyage</Text>
-
+                <View className="w-20 h-20 rounded-full bg-blue-100 dark:bg-blue-900/30 justify-center items-center mb-2">
+                    <IconSymbol name="link" size={40} color="blue" />
                 </View>
-                <View>
-                    <Text className="text-md text-center dark:text-gray-400">Demande aux autres participants le lien du voyage que tu souhaites rejoindre.</Text>
-                    <Text className="text-md text-center dark:text-gray-400">L'aventure commence maintenant</Text>
-                </View>
+                <Text className="text-2xl font-bold dark:text-white text-center mb-2">
+                    Rejoindre un voyage
+                </Text>
+                <Text className="text-md text-gray-50 dark:text-gray-400 text-center mb-8">
+                    Collez le lien pour rejoindre l&apos;aventure
+                </Text>
 
-
-                <View className="flex flex-row flex-grow px-5 items-center gap-2 mt-5 p-2">
-                    <FormText control={control}
-                        name="value"
-                        rules={{
-                            required: true,
-                            pattern: urlRegex
-                        }}
-                        endAdornment={
-                            <View>
-                                <Button onPress={async () => {
-                                    const text = await Clipboard.getStringAsync();
-                                    if (urlRegex.test(text))
-                                        setValue("value", text);
-                                }} >
-                                    <IconSymbol name="doc.on.doc" color="blue" />
-                                </Button>
-                            </View>
-                        } />
-
-
-                </View>
-
-
-                <View className="my-5">
+                <FormLink
+                    control={control}
+                    name="value"
+                    required
+                    placeholder="vakeoexpo://token/..."
+                    pattern={/^(?:https?:\/\/[^/\s]+\/token|vakeoexpo:\/\/token)\/[A-Za-z0-9_-]+\/?$/}
+                />
+                <View className="m-5">
                     <Button title="Rejoindre le voyage"
                         variant="contained"
                         onPress={handleSubmit(onSubmit)}
-                        className="w-lg"
                         isLoading={verifyToken.isPending}
                     />
                 </View>
