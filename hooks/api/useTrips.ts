@@ -90,14 +90,16 @@ export const useUpdateTripUser = (tripId: string, userId: string) => {
   })
 }
 
-const shareTrip = async (id: string) => {
-  const response = await axios.post(`/trips/${id}/share`);
+const shareTrip = async (id: any) => {
+  const response = await axios.get(`/trips/${id}/share`);
   return response.data;
 }
 
 export const useShareTrip = (id: string) => {
-  return useMutation({
-    mutationFn: () => shareTrip(id)
+  return useQuery({
+    queryKey: ["trips", id, "share"],
+    queryFn: () => shareTrip(id),
+    enabled: !!id
   });
 }
 
