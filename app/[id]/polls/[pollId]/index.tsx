@@ -1,7 +1,6 @@
 import { PickUsersModal } from "@/components/modals/PickUsersModal";
 import { HousingOptions } from "@/components/polls/HousingOptions";
 import { PollOption } from "@/components/polls/PollOption";
-import SharedCalendarPoll from "@/components/polls/SharedCalendarPoll";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
@@ -13,7 +12,7 @@ import useI18nNumbers from "@/hooks/i18n/useI18nNumbers";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import useColors from "@/hooks/styles/useColors";
 import dayjs from "@/lib/dayjs-config";
-import { getDatesBetween } from "@/lib/utils"; // <-- Assure-toi que cet import existe
+import { getDatesBetween } from "@/lib/utils";
 import { useLocalSearchParams } from "expo-router";
 import { useContext, useMemo, useState } from "react";
 import { Text, View, Pressable, Modal, SafeAreaView } from "react-native";
@@ -36,10 +35,8 @@ export default function PollDetailsPage() {
     const { formatPercent } = useI18nNumbers();
 
     const [selectedOption, setSelectedOption] = useState(null);
-    const [currentMonth, setCurrentMonth] = useState(dayjs()); 
     const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
 
-    // États pour l'ajout MANUEL de nouvelles dates
     const [openAddModal, setOpenAddModal] = useState(false);
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
@@ -60,32 +57,40 @@ export default function PollDetailsPage() {
         }));
     }, [trip?.users]);
 
-    // Remplissage du calendrier avec toutes les dates (étirement des créneaux)
-    const calendarVotesData = useMemo(() => {
+    // Formatage pour le système "multi-period" (Lignes horizontales)
+    const viewMarkedDates = useMemo(() => {
         if (!poll || poll.type !== "DatesPoll") return {};
-        const formattedVotes: Record<string, string[]> = {};
+        const marks: Record<string, any> = {};
         
         poll.options?.forEach((opt: any) => {
             if (!opt.startDate) return;
             const start = dayjs(opt.startDate).startOf('day');
             const end = opt.endDate ? dayjs(opt.endDate).startOf('day') : start;
-            const voterIds = opt.selectedBy?.map((u: any) => u._id) || [];
             
-            let current = start;
-            while (current.isBefore(end) || current.isSame(end, 'day')) {
-                const dateStr = current.format('YYYY-MM-DD');
-                if (formattedVotes[dateStr]) {
-                     formattedVotes[dateStr] = [...new Set([...formattedVotes[dateStr], ...voterIds])];
-                } else {
-                     formattedVotes[dateStr] = [...voterIds];
-                }
-                current = current.add(1, 'day');
-            }
-        });
-        return formattedVotes;
-    }, [poll]);
+            opt.selectedBy?.forEach((u: any) => {
+                const pColor = participantsData.find(p => p._id === u._id)?.colorHex || '#3b82f6';
+                let current = dayjs(start);
+                
+                while (current.isBefore(end) || current.isSame(end, 'day')) {
+                    const dateStr = current.format('YYYY-MM-DD');
+                    const isStart = current.isSame(start, 'day');
+                    const isEnd = current.isSame(end, 'day');
 
-    // LA MAGIE DU CLIC SUR LE CALENDRIER : Voter OU Ajouter
+                    if (!marks[dateStr]) marks[dateStr] = { periods: [] };
+                    
+                    marks[dateStr].periods.push({
+                        startingDay: isStart,
+                        endingDay: isEnd,
+                        color: pColor
+                    });
+                    
+                    current = current.add(1, 'day');
+                }
+            });
+        });
+        return marks;
+    }, [poll, participantsData]);
+
     const handleCalendarToggle = (dateString: string) => {
         if (!poll?.options) return;
         const clickedDate = dayjs(dateString);
@@ -99,25 +104,19 @@ export default function PollDetailsPage() {
         });
 
         if (overlappingOptions.length > 0) {
-            // Le créneau existe : On VOTE
             overlappingOptions.forEach(targetOption => {
                 const includeMe = targetOption.selectedBy?.map((u: any) => u._id).includes(me?._id);
                 handleClick(targetOption, includeMe);
             });
         } else {
-            // Le créneau n'existe pas : On l'AJOUTE à la main
             setStartDate(dateString);
             setEndDate(dateString);
             setOpenAddModal(true);
         }
     };
 
-    // ⚠️ FONCTION POUR LE DEVELOPPEUR ⚠️
     const handleAddNewOption = async () => {
-        // ICI : Il faut appeler l'API pour rajouter la nouvelle option au sondage
-        // ex: await createPollOption.mutateAsync({ startDate, endDate, pollId });
-        alert(`DEV: Relier API pour créer l'option du ${startDate} au ${endDate}`);
-        
+        alert("DEV: Appel API à faire pour créer l'option");
         setOpenAddModal(false);
         setStartDate("");
         setEndDate("");
@@ -146,6 +145,16 @@ export default function PollDetailsPage() {
                     <Text className="text-gray-600 dark:text-gray-300 text-lg">{poll?.hasSelected.length} votes</Text>
                 </View>
 
+                {poll?.type === "HousingPoll" && (
+                    <View className="mb-5">
+                        <HousingOptions
+                            poll={poll} user={me}
+                            onVote={(option) => handleClick(option, false)}
+                            onUnVote={(option) => handleClick(option, true)}
+                            onSelected={(option) => setSelectedOption(option)} />
+                    </View>
+                )}
+                
                 {poll?.type === "DatesPoll" && (
                     <View className="mb-5">
                         <View className="flex-row p-1 mb-4 rounded-lg" style={{ backgroundColor: colors.neutral }}>
@@ -158,18 +167,61 @@ export default function PollDetailsPage() {
                         </View>
 
                         {viewMode === 'calendar' ? (
-                            <SharedCalendarPoll 
-                                baseDate={currentMonth} 
-                                participants={participantsData} 
-                                votes={calendarVotesData} 
-                                currentUserId={me?._id} 
-                                onToggleDate={handleCalendarToggle} 
-                                onPreviousMonth={() => setCurrentMonth(currentMonth.subtract(1, 'month'))}
-                                onNextMonth={() => setCurrentMonth(currentMonth.add(1, 'month'))}
-                            />
+                            <View className="rounded-xl overflow-hidden border border-gray-200 bg-white">
+                                <Calendar
+                                    markingType="multi-period"
+                                    markedDates={viewMarkedDates}
+                                    onDayPress={({ dateString }) => handleCalendarToggle(dateString)}
+                                    theme={{
+                                        backgroundColor: colors.background,
+                                        calendarBackground: colors.card,
+                                        textSectionTitleColor: colors.text,
+                                        dayTextColor: colors.text,
+                                        monthTextColor: colors.text,
+                                        textDayFontSize: 16,
+                                        textMonthFontSize: 20,
+                                        
+                                        // 🚀 ICI ON FORCE LA HAUTEUR DES LIGNES COMPLÈTES DE LA SEMAINE
+                                        'stylesheet.calendar.main': {
+                                            week: {
+                                                marginTop: 0,
+                                                marginBottom: 0,
+                                                flexDirection: 'row',
+                                                justifyContent: 'space-around',
+                                                height: 90, // <-- HAUTEUR DE LA LIGNE (très grand)
+                                            },
+                                            dayContainer: {
+                                                flex: 1,
+                                                alignItems: 'center',
+                                                justifyContent: 'flex-start',
+                                                borderRightWidth: 0.5,
+                                                borderBottomWidth: 0.5,
+                                                borderColor: '#e5e7eb',
+                                            }
+                                        },
+                                        // 🚀 ICI ON PARAMÈTRE L'INTÉRIEUR DE LA CASE
+                                        'stylesheet.day.multiPeriod': {
+                                            base: {
+                                                width: '100%',
+                                                height: '100%',
+                                                alignItems: 'center',
+                                                paddingTop: 5,
+                                            },
+                                            text: {
+                                                fontSize: 14,
+                                                color: colors.text,
+                                                marginBottom: 2,
+                                                fontWeight: 'bold',
+                                            }
+                                        }
+                                    }}
+                                />
+                                <View className="p-3 bg-gray-50 flex-row justify-center items-center gap-2">
+                                    <Text className="text-xs text-gray-500">Appuyez sur un jour vide pour proposer vos dates</Text>
+                                </View>
+                            </View>
                         ) : (
                             <View className="gap-5">
-                                {/* BOUTON POUR AJOUTER A LA MAIN DANS LA LISTE */}
                                 <Pressable
                                     onPress={() => { setStartDate(""); setEndDate(""); setOpenAddModal(true); }}
                                     className="my-1 flex-row items-center justify-center rounded-full bg-blue-200 p-3"
@@ -191,7 +243,6 @@ export default function PollDetailsPage() {
                     </View>
                 )}
 
-                {/* MODALE POUR RENTRER LES DATES A LA MAIN */}
                 <Modal visible={openAddModal} animationType="slide" transparent={false} onRequestClose={() => setOpenAddModal(false)}>
                     <SafeAreaView style={{ flex: 1, padding: 10, backgroundColor: colors.background }}>
                         <Pressable onPress={() => setOpenAddModal(false)} className="mb-5">
@@ -225,9 +276,7 @@ export default function PollDetailsPage() {
                         )}
                     </SafeAreaView>
                 </Modal>
-
             </View>
-            <PickUsersModal open={!!selectedOption && !poll.isAnonymous} onClose={() => setSelectedOption(null)} users={selectedOption?.selectedBy} disabled title="Votants" />
         </Animated.ScrollView>
     )
 }
