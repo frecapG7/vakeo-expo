@@ -150,7 +150,7 @@ export default function ItemDetails() {
 
                                         <Pressable className="items-center"
                                             onPressOut={() => router.push({
-                                                pathname: "/[id]/(tabs)/messages",
+                                                pathname: "/[id]/settings",
                                                 params: {
                                                     id: String(id)
                                                 }

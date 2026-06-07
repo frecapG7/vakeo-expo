@@ -95,6 +95,12 @@ export default function TripDetailsLayout() {
                         title: "",
                     }}
                 />
+                <Stack.Screen name="settings"
+                    options={{
+                        headerShown: true,
+                        title: "Réglages",
+                    }}
+                />
             </Stack>
 
         </TripContext.Provider>

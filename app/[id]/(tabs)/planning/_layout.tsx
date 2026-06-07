@@ -60,7 +60,17 @@ export default function PlanningLayout() {
                             />
                         </View>
                     </Pressable>
-                    <Avatar alt={me?.name?.charAt(0)} src={me?.avatar} />
+                    <Pressable
+                        className="items-center"
+                        onPress={() => router.push({
+                            pathname: "/[id]/settings",
+                            params: {
+                                id: String(id)
+                            }
+                        })}>
+
+                        <Avatar alt={me?.name?.charAt(0)} src={me?.avatar} />
+                    </Pressable>
                 </View>,
         }}>
             <Stack.Screen name="index" />

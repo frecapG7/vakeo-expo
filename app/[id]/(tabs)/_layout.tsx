@@ -83,7 +83,7 @@ export default function ItemDetailsLayout() {
                         <View className="flex flex-row gap-2 justify-end items-center mx-10">
                             <Pressable className="flex-row gap-1 items-center"
                                 onPressOut={() => router.navigate({
-                                    pathname: "/[id]/(tabs)/settings",
+                                    pathname: "/[id]/settings",
                                     params: {
                                         id: String(id)
                                     }
@@ -91,26 +91,12 @@ export default function ItemDetailsLayout() {
                                 <Text className="text-white font-bold text-sm">
                                     {me?.name}
                                 </Text>
-                                <Avatar src={me?.avatar} alt={me?.name?.charAt(0)} size2="sm" badgeIcon="gear" />
+                                <Avatar src={me?.avatar} alt={me?.name?.charAt(0)} size2="sm"  />
                             </Pressable>
                         </View>
                 }}
 
             />
-
-            <Tabs.Screen name="settings"
-                options={{
-                    href: null,
-                    headerShown: true,
-                    headerRight: () => <></>,
-                    title: "Réglages",
-                    tabBarIcon: ({ color, size }) => (
-                        <IconSymbol name="person.circle" size={size} color={color} />
-                    ),
-                }}
-
-            />
-
             <Tabs.Screen name="links"
                 options={{
                     href: null
