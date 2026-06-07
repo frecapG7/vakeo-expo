@@ -98,7 +98,7 @@ export default function TripDetailsLayout() {
                 <Stack.Screen name="settings"
                     options={{
                         headerShown: true,
-                        title: "Réglages",
+                        title: "Mon profil",
                     }}
                 />
             </Stack>
