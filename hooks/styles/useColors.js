@@ -14,6 +14,8 @@ const lightColor = {
   calendarPrimary: "#rgb(248, 146, 29)",
   inputPlaceHolder: "rgba(115, 114, 114, 0.61)",
   textInactiveColor: "rgba(189, 18, 18, 0.88)",
+  success: "#22c55e",
+  gray: "#9ca3af",
 };
 const darkColor = {
   background: "#222121",
@@ -27,6 +29,8 @@ const darkColor = {
   calendarPrimary: "#rgb(245, 193, 133)",
   inputPlaceHolder: "rgba(139, 135, 135, 0.98)",
   textInactiveColor: "rgba(177, 170, 170, 0.88)",
+  success: "#22c55e",
+  gray: "#d1d5db",
 }
 
 const useColors = () => {

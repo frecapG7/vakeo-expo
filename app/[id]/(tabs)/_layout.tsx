@@ -52,16 +52,6 @@ export default function ItemDetailsLayout() {
                     tabBarIcon: ({ color }) => <IconSymbol name="house.fill" color={color} />,
                 }} />
             <Tabs.Screen
-                name="activities"
-                options={{
-                    href: null,
-                    tabBarIcon: ({ color }) => <IconSymbol name="calendar" color={color} />,
-                    headerShown: true,
-                    title: "Planning",
-
-                }}
-            />
-            <Tabs.Screen
                 name="planning"
                 options={{
                     href: {
@@ -71,14 +61,19 @@ export default function ItemDetailsLayout() {
                         }
                     },
                     tabBarIcon: ({ color }) => <IconSymbol name="calendar" color={color} />,
-                    headerShown: true,
+                    headerShown: false,
                     title: "Planning",
 
                 }}
             />
             <Tabs.Screen name="messages"
                 options={{
-                    href: null,
+                    href: {
+                        pathname: "/[id]/(tabs)/messages",
+                        params: {
+                            id: String(id)
+                        }
+                    },
                     headerShown: true,
                     title: "Messagerie",
                     tabBarIcon: ({ color, size }) => (
@@ -115,14 +110,6 @@ export default function ItemDetailsLayout() {
                 }}
 
             />
-
-
-
-            {/* <Tabs.Screen name="calendar"
-                options={{
-                    href: null,
-                    title: "Planning",
-                }} /> */}
 
             <Tabs.Screen name="links"
                 options={{

@@ -63,7 +63,7 @@ const EventItem = ({ event, user, onPress }: { event: Event, user: TripUser, onP
     return (
         <Button
             onPress={onPress}
-            className="pt-3 p-1 border-b border-orange-400 dark:border-gray-400 bg-gray-100 dark:bg-gray-800/50 ">
+            className="flex-row items-center rounded-2xl bg-white dark:bg-gray-800 shadow-md mx-2 p-4 gap-4 border border-gray-100 dark:border-gray-700">
             <View className="flex-row gap-3 items-center">
                 <View className="mt-1">
                     <EventIcon name={event.type} size="md" />
@@ -141,14 +141,15 @@ export default function TripPlanning() {
         <Animated.View style={styles.container}>
             <Animated.FlatList
                 data={events || []}
+                showsVerticalScrollIndicator={false}
                 ListHeaderComponent={
-                    <View className="gap-4 mb-5">
+                    <View className="gap-4 my-2">
                         <View className="">
                             <Animated.ScrollView
                                 horizontal
                                 showsHorizontalScrollIndicator={false}
                                 className="flex-row "
-                                contentContainerClassName="gap-5">
+                                contentContainerClassName="gap-5 my-2">
                                 {typeFilters.map(item => (
                                     <Pressable
                                         key={item.value}
@@ -193,9 +194,9 @@ export default function TripPlanning() {
                     </View>
 
                 }
-                ItemSeparatorComponent={() => <View className="my-0" />}
+                ItemSeparatorComponent={() => <View className="my-1" />}
                 keyExtractor={(item) => item?._id}
-                contentContainerClassName="p-2"
+                contentContainerClassName=""
                 ListEmptyComponent={
                     isLoading ?
                         <View className="gap-5">
