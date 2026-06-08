@@ -6,7 +6,7 @@ import { useGetTrip, useShareTrip } from "@/hooks/api/useTrips";
 import { FontAwesome5 } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import * as Linking from 'expo-linking';
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useMemo } from "react";
 import { Text, View } from "react-native";
 import QRCode from 'react-native-qrcode-svg';
@@ -14,12 +14,10 @@ import Animated from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
 
 export default function ShareTripPage() {
-    const { id } = useLocalSearchParams();
-    const router = useRouter();
-
+    const { id } = useLocalSearchParams<{id: string}>();
 
     const { data: trip } = useGetTrip(id);
-    const { data: share } = useShareTrip(Array.isArray(id) ? id[0] : id);
+    const { data: share } = useShareTrip(id);
 
     const link = useMemo(() => {
         if (!share?.value) return "";

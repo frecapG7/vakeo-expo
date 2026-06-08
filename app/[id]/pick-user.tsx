@@ -31,7 +31,7 @@ export default function PickTripUserPage() {
             user: item._id
         });
         router.dismissTo({
-            pathname: "/[id]/(tabs)/settings",
+            pathname: "/[id]/settings/avatar",
             params: {
                 id: String(id)
             }

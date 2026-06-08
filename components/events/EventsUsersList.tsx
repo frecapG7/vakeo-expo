@@ -12,11 +12,20 @@ export const EventUserList = ({ event, selected }: { event: Event, selected?: Tr
 
     if (!event)
         return (
-
             <View>
                 <Skeleton height={64} />
             </View>
         )
+
+    if (!event.attendees || event.attendees.length === 0) {
+        return (
+            <View className="m-2">
+                <Text className="text-gray-500 dark:text-gray-400">
+                    Aucun participant
+                </Text>
+            </View>
+        )
+    }
 
     return (
         <View>

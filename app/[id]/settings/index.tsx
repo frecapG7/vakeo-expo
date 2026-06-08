@@ -1,13 +1,12 @@
-import { PickAvatarModal } from "@/components/modals/PickAvatarModal";
 import { Avatar } from "@/components/ui/Avatar";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Switch } from "@/components/ui/Switch";
 import { RestrictionIcon } from "@/components/users/RestrictionIcon";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
-import { useGetTrip, useGetTripUser, useUpdateTripUser } from "@/hooks/api/useTrips";
-import { useLocalSearchParams } from "expo-router";
-import { useContext, useMemo, useState } from "react";
+import { useGetTripUser, useUpdateTripUser } from "@/hooks/api/useTrips";
+import { router, useLocalSearchParams } from "expo-router";
+import { useContext, useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 
@@ -19,9 +18,6 @@ export default function TripSettings() {
     const { id } = useLocalSearchParams();
     const { me } = useContext(TripContext);
 
-    const [openAvatarModal, setOpenAvatarModal] = useState(false);
-
-    const {data: trip} = useGetTrip(id);
     const { data: user } = useGetTripUser(String(id), String(me?._id), {
         enabled: (!!id && !!me?._id),
     })
@@ -70,7 +66,12 @@ export default function TripSettings() {
                 <View className="flex-row gap-5 items-end">
                     <Text className="dark:text-white text-3xl font-bold">{user?.name}</Text>
                     <Pressable className="rounded-full border-blue-400"
-                        onPress={() => setOpenAvatarModal(true)} >
+                        onPress={() => router.push({
+                            pathname: "/[id]/settings/avatar",
+                            params: {
+                                id: String(id)
+                            }
+                        })} >
                         <Text className="text-lg dark:text-white">Modifier</Text>
                     </Pressable>
                 </View>
@@ -151,18 +152,7 @@ export default function TripSettings() {
 
 
 
-            <PickAvatarModal open={openAvatarModal}
-                onClose={() => setOpenAvatarModal(false)}
-                onClick={async (avatar) => {
-                    await updateTripUser.mutateAsync({
-                        ...me,
-                        avatar
-                    });
-                    setOpenAvatarModal(false);
-                }}
-                selected={user?.avatar}
-                disabled={trip?.users.filter(u => u._id !== user._id)}
-                />
+          
         </Animated.View>
     )
 }

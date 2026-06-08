@@ -1,21 +1,38 @@
-import { Stack, useGlobalSearchParams, useRouter } from "expo-router";
-import { Pressable, Text, View } from "react-native";
-
-
+import { BackgroundHeader } from "@/components/header/BackgroundHeader";
+import { Avatar } from "@/components/ui/Avatar";
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import styles from "@/constants/Styles";
+import { TripContext } from "@/context/TripContext";
+import { useGetTrip } from "@/hooks/api/useTrips";
+import useColors from "@/hooks/styles/useColors";
+import { Stack, useGlobalSearchParams, usePathname, useRouter } from "expo-router";
+import { useContext } from "react";
+import { Pressable, View } from "react-native";
 
 export default function PlanningLayout() {
 
     const { id } = useGlobalSearchParams();
     const router = useRouter();
+    const { data: trip } = useGetTrip(id);
+    const { me } = useContext(TripContext);
+
+    const colors = useColors();
+
+    const pathname = usePathname();
+    const isCalendar = pathname?.includes("calendar");
 
     return (
         <Stack screenOptions={{
             headerShown: true,
-            header: ({ navigation, route }) =>
-                <View className="flex flex-row justify-end my-2">
+            title: "Planning",
+            headerTintColor: "white",
+            headerTitleStyle: styles.headerTitle,
+            headerBackground: () => trip && <BackgroundHeader trip={trip} />,
+            headerRight: () =>
+                <View className="flex flex-row justify-end items-center my-2 gap-2">
                     <Pressable
                         onPress={() => {
-                            if (route.name === "calendar")
+                            if (isCalendar)
                                 router.dismissTo({
                                     pathname: "/[id]/(tabs)/planning",
                                     params: {
@@ -30,21 +47,37 @@ export default function PlanningLayout() {
                                     }
                                 })
                         }}
-                        className="flex-row p-1 rounded-full bg-gray-200 dark:bg-gray-800 justify-evenly items-center w-40 gap-2">
-                        <Text
-                            className={`${route.name !== "calendar" && "bg-white dark:bg-gray-900  dark:text-white rounded-full  font-bold"} p-2 text-center dark:text-gray-400`}>
-                            Liste
-                        </Text>
-                        <Text
-                            className={`${route.name === "calendar" && "bg-white dark:bg-gray-900  dark:text-white rounded-full  font-bold"} p-2 text-center dark:text-gray-400`}>
-                            Calendrier
-                        </Text>
+                        className="flex-row p-1 rounded-full bg-gray-200 dark:bg-gray-800 justify-evenly items-center gap-2">
+                        <View className={`${!isCalendar ? "bg-white dark:bg-gray-900 rounded-full" : ""} p-2`}>
+                            <IconSymbol
+                                name="list.dash"
+                                size={20}
+                                color={!isCalendar ? colors.text : "gray"}
+                            />
+                        </View>
+                        <View className={`${isCalendar ? "bg-white dark:bg-gray-900 rounded-full" : ""} p-2`}>
+                            <IconSymbol
+                                name="calendar"
+                                size={20}
+                                color={isCalendar ? colors.text : "gray"}
+                            />
+                        </View>
                     </Pressable>
-                </View>
+                    <Pressable
+                        className="items-center"
+                        onPress={() => router.push({
+                            pathname: "/[id]/settings",
+                            params: {
+                                id: String(id)
+                            }
+                        })}>
+
+                        <Avatar alt={me?.name?.charAt(0)} src={me?.avatar} />
+                    </Pressable>
+                </View>,
         }}>
             <Stack.Screen name="index" />
-            <Stack.Screen name="calendar"
-            />
+            <Stack.Screen name="calendar" />
         </Stack>
     )
 }

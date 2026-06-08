@@ -2,7 +2,7 @@ import { GoodBottomForm } from "@/components/goods/GoodBottomForm";
 import { GoodListItemSkeleton } from "@/components/goods/GoodListItem";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { Switch } from "@/components/ui/Switch";
+import { ToggleButton } from "@/components/ui/ToggleButton";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useCheckGood, useDeleteGood, useGetGoods, usePostGood, usePutGood } from "@/hooks/api/useGoods";
@@ -147,14 +147,16 @@ export default function TripGoods() {
                     data={goods}
                     refreshing={isFetching}
                     className="flex-1"
+                    contentContainerClassName=""
                     renderItem={({ item }) =>
-                        <View className={`flex-row items-center rounded-xl py-2 ${item.checked ? "opacity-50" : ""}`}>
-                            <Button className="px-5"
+                        <View
+                            className={`flex-row items-center rounded-2xl bg-white dark:bg-gray-800 shadow-md mx-4 p-4 gap-4 border border-gray-100 dark:border-gray-700 ${item.checked ? "opacity-60" : ""}`}>
+                            <Button className=""
                                 onPress={() => onCheck(item)}
                                 disabled={false}>
                                 <IconSymbol name={item.checked ? "checkmark.circle.fill" : "circle"}
-                                    color={item.checked ? "green" : "gray"}
-                                    size={32} />
+                                    color={item.checked ? colors.success : colors.gray}
+                                    size={30} />
                             </Button>
                             <Pressable
                                 onLongPress={() => {
@@ -162,15 +164,17 @@ export default function TripGoods() {
                                     bottomSheetRef.current?.snapToIndex(2)
                                 }}
                                 disabled={item?.checked}
-                                className="flex-1 border-b border-orange-200 dark:border-gray-200">
+                                className="flex-1 justify-center">
                                 <Text className={`dark:text-white capitalize  ${item.checked && "line-through"}`}>
-                                    <Text className="text-2xl">
+                                    <Text className="text-lg">
                                         {item.name}
                                     </Text>
                                 </Text>
-                                <Text className="dark:text-white text-xs">
-                                    {item.event?.name}
-                                </Text>
+                                {item?.event &&
+                                    <Text className="text-gray-400 text-xs">
+                                        {item.event?.name}
+                                    </Text>
+                                }
 
                             </Pressable>
 
@@ -178,7 +182,7 @@ export default function TripGoods() {
                     }
                     keyExtractor={(i) => i._id}
                     ItemSeparatorComponent={() =>
-                        <View className="items-center my-2">
+                        <View className="items-center my-1">
                             {/* <View className="h-0.5 bg-gray-400 w-80 rounded-full my-2" /> */}
                         </View>
                     }
@@ -190,11 +194,13 @@ export default function TripGoods() {
                                 <GoodListItemSkeleton />
                             </View>
                             :
-                            <View className="flex-1 items-center justify-center gap-2 mt-5">
-                                <IconSymbol name="list.bullet" size={45} color="gray" />
-                                <Text className="text-2xl dark:text-white">La liste est vide</Text>
-                                <Text className="text-lg dark:text-white mt-5">
-                                    Commence à ajouter des éléments à la liste
+                            <View className="flex-1 items-center justify-center gap-4 my-10 px-4">
+                                <View className="p-6 rounded-full bg-gray-100 dark:bg-gray-700">
+                                    <IconSymbol name="list.bullet.clipboard" size={50} color={colors.gray} />
+                                </View>
+                                <Text className="text-3xl font-bold dark:text-white text-center">Aucun article</Text>
+                                <Text className="text-base text-gray-500 dark:text-gray-400 text-center max-w-xs">
+                                    Appuyez sur "+" pour ajouter un article
                                 </Text>
                             </View>
                     }
@@ -203,12 +209,12 @@ export default function TripGoods() {
                         if (hasNextPage)
                             fetchNextPage();
                     }}
-                    ListHeaderComponent={() => <View className="flex flex-row justify-end">
-                        <View className="items-center gap-1 ">
-                            <Switch value={unchecked}
-                                onSwitch={(v) => setUnchecked(v)} />
-                            <Text className="text-xs text-gray-400">Uniquement manquant</Text>
-                        </View>
+                    ListHeaderComponent={() => <View className="flex flex-row mb-2">
+                        <ToggleButton
+                            active={unchecked}
+                            onPress={() => setUnchecked(!unchecked)}
+                            label="Uniquement manquant"
+                        />
                     </View>
                     }
                     ListFooterComponent={<View className="my-5" />}

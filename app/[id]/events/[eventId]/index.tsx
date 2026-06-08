@@ -14,12 +14,13 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useContext, useMemo } from "react";
 import { KeyboardAvoidingView, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function EventDetails() {
 
     const { id, eventId } = useLocalSearchParams();
     const { me } = useContext(TripContext);
+    const insets = useSafeAreaInsets();
 
     const { data: event } = useGetEvent(id, eventId);
     const updateEvent = useUpdateEvent(id, eventId);
@@ -68,21 +69,18 @@ export default function EventDetails() {
 
     return (
         <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
-            <Animated.ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+            <Animated.ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: insets.bottom }}>
                 <LinearGradient
-                    colors={['#FF4500',
-                        '#FF6B00',
-                        '#FF8C00',
-                    ]} // Orange gradient colors
+                    colors={['#FF4500', '#FF8C00', '#FFB347']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={{
-                        padding: 8,
                         borderRadius: 5,
+                        // paddingTop: insets.top + 8,
+                        height: 100 + insets.top,
                     }}
-                    className="h-30"
                 >
-                    <View className="flex flex-row justify-end">
+                    <View className="flex flex-row justify-end mr-4 mt-2">
                         <Button
                             key={isAttendee ? "attending-button" : "attend-button"}
                             variant={isAttendee ? "contained" : "outlined"}
@@ -93,50 +91,47 @@ export default function EventDetails() {
                         />
                     </View>
                 </LinearGradient>
-                <View className="flex-row justify-center -mt-18">
-                    <View className="rounded-full bg-orange-600 p-3">
+                <View className="flex-row justify-center" style={{ marginTop: -60 - insets.top }}>
+                    <View className="rounded-full bg-white p-1 border-2 border-orange-600">
                         <EventIcon name={event?.type} size="lg" />
-
                     </View>
                 </View>
-                <SafeAreaView style={styles.container}>
-                    <View className="">
-                        <EventInfo event={event} />
-                    </View>
+                <View className="my-4">
+                    <EventInfo event={event} />
+                </View>
 
 
-                    <View className="my-10">
-                        <View className="flex-row justify-between px-4">
-                            <View className="flex-row items-center gap-2">
-                                <IconSymbol name="person.2.fill" size={18} color="orange" />
-                                <Text className="text-xl font-bold dark:text-white">
-                                    Participants
-                                </Text>
-                            </View>
-                            <Button onPress={() => router.push({
-                                pathname: "/[id]/events/[eventId]/edit-users",
-                                params: {
-                                    id: String(id),
-                                    eventId: String(eventId)
-                                }
-                            })}>
-                                <Text className="text-blue-400">
-                                    Modifier
-                                </Text>
-                            </Button>
+                <View className="my-10">
+                    <View className="flex-row justify-between px-4">
+                        <View className="flex-row items-center gap-2">
+                            <IconSymbol name="person.2.fill" size={18} color="orange" />
+                            <Text className="text-xl font-bold dark:text-white">
+                                Participants
+                            </Text>
                         </View>
-                        <EventUserList event={event}
-                            selected={me}
-                        />
+                        <Button onPress={() => router.push({
+                            pathname: "/[id]/events/[eventId]/edit-users",
+                            params: {
+                                id: String(id),
+                                eventId: String(eventId)
+                            }
+                        })}>
+                            <Text className="text-blue-400">
+                                Modifier
+                            </Text>
+                        </Button>
                     </View>
+                    <EventUserList event={event}
+                        selected={me}
+                    />
+                </View>
 
-                    <View className="px-4 my-2">
-                        <EventsGoodsList
-                            event={event}
-                            user={me}
-                        />
-                    </View>
-                </SafeAreaView>
+                <View className="px-4 my-2">
+                    <EventsGoodsList
+                        event={event}
+                        user={me}
+                    />
+                </View>
 
             </Animated.ScrollView>
         </KeyboardAvoidingView>

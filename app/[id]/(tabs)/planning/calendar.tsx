@@ -37,7 +37,7 @@ export default function TripCalendar() {
 
 
 
-    const { id } = useLocalSearchParams();
+    const { id } = useLocalSearchParams<{id: string}>();
     const router = useRouter();
 
     const { data: trip } = useGetTrip(id);
