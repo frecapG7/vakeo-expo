@@ -4,9 +4,9 @@ import { Switch } from "@/components/ui/Switch";
 import { RestrictionIcon } from "@/components/users/RestrictionIcon";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
-import { useGetTrip, useGetTripUser, useUpdateTripUser } from "@/hooks/api/useTrips";
+import { useGetTripUser, useUpdateTripUser } from "@/hooks/api/useTrips";
 import { router, useLocalSearchParams } from "expo-router";
-import { useContext, useMemo, useState } from "react";
+import { useContext, useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 
@@ -18,9 +18,6 @@ export default function TripSettings() {
     const { id } = useLocalSearchParams();
     const { me } = useContext(TripContext);
 
-    const [openAvatarModal, setOpenAvatarModal] = useState(false);
-
-    const {data: trip} = useGetTrip(id);
     const { data: user } = useGetTripUser(String(id), String(me?._id), {
         enabled: (!!id && !!me?._id),
     })
