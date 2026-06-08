@@ -11,7 +11,7 @@ export default function ItemDetailsLayout() {
                     Accueil
                 </NativeTabs.Trigger.Label>
                 <NativeTabs.Trigger.Icon
-                    sf="house.fill"
+                    sf={{ default: "house", selected: "house.fill" }}
                     md="home"
                 />
             </NativeTabs.Trigger>
@@ -19,13 +19,17 @@ export default function ItemDetailsLayout() {
                 <NativeTabs.Trigger.Label>
                     Planning
                 </NativeTabs.Trigger.Label>
-                <NativeTabs.Trigger.Icon sf="calendar.circle.fill" md="calendar_month" />
+                <NativeTabs.Trigger.Icon
+                    sf={{ default: "calendar.circle", selected: "calendar.circle.fill" }}
+                    md="calendar_month" />
             </NativeTabs.Trigger>
             <NativeTabs.Trigger name="messages">
                 <NativeTabs.Trigger.Label>
                     Messages
                 </NativeTabs.Trigger.Label>
-                <NativeTabs.Trigger.Icon sf="bubble.fill" md="chat" />
+                <NativeTabs.Trigger.Icon
+                    sf={{ default: "bubble.right", selected: "bubble.right.fill" }}
+                    md="chat" />
             </NativeTabs.Trigger>
         </NativeTabs>
 

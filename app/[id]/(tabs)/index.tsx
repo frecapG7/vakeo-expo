@@ -84,7 +84,7 @@ const PollsWidget = ({ trip, user, onClick }: { trip: Trip, user: TripUser, onCl
 
 export default function ItemDetails() {
 
-    const { id } = useGlobalSearchParams();
+    const { id } = useGlobalSearchParams<{id: string}>();
     const { data: trip } = useGetTrip(id, true);
     const { me } = useContext(TripContext);
     const { data: goodsCount } = useGetGoodsCount(id);

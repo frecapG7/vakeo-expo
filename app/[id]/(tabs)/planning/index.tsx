@@ -115,7 +115,7 @@ const EventItem = ({ event, user, onPress }: { event: Event, user: TripUser, onP
 
 export default function TripPlanning() {
 
-    const { id } = useGlobalSearchParams();
+    const { id } = useGlobalSearchParams<{id: string}>();
     const [search, setSearch] = useState("");
     const [typeFilter, setTypeFilter] = useState("");
     const [onlyAttendee, setOnlyAttendee] = useState(false);

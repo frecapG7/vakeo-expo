@@ -12,7 +12,7 @@ import { GiftedChat } from 'react-native-gifted-chat';
 export default function TripMessages() {
 
 
-    const { id } = useGlobalSearchParams();
+    const { id } = useGlobalSearchParams<{id: string}>();
 
     const { me } = useContext(TripContext);
 
