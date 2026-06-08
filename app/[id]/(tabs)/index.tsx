@@ -7,7 +7,7 @@ import { default as styles } from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetGoodsCount } from "@/hooks/api/useGoods";
 import { useGetPolls } from "@/hooks/api/usePolls";
-import { useGetDashboard, useGetTrip, useShareTrip } from "@/hooks/api/useTrips";
+import { useGetDashboard, useGetTrip } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import useColors from "@/hooks/styles/useColors";
 import dayjs from "@/lib/dayjs-config";
@@ -15,7 +15,7 @@ import { countDaysBetween } from "@/lib/utils";
 import { Poll, Trip, TripUser } from "@/types/models";
 import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from "@gorhom/bottom-sheet";
 import { ImageBackground } from "expo-image";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useGlobalSearchParams, useRouter } from "expo-router";
 import { useContext, useRef } from "react";
 import { Pressable, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -84,13 +84,11 @@ const PollsWidget = ({ trip, user, onClick }: { trip: Trip, user: TripUser, onCl
 
 export default function ItemDetails() {
 
-    const { id } = useLocalSearchParams();
+    const { id } = useGlobalSearchParams();
     const { data: trip } = useGetTrip(id, true);
     const { me } = useContext(TripContext);
     const { data: goodsCount } = useGetGoodsCount(id);
     const { data: dashboard } = useGetDashboard(id, me?._id);
-
-    const shareTrip = useShareTrip(String(id));
 
     const router = useRouter();
 
@@ -288,7 +286,8 @@ export default function ItemDetails() {
                         }}>
                         <BottomSheetView style={{ flex: 1, padding: 10, minHeight: 150 }}>
                             <View className="flex flex-grow gap-5 p-1 divide-y-5 divide-solid dark:divide-white">
-                                <Button onPress={handleShare} className="flex flex-row gap-5 items-center" isLoading={shareTrip.isPending}>
+                                <Button onPress={handleShare}
+                                     className="flex flex-row gap-5 items-center" >
                                     <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
                                         <Animated.View entering={FadeIn} exiting={FadeOut}>
                                             <IconSymbol name="doc.on.doc" size={30} />

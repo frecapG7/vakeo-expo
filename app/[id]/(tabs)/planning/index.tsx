@@ -8,7 +8,7 @@ import { useGetEvents } from "@/hooks/api/useEvents";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import dayjs from "@/lib/dayjs-config";
 import { Event, TripUser } from "@/types/models";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useGlobalSearchParams, useRouter } from "expo-router";
 import { useContext, useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
@@ -115,7 +115,7 @@ const EventItem = ({ event, user, onPress }: { event: Event, user: TripUser, onP
 
 export default function TripPlanning() {
 
-    const { id } = useLocalSearchParams();
+    const { id } = useGlobalSearchParams();
     const [search, setSearch] = useState("");
     const [typeFilter, setTypeFilter] = useState("");
     const [onlyAttendee, setOnlyAttendee] = useState(false);

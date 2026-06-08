@@ -2,7 +2,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetMessages, usePostMessage } from "@/hooks/api/useMessages";
-import { useLocalSearchParams } from "expo-router";
+import { useGlobalSearchParams } from "expo-router";
 import { useCallback, useContext, useMemo } from "react";
 import { Platform, Text, View } from "react-native";
 import { GiftedChat } from 'react-native-gifted-chat';
@@ -12,7 +12,7 @@ import { GiftedChat } from 'react-native-gifted-chat';
 export default function TripMessages() {
 
 
-    const { id } = useLocalSearchParams();
+    const { id } = useGlobalSearchParams();
 
     const { me } = useContext(TripContext);
 

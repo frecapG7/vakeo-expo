@@ -1,6 +1,7 @@
 import { BackgroundHeader } from "@/components/header/BackgroundHeader";
 import { Avatar } from "@/components/ui/Avatar";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetTrip } from "@/hooks/api/useTrips";
 import useColors from "@/hooks/styles/useColors";
@@ -24,6 +25,8 @@ export default function PlanningLayout() {
         <Stack screenOptions={{
             headerShown: true,
             title: "Planning",
+            headerTintColor: "white",
+            headerTitleStyle: styles.headerTitle,
             headerBackground: () => trip && <BackgroundHeader trip={trip} />,
             headerRight: () =>
                 <View className="flex flex-row justify-end items-center my-2 gap-2">
@@ -74,8 +77,7 @@ export default function PlanningLayout() {
                 </View>,
         }}>
             <Stack.Screen name="index" />
-            <Stack.Screen name="calendar"
-            />
+            <Stack.Screen name="calendar" />
         </Stack>
     )
 }

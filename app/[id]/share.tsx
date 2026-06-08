@@ -19,7 +19,7 @@ export default function ShareTripPage() {
 
 
     const { data: trip } = useGetTrip(id);
-    const { data: share } = useShareTrip(Array.isArray(id) ? id[0] : id);
+    const { data: share } = useShareTrip(id);
 
     const link = useMemo(() => {
         if (!share?.value) return "";
