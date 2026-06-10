@@ -3,7 +3,7 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { default as styles } from "@/constants/Styles";
 import { useGetTrip, useShareTrip } from "@/hooks/api/useTrips";
-import { FontAwesome5 } from '@expo/vector-icons';
+import FontAwesome5 from "@react-native-vector-icons/fontawesome5/static";
 import * as Clipboard from 'expo-clipboard';
 import * as Linking from 'expo-linking';
 import { useLocalSearchParams } from "expo-router";
