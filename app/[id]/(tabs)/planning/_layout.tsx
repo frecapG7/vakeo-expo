@@ -7,7 +7,8 @@ import { useGetTrip } from "@/hooks/api/useTrips";
 import useColors from "@/hooks/styles/useColors";
 import { Stack, useGlobalSearchParams, usePathname, useRouter } from "expo-router";
 import { useContext } from "react";
-import { Pressable, View } from "react-native";
+import { Platform, Pressable, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PlanningLayout() {
 
@@ -19,65 +20,64 @@ export default function PlanningLayout() {
     const colors = useColors();
 
     const pathname = usePathname();
-    const isCalendar = pathname?.includes("calendar");
+    const isCalendar = pathname?.includes("calendar") || pathname?.includes("day");
+
+    const insets = useSafeAreaInsets();
+    const bottomPadding = Platform.OS === 'ios' ? insets.bottom : 0;
 
     return (
-        <Stack screenOptions={{
-            headerShown: true,
-            title: "Planning",
-            headerTintColor: "white",
-            headerTitleStyle: styles.headerTitle,
-            headerBackground: () => trip && <BackgroundHeader trip={trip} />,
-            headerRight: () =>
-                <View className="flex flex-row justify-end items-center my-2 gap-2">
-                    <Pressable
-                        onPress={() => {
-                            if (isCalendar)
-                                router.dismissTo({
-                                    pathname: "/[id]/(tabs)/planning",
-                                    params: {
-                                        id: String(id),
-                                    }
-                                })
-                            else
-                                router.dismissTo({
-                                    pathname: "/[id]/(tabs)/planning/calendar",
-                                    params: {
-                                        id: String(id),
-                                    }
-                                })
-                        }}
-                        className="flex-row p-1 rounded-full bg-gray-200 dark:bg-gray-800 justify-evenly items-center gap-2">
-                        <View className={`${!isCalendar ? "bg-white dark:bg-gray-900 rounded-full" : ""} p-2`}>
-                            <IconSymbol
-                                name="list.dash"
-                                size={20}
-                                color={!isCalendar ? colors.text : "gray"}
-                            />
-                        </View>
-                        <View className={`${isCalendar ? "bg-white dark:bg-gray-900 rounded-full" : ""} p-2`}>
-                            <IconSymbol
-                                name="calendar"
-                                size={20}
-                                color={isCalendar ? colors.text : "gray"}
-                            />
-                        </View>
-                    </Pressable>
-                    <Pressable
-                        className="items-center"
-                        onPress={() => router.push({
-                            pathname: "/[id]/settings",
-                            params: {
-                                id: String(id)
-                            }
-                        })}>
+        <View className="flex-1"
+            style={{
+                paddingBottom: bottomPadding
+            }}>
+            <Stack screenOptions={{
+                headerShown: true,
+                title: "Planning",
+                headerTintColor: "white",
+                headerTitleStyle: styles.headerTitle,
+                headerBackground: () => trip && <BackgroundHeader trip={trip} />,
+                headerRight: () =>
+                    <View className="flex flex-row justify-end items-center my-2 gap-2">
+                        <View>
+                            <Pressable
+                                onPress={() =>
+                                    router.push({
+                                        pathname: isCalendar
+                                            ? "/[id]/(tabs)/planning"
+                                            : "/[id]/(tabs)/planning/calendar",
+                                        params: { id: String(id) }
+                                    })
+                                }
+                                className="p-2 rounded-full bg-gray-200 dark:bg-gray-800">
+                                <IconSymbol
+                                    name={isCalendar ? "list.dash" : "calendar"}
+                                    size={20}
+                                    color={colors.text}
+                                />
+                            </Pressable>
 
-                        <Avatar alt={me?.name?.charAt(0)} src={me?.avatar} />
-                    </Pressable>
-                </View>,
-        }}>
-            <Stack.Screen name="index" />
-            <Stack.Screen name="calendar" />
-        </Stack>
+                        </View>
+                        <Pressable
+                            className="items-center"
+                            onPress={() => router.push({
+                                pathname: "/[id]/settings",
+                                params: {
+                                    id: String(id)
+                                }
+                            })}>
+
+                            <Avatar alt={me?.name?.charAt(0)} src={me?.avatar} />
+                        </Pressable>
+                    </View>,
+            }}>
+                <Stack.Screen name="index" />
+                <Stack.Screen name="calendar" />
+                <Stack.Screen name="day" options={{
+                    presentation: "modal",
+
+                }} />
+            </Stack>
+        </View>
+
     )
 }
