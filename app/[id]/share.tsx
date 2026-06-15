@@ -3,7 +3,7 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { default as styles } from "@/constants/Styles";
 import { useGetTrip, useShareTrip } from "@/hooks/api/useTrips";
-import FontAwesome5 from "@react-native-vector-icons/fontawesome5/static";
+import { FontAwesome5 } from "@react-native-vector-icons/fontawesome5/static";
 import * as Clipboard from 'expo-clipboard';
 import * as Linking from 'expo-linking';
 import { useLocalSearchParams } from "expo-router";
@@ -14,7 +14,7 @@ import Animated from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
 
 export default function ShareTripPage() {
-    const { id } = useLocalSearchParams<{id: string}>();
+    const { id } = useLocalSearchParams<{ id: string }>();
 
     const { data: trip } = useGetTrip(id);
     const { data: share } = useShareTrip(id);
@@ -61,7 +61,10 @@ export default function ShareTripPage() {
                     className="w-full flex-row justify-between items-center gap-2 bg-green-500 rounded-xl p-4"
                 >
                     <View className="flex-row items-center gap-3">
-                        <FontAwesome5 name="whatsapp" size={24} color="white" />
+                        <FontAwesome5 name="whatsapp"
+                            size={24}
+                            color="white"
+                            iconStyle="brand" />
                         <Text className="text-white font-medium">Partager sur WhatsApp</Text>
                     </View>
                     <IconSymbol name="chevron.right" color="white" />
@@ -72,7 +75,11 @@ export default function ShareTripPage() {
                     className="w-full flex-row justify-between items-center gap-2 bg-blue-600 rounded-xl p-4"
                 >
                     <View className="flex-row items-center gap-3">
-                        <FontAwesome5 name="facebook-messenger" size={24} color="white" />
+                        <FontAwesome5
+                            name="facebook-messenger"
+                            size={24}
+                            color="white"
+                            iconStyle="brand" />
                         <Text className="text-white font-medium">Partager sur Messenger</Text>
                     </View>
                     <IconSymbol name="chevron.right" color="white" />

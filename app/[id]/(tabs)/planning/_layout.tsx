@@ -12,7 +12,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PlanningLayout() {
 
-    const { id } = useGlobalSearchParams();
+    const { id } = useGlobalSearchParams<{id: string}>();
     const router = useRouter();
     const { data: trip } = useGetTrip(id);
     const { me } = useContext(TripContext);
@@ -45,7 +45,7 @@ export default function PlanningLayout() {
                                         pathname: isCalendar
                                             ? "/[id]/(tabs)/planning"
                                             : "/[id]/(tabs)/planning/calendar",
-                                        params: { id: String(id) }
+                                        params: { id }
                                     })
                                 }
                                 className="p-2 rounded-full bg-gray-200 dark:bg-gray-800">

@@ -1,6 +1,8 @@
+import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useGetEvents } from "@/hooks/api/useEvents";
 import useColors from "@/hooks/styles/useColors";
 import dayjs from "@/lib/dayjs-config";
+import { Event } from "@/types/models";
 import { useGlobalSearchParams, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
@@ -33,7 +35,7 @@ export default function DayModal() {
                 },
                 {}
             ) || {};
-    }, [events, colors.primary]);
+    }, [events, colors.calendarPrimary]);
 
 
     // For timeline - filter events for current day
@@ -42,7 +44,7 @@ export default function DayModal() {
             .filter(event => dayjs(event.startDate).format('YYYY-MM-DD') === date) || [];
     }, [events, date]);
 
-    const [newEvent, setNewEvent] = useState<Event | null>();
+    const [newEvent, setNewEvent] = useState<Omit<Event, "_id"> | null>();
 
     const timelineEvents = useMemo(() => {
         const baseEvents = dayEvents?.map(event => ({
@@ -98,6 +100,13 @@ export default function DayModal() {
                     }}
                     markedDates={markedDates}
                     markingType="multi-dot"
+                    renderArrow={(direction) => (
+                        <IconSymbol
+                            name={direction === 'left' ? 'chevron.left' : 'chevron.right'}
+                            size={24}
+                            color={colors.primary}
+                        />
+                    )}
 
                 />
                 <TimelineList
@@ -129,21 +138,23 @@ export default function DayModal() {
                                 )}
                             </Pressable>,
                         onBackgroundLongPress: (timeString, time) => {
+                            const endTime = dayjs(timeString).add(2, "hour").format("YYYY-MM-DD HH:mm:ss");
                             setNewEvent({
                                 startDate: timeString,
-                                endDate: dayjs(timeString).add(2, "hour").format("YYYY-MM-DD HH:mm:ss"),
+                                endDate: endTime,
                                 name: "Nouvelle activité",
                                 trip: String(id),
                                 type: ""
                             })
                         },
                         onBackgroundLongPressOut: (timeString, time) => {
+                            const endTime = dayjs(timeString).add(2, "hour").format("YYYY-MM-DD HH:mm:ss");
                             router.push({
                                 pathname: "/[id]/events/new",
                                 params: {
                                     id: String(id),
-                                    startDate: String(newEvent?.startDate),
-                                    endDate: String(newEvent?.endDate),
+                                    startDate: timeString,
+                                    endDate: endTime,
                                 }
                             });
                             setNewEvent(null);
@@ -172,10 +183,6 @@ export default function DayModal() {
                         }
 
                     }}
-
-                    onEventPress={(e) => console.log(e)}
-
-
                     scrollToFirst
                     showNowIndicator
                     containerStyle={{ flex: 1 }}

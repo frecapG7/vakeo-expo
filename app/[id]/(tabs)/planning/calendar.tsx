@@ -1,5 +1,6 @@
 import { EventIcon } from "@/components/events/EventIcon";
 import { Button } from "@/components/ui/Button";
+import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
 import { useGetEvents } from "@/hooks/api/useEvents";
 import { useGetTrip } from "@/hooks/api/useTrips";
@@ -23,6 +24,7 @@ const DayComponent = ({ date, state, onDayPress, count = 0 }: { date?: DateData,
 
     return (
         <Pressable
+            key={`${date?.dateString}-${state}-${count}`}
             className={`
                 items-center justify-center rounded-full active:scale-[1.5] aspect-square
                 dark:bg-gray-800
@@ -66,12 +68,10 @@ export default function TripCalendar() {
 
     const colors = useColors();
 
-    const { data: eventsData, } = useGetEvents(String(id), {
+    const { data: eventsData, } = useGetEvents(id, {
         startDate: dayjs(currentDate).startOf('month').toISOString(),
         endDate: dayjs(currentDate).endOf('month').toISOString(),
         limit: 50
-    }, {
-        enabled: !!id,
     });
 
     const eventCounts = useMemo(() => {
@@ -124,13 +124,20 @@ export default function TripCalendar() {
                 dayComponent={({ date, state, marking }) => <DayComponent date={date}
                     state={date?.dateString === selectedDay ? 'selected' : state}
                     onDayPress={handleDayPress}
-                    count={marking?.count | 0}
+                    count={marking?.count ?? 0}
                 />}
                 firstDay={1}
                 style={{
                     // flex: 1,
                     // height: "100%"
                 }}
+                renderArrow={(direction) => (
+                    <IconSymbol
+                        name={direction === 'left' ? 'chevron.left' : 'chevron.right'}
+                        size={24}
+                        color={colors.text}
+                    />
+                )}
 
             />
             {selectedDay && (
@@ -144,7 +151,10 @@ export default function TripCalendar() {
                         </Text>
                         <Pressable onPress={() => router.push({
                             pathname: "/[id]/(tabs)/planning/day",
-                            params: { id: String(id), date: selectedDay },
+                            params: {
+                                id,
+                                date: selectedDay
+                            },
                         })}>
                             <Text className="text-orange-400 font-medium">Voir tout</Text>
                         </Pressable>
@@ -188,9 +198,9 @@ export default function TripCalendar() {
                             onPress={() => router.push({
                                 pathname: "/[id]/events/new",
                                 params: {
-                                    id: String(id),
-                                    startDate: dayjs(currentDate).hour(12).toISOString(),
-                                    endDate: dayjs(currentDate).hour(14).toISOString(),
+                                    id,
+                                    startDate: dayjs(selectedDay).hour(12).toISOString(),
+                                    endDate: dayjs(selectedDay).hour(14).toISOString(),
                                 }
                             })}
                         />
