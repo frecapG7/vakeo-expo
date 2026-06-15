@@ -1,282 +1,355 @@
-import { PickUsersModal } from "@/components/modals/PickUsersModal";
-import { HousingOptions } from "@/components/polls/HousingOptions";
-import { PollOption } from "@/components/polls/PollOption";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
-import { useGetPoll, useUnvotePoll, useVotePoll } from "@/hooks/api/usePolls";
-import useI18nNumbers from "@/hooks/i18n/useI18nNumbers";
+import { useAvailability, AvailabilityRange } from "@/hooks/api/useAvailability";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import useColors from "@/hooks/styles/useColors";
 import dayjs from "@/lib/dayjs-config";
-import { getDatesBetween } from "@/lib/utils";
 import { useLocalSearchParams } from "expo-router";
-import { useContext, useMemo, useState } from "react";
-import { Text, View, Pressable, Modal, SafeAreaView } from "react-native";
+import { useContext, useEffect, useMemo, useState } from "react";
+import { Pressable, ScrollView, Text, View, Alert } from "react-native";
 import { Calendar } from "react-native-calendars";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 const PARTICIPANT_COLORS = ['#3b82f6', '#ef4444', '#eab308', '#a855f7', '#14b8a6', '#f97316', '#ec4899'];
 
 export default function PollDetailsPage() {
-    const { id, pollId } = useLocalSearchParams();
+    const { id } = useLocalSearchParams();
     const colors = useColors();
+    const { formatRange } = useI18nTime();
+    
+    const { me, trip } = useContext(TripContext);
+    
+    const { getAvailabilities, updateAvailability } = useAvailability(String(id));
 
-    const { me, trip } = useContext(TripContext); 
-    const { data: poll } = useGetPoll(id, pollId);
+    const [tempStart, setTempStart] = useState<string | null>(null);
+    const [myRanges, setMyRanges] = useState<AvailabilityRange[]>([]);
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-    const votePoll = useVotePoll(id, pollId);
-    const unvotePoll = useUnvotePoll(id, pollId);
+    const [lastNudgedAt, setLastNudgedAt] = useState<number | null>(null);
 
-    const { formatDuration, formatRange } = useI18nTime();
-    const { formatPercent } = useI18nNumbers();
-
-    const [selectedOption, setSelectedOption] = useState(null);
-    const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
-
-    const [openAddModal, setOpenAddModal] = useState(false);
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
-
-    const handleClick = async (option: any, includeMe: boolean) => {
-        if (includeMe)
-            unvotePoll.mutateAsync({ option: option?._id, user: me })
-        else
-            await votePoll.mutateAsync({ options: [option?._id], user: me });
-    }
+    useEffect(() => {
+        if (getAvailabilities.data && me?._id) {
+            const myData = getAvailabilities.data.find((a: any) => a.userId === me._id);
+            if (myData && !hasUnsavedChanges) {
+                setMyRanges(myData.ranges);
+            }
+        }
+    }, [getAvailabilities.data, me?._id]);
 
     const participantsData = useMemo(() => {
         if (!trip?.users) return [];
-        return trip.users.map((user: any, index: number) => ({
+        return trip.users.map((user, index) => ({
             _id: user._id,
             name: user.name || user.username,
             colorHex: PARTICIPANT_COLORS[index % PARTICIPANT_COLORS.length]
         }));
     }, [trip?.users]);
 
-    // Formatage pour le système "multi-period" (Lignes horizontales)
+    const getUserColor = (userId?: string) => {
+        return participantsData.find(p => p._id === userId)?.colorHex || '#9ca3af';
+    };
+
+    const getUserName = (userId?: string) => {
+        return participantsData.find(p => p._id === userId)?.name || 'Utilisateur inconnu';
+    };
+
+    const hasVoted = useMemo(() => {
+        if (!me?._id || !getAvailabilities.data) return false;
+        const myData = getAvailabilities.data.find((a: any) => a.userId === me._id);
+        return myData && myData.ranges && myData.ranges.length > 0;
+    }, [getAvailabilities.data, me?._id]);
+
+    // 🧠 LOGIQUE DE DESSIN (Avec sécurité anti-doublons de lignes)
     const viewMarkedDates = useMemo(() => {
-        if (!poll || poll.type !== "DatesPoll") return {};
         const marks: Record<string, any> = {};
-        
-        poll.options?.forEach((opt: any) => {
-            if (!opt.startDate) return;
-            const start = dayjs(opt.startDate).startOf('day');
-            const end = opt.endDate ? dayjs(opt.endDate).startOf('day') : start;
-            
-            opt.selectedBy?.forEach((u: any) => {
-                const pColor = participantsData.find(p => p._id === u._id)?.colorHex || '#3b82f6';
-                let current = dayjs(start);
-                
-                while (current.isBefore(end) || current.isSame(end, 'day')) {
-                    const dateStr = current.format('YYYY-MM-DD');
-                    const isStart = current.isSame(start, 'day');
-                    const isEnd = current.isSame(end, 'day');
+        let maxVotesCount = 0;
 
-                    if (!marks[dateStr]) marks[dateStr] = { periods: [] };
-                    
+        const addRangeToMarks = (range: AvailabilityRange, userId: string, color: string) => {
+            let current = dayjs(range.startDate);
+            const end = dayjs(range.endDate);
+
+            while (current.isBefore(end) || current.isSame(end, 'day')) {
+                const dateStr = current.format('YYYY-MM-DD');
+                if (!marks[dateStr]) marks[dateStr] = { periods: [], users: new Set() };
+
+                // 🛡️ SÉCURITÉ : On ne dessine la ligne que si l'utilisateur n'est pas déjà enregistré ce jour-là
+                if (!marks[dateStr].users.has(userId)) {
+                    marks[dateStr].users.add(userId);
                     marks[dateStr].periods.push({
-                        startingDay: isStart,
-                        endingDay: isEnd,
-                        color: pColor
+                        color: color,
+                        startingDay: current.isSame(dayjs(range.startDate), 'day'),
+                        endingDay: current.isSame(end, 'day')
                     });
-                    
-                    current = current.add(1, 'day');
                 }
-            });
-        });
-        return marks;
-    }, [poll, participantsData]);
 
-    const handleCalendarToggle = (dateString: string) => {
-        if (!poll?.options) return;
+                current = current.add(1, 'day');
+            }
+        };
+
+        // 1. Ajouter les données des autres
+        getAvailabilities.data?.forEach((avail: any) => {
+            if (avail.userId === me?._id) return; 
+            const color = getUserColor(avail.userId);
+            avail.ranges.forEach((range: any) => addRangeToMarks(range, avail.userId, color));
+        });
+
+        // 2. Ajouter mes données
+        const myColor = getUserColor(me?._id);
+        myRanges.forEach(range => addRangeToMarks(range, me?._id || 'me', myColor));
+
+        // 3. Ajouter mon clic en cours
+        if (tempStart) {
+            if (!marks[tempStart]) marks[tempStart] = { periods: [], users: new Set() };
+            if (!marks[tempStart].users.has(me?._id || 'me')) {
+                marks[tempStart].users.add(me?._id || 'me');
+                marks[tempStart].periods.push({ color: myColor, startingDay: true, endingDay: true });
+            }
+        }
+
+        // 4. Calcul du nombre maximum de votes
+        Object.keys(marks).forEach(dateStr => {
+            const count = marks[dateStr].users.size;
+            if (count > maxVotesCount) {
+                maxVotesCount = count;
+            }
+        });
+
+        // 5. Marqueur Top Choice
+        Object.keys(marks).forEach(dateStr => {
+            const count = marks[dateStr].users.size;
+            marks[dateStr].isTopChoice = (count === maxVotesCount && maxVotesCount > 0);
+        });
+
+        return marks;
+    }, [getAvailabilities.data, myRanges, tempStart, me?._id]);
+
+    const handleDayPress = (dateString: string) => {
         const clickedDate = dayjs(dateString);
 
-        const overlappingOptions = poll.options.filter((opt: any) => {
-            if (!opt.startDate) return false;
-            const start = dayjs(opt.startDate).startOf('day');
-            const end = opt.endDate ? dayjs(opt.endDate).startOf('day') : start;
-            return (clickedDate.isSame(start, 'day') || clickedDate.isAfter(start, 'day')) &&
-                   (clickedDate.isSame(end, 'day') || clickedDate.isBefore(end, 'day'));
-        });
-
-        if (overlappingOptions.length > 0) {
-            overlappingOptions.forEach(targetOption => {
-                const includeMe = targetOption.selectedBy?.map((u: any) => u._id).includes(me?._id);
-                handleClick(targetOption, includeMe);
+        if (!tempStart) {
+            // 🛡️ SÉCURITÉ 1 : On vérifie si la date cliquée est déjà dans nos périodes
+            const isAlreadySelected = myRanges.some(range => {
+                const rStart = dayjs(range.startDate);
+                const rEnd = dayjs(range.endDate);
+                return (clickedDate.isSame(rStart, 'day') || clickedDate.isAfter(rStart, 'day')) &&
+                       (clickedDate.isSame(rEnd, 'day') || clickedDate.isBefore(rEnd, 'day'));
             });
+
+            if (isAlreadySelected) {
+                Alert.alert("Date déjà sélectionnée", "Vous avez déjà indiqué être disponible à cette date. Supprimez la période correspondante en dessous si vous souhaitez la modifier.");
+                return;
+            }
+            
+            setHasUnsavedChanges(true);
+            setTempStart(dateString);
         } else {
-            setStartDate(dateString);
-            setEndDate(dateString);
-            setOpenAddModal(true);
+            const startStr = dayjs(tempStart).isBefore(clickedDate) ? tempStart : dateString;
+            const endStr = dayjs(tempStart).isBefore(clickedDate) ? dateString : tempStart;
+            
+            const nStart = dayjs(startStr);
+            const nEnd = dayjs(endStr);
+
+            // 🛡️ SÉCURITÉ 2 : On vérifie si le nouvel intervalle chevauche un intervalle existant
+            const isOverlapping = myRanges.some(range => {
+                const rStart = dayjs(range.startDate);
+                const rEnd = dayjs(range.endDate);
+                // Il y a chevauchement si Start1 <= End2 ET Start2 <= End1
+                return (nStart.isSame(rEnd, 'day') || nStart.isBefore(rEnd, 'day')) && 
+                       (rStart.isSame(nEnd, 'day') || rStart.isBefore(nEnd, 'day'));
+            });
+
+            if (isOverlapping) {
+                Alert.alert("Chevauchement", "Cette nouvelle période chevauche vos disponibilités existantes. Veuillez choisir une période libre.");
+                setTempStart(null); // On annule la sélection en cours
+                return;
+            }
+
+            setHasUnsavedChanges(true);
+            setMyRanges(prev => [...prev, { startDate: startStr, endDate: endStr }]);
+            setTempStart(null);
         }
     };
 
-    const handleAddNewOption = async () => {
-        alert("DEV: Appel API à faire pour créer l'option");
-        setOpenAddModal(false);
-        setStartDate("");
-        setEndDate("");
+    const handleRemoveRange = (indexToRemove: number) => {
+        setHasUnsavedChanges(true);
+        setMyRanges(prev => prev.filter((_, index) => index !== indexToRemove));
     };
 
-    if (!poll) return (
-        <View style={styles.container}>
-            <View className="flex-row gap-2 items-center"><Skeleton variant="circular" /><View className="w-40"><Skeleton height={5} /></View></View>
-            <View className="gap-5 my-5"><Skeleton height={40} /><Skeleton height={40} /><Skeleton height={40} /></View>
-        </View>
-    );
+    const handleSave = async () => {
+        if (!me?._id) return;
+        await updateAvailability.mutateAsync({
+            userId: me._id,
+            ranges: myRanges
+        });
+        setHasUnsavedChanges(false);
+    };
+
+    const handleNudge = () => {
+        const now = Date.now();
+        if (lastNudgedAt && (now - lastNudgedAt) < 86400000) {
+            Alert.alert("Déjà relancés !", "Une notification a déjà été envoyée au groupe il y a moins de 24 heures. Laissez-leur un peu de temps !");
+            return;
+        }
+
+        setLastNudgedAt(now);
+        Alert.alert("Succès", "Une notification vient d'être envoyée à tous ceux qui n'ont pas encore donné leurs disponibilités.");
+    };
 
     return (
-        <Animated.ScrollView style={styles.container}>
-            <View className="flex-row gap-2 items-center my-2">
-                <Avatar src={poll?.createdBy?.avatar} alt={poll?.createdBy?.name?.charAt(0)} size2="md" />
-                <View>
-                    <Text className="font-bold text-lg dark:text-white">{poll?.createdBy?.name}</Text>
-                    <Text className="dark:text-white">{formatDuration(poll?.createdAt)}</Text>
-                </View>
-            </View>
-
-            <View className="m-2 mb-10 rounded-xl p-2 border border-gray-200">
-                <View className="mb-5">
-                    <Text className="text-xl font-bold dark:text-white">{poll?.question}</Text>
-                    <Text className="text-gray-600 dark:text-gray-300 text-lg">{poll?.hasSelected.length} votes</Text>
+        <ScrollView style={styles.container}>
+            <View className="m-2 mt-5 mb-10 rounded-xl p-2 border border-gray-200">
+                
+                {/* EN-TÊTE */}
+                <View className="mb-5 px-2">
+                    <Text className="text-xl font-bold dark:text-white">Disponibilités partagées</Text>
+                    <Text className="text-gray-600 dark:text-gray-300 mt-1">
+                        {tempStart ? "Touchez la date de fin de votre disponibilité." : "Touchez une date pour donner vos disponibilités."}
+                    </Text>
                 </View>
 
-                {poll?.type === "HousingPoll" && (
-                    <View className="mb-5">
-                        <HousingOptions
-                            poll={poll} user={me}
-                            onVote={(option) => handleClick(option, false)}
-                            onUnVote={(option) => handleClick(option, true)}
-                            onSelected={(option) => setSelectedOption(option)} />
+                {/* CALENDRIER */}
+                <View className="rounded-xl overflow-hidden border border-gray-200 bg-white mb-5">
+                    <Calendar
+                        theme={{
+                            backgroundColor: colors.background,
+                            calendarBackground: colors.card,
+                            textSectionTitleColor: colors.text,
+                            dayTextColor: colors.text,
+                            monthTextColor: colors.text,
+                            'stylesheet.calendar.main': {
+                                week: { marginTop: 0, marginBottom: 0, flexDirection: 'row', justifyContent: 'space-around', height: 70 },
+                                dayContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' }
+                            }
+                        }}
+                        dayComponent={({ date, state }) => {
+                            const dateStr = date?.dateString || '';
+                            const mark = viewMarkedDates[dateStr] || { periods: [], isTopChoice: false };
+                            
+                            return (
+                                <Pressable 
+                                    onPress={() => handleDayPress(dateStr)}
+                                    style={{
+                                        width: '95%',
+                                        height: 65,
+                                        backgroundColor: 'transparent',
+                                        borderColor: mark.isTopChoice ? '#eab308' : 'transparent',
+                                        borderWidth: mark.isTopChoice ? 2 : 0,
+                                        borderRadius: 8,
+                                        alignItems: 'center',
+                                        paddingTop: 6,
+                                        opacity: state === 'disabled' ? 0.3 : 1
+                                    }}
+                                >
+                                    <Text style={{ 
+                                        color: colors.text, 
+                                        fontWeight: mark.isTopChoice ? 'bold' : 'normal',
+                                        fontSize: 16
+                                    }}>
+                                        {date?.day}
+                                    </Text>
+                                    
+                                    <View style={{ width: '100%', marginTop: 'auto', marginBottom: 4, gap: 1 }}>
+                                        {mark.periods.map((p: any, i: number) => (
+                                            <View key={i} style={{
+                                                height: 4,
+                                                backgroundColor: p.color,
+                                                width: '100%',
+                                                marginLeft: p.startingDay ? 4 : 0,
+                                                marginRight: p.endingDay ? 4 : 0,
+                                                borderTopLeftRadius: p.startingDay ? 4 : 0,
+                                                borderBottomLeftRadius: p.startingDay ? 4 : 0,
+                                                borderTopRightRadius: p.endingDay ? 4 : 0,
+                                                borderBottomRightRadius: p.endingDay ? 4 : 0,
+                                            }} />
+                                        ))}
+                                    </View>
+                                </Pressable>
+                            );
+                        }}
+                    />
+                </View>
+
+                {/* MES SÉLECTIONS */}
+                {myRanges.length > 0 && (
+                    <View className="mb-5 gap-2 px-2">
+                        <Text className="font-bold dark:text-white mb-2">Mes périodes sélectionnées :</Text>
+                        {myRanges.map((range, index) => (
+                            <View key={index} className="flex-row items-center justify-between bg-gray-100 dark:bg-gray-800 p-3 rounded-lg border border-gray-300 dark:border-gray-700">
+                                <Text className="capitalize dark:text-white">
+                                    {formatRange(dayjs(range.startDate), dayjs(range.endDate))}
+                                </Text>
+                                <Pressable onPress={() => handleRemoveRange(index)} className="bg-red-200 p-2 rounded-full">
+                                    <IconSymbol name="trash" color="red" size={18} />
+                                </Pressable>
+                            </View>
+                        ))}
                     </View>
                 )}
-                
-                {poll?.type === "DatesPoll" && (
-                    <View className="mb-5">
-                        <View className="flex-row p-1 mb-4 rounded-lg" style={{ backgroundColor: colors.neutral }}>
-                            <Pressable onPress={() => setViewMode('calendar')} className="flex-1 py-2 items-center rounded-md" style={{ backgroundColor: viewMode === 'calendar' ? colors.card : 'transparent' }}>
-                                <Text className="font-bold text-sm" style={{ color: viewMode === 'calendar' ? colors.primary : colors.text }}>Calendrier</Text>
-                            </Pressable>
-                            <Pressable onPress={() => setViewMode('list')} className="flex-1 py-2 items-center rounded-md" style={{ backgroundColor: viewMode === 'list' ? colors.card : 'transparent' }}>
-                                <Text className="font-bold text-sm" style={{ color: viewMode === 'list' ? colors.primary : colors.text }}>Liste</Text>
-                            </Pressable>
-                        </View>
 
-                        {viewMode === 'calendar' ? (
-                            <View className="rounded-xl overflow-hidden border border-gray-200 bg-white">
-                                <Calendar
-                                    markingType="multi-period"
-                                    markedDates={viewMarkedDates}
-                                    onDayPress={({ dateString }) => handleCalendarToggle(dateString)}
-                                    theme={{
-                                        backgroundColor: colors.background,
-                                        calendarBackground: colors.card,
-                                        textSectionTitleColor: colors.text,
-                                        dayTextColor: colors.text,
-                                        monthTextColor: colors.text,
-                                        textDayFontSize: 16,
-                                        textMonthFontSize: 20,
-                                        
-                                        // 🚀 ICI ON FORCE LA HAUTEUR DES LIGNES COMPLÈTES DE LA SEMAINE
-                                        'stylesheet.calendar.main': {
-                                            week: {
-                                                marginTop: 0,
-                                                marginBottom: 0,
-                                                flexDirection: 'row',
-                                                justifyContent: 'space-around',
-                                                height: 90, // <-- HAUTEUR DE LA LIGNE (très grand)
-                                            },
-                                            dayContainer: {
-                                                flex: 1,
-                                                alignItems: 'center',
-                                                justifyContent: 'flex-start',
-                                                borderRightWidth: 0.5,
-                                                borderBottomWidth: 0.5,
-                                                borderColor: '#e5e7eb',
-                                            }
-                                        },
-                                        // 🚀 ICI ON PARAMÈTRE L'INTÉRIEUR DE LA CASE
-                                        'stylesheet.day.multiPeriod': {
-                                            base: {
-                                                width: '100%',
-                                                height: '100%',
-                                                alignItems: 'center',
-                                                paddingTop: 5,
-                                            },
-                                            text: {
-                                                fontSize: 14,
-                                                color: colors.text,
-                                                marginBottom: 2,
-                                                fontWeight: 'bold',
-                                            }
-                                        }
-                                    }}
-                                />
-                                <View className="p-3 bg-gray-50 flex-row justify-center items-center gap-2">
-                                    <Text className="text-xs text-gray-500">Appuyez sur un jour vide pour proposer vos dates</Text>
+                {/* BOUTON SAUVEGARDER */}
+                {hasUnsavedChanges && (
+                    <Animated.View entering={FadeIn} exiting={FadeOut} className="mb-5">
+                        <Button 
+                            variant="contained" 
+                            title="Partager mes dates" 
+                            isLoading={updateAvailability.isPending}
+                            onPress={handleSave} 
+                        />
+                    </Animated.View>
+                )}
+
+                {/* RÉSUMÉ DES DISPONIBILITÉS DU GROUPE */}
+                <View className="mt-5 pt-5 border-t border-gray-200 px-2">
+                    <Text className="font-bold text-lg dark:text-white mb-4">Résumé du groupe</Text>
+                    {getAvailabilities.data?.map((avail: any) => {
+                        const isMe = avail.userId === me?._id;
+                        if (isMe && hasUnsavedChanges) return null;
+                        
+                        const displayRanges = isMe ? myRanges : avail.ranges;
+                        if (displayRanges.length === 0) return null;
+
+                        const userColor = getUserColor(avail.userId);
+                        const userName = isMe ? "Moi" : getUserName(avail.userId);
+
+                        return (
+                            <View key={avail.userId} className="mb-4">
+                                <View className="flex-row items-center gap-2 mb-2">
+                                    <View style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: userColor }} />
+                                    <Text className="font-bold dark:text-white">{userName}</Text>
+                                </View>
+                                <View className="pl-6 gap-1">
+                                    {displayRanges.map((range: AvailabilityRange, idx: number) => (
+                                        <Text key={idx} className="text-gray-600 dark:text-gray-300 capitalize">
+                                            • {formatRange(dayjs(range.startDate), dayjs(range.endDate))}
+                                        </Text>
+                                    ))}
                                 </View>
                             </View>
-                        ) : (
-                            <View className="gap-5">
-                                <Pressable
-                                    onPress={() => { setStartDate(""); setEndDate(""); setOpenAddModal(true); }}
-                                    className="my-1 flex-row items-center justify-center rounded-full bg-blue-200 p-3"
-                                >
-                                    <IconSymbol name="plus" color="black" />
-                                    <Text className="font-bold ml-2">Ajouter mes dates</Text>
-                                </Pressable>
+                        );
+                    })}
+                    
+                    {getAvailabilities.data?.length === 0 && myRanges.length === 0 && (
+                        <Text className="text-gray-500 italic">Personne n'a encore partagé ses disponibilités.</Text>
+                    )}
+                </View>
 
-                                {poll?.options?.map((option: any) => {
-                                    const includeMe = option?.selectedBy?.map((u: any) => u._id).includes(me?._id);
-                                    return (
-                                        <Button disabled={poll?.isClosed || votePoll?.isPending} key={option?._id} onPress={() => handleClick(option, includeMe)} onLongPress={() => setSelectedOption(option)}>
-                                            <PollOption label={formatRange(dayjs(option.startDate), dayjs(option.endDate))} selectedBy={option.selectedBy} percent={option.percent} isAnonymous={poll.isAnonymous} includeUser={includeMe} />
-                                        </Button>
-                                    );
-                                })}
-                            </View>
-                        )}
-                    </View>
+                {/* BOUTON RELANCER */}
+                {hasVoted && (
+                    <Animated.View entering={FadeIn} className="mt-6 pt-5 border-t border-gray-200">
+                        <Pressable 
+                            onPress={handleNudge}
+                            className="w-full flex-row justify-center items-center bg-orange-100 py-3 rounded-xl border border-orange-300 active:bg-orange-200"
+                        >
+                            <IconSymbol name="bell.fill" color="#ea580c" size={20} />
+                            <Text className="ml-2 font-bold text-orange-600 text-lg">Relancer le groupe</Text>
+                        </Pressable>
+                    </Animated.View>
                 )}
 
-                <Modal visible={openAddModal} animationType="slide" transparent={false} onRequestClose={() => setOpenAddModal(false)}>
-                    <SafeAreaView style={{ flex: 1, padding: 10, backgroundColor: colors.background }}>
-                        <Pressable onPress={() => setOpenAddModal(false)} className="mb-5">
-                            <Text className="dark:text-white text-xl">Fermer</Text>
-                        </Pressable>
-                        <Text className="text-lg font-bold mb-3 dark:text-white">Ajouter une nouvelle disponibilité</Text>
-                        <Calendar
-                            theme={{ backgroundColor: colors.background, calendarBackground: colors.background, dayTextColor: colors.text, monthTextColor: colors.text }}
-                            markingType="period"
-                            onDayPress={({ dateString }) => {
-                                if (!startDate || (startDate && endDate)) {
-                                    setStartDate(dateString);
-                                    setEndDate("");
-                                } else {
-                                    setEndDate(dateString);
-                                }
-                            }}
-                            markedDates={{
-                                ...(startDate && { [startDate]: { startingDay: true, color: colors.primary, textColor: colors.card, selected: true } }),
-                                ...(endDate && { [endDate]: { endingDay: true, color: colors.primary, textColor: colors.card, selected: true } }),
-                                ...(startDate && endDate && getDatesBetween ? getDatesBetween(dayjs(startDate), dayjs(endDate)).reduce((acc: any, date) => {
-                                    acc[date] = { color: colors.neutral, textColor: colors.text, selected: true };
-                                    return acc;
-                                }, {}) : {})
-                            }}
-                        />
-                        {(startDate) && (
-                            <Animated.View entering={FadeIn} exiting={FadeOut} className="mx-2 my-5">
-                                <Button variant="contained" title="Valider ces dates" onPress={handleAddNewOption} />
-                            </Animated.View>
-                        )}
-                    </SafeAreaView>
-                </Modal>
             </View>
-        </Animated.ScrollView>
-    )
+        </ScrollView>
+    );
 }
