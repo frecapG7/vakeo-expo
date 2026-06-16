@@ -1,6 +1,6 @@
 // Fallback for using MaterialIcons on Android and web.
 
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import MaterialIcons from "@react-native-vector-icons/material-icons/static";
 import { SymbolViewProps, SymbolWeight } from 'expo-symbols';
 import { useColorScheme } from 'nativewind';
 import { ComponentProps } from 'react';
@@ -35,8 +35,8 @@ const MAPPING = {
   "ellipsis.circle": "more-horiz",
   "flame": "local-fire-department",
   "arrow.left": "arrow-back",
+  "arrow.right" : "arrow-forward",
   "arrow.up.right" : "arrow-outward",
-  "arrow.right" : "arrow-right",
   "arrow.up.left" : "subdirectory-arrow-right",
   "cart": "shopping-cart",
   "link": "insert-link",

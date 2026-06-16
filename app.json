@@ -56,7 +56,9 @@
       ],
       "@sentry/react-native",
       "expo-font",
-      "expo-image"
+      "expo-image",
+      "@react-native-vector-icons/fontawesome5",
+      "@react-native-vector-icons/material-icons"
     ],
     "experiments": {
       "typedRoutes": true
