@@ -35,7 +35,6 @@ export const useGetMessages = (tripId: any) => {
 
 
 const postMessage = async (tripId: any, message: IMessage): Promise<void> => {
-    console.log("posting content");
     const response = await axios.post(`/trips/${tripId}/messages`, message);
     return response.data;
 }
