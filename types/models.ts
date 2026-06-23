@@ -15,7 +15,10 @@ export interface TripStop {
     _id: string,
     name: string,
     location?: Location,
-    accommodation?: Link
+    accommodation?: Link,
+    polls?: Poll[],
+    createdBy: TripUser,
+    modifiedBy?: TripUser
 }
 
 export interface Trip {

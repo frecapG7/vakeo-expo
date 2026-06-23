@@ -17,45 +17,51 @@ export const useGetTripStops = (id: any) => {
 }
 
 
-const postTripStop = async (id: any, data: TripStop): Promise<TripStop> => {
-    const response = await axios.post(`/trips/${id}/stops`, data);
+const postTripStop = async (id: any, data: TripStop, userId?: string): Promise<TripStop> => {
+    const response = await axios.post(`/trips/${id}/stops`, data, {
+        headers: { ...(userId && { 'x-user-id': userId }) }
+    });
     return response.data;
 }
 
 
-export const usePostTripStop = (id: any) => {
+export const usePostTripStop = (id: any, userId?: string) => {
     const queryClient = useQueryClient();
     return useMutation<TripStop, Error, TripStop>({
-        mutationFn: (data) => postTripStop(id, data),
+        mutationFn: (data) => postTripStop(id, data, userId),
          onSuccess: (newTripStop) => queryClient.setQueryData<TripStop[]>(["trip", id, "stops"], (prevTripStops) => [...(prevTripStops || []), newTripStop])
     })
 }
 
 
-const putTripStop = async (id: any, data: TripStop): Promise<TripStop> => {
-    const response = await axios.put(`/trips/${id}/stops/${data._id}`, data);
+const putTripStop = async (id: any, data: TripStop, userId?: string): Promise<TripStop> => {
+    const response = await axios.put(`/trips/${id}/stops/${data._id}`, data, {
+        headers: { ...(userId && { 'x-user-id': userId }) }
+    });
     return response.data;
 }
 
 
-export const usePutTripStop = (id: any) => {
+export const usePutTripStop = (id: any, userId ?: string) => {
     const queryClient = useQueryClient();
     return useMutation<TripStop, Error, TripStop>({
-        mutationFn: (data) => putTripStop(id, data),
+        mutationFn: (data) => putTripStop(id, data, userId),
         onSuccess: (data) => queryClient.setQueryData<TripStop[]>(
             ["trip", id, "stops"], (prevTripStops) => prevTripStops?.map(tripStop => tripStop._id === data._id ? data : tripStop) || [])
     })
 }
 
 
-const deleteTripStop = async (id: any, stopId: any): Promise<void> => {
-    await axios.delete(`/trips/${id}/stops/${stopId}`);
+const deleteTripStop = async (id: any, stopId: any, userId?: string): Promise<void> => {
+    await axios.delete(`/trips/${id}/stops/${stopId}`, {
+        headers: { ...(userId && { 'x-user-id': userId }) }
+    });
 }
 
-export const useDeleteTripStop = (id: any) => {
+export const useDeleteTripStop = (id: any, userId?: string) => {
     const queryClient = useQueryClient();
     return useMutation<void, Error, string>({
-        mutationFn: (stopId) => deleteTripStop(id, stopId),
+        mutationFn: (stopId) => deleteTripStop(id, stopId, userId),
         onSuccess: (_, stopId) => queryClient.setQueryData<TripStop[]>(["trip", id, "stops"], (prevTripStops) => prevTripStops?.filter(tripStop => tripStop._id !== stopId) || [])
     })
 }

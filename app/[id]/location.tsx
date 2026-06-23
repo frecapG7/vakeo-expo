@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
+import { TripContext } from "@/context/TripContext";
 import { useGetTrip } from "@/hooks/api/useTrips";
 import { useDeleteTripStop, useGetTripStops, usePostTripStop, usePutTripStop } from "@/hooks/api/useTripStop";
 import dayjs from "@/lib/dayjs-config";
 import { TripStop } from "@/types/models";
 import { Image } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Alert, Modal, Pressable, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { SlideInRight, SlideOutRight } from "react-native-reanimated";
@@ -20,23 +21,22 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TripLocation() {
 
-
     const { id } = useLocalSearchParams();
     const { data: trip } = useGetTrip(id);
 
-
     const [selectedTripStop, setSelectedTripStop] = useState<TripStop | undefined>();
-
 
     const now = dayjs();
 
     const [openModal, setOpenModal] = useState(false);
     const [openLocationWizard, setOpenLocationWizard] = useState(false);
 
+    const {me} = useContext(TripContext);
+
     const { data: tripStops, isLoading, isRefetching, refetch } = useGetTripStops(id);
-    const postTripStop = usePostTripStop(id);
-    const putTripStop = usePutTripStop(id);
-    const deleteTripStop = useDeleteTripStop(id);
+    const postTripStop = usePostTripStop(id, me?._id);
+    const putTripStop = usePutTripStop(id, me?._id);
+    const deleteTripStop = useDeleteTripStop(id, me?._id);
 
 
     const onDelete = (tripStop: TripStop) => {
@@ -229,6 +229,12 @@ export default function TripLocation() {
                         }}
                         trip={trip}
                         tripStop={selectedTripStop}
+                        onSubmit={async (data) => {
+                            await putTripStop.mutateAsync(data);
+                            setSelectedTripStop(undefined);
+                            setOpenLocationWizard(false);
+                        }}
+                        isSubmitting={putTripStop.isPending}
                     />
                 }
 

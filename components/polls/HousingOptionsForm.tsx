@@ -8,7 +8,7 @@ import * as Linking from 'expo-linking';
 import { useState } from "react";
 import { useFieldArray } from "react-hook-form";
 import { TextInput } from "react-native-gesture-handler";
-import Animated, { BounceIn, BounceOut, FadeIn, FadeOut, SlideOutDown } from "react-native-reanimated";
+import Animated, { BounceIn, BounceOut, FadeIn, SlideOutDown } from "react-native-reanimated";
 import { Skeleton } from "../ui/Skeleton";
 
 const isValidUrl = (url: string) => {
@@ -89,7 +89,7 @@ export const HousingOptionsForm = ({ control }: { control: any }) => {
 
             <View className="gap-2 my-2">
                 {postLinkPreview.isPending &&
-                    <Animated.View entering={BounceIn} exiting={FadeOut}>
+                    <Animated.View entering={BounceIn} exiting={BounceOut}>
                         <Skeleton height={40} />
                     </Animated.View>}
                 {options.map((option, index) => (
@@ -149,12 +149,6 @@ export const HousingOptionsForm = ({ control }: { control: any }) => {
                     </Animated.View>
                 ))}
             </View>
-
-
-
-
-
-
         </View>
     )
 }
