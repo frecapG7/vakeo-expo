@@ -5,10 +5,9 @@ import { IconSymbol } from "../ui/IconSymbol";
 import * as Clipboard from 'expo-clipboard';
 import { Image, ImageBackground } from "expo-image";
 import * as Linking from 'expo-linking';
-import { useState } from "react";
-import { useFieldArray } from "react-hook-form";
-import { TextInput } from "react-native-gesture-handler";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import Animated, { BounceIn, BounceOut, FadeIn, SlideOutDown } from "react-native-reanimated";
+import { FormLink } from "../form/FormLink";
 import { Skeleton } from "../ui/Skeleton";
 
 const isValidUrl = (url: string) => {
@@ -20,7 +19,7 @@ const isValidUrl = (url: string) => {
 export const HousingOptionsForm = ({ control }: { control: any }) => {
 
 
-    const [input, setInput] = useState("");
+    // const [input, setInput] = useState("");
     const postLinkPreview = usePostLinkPreview();
 
     const { fields: options, append, remove } = useFieldArray({
@@ -36,16 +35,25 @@ export const HousingOptionsForm = ({ control }: { control: any }) => {
         }
     }
 
+
+    const { control: internalControl } = useForm();
+    const input = useWatch({
+        control: internalControl,
+        name: "input"
+    })
+
     return (
         <View>
+            <FormLink control={internalControl}
+                name="input"
+            />
             <View className="flex-row bg-white rounded-xl items-center justify-between border border-gray-200 focus:border-blue-500 px-1 py-2">
                 <View className="flex-row items-center">
-                    <IconSymbol name="link" color="gray" />
-                    <TextInput placeholder="Colle un lien Airbnb, Abritel, Booking..."
+                    {/* <TextInput placeholder="Colle un lien Airbnb, Abritel, Booking..."
                         value={input}
                         onChangeText={(v) => setInput(v)}
                         maxLength={38}
-                        scrollEnabled />
+                        scrollEnabled /> */}
                 </View>
                 {isValidUrl(input) ?
                     <Animated.View

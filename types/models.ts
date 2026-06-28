@@ -105,7 +105,8 @@ export interface Poll {
     isSingleAnswer: boolean,
     isAnonymous: boolean,
     isClosed: boolean,
-    hasSelected: TripUser[]
+    hasSelected: TripUser[],
+    createdAt: Date
 };
 
 

@@ -24,7 +24,6 @@ export const PollSettingsForm = ({ control }: { control: any }) => {
     return (
         <View>
             <View className="flex-1 gap-4 my-2">
-                <Text className="text-lg text-gray-600 dark:text-gray-200">Réglages</Text>
                 <View
                     className={`flex-row items-center rounded-lg justify-between border border-2 p-5 ${singleAnswer ? "border-blue-400 dark:border-blue-600" : "border-gray-200 dark:border-gray-600"}`}>
                     <View>

@@ -13,41 +13,21 @@ import { useContext, useEffect } from "react";
 
 import { useController, useFieldArray, useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
+import Animated, { SlideInUp, SlideOutDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const SONG_HEIGHT = 40;
 
-const ListItem = ({ control, item, index, onRemove }) => {
-
-    const top = useSharedValue(index * SONG_HEIGHT);
-
-
-    const animatedStyle = useAnimatedStyle(() => {
-        return {
-            top: top.value
-        }
-    });
-
-    return (
-        <Animated.View className="flex-row items-center" key={index}>
-            <IconSymbol name="line.horizontal.3" color="gray" />
-            <FormText control={control}
-                name={`options[${index}].value`}
-                rules={{
-                    required: true
-                }}
-            />
-            <Pressable onPress={onRemove}>
-                <IconSymbol name="xmark" color="gray" />
-            </Pressable>
-        </Animated.View>
-    )
+const placeholder = (type: string): string => {
+    if (type = "DatesPoll")
+        return "On part quand?";
+    else if (type = "HousingPoll")
+        return "On loge ou?";
+    else
+        return "On part ou?"
 }
 
 
 export default function NewPoll() {
-
 
     const { control, handleSubmit, setValue } = useForm({
         defaultValues: {
@@ -55,11 +35,7 @@ export default function NewPoll() {
             type: "",
             singleAnswer: false,
             anonymous: false,
-            // options: [{
-            //     value: "",
-            // }, {
-            //     value: ""
-            // }]
+            options: []
         }
     });
 
@@ -71,7 +47,6 @@ export default function NewPoll() {
         }
     });
 
-
     const { fields: options, append, update, remove } = useFieldArray({
         control,
         name: "options",
@@ -81,41 +56,46 @@ export default function NewPoll() {
         keyName: "key",
     })
 
-
-    const { id, type: typeParam } = useLocalSearchParams();
+    const { id, type: typeParam , stop} = useLocalSearchParams<{ id: string , type: string, stop ?: string}>();
     const { me } = useContext(TripContext);
-    const postPoll = usePostPoll(id);
+    const postPoll = usePostPoll(id, me?._id);
     const router = useRouter();
 
     const onSubmit = async (data: Omit<Poll, '_id'>) => {
-        postPoll.mutateAsync({
+        const result = await postPoll.mutateAsync({
             ...data,
-            createdBy: me
+            ...(stop && {stop})
         });
         router.dismissTo({
-            pathname: "/[id]/polls",
+            pathname: "/[id]/polls/[pollId]",
             params: {
-                id: String(id)
+                id,
+                pollId: result._id
+
             }
         });
     }
+    // useEffect(() => {
+    //     if (type === "DatesPoll")
+    //         setValue("question", "Quelles dates ?");
+    //     else if (type === "HousingPoll")
+    //         setValue("question", "Quels hébergement ? ");
+    //     else {
+    //         setValue("question", "Qu'est ce qu'on mange ? ")
 
-
-    useEffect(() => {
-        if (type === "DatesPoll")
-            setValue("question", "Quelles dates ?");
-        else if (type === "HousingPoll")
-            setValue("question", "Quels hébergement ? ");
-        else {
-            setValue("question", "Qu'est ce qu'on mange ? ")
-
-        }
-    }, [type,]);
+    //     }
+    // }, [type,]);
 
     useEffect(() => {
         if (typeParam)
             setValue("type", String(typeParam));
     }, [typeParam, setValue]);
+
+    useEffect(() => {
+        if (type === "OtherPoll" && options.length === 0) {
+            append({ value: "" });
+        }
+    }, [type, options.length, append]);
 
     if (!type)
         return (
@@ -145,78 +125,95 @@ export default function NewPoll() {
 
         )
 
-
-
     return (
 
         <SafeAreaView style={{ flex: 1 }}>
             <Animated.ScrollView style={styles.container}>
-                {/* <Pressable className="flex-row bg-green-200 py-5" onPress={() => setType("")}>
-                    <IconSymbol name="checkmark.circle.fill" color="green" />
-                    <Text>Sondages de dates</Text>
-                </Pressable> */}
 
-                <View className="flex-1 border-b border-gray-200 my-2">
-                    <Text className="text-lg text-gray-600 dark:text-gray-200">
-                        Posez une question*
+                <View className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-4 shadow-sm border border-gray-100 dark:border-gray-700">
+                    <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+                        Question *
                     </Text>
-                    <FormText control={control}
+                    <FormText
+                        control={control}
                         name="question"
-                        placeholder="Quelles date?"
+                        rules={{
+                            required: true,
+                            maxLength: 255
+                        }}
+                        placeholder={placeholder(type)}
                     />
                 </View>
-
                 {type === "HousingPoll" &&
                     <View className="flex-1 my-2">
                         <HousingOptionsForm control={control} />
                     </View>
                 }
-                {type === "DatesPoll" && 
+                {type === "DatesPoll" &&
                     <View className="flex-1 my-2">
-                        <DatesPollOptionsForm control={control}/>
+                        <DatesPollOptionsForm control={control} />
                     </View>
                 }
                 {type === "OtherPoll" &&
-                    <View className="flex-1 gap-2 my-2">
-                        <Text className="text-lg text-gray-600 dark:text-gray-200">Options</Text>
-                        <View className="gap-2 mx-2">
+                    <View className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-4 shadow-sm border border-gray-100 dark:border-gray-700">
+                        <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+                            Options
+                        </Text>
+                        <View className="gap-3">
                             {options?.map((option, index) => (
-                                <View key={option.key}>
-                                    <ListItem control={control}
-                                        item={option}
-                                        index={index}
-                                        onRemove={() => remove(index)} />
-                                </View>
+                                <Animated.View
+                                    entering={SlideInUp}
+                                    exiting={SlideOutDown}
+                                    key={option.key}
+                                    className="flex-row items-center bg-gray-50 dark:bg-gray-700 rounded-lg p-3"
+                                >
+                                    <View className="flex-1">
+                                        <FormText
+                                            control={control}
+                                            name={`options[${index}].value`}
+                                            placeholder={`Option ${index + 1}`}
+                                            rules={{ required: true }}
+                                        />
+                                    </View>
+                                    <Pressable
+                                        onPress={() => remove(index)}
+                                        className="p-2 rounded-full hover:bg-red-50"
+                                    >
+                                        <IconSymbol name="trash" color="#ef4444" size={20} />
+                                    </Pressable>
+                                </Animated.View>
                             ))}
 
+                            <Button
+                                onPress={() => append({ value: "" })}
+                                className="mt-3 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg justify-start"
+                            >
+                                <IconSymbol name="plus.circle.fill" color="#3b82f6" size={20} />
+                                <Text className="text-blue-600 dark:text-blue-400 font-medium ml-2">
+                                    Ajouter une option
+                                </Text>
+                            </Button>
                         </View>
-
-                        <Pressable
-                            onPress={() => append({
-                                value: "",
-                            })}
-                            className="my-3 flex-row items-center justify-center rounded-full bg-blue-200  p-2">
-                            <IconSymbol name="plus" color="black" />
-                            <Text>Ajouter une option</Text>
-                        </Pressable>
-
                     </View>
                 }
 
-                <View className="flex-1">
+                <View className="flex-1 bg-white dark:bg-gray-800 rounded-xl p-4 mb-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                    <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+                        Paramètres
+                    </Text>
                     <PollSettingsForm control={control} />
                 </View>
 
-
-
-                <Button className="flex-row  bg-blue-400 items-center justify-center rounded-full p-4 my-5"
-                    onPress={handleSubmit(onSubmit)}
-                    isLoading={postPoll?.isPending}>
-                    <IconSymbol name="tray" color="white" />
-                    <Text className="text-white font-bold text-xl">Créér</Text>
-                </Button>
+                <View className="my-4">
+                    <Button
+                        variant="contained"
+                        icon="tray"
+                        title="Démarrer le sondage"
+                        onPress={handleSubmit(onSubmit)}
+                        isLoading={postPoll?.isPending} />
+                </View>
 
             </Animated.ScrollView>
-        </SafeAreaView>
+        </SafeAreaView >
     )
 }
