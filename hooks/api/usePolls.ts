@@ -52,8 +52,17 @@ export const usePutPoll = (tripId: string, pollId: string, userId?: string) => {
     const queryClient = useQueryClient();
     return useMutation<any, Error, Poll>({
         mutationFn: (data) => updatePoll(tripId, pollId, data, userId),
-        onSuccess: (data: Poll) => queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
-            .then(() => queryClient.setQueryData(["trips", tripId, "polls", pollId], data))
+         onSuccess: async (data: Poll) => {
+            // 1. Set the updated poll data (immediate update, no flicker)
+            queryClient.setQueryData(
+                ["trips", tripId, "polls", pollId],
+                data
+            );
+            // 2. Invalidate tripStops (triggers refetch for related data)
+            await queryClient.invalidateQueries({
+                queryKey: ["trips", tripId, "stops"]
+            });
+        }
     })
 }
 

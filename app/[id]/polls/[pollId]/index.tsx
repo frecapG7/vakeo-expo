@@ -95,6 +95,7 @@ export default function PollDetailsPage() {
         <Animated.ScrollView
             style={styles.container}
             contentContainerStyle={{ paddingBottom: 20 }}
+            showsVerticalScrollIndicator={false}
         >
             {/* Enhanced Header */}
             <View className="flex-row gap-3 items-center p-4">
