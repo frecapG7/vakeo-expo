@@ -1,8 +1,7 @@
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
-import { usePutTripStop } from "@/hooks/api/useTripStop";
 import useColors from "@/hooks/styles/useColors";
-import { Trip, TripStop } from "@/types/models";
+import { Poll, Trip, TripStop, TripUser } from "@/types/models";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -17,8 +16,21 @@ import { BottomLocationForm } from "./BottomLocationForm";
 
 
 
-type WizardStep = 'choice' | 'form' | 'pollCreation';
 
+interface PollStatusDotProps {
+    poll?: Poll;
+    user?: TripUser;
+}
+
+const PollStatusDot = ({ poll, user }: PollStatusDotProps) => {
+    if (!poll || !user) return null;
+
+    const hasVoted = poll.hasSelected?.some(u => u._id === user._id);
+
+    return (
+        <View className={`w-2.5 h-2.5 rounded-full ml-1 ${hasVoted ? 'bg-green-500' : 'bg-red-500'}`}/>
+    );
+};
 
 interface AccommodationWizardProps {
     visible: boolean;
@@ -55,7 +67,6 @@ export const TripStopDetailsEditor = ({
 
 
     const { control, handleSubmit, reset, formState: { isSubmitSuccessful } } = useForm<TripStop>();
-    const putTripStop = usePutTripStop(trip._id);
 
     useEffect(() => {
         if (tripStop)
@@ -99,20 +110,28 @@ export const TripStopDetailsEditor = ({
                 {/* Horizontal Tab Navigation */}
                 <View className="flex-row border-b border-gray-200 dark:border-gray-700 mt-2">
                     <Pressable
-                        className={`flex-1 py-2 ${tabValue === 'location' ? 'border-b-2 border-blue-500' : ''}`}
+                        className={`flex-row items-center justify-center flex-1 py-2 ${tabValue === 'location' ? 'border-b-2 border-blue-500' : ''}`}
                         onPress={() => setTabValue('location')}
                     >
                         <Text className={`text-center font-medium ${tabValue === 'location' ? 'text-blue-500' : 'text-gray-500 dark:text-gray-400'}`}>
                             Adresse
                         </Text>
+                        <PollStatusDot
+                            poll={tripStop?.polls?.find(p => !p.isClosed && p.type === "OtherPoll")}
+                            user={me}
+                        />
                     </Pressable>
                     <Pressable
-                        className={`flex-1 py-2 ${tabValue === 'accommodation' ? 'border-b-2 border-blue-500' : ''}`}
+                        className={`flex-row items-center justify-center flex-1 py-2 ${tabValue === 'accommodation' ? 'border-b-2 border-blue-500' : ''}`}
                         onPress={() => setTabValue('accommodation')}
                     >
                         <Text className={`text-center font-medium ${tabValue === 'accommodation' ? 'text-blue-500' : 'text-gray-500 dark:text-gray-400'}`}>
                             Hébergement
                         </Text>
+                        <PollStatusDot
+                            poll={tripStop?.polls?.find(p => !p.isClosed && p.type === "HousingPoll")}
+                            user={me}
+                        />
                     </Pressable>
                 </View>
 
@@ -130,7 +149,8 @@ export const TripStopDetailsEditor = ({
                                         pathname: "/[id]/polls/new",
                                         params: {
                                             id: trip._id,
-                                            type: "OtherPoll"
+                                            type: "OtherPoll",
+                                            stop: tripStop?._id
                                         }
                                     })}
                                     onPollClick={(pollId) => router.push({

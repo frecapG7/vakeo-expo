@@ -95,6 +95,29 @@ export interface Dashboard {
 
 export type PollType = "DatesPoll" | "HousingPoll" | "OtherPoll";
 
+// Base option interface with common fields
+export interface PollOption {
+    selectedBy: TripUser[];
+    percent: number;
+}
+
+// Specific option types
+export interface DatePollOption extends PollOption {
+    startDate: Date;
+    endDate: Date;
+}
+
+export interface HousingPollOption extends PollOption {
+    image: string;
+    icon: string;
+    url: string;
+    title: string;
+}
+
+export interface OtherPollOption extends PollOption {
+    value: string;
+}
+
 
 export interface Poll {
     _id: string,
@@ -105,44 +128,23 @@ export interface Poll {
     isSingleAnswer: boolean,
     isAnonymous: boolean,
     isClosed: boolean,
-    hasSelected: TripUser[],
-    createdAt: Date
+    hasSelected: TripUser[]
+    createdAt: Date;
+    options: PollOption[];
 };
 
 
 export interface DatesPoll extends Poll {
-    options: [
-        {
-            startDate: Date,
-            endDate: Date,
-            selectedBy: TripUser[],
-            percent: number
-        }
-    ]
+    options: DatePollOption[];
 };
 
 
 export interface HousingPoll extends Poll {
-    options: [
-        {
-            image: string,
-            icon: string,
-            url: string,
-            title: string,
-            selectedBy: TripUser[],
-            percent: number
-        }
-    ]
+    options: HousingPollOption[];
 };
 
 export interface OtherPoll extends Poll {
-    options: [
-        {
-            value: string,
-            selectedBy: TripUser[],
-            percent: number
-        }
-    ]
+    options: OtherPollOption[];
 }
 
 

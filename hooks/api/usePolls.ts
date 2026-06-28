@@ -39,6 +39,24 @@ export const usePostPoll = (tripId: any, userId?: string) => {
     })
 }
 
+const updatePoll = async (tripId: string, pollId: string, data: any, userId?: string): Promise<Poll> => {
+    const response = await axios.put(`/trips/${tripId}/polls/${pollId}`, data, {
+        headers: {
+            ...(userId && { 'x-user-id': userId })
+        }
+    });
+    return response.data;
+}
+
+export const usePutPoll = (tripId: string, pollId: string, userId?: string) => {
+    const queryClient = useQueryClient();
+    return useMutation<any, Error, Poll>({
+        mutationFn: (data) => updatePoll(tripId, pollId, data, userId),
+        onSuccess: (data: Poll) => queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
+            .then(() => queryClient.setQueryData(["trips", tripId, "polls", pollId], data))
+    })
+}
+
 
 
 const getPolls = async (tripId: any, params?: IParams) => {
@@ -91,7 +109,7 @@ const votePoll = async (tripId: any, pollId: any, data: any, userId?: string): P
 
 export const useVotePoll = (tripId: any, pollId: any, userId?: string) => {
     const queryClient = useQueryClient();
-    return useMutation<Poll, Error, any>({
+    return useMutation<any, Error, any>({
         mutationFn: (data) => votePoll(tripId, pollId, data, userId),
         onSuccess: async (data) => {
             await queryClient.invalidateQueries({

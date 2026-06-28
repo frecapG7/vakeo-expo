@@ -1,3 +1,4 @@
+import { AddOptionModal } from "@/components/modals/AddOptionModal";
 import { PickUsersModal } from "@/components/modals/PickUsersModal";
 import { HousingOptions } from "@/components/polls/HousingOptions";
 import { PollOption } from "@/components/polls/PollOption";
@@ -7,12 +8,12 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
-import { useGetPoll, useUnvotePoll, useVotePoll } from "@/hooks/api/usePolls";
-import useI18nNumbers from "@/hooks/i18n/useI18nNumbers";
+import { useGetPoll, usePutPoll, useUnvotePoll, useVotePoll } from "@/hooks/api/usePolls";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import dayjs from "@/lib/dayjs-config";
 
-import { useLocalSearchParams, useNavigation } from "expo-router";
+import { PollOption as Option } from "@/types/models";
+import { useLocalSearchParams } from "expo-router";
 import { useContext, useState } from "react";
 import { Text, View } from "react-native";
 import Animated from "react-native-reanimated";
@@ -20,22 +21,22 @@ import Animated from "react-native-reanimated";
 
 
 
-export default function PollDetailsPage() {
-    const { id, pollId } = useLocalSearchParams();
 
+export default function PollDetailsPage() {
+    const { id, pollId } = useLocalSearchParams<{id: string, pollId: string}>();
 
     const { me } = useContext(TripContext);
     const { data: poll } = useGetPoll(id, pollId);
-
+    const updatePoll = usePutPoll(id, pollId, me?._id);
     const votePoll = useVotePoll(id, pollId, me?._id);
     const unvotePoll = useUnvotePoll(id, pollId, me?._id);
 
     const { formatDuration, formatRange } = useI18nTime();
 
-    const { formatPercent } = useI18nNumbers();
 
-    const [selectedOption, setSelectedOption] = useState(null);
+    const [selectedOption, setSelectedOption] = useState<Option | null>(null);
     const [loadingOptionId, setLoadingOptionId] = useState<string | null>(null);
+    const [showAddOption, setShowAddOption] = useState(false);
 
     const handleClick = async (option: any, includeMe: boolean) => {
         setLoadingOptionId(option._id);
@@ -53,7 +54,10 @@ export default function PollDetailsPage() {
         }
     }
 
-    const navigation = useNavigation();
+    const handleUpdate = async(option: Option) => {
+        await updatePoll.mutateAsync({newOptions: [option]});
+        setShowAddOption(false);
+    }
 
     // Keep it case headerTitle is shown in stack
     // useFocusEffect(
@@ -156,8 +160,8 @@ export default function PollDetailsPage() {
                                     onPress={() => handleClick(option, includeMe)}
                                     onLongPress={() => setSelectedOption(option)}
                                     className={`rounded-xl border-2 ${includeMe
-                                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-800/30'
-                                            : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800'
+                                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-800/30'
+                                        : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800'
                                         }`}
                                 >
                                     <PollOption
@@ -207,7 +211,7 @@ export default function PollDetailsPage() {
                 </View>
 
                 {/* Closed Poll Indicator */}
-                {poll?.isClosed && (
+                {poll?.isClosed ? (
                     <View className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-700">
                         <View className="flex-row items-center gap-2">
                             <IconSymbol name="lock.fill" color="amber" size={18} />
@@ -215,14 +219,32 @@ export default function PollDetailsPage() {
                                 Sondage terminé
                             </Text>
                         </View>
+                    </View>)
+                    :
+                    <View className="mt-3">
+
+                        <Button variant="contained"
+                            size="small"
+                            icon="plus"
+                            title="Ajouter une option"
+                            onPress={() => setShowAddOption(true)}
+                        />
                     </View>
-                )}
+                }
             </View>
+
+            <AddOptionModal
+                open={showAddOption}
+                onClose={() => setShowAddOption(false)}
+                poll={poll}
+                onAdd={handleUpdate}
+                isLoading={updatePoll.isPending}
+            />
 
             <PickUsersModal
                 open={!!selectedOption && !poll.isAnonymous}
                 onClose={() => setSelectedOption(null)}
-                users={selectedOption?.selectedBy}
+                users={selectedOption?.selectedBy || []}
                 disabled
                 title="Votants"
             />
