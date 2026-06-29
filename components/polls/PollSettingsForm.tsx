@@ -11,21 +11,21 @@ export const PollSettingsForm = ({ control }: { control: any }) => {
 
 
 
-    const { field: { value: singleAnswer, onChange: setSingleAnswer } } = useController({
+    const { field: { value: isSingleAnswer, onChange: setIsSingleAnswer } } = useController({
         control,
-        name: "singleAnswer",
+        name: "isSingleAnswer",
     });
 
-    const { field: { value: anonymous, onChange: setAnonymous } } = useController({
+    const { field: { value: isAnonymous, onChange: setIsAnonymous } } = useController({
         control,
-        name: "anonymous",
+        name: "isAnonymous",
     });
 
     return (
         <View>
             <View className="flex-1 gap-4 my-2">
                 <View
-                    className={`flex-row items-center rounded-lg justify-between border border-2 p-5 ${singleAnswer ? "border-blue-400 dark:border-blue-600" : "border-gray-200 dark:border-gray-600"}`}>
+                    className={`flex-row items-center rounded-lg justify-between border border-2 p-5 ${isSingleAnswer ? "border-blue-400 dark:border-blue-600" : "border-gray-200 dark:border-gray-600"}`}>
                     <View>
                         <Text className="font-bold dark:text-white">
                             Réponse unique
@@ -34,11 +34,11 @@ export const PollSettingsForm = ({ control }: { control: any }) => {
                             Seule réponse à la fois sera possible
                         </Text>
                     </View>
-                    <Switch value={singleAnswer} onSwitch={setSingleAnswer} />
+                    <Switch value={isSingleAnswer} onSwitch={setIsSingleAnswer} />
                 </View>
 
                 <View
-                    className={`flex-row items-center rounded-lg justify-between border border-2 p-5 ${anonymous ? "border-blue-400 dark:border-blue-600" : "border-gray-200 dark:border-gray-600"}`}>
+                    className={`flex-row items-center rounded-lg justify-between border border-2 p-5 ${isAnonymous ? "border-blue-400 dark:border-blue-600" : "border-gray-200 dark:border-gray-600"}`}>
                     <View>
                         <Text className="font-bold dark:text-white">
                             Votes anonyme
@@ -47,7 +47,7 @@ export const PollSettingsForm = ({ control }: { control: any }) => {
                             Seul les résultats du vote seront visible
                         </Text>
                     </View>
-                    <Switch value={anonymous} onSwitch={setAnonymous} />
+                    <Switch value={isAnonymous} onSwitch={setIsAnonymous} />
                 </View>
             </View>
 

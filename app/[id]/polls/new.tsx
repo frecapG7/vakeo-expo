@@ -18,9 +18,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 
 const placeholder = (type: string): string => {
-    if (type = "DatesPoll")
+    if (type === "DatesPoll")
         return "On part quand?";
-    else if (type = "HousingPoll")
+    else if (type === "HousingPoll")
         return "On loge ou?";
     else
         return "On part ou?"
@@ -33,8 +33,8 @@ export default function NewPoll() {
         defaultValues: {
             question: "",
             type: "",
-            singleAnswer: false,
-            anonymous: false,
+            isSingleAnswer: false,
+            isAnonymous: false,
             options: []
         }
     });

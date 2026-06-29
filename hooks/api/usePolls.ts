@@ -1,5 +1,5 @@
 import axios from "@/lib/axios";
-import { Poll, PollType } from "@/types/models";
+import { Poll, PollOption, PollType } from "@/types/models";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 
@@ -39,7 +39,11 @@ export const usePostPoll = (tripId: any, userId?: string) => {
     })
 }
 
-const updatePoll = async (tripId: string, pollId: string, data: any, userId?: string): Promise<Poll> => {
+interface UpdatePollPayload {
+    newOptions: PollOption[];
+}
+
+const updatePoll = async (tripId: string, pollId: string, data: UpdatePollPayload, userId?: string): Promise<Poll> => {
     const response = await axios.put(`/trips/${tripId}/polls/${pollId}`, data, {
         headers: {
             ...(userId && { 'x-user-id': userId })
@@ -50,9 +54,9 @@ const updatePoll = async (tripId: string, pollId: string, data: any, userId?: st
 
 export const usePutPoll = (tripId: string, pollId: string, userId?: string) => {
     const queryClient = useQueryClient();
-    return useMutation<any, Error, Poll>({
+    return useMutation<Poll, Error, UpdatePollPayload>({
         mutationFn: (data) => updatePoll(tripId, pollId, data, userId),
-         onSuccess: async (data: Poll) => {
+        onSuccess: async (data: Poll) => {
             // 1. Set the updated poll data (immediate update, no flicker)
             queryClient.setQueryData(
                 ["trips", tripId, "polls", pollId],
@@ -60,7 +64,7 @@ export const usePutPoll = (tripId: string, pollId: string, userId?: string) => {
             );
             // 2. Invalidate tripStops (triggers refetch for related data)
             await queryClient.invalidateQueries({
-                queryKey: ["trips", tripId, "stops"]
+                queryKey: ["trip", tripId, "stops"]
             });
         }
     })
@@ -104,7 +108,6 @@ export const useGetPoll = (tripId: any, pollId: any) => {
 
 
 const votePoll = async (tripId: any, pollId: any, data: any, userId?: string): Promise<Poll> => {
-
     const response = await axios.patch(`/trips/${tripId}/polls/${pollId}/vote`, data, {
         headers: {
             "x-user-id": userId
@@ -116,7 +119,7 @@ const votePoll = async (tripId: any, pollId: any, data: any, userId?: string): P
 }
 
 
-export const useVotePoll = (tripId: any, pollId: any, userId?: string) => {
+export const useVotePoll = (tripId: string, pollId: string, userId?: string) => {
     const queryClient = useQueryClient();
     return useMutation<any, Error, any>({
         mutationFn: (data) => votePoll(tripId, pollId, data, userId),
@@ -129,7 +132,7 @@ export const useVotePoll = (tripId: any, pollId: any, userId?: string) => {
     });
 }
 
-const unvotePoll = async (tripId: any, pollId: any, optionId: any, userId: any): Promise<Poll> => {
+const unvotePoll = async (tripId: string, pollId: string, optionId: string, userId?: string): Promise<Poll> => {
     const response = await axios.delete(`/trips/${tripId}/polls/${pollId}/vote/${optionId}`, {
         headers: {
             "x-user-id": userId
@@ -139,10 +142,15 @@ const unvotePoll = async (tripId: any, pollId: any, optionId: any, userId: any):
 }
 
 
-export const useUnvotePoll = (tripId: any, pollId: any, userId?: string) => {
+export const useUnvotePoll = (tripId: string, pollId: string, userId?: string) => {
     const queryClient = useQueryClient();
     return useMutation<Poll, Error, any>({
         mutationFn: ({ option }) => unvotePoll(tripId, pollId, option, userId),
-        onSuccess: (data) => queryClient.setQueryData(["trips", tripId, "polls", pollId], data)
+        onSuccess: async (data) => {
+            await queryClient.invalidateQueries({
+                queryKey: ["trips", tripId, "stops"]
+            });
+            queryClient.setQueryData(["trips", tripId, "polls", pollId], data)
+        }
     });
 }

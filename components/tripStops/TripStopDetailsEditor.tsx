@@ -28,7 +28,7 @@ const PollStatusDot = ({ poll, user }: PollStatusDotProps) => {
     const hasVoted = poll.hasSelected?.some(u => u._id === user._id);
 
     return (
-        <View className={`w-2.5 h-2.5 rounded-full ml-1 ${hasVoted ? 'bg-green-500' : 'bg-red-500'}`}/>
+        <View className={`w-2.5 h-2.5 rounded-full ml-1 ${hasVoted ? 'bg-green-500' : 'bg-red-500'}`} />
     );
 };
 
@@ -145,21 +145,29 @@ export const TripStopDetailsEditor = ({
                             <View className="flex-row justify-end">
                                 <PollStatus poll={tripStop?.polls?.filter(p => !p.isClosed && p.type === "OtherPoll")?.[0]}
                                     selectedUser={me}
-                                    onNewClick={() => router.push({
-                                        pathname: "/[id]/polls/new",
-                                        params: {
-                                            id: trip._id,
-                                            type: "OtherPoll",
-                                            stop: tripStop?._id
+                                    onNewClick={() => {
+                                        onClose();
+                                        router.push({
+                                            pathname: "/[id]/polls/new",
+                                            params: {
+                                                id: trip._id,
+                                                type: "OtherPoll",
+                                                stop: tripStop?._id
+                                            }
                                         }
-                                    })}
-                                    onPollClick={(pollId) => router.push({
-                                        pathname: "/[id]/polls/[pollId]",
-                                        params: {
-                                            id: trip._id,
-                                            pollId
-                                        }
-                                    })}
+                                        )
+                                    }}
+                                    onPollClick={(pollId) => {
+                                        onClose();
+                                        router.push({
+                                            pathname: "/[id]/polls/[pollId]",
+                                            params: {
+                                                id: trip._id,
+                                                pollId,
+                                                stop: tripStop?._id
+                                            }
+                                        })
+                                    }}
                                 />
                             </View>
                             <BottomLocationForm
@@ -171,20 +179,26 @@ export const TripStopDetailsEditor = ({
                             <View className="flex-row justify-end">
                                 <PollStatus poll={tripStop?.polls?.filter(p => !p.isClosed && p.type === "HousingPoll")?.[0]}
                                     selectedUser={me}
-                                    onNewClick={() => router.push({
-                                        pathname: "/[id]/polls/new",
-                                        params: {
-                                            id: trip._id,
-                                            type: "HousingPoll"
-                                        }
-                                    })}
-                                    onPollClick={(pollId) => router.push({
-                                        pathname: "/[id]/polls/[pollId]",
-                                        params: {
-                                            id: trip._id,
-                                            pollId
-                                        }
-                                    })}
+                                    onNewClick={() => {
+                                        onClose();
+                                        router.push({
+                                            pathname: "/[id]/polls/new",
+                                            params: {
+                                                id: trip._id,
+                                                type: "HousingPoll"
+                                            }
+                                        })
+                                    }}
+                                    onPollClick={(pollId) => {
+                                        onClose();
+                                        router.push({
+                                            pathname: "/[id]/polls/[pollId]",
+                                            params: {
+                                                id: trip._id,
+                                                pollId
+                                            }
+                                        })
+                                    }}
                                 />
                             </View>
                             <BottomAccommodationForm

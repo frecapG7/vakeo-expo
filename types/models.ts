@@ -97,6 +97,7 @@ export type PollType = "DatesPoll" | "HousingPoll" | "OtherPoll";
 
 // Base option interface with common fields
 export interface PollOption {
+    _id: string;
     selectedBy: TripUser[];
     percent: number;
 }
@@ -119,33 +120,38 @@ export interface OtherPollOption extends PollOption {
 }
 
 
-export interface Poll {
-    _id: string,
-    type: PollType,
-    question: string,
-    trip: string,
-    createdBy?: TripUser,
-    isSingleAnswer: boolean,
-    isAnonymous: boolean,
-    isClosed: boolean,
-    hasSelected: TripUser[]
+// Base interface for shared poll fields (without discriminator)
+export interface BasePoll {
+    _id: string;
+    question: string;
+    trip: string;
+    createdBy?: TripUser;
+    isSingleAnswer: boolean;
+    isAnonymous: boolean;
+    isClosed: boolean;
+    hasSelected: TripUser[];
     createdAt: Date;
     options: PollOption[];
-};
+}
 
-
-export interface DatesPoll extends Poll {
+// Concrete poll types with literal type discriminators
+export interface DatesPoll extends BasePoll {
+    type: "DatesPoll";
     options: DatePollOption[];
-};
+}
 
-
-export interface HousingPoll extends Poll {
+export interface HousingPoll extends BasePoll {
+    type: "HousingPoll";
     options: HousingPollOption[];
-};
+}
 
-export interface OtherPoll extends Poll {
+export interface OtherPoll extends BasePoll {
+    type: "OtherPoll";
     options: OtherPollOption[];
 }
+
+// Poll is now a discriminated union
+export type Poll = DatesPoll | HousingPoll | OtherPoll;
 
 
 

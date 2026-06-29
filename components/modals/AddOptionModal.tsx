@@ -7,14 +7,14 @@ interface AddOptionModalProps {
     open: boolean;
     onClose: () => void;
     poll: Poll;
-    onAdd: (newOption: PollOption) => void;
+    onAdd: (newOption: PollOption) => Promise<void>;
     isLoading: boolean;
 }
 
 export function AddOptionModal({ open, onClose, poll, onAdd, isLoading }: AddOptionModalProps) {
     const [newOption, setNewOption] = useState<Partial<PollOption>>({});
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!newOption || Object.keys(newOption).length === 0) return;
 
         const baseOption: Omit<PollOption, '_id'> = {
@@ -47,7 +47,7 @@ export function AddOptionModal({ open, onClose, poll, onAdd, isLoading }: AddOpt
             } as OtherPollOption;
         }
 
-        onAdd(typedOption);
+        await onAdd(typedOption);
         setNewOption({});
         onClose();
     };

@@ -17,13 +17,10 @@ import { useLocalSearchParams } from "expo-router";
 import { useContext, useState } from "react";
 import { Text, View } from "react-native";
 import Animated from "react-native-reanimated";
-
-
-
-
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PollDetailsPage() {
-    const { id, pollId } = useLocalSearchParams<{id: string, pollId: string}>();
+    const { id, pollId } = useLocalSearchParams<{ id: string, pollId: string }>();
 
     const { me } = useContext(TripContext);
     const { data: poll } = useGetPoll(id, pollId);
@@ -37,6 +34,8 @@ export default function PollDetailsPage() {
     const [selectedOption, setSelectedOption] = useState<Option | null>(null);
     const [loadingOptionId, setLoadingOptionId] = useState<string | null>(null);
     const [showAddOption, setShowAddOption] = useState(false);
+
+    const insets = useSafeAreaInsets();
 
     const handleClick = async (option: any, includeMe: boolean) => {
         setLoadingOptionId(option._id);
@@ -54,9 +53,13 @@ export default function PollDetailsPage() {
         }
     }
 
-    const handleUpdate = async(option: Option) => {
-        await updatePoll.mutateAsync({newOptions: [option]});
-        setShowAddOption(false);
+    const handleUpdate = async (option: Option) => {
+        try {
+            await updatePoll.mutateAsync({ newOptions: [option] });
+            setShowAddOption(false);
+        } catch (error) {
+            // Leave modal open on error so user can retry
+        }
     }
 
     // Keep it case headerTitle is shown in stack
@@ -93,8 +96,10 @@ export default function PollDetailsPage() {
 
     return (
         <Animated.ScrollView
-            style={styles.container}
-            contentContainerStyle={{ paddingBottom: 20 }}
+            style={{
+                ...styles.container,
+                marginBottom: insets.bottom
+            }}
             showsVerticalScrollIndicator={false}
         >
             {/* Enhanced Header */}
@@ -184,16 +189,14 @@ export default function PollDetailsPage() {
                 {/* Poll Settings Footer */}
                 <View className="flex-row justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-600">
                     <View className="flex-row items-center gap-2">
-                        <View className="flex-row -space-x-1">
-                            {poll?.isSingleAnswer ? (
+                        {poll?.isSingleAnswer ? (
+                            <IconSymbol name="checkmark.circle.fill" color="gray" size={18} />
+                        ) : (
+                            <View className="flex-row">
                                 <IconSymbol name="checkmark.circle.fill" color="gray" size={18} />
-                            ) : (
-                                <>
-                                    <IconSymbol name="checkmark.circle.fill" color="gray" size={18} />
-                                    <IconSymbol name="checkmark.circle.fill" color="gray" size={18} className="-ml-2" />
-                                </>
-                            )}
-                        </View>
+                                <IconSymbol name="checkmark.circle.fill" color="gray" size={18}  style={{ marginLeft: -6 }} />
+                            </View>
+                        )}
                         <Text className="text-sm text-gray-500 dark:text-gray-400">
                             {poll?.isSingleAnswer ? "Une option" : "Options multiples"}
                         </Text>
