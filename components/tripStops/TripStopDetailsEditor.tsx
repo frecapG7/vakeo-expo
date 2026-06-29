@@ -164,7 +164,6 @@ export const TripStopDetailsEditor = ({
                                             params: {
                                                 id: trip._id,
                                                 pollId,
-                                                stop: tripStop?._id
                                             }
                                         })
                                     }}
@@ -185,7 +184,8 @@ export const TripStopDetailsEditor = ({
                                             pathname: "/[id]/polls/new",
                                             params: {
                                                 id: trip._id,
-                                                type: "HousingPoll"
+                                                type: "HousingPoll",
+                                                stop: tripStop?._id
                                             }
                                         })
                                     }}

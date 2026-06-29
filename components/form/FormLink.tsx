@@ -14,14 +14,16 @@ export const FormLink = ({
     placeholder = "https://www.example...",
     required = true,
     autoFocus = false,
-    pattern = /^(https?:\/\/)[\w\.-]+(\/[\w\.-]*)*$/
+    pattern = /^(https?:\/\/)[\w\.-]+(\/[\w\.-]*)*$/,
+    onPaste
 }: {
     control: any;
     name: string;
     placeholder?: string;
     required?: boolean;
     autoFocus?: boolean;
-    pattern ?: RegExp
+    pattern ?: RegExp,
+    onPaste ?: (text: string) => void
 }) => {
     const {
         field: { value, onChange },
@@ -63,7 +65,7 @@ export const FormLink = ({
     const handlePaste = async () => {
         const text = await Clipboard.getStringAsync();
         if (pattern.test(text)) {
-            onChange(text);
+            onPaste ? onPaste(text) : onChange(text);
             Toast.info("Lien collé !");
         } else {
             Toast.info("Aucun lien valide trouvé");

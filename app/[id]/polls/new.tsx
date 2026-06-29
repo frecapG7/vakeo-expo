@@ -1,6 +1,7 @@
 import { FormText } from "@/components/form/FormText";
 import { DatesPollOptionsForm } from "@/components/polls/DatesPollOptionsForm";
 import { HousingOptionsForm } from "@/components/polls/HousingOptionsForm";
+import { OtherPollOptionsForm } from "@/components/polls/OtherPollOptionsForm";
 import { PollSettingsForm } from "@/components/polls/PollSettingsForm";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
@@ -11,9 +12,9 @@ import { Poll } from "@/types/models";
 import { useLocalSearchParams, useRouter } from "expo-router/build/hooks";
 import { useContext, useEffect } from "react";
 
-import { useController, useFieldArray, useForm } from "react-hook-form";
-import { Pressable, Text, View } from "react-native";
-import Animated, { SlideInUp, SlideOutDown } from "react-native-reanimated";
+import { useController, useForm } from "react-hook-form";
+import { Text, View } from "react-native";
+import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 
@@ -47,16 +48,7 @@ export default function NewPoll() {
         }
     });
 
-    const { fields: options, append, update, remove } = useFieldArray({
-        control,
-        name: "options",
-        rules: {
-            minLength: 1
-        },
-        keyName: "key",
-    })
-
-    const { id, type: typeParam , stop} = useLocalSearchParams<{ id: string , type: string, stop ?: string}>();
+    const { id, type: typeParam, stop } = useLocalSearchParams<{ id: string, type: string, stop?: string }>();
     const { me } = useContext(TripContext);
     const postPoll = usePostPoll(id, me?._id);
     const router = useRouter();
@@ -64,7 +56,7 @@ export default function NewPoll() {
     const onSubmit = async (data: Omit<Poll, '_id'>) => {
         const result = await postPoll.mutateAsync({
             ...data,
-            ...(stop && {stop})
+            ...(stop && { stop })
         });
         router.dismissTo({
             pathname: "/[id]/polls/[pollId]",
@@ -90,12 +82,6 @@ export default function NewPoll() {
         if (typeParam)
             setValue("type", String(typeParam));
     }, [typeParam, setValue]);
-
-    useEffect(() => {
-        if (type === "OtherPoll" && options.length === 0) {
-            append({ value: "" });
-        }
-    }, [type, options.length, append]);
 
     if (!type)
         return (
@@ -144,58 +130,27 @@ export default function NewPoll() {
                         placeholder={placeholder(type)}
                     />
                 </View>
-                {type === "HousingPoll" &&
-                    <View className="flex-1 my-2">
-                        <HousingOptionsForm control={control} />
-                    </View>
-                }
+
                 {type === "DatesPoll" &&
                     <View className="flex-1 my-2">
                         <DatesPollOptionsForm control={control} />
                     </View>
                 }
-                {type === "OtherPoll" &&
-                    <View className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-4 shadow-sm border border-gray-100 dark:border-gray-700">
-                        <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
-                            Options
-                        </Text>
-                        <View className="gap-3">
-                            {options?.map((option, index) => (
-                                <Animated.View
-                                    entering={SlideInUp}
-                                    exiting={SlideOutDown}
-                                    key={option.key}
-                                    className="flex-row items-center bg-gray-50 dark:bg-gray-700 rounded-lg p-3"
-                                >
-                                    <View className="flex-1">
-                                        <FormText
-                                            control={control}
-                                            name={`options[${index}].value`}
-                                            placeholder={`Option ${index + 1}`}
-                                            rules={{ required: true }}
-                                        />
-                                    </View>
-                                    <Pressable
-                                        onPress={() => remove(index)}
-                                        className="p-2 rounded-full hover:bg-red-50"
-                                    >
-                                        <IconSymbol name="trash" color="#ef4444" size={20} />
-                                    </Pressable>
-                                </Animated.View>
-                            ))}
-
-                            <Button
-                                onPress={() => append({ value: "" })}
-                                className="mt-3 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg justify-start"
-                            >
-                                <IconSymbol name="plus.circle.fill" color="#3b82f6" size={20} />
-                                <Text className="text-blue-600 dark:text-blue-400 font-medium ml-2">
-                                    Ajouter une option
-                                </Text>
-                            </Button>
+                <View className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-4 shadow-sm border border-gray-100 dark:border-gray-700">
+                    <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+                        Options
+                    </Text>
+                    {type === "OtherPoll" &&
+                        <OtherPollOptionsForm
+                            control={control}
+                        />
+                    }
+                    {type === "HousingPoll" &&
+                        <View className="flex-1 my-2">
+                            <HousingOptionsForm control={control} />
                         </View>
-                    </View>
-                }
+                    }
+                </View>
 
                 <View className="flex-1 bg-white dark:bg-gray-800 rounded-xl p-4 mb-6 shadow-sm border border-gray-100 dark:border-gray-700">
                     <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
