@@ -64,7 +64,7 @@ export const usePutPoll = (tripId: string, pollId: string, userId?: string) => {
             );
             // 2. Invalidate tripStops (triggers refetch for related data)
             await queryClient.invalidateQueries({
-                queryKey: ["trip", tripId, "stops"]
+                queryKey: ["trips", tripId, "stops"]
             });
         }
     })

@@ -65,7 +65,8 @@ export const FormLink = ({
     const handlePaste = async () => {
         const text = await Clipboard.getStringAsync();
         if (pattern.test(text)) {
-            onPaste ? onPaste(text) : onChange(text);
+            onChange(text);
+            await onPaste?.(text)
             Toast.info("Lien collé !");
         } else {
             Toast.info("Aucun lien valide trouvé");

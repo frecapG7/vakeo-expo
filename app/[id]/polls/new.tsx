@@ -131,15 +131,14 @@ export default function NewPoll() {
                     />
                 </View>
 
-                {type === "DatesPoll" &&
-                    <View className="flex-1 my-2">
-                        <DatesPollOptionsForm control={control} />
-                    </View>
-                }
+                
                 <View className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-4 shadow-sm border border-gray-100 dark:border-gray-700">
                     <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
                         Options
                     </Text>
+                    {type === "DatesPoll" &&
+                        <DatesPollOptionsForm control={control} />
+                    }
                     {type === "OtherPoll" &&
                         <OtherPollOptionsForm
                             control={control}

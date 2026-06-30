@@ -1,7 +1,15 @@
 import { Button } from "@/components/ui/Button";
+import { usePostLinkPreview } from "@/hooks/api/useLinkPreview";
 import { DatePollOption, HousingPollOption, OtherPollOption, Poll, PollOption } from "@/types/models";
-import { useState } from "react";
-import { Modal, Text, TextInput, View } from "react-native";
+import { Image, ImageBackground } from "expo-image";
+import { useEffect } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { Modal, Pressable, Text, View } from "react-native";
+import Animated, { BounceIn, BounceOut } from "react-native-reanimated";
+import { FormLink } from "../form/FormLink";
+import { FormText } from "../form/FormText";
+import { IconSymbol } from "../ui/IconSymbol";
+import { Skeleton } from "../ui/Skeleton";
 
 interface AddOptionModalProps {
     open: boolean;
@@ -12,61 +20,45 @@ interface AddOptionModalProps {
 }
 
 export function AddOptionModal({ open, onClose, poll, onAdd, isLoading }: AddOptionModalProps) {
-    const [newOption, setNewOption] = useState<Partial<PollOption>>({});
+    const postLinkPreview = usePostLinkPreview();
 
-    const handleSubmit = async () => {
-        if (!newOption || Object.keys(newOption).length === 0) return;
+    const { control, formState: { isSubmitSuccessful }, reset, handleSubmit } = useForm();
 
-        const baseOption: Omit<PollOption, '_id'> = {
-            selectedBy: [],
-            percent: 0,
-        };
+    const handlePasteLink = async (url: string) => {
+        const response = await postLinkPreview.mutateAsync(url);
+        if (response.success && response.data) {
+            // setValue("title", response.data.title);
+            // setValue("image", response.data.image);
+            // setValue("icon", response.data.icon);
+            // setValue("url", response.data.url);
+            reset(response.data);
+        }
+    };
 
+    const option = useWatch({ control });
+    useEffect(() => {
+        if (isSubmitSuccessful)
+            reset();
+    }, [isSubmitSuccessful, reset]);
+
+    const onSubmit = async (data: any) => {
         let typedOption: PollOption;
 
         if (poll.type === "DatesPoll") {
             typedOption = {
-                ...baseOption,
-                startDate: new Date(newOption.startDate as string),
-                endDate: new Date(newOption.endDate as string),
+                startDate: new Date(data.startDate as string),
+                endDate: new Date(data.endDate as string),
             } as DatePollOption;
         }
         else if (poll.type === "HousingPoll") {
-            typedOption = {
-                ...baseOption,
-                image: newOption.image as string || "",
-                icon: newOption.icon as string || "",
-                url: newOption.url as string || "",
-                title: newOption.title as string || "",
-            } as HousingPollOption;
+            typedOption = data as HousingPollOption;
         }
         else {
-            typedOption = {
-                ...baseOption,
-                value: newOption.value as string || "",
-            } as OtherPollOption;
+            typedOption = data as OtherPollOption;
         }
 
         await onAdd(typedOption);
-        setNewOption({});
         onClose();
-    };
-
-    const isValid = (): boolean => {
-        if (!newOption || Object.keys(newOption).length === 0) return false;
-
-        if (poll.type === "DatesPoll") {
-            const option = newOption as Partial<DatePollOption>;
-            return !!(option.startDate && option.endDate);
-        }
-        else if (poll.type === "HousingPoll") {
-            const option = newOption as Partial<HousingPollOption>;
-            return !!option.title;
-        }
-        else {
-            const option = newOption as Partial<OtherPollOption>;
-            return !!option.value;
-        }
     };
 
     return (
@@ -98,73 +90,88 @@ export function AddOptionModal({ open, onClose, poll, onAdd, isLoading }: AddOpt
                                 <Text className="text-sm font-medium mb-1 dark:text-gray-300">
                                     Date de début
                                 </Text>
-                                <TextInput
-                                    className="border border-gray-300 dark:border-gray-600 rounded-lg p-3 bg-white dark:bg-gray-700 text-black dark:text-white"
-                                    placeholder="JJ/MM/AAAA"
-                                    value={newOption.startDate as string || ""}
-                                    onChangeText={(t) => setNewOption({ ...newOption, startDate: t })}
-                                />
-                            </View>
-                            <View>
-                                <Text className="text-sm font-medium mb-1 dark:text-gray-300">
-                                    Date de fin
-                                </Text>
-                                <TextInput
-                                    className="border border-gray-300 dark:border-gray-600 rounded-lg p-3 bg-white dark:bg-gray-700 text-black dark:text-white"
-                                    placeholder="JJ/MM/AAAA"
-                                    value={newOption.endDate as string || ""}
-                                    onChangeText={(t) => setNewOption({ ...newOption, endDate: t })}
+                                <FormText
+                                    control={control}
+                                    name="startDate"
+                                    rules={{
+                                        required: true
+                                    }}
                                 />
                             </View>
                         </View>
                     )}
 
                     {poll.type === "HousingPoll" && (
-                        <View className="gap-4">
-                            <View>
-                                <Text className="text-sm font-medium mb-1 dark:text-gray-300">
-                                    Titre
-                                </Text>
-                                <TextInput
-                                    className="border border-gray-300 dark:border-gray-600 rounded-lg p-3 bg-white dark:bg-gray-700 text-black dark:text-white"
-                                    placeholder="Titre du logement"
-                                    value={newOption.title as string || ""}
-                                    onChangeText={(t) => setNewOption({ ...newOption, title: t })}
-                                />
-                            </View>
-                            <View>
-                                <Text className="text-sm font-medium mb-1 dark:text-gray-300">
-                                    URL de l'image
-                                </Text>
-                                <TextInput
-                                    className="border border-gray-300 dark:border-gray-600 rounded-lg p-3 bg-white dark:bg-gray-700 text-black dark:text-white"
-                                    placeholder="https://..."
-                                    value={newOption.image as string || ""}
-                                    onChangeText={(t) => setNewOption({ ...newOption, image: t })}
-                                />
-                            </View>
-                            <View>
-                                <Text className="text-sm font-medium mb-1 dark:text-gray-300">
-                                    URL du logement
-                                </Text>
-                                <TextInput
-                                    className="border border-gray-300 dark:border-gray-600 rounded-lg p-3 bg-white dark:bg-gray-700 text-black dark:text-white"
-                                    placeholder="https://..."
-                                    value={newOption.url as string || ""}
-                                    onChangeText={(t) => setNewOption({ ...newOption, url: t })}
-                                />
-                            </View>
-                            <View>
-                                <Text className="text-sm font-medium mb-1 dark:text-gray-300">
-                                    Icône (emoji)
-                                </Text>
-                                <TextInput
-                                    className="border border-gray-300 dark:border-gray-600 rounded-lg p-3 bg-white dark:bg-gray-700 text-black dark:text-white"
-                                    placeholder="🏠"
-                                    value={newOption.icon as string || ""}
-                                    onChangeText={(t) => setNewOption({ ...newOption, icon: t })}
-                                />
-                            </View>
+                        <View className="">
+                            {postLinkPreview.isPending ?
+                                <Animated.View entering={BounceIn}
+                                    exiting={BounceOut}>
+                                    <Skeleton height={40} />
+                                </Animated.View>
+                                :
+                                <Animated.View entering={BounceIn}
+                                    exiting={BounceOut}>
+                                    {option?.image && (
+                                        <Button onPress={() => console.log(option.url)}>
+                                            <ImageBackground
+                                                source={option.image}
+                                                style={{
+                                                    height: 200,
+                                                    width: "100%",
+                                                    flex: 1,
+                                                    alignItems: "flex-end",
+                                                    borderRadius: "inherit"
+                                                }}
+                                                className="rounded-t-full"
+                                                contentFit="cover"
+                                            >
+                                                <View className="flex-1 items-end p-2">
+                                                    <View className="flex-1 justify-between">
+                                                        <Pressable
+                                                            onPress={() => reset({ url: "" })}
+                                                            className="p-2 bg-white/80  w-11 rounded-full items-center shadow-md border border-gray-300"
+                                                        >
+                                                            <IconSymbol name="trash" color="red" size={20} />
+                                                        </Pressable>
+                                                        {option.icon && (
+                                                            <View>
+                                                                <Image
+                                                                    source={option.icon}
+                                                                    style={{
+                                                                        width: 40,
+                                                                        height: 40,
+                                                                        borderRadius: 10
+                                                                    }}
+                                                                />
+                                                            </View>
+                                                        )}
+                                                    </View>
+                                                </View>
+                                            </ImageBackground>
+                                        </Button>
+                                    )}
+                                </Animated.View>
+                            }
+
+
+
+                            {option?.title ? (
+                                <View className="mx-1 px-3 pb-2">
+                                    <Text className="font-bold text-lg dark:text-white">
+                                        {option.title}
+                                    </Text>
+                                </View>
+                            ) :
+                                <View className="p-3">
+                                    <FormLink
+                                        control={control}
+                                        name="url"
+                                        placeholder="Colle un lien Airbnb, Abritel, Booking..."
+                                        pattern={/^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?$/i}
+                                        onPaste={handlePasteLink}
+                                    />
+                                </View>
+                            }
                         </View>
                     )}
 
@@ -173,11 +180,14 @@ export function AddOptionModal({ open, onClose, poll, onAdd, isLoading }: AddOpt
                             <Text className="text-sm font-medium mb-1 dark:text-gray-300">
                                 Option
                             </Text>
-                            <TextInput
-                                className="border border-gray-300 dark:border-gray-600 rounded-lg p-3 bg-white dark:bg-gray-700 text-black dark:text-white"
+                            <FormText
+                                control={control}
                                 placeholder="Nouvelle option"
-                                value={newOption.value as string || ""}
-                                onChangeText={(t) => setNewOption({ ...newOption, value: t })}
+                                name="value"
+                                rules={{
+                                    required: true,
+                                    maxLength: 255
+                                }}
                             />
                         </View>
                     )}
@@ -185,8 +195,8 @@ export function AddOptionModal({ open, onClose, poll, onAdd, isLoading }: AddOpt
                     {/* Submit button */}
                     <Button
                         title="Ajouter"
-                        onPress={handleSubmit}
-                        disabled={!isValid()}
+                        icon="plus"
+                        onPress={handleSubmit(onSubmit)}
                         variant="contained"
                         isLoading={isLoading}
                     />

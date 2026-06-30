@@ -4,86 +4,184 @@ import useColors from "@/hooks/styles/useColors";
 import { getDatesBetween } from "@/lib/utils";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
-import { useFieldArray } from "react-hook-form";
+import { useFieldArray, useWatch } from "react-hook-form";
 import { Modal, Pressable, Text, View } from "react-native";
 import { Calendar } from "react-native-calendars";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import Animated, { SlideInUp, SlideOutDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "../ui/Button";
 import { IconSymbol } from "../ui/IconSymbol";
 
+export const DateOptionItem = ({
+    control,
+    index,
+    onDateSelect,
+    onRemove
+}: {
+    control: any;
+    index: number;
+    onDateSelect: (index: number) => void;
+    onRemove: () => void;
+}) => {
+    const option = useWatch({ control, name: `options[${index}]` });
+    const { formatRange } = useI18nTime();
 
+    const hasDates = option.startDate && option.endDate;
 
-
+    return (
+        <Animated.View
+            entering={SlideInUp}
+            exiting={SlideOutDown}
+            key={option.id}
+            className="flex-row items-center bg-gray-50 dark:bg-gray-700 rounded-lg p-3 gap-2"
+        >
+            <Pressable
+                onPress={() => onDateSelect(index)}
+                className="flex-1"
+            >
+                {hasDates ? (
+                    <View className="flex-row items-center gap-2">
+                        <IconSymbol name="calendar" color="#3b82f6" size={18} />
+                        <Text className="text-sm dark:text-white">
+                            {formatRange(dayjs(option.startDate), dayjs(option.endDate))}
+                        </Text>
+                    </View>
+                ) : (
+                    <View className="flex-row items-center gap-2">
+                        <IconSymbol name="calendar" color="gray" size={18} />
+                        <Text className="text-sm text-gray-500 dark:text-gray-400">
+                            Sélectionner des dates
+                        </Text>
+                    </View>
+                )}
+            </Pressable>
+            {hasDates && (
+                <Pressable
+                    onPress={onRemove}
+                    className="p-2 rounded-full hover:bg-red-50"
+                >
+                    <IconSymbol name="trash" color="#ef4444" size={20} />
+                </Pressable>
+            )}
+        </Animated.View>
+    );
+};
 
 export const DatesPollOptionsForm = ({ control }: { control: any }) => {
-
-
-    const [openModal, setOpenModal] = useState(false);
-
-    const colors = useColors();
-
-    const { fields: options, append, remove } = useFieldArray({
-        control,
-        name: "options",
-    })
-
+    const [calendarIndex, setCalendarIndex] = useState<number | null>(null);
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
 
-
+    const colors = useColors();
     const { formatRange } = useI18nTime();
 
+    const { fields: options, append, remove, update } = useFieldArray({
+        control,
+        name: "options",
+    });
+
+    // Add default option on mount
     useEffect(() => {
-        if (!openModal) {
-            setEndDate("");
-            setStartDate("");
+        if (options.length === 0) {
+            append({ startDate: "", endDate: "" });
         }
-    }, [openModal, setStartDate, setEndDate]);
+    }, [options.length, append]);
+
+    const handleDateSelect = (index: number) => {
+        setCalendarIndex(index);
+        // Pre-fill with existing dates if editing
+        if (options[index]?.startDate) {
+            setStartDate(dayjs(options[index].startDate).format("YYYY-MM-DD"));
+            setEndDate(dayjs(options[index].endDate).format("YYYY-MM-DD"));
+        } else {
+            setStartDate("");
+            setEndDate("");
+        }
+    };
+
+    const handleSaveDates = () => {
+        if (calendarIndex !== null && startDate && endDate) {
+            update(calendarIndex, {
+                startDate: dayjs(startDate).toISOString(),
+                endDate: dayjs(endDate).toISOString()
+            });
+        }
+        setCalendarIndex(null);
+    };
+
+    const markedDates = {
+        ...(startDate && {
+            [startDate]: {
+                startingDay: true,
+                color: colors.calendarPrimary,
+                textColor: colors.neutral,
+                selected: true,
+                disableTouchEvent: true
+            }
+        }),
+        ...(endDate && {
+            [endDate]: {
+                endingDay: true,
+                color: colors.calendarPrimary,
+                textColor: colors.neutral,
+                selected: true,
+                disableTouchEvent: true
+            }
+        }),
+        ...(getDatesBetween(dayjs(startDate), dayjs(endDate))
+            .reduce((acc: Record<string, any>, date) => {
+                acc[date] = {
+                    color: colors.neutral,
+                    textColor: colors.text,
+                    selected: true,
+                    disableTouchEvent: true
+                };
+                return acc;
+            }, {} as Record<string, any>))
+    };
 
     return (
-        <View>
+        <View className="gap-3">
+            {options.map((option, index) => (
+                <DateOptionItem
+                    key={option.id}
+                    control={control}
+                    index={index}
+                    onDateSelect={handleDateSelect}
+                    onRemove={() => remove(index)}
+                />
+            ))}
 
-            <View className="gap-5 m-2">
-                {options.map((option, index) => (
-                    <View
-                        key={option.id}
-                        className="flex-row items-center gap-2">
-                        <Text className="flex-1 capitalize text-sm dark:text-white bg-white dark:bg-gray-900 border border-gray-600 dark:border-gray-200 rounded-xl p-3">
-                            {formatRange(dayjs(option.startDate), dayjs(option.endDate))}
-                        </Text>
-                        <Pressable onPress={() => remove(index)} className="flex items-center">
-                            <IconSymbol name="xmark" color="gray" />
-                        </Pressable>
-                    </View>
-                ))}
-            </View>
+            <Button
+                onPress={() => append({ startDate: "", endDate: "" })}
+                className="mt-3 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg justify-start"
+            >
+                <IconSymbol name="plus.circle.fill" color="#3b82f6" size={20} />
+                <Text className="text-blue-600 dark:text-blue-400 font-medium ml-2">
+                    Ajouter une option
+                </Text>
+            </Button>
 
-            <Pressable
-                onPress={() => setOpenModal(true)}
-                className="my-3 flex-row items-center justify-center rounded-full bg-blue-200  p-2">
-                <IconSymbol name="plus" color="black" />
-                <Text>Ajouter une option</Text>
-            </Pressable>
-
-
-            <Modal visible={openModal}
+            {/* Calendar Modal */}
+            <Modal
+                visible={calendarIndex !== null}
                 animationType="slide"
                 transparent={false}
-                onRequestClose={() => setOpenModal(false)}
-                allowSwipeDismissal>
+                onRequestClose={() => setCalendarIndex(null)}
+            >
                 <SafeAreaView style={{
                     ...styles.container,
                     padding: 10,
                     backgroundColor: colors.background
                 }}>
-                    <Pressable onPress={() => setOpenModal(false)}>
-                        <Text className="dark:text-white text-xl mb-5">Fermer</Text>
-                    </Pressable>
+                    <View className="flex-row justify-between items-center mb-5">
+                        <Pressable onPress={() => setCalendarIndex(null)}>
+                            <Text className="dark:text-white text-xl">Annuler</Text>
+                        </Pressable>
+                    </View>
 
-
-                    <Text>
-                        Choisis une date de début et de fin
+                    <Text className="mb-4 dark:text-white">
+                        Sélectionne une date de début et de fin
                     </Text>
 
                     <Calendar
@@ -106,7 +204,6 @@ export const DatesPollOptionsForm = ({ control }: { control: any }) => {
                             monthTextColor: colors.text,
                             indicatorColor: colors.text,
                         }}
-                        // initialDate={startDate}
                         markingType="period"
                         onDayPress={({ dateString }) => {
                             if (!startDate) {
@@ -116,58 +213,30 @@ export const DatesPollOptionsForm = ({ control }: { control: any }) => {
                                 setEndDate("");
                                 setStartDate(dateString);
                             } else {
-                                setEndDate(dateString)
+                                setEndDate(dateString);
                             }
                         }}
-                        markedDates={{
-                            ...(startDate && {
-                                [startDate]: {
-                                    startingDay: true,
-                                    color: colors.calendarPrimary,
-                                    textColor: colors.neutral,
-                                    selected: true,
-                                    disableTouchEvent: true
-                                }
-                            }),
-                            ...(endDate && {
-                                [endDate]: {
-                                    endingDay: true,
-                                    color: colors.calendarPrimary,
-                                    textColor: colors.neutral,
-                                    selected: true,
-                                    disableTouchEvent: true
-                                }
-                            }),
-                            ...(getDatesBetween(dayjs(startDate), dayjs(endDate))
-                                .reduce((acc: Record<string, any>, date) => {
-                                    acc[date] = {
-                                        color: colors.neutral,
-                                        textColor: colors.text,
-                                        selected: true,
-                                        disableTouchEvent: true
-                                    }
-                                    return acc;
-                                }, {} as Record<string, any>))
-                        }}
-                    // minDate={startDate && CalendarUtils.getCalendarDateString(startDate)}
+                        markedDates={markedDates}
+                        renderArrow={(direction) => (
+                            <IconSymbol
+                                name={direction === 'left' ? 'chevron.left' : 'chevron.right'}
+                                size={24}
+                                color={colors.primary}
+                            />
+                        )}
                     />
+                    {(startDate && endDate) && (
+                        <View className="my-4">
 
-
-                    {(startDate && endDate) &&
-                        <Animated.View entering={FadeIn}
-                            exiting={FadeOut}
-                            className="mx-2 my-5">
-                            <Button variant="contained" title="Ajouter" onPress={() => {
-                                append({
-                                    startDate: dayjs(startDate).toISOString(),
-                                    endDate: dayjs(endDate).toISOString()
-                                });
-                                setOpenModal(false);
-                            }} />
-                        </Animated.View>
-                    }
+                            <Button
+                                title="Enregistrer"
+                                onPress={handleSaveDates}
+                                variant="contained"
+                            />
+                        </View>
+                    )}
                 </SafeAreaView>
             </Modal>
         </View>
-    )
-}
+    );
+};
