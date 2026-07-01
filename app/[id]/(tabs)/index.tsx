@@ -103,7 +103,7 @@ export default function ItemDetails() {
         router.push({ pathname: "/[id]/share", params: { id: String(id) } })
     }
 
-    const otherUsers = trip?.users?.filter(u => u._id !== me?._id) || [];
+    const otherUsers = me ? trip?.users?.filter(u => u._id !== me._id) || [] : [];
     const displayUsers = otherUsers.slice(0, 5);
     const hasMore = otherUsers.length > 5;
 

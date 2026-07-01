@@ -75,13 +75,16 @@ export const DatesPollOptionsForm = ({ control }: { control: any }) => {
     const colors = useColors();
     const { formatRange } = useI18nTime();
 
-    const formState = useFormState({ control });
     const { fields: options, append, remove, update } = useFieldArray<{ startDate?: string; endDate?: string }>({
         control,
         name: "options",
         rules: {
-            validate: value => value.every(opt => opt.startDate && opt.endDate) || "All options need dates"
+            validate: (value) =>  value.every(opt => opt.startDate && opt.endDate) || "options.error"
         }
+    });
+    const formState = useFormState({
+        control,
+        name: "options"
     });
 
     // Add default option on mount
@@ -155,8 +158,8 @@ export const DatesPollOptionsForm = ({ control }: { control: any }) => {
                     onRemove={() => remove(index)}
                 />
             ))}
-            {formState.errors.options?.message && (
-                <Text className="text-red-500 text-sm ml-2 m    t-1">
+            {formState.errors.options?.root && (
+                <Text className="text-red-500 text-sm ml-2 mt-1">
                     Toutes les options doivent avoir une date de début et une date de fin
                 </Text>
             )}
