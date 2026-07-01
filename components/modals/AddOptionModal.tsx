@@ -120,7 +120,6 @@ export function AddOptionModal({ open, onClose, poll, onAdd, isLoading }: AddOpt
                                                     width: "100%",
                                                     flex: 1,
                                                     alignItems: "flex-end",
-                                                    borderRadius: "inherit"
                                                 }}
                                                 className="rounded-t-full"
                                                 contentFit="cover"

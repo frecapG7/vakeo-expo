@@ -84,7 +84,7 @@ const PollsWidget = ({ trip, user, onClick }: { trip: Trip, user: TripUser, onCl
 
 export default function ItemDetails() {
 
-    const { id } = useGlobalSearchParams<{id: string}>();
+    const { id } = useGlobalSearchParams<{ id: string }>();
     const { data: trip } = useGetTrip(id, true);
     const { me } = useContext(TripContext);
     const { data: goodsCount } = useGetGoodsCount(id);
@@ -102,6 +102,10 @@ export default function ItemDetails() {
         bottomSheetModalRef.current?.close();
         router.push({ pathname: "/[id]/share", params: { id: String(id) } })
     }
+
+    const otherUsers = trip?.users?.filter(u => u._id !== me?._id) || [];
+    const displayUsers = otherUsers.slice(0, 5);
+    const hasMore = otherUsers.length > 5;
 
     if (!trip)
         return (
@@ -168,37 +172,30 @@ export default function ItemDetails() {
                             </View>
                         </ImageBackground>
                     </View>
-
-
                     <View className="shadow mx-4 -mt-10 mb-5 px-2 pt-4 rounded-xl gap-5 bg-white dark:bg-gray-900 flex" >
-                        <Button className="px-5 gap-2" onPress={() =>
-                            router.push({
-                                pathname: "/[id]/attendees",
-                                params: {
-                                    id: String(id)
-                                }
-                            })
-                        }>
+                        <View className="gap-1">
                             <Text className="text-4xl font-bold dark:text-white" numberOfLines={2}>{trip?.name}</Text>
-                            <View className="flex gap-1 items-start justify-start">
-                                <AvatarsGroup
-                                    maxLength={5}
-                                    size2="sm"
-                                    avatars={trip?.users?.filter(u => u._id !== me?._id).map(u => ({
-                                        avatar: u?.avatar,
-                                        alt: u?.name?.charAt(0)
-                                    })
-                                    )}
-                                />
-                                <Text numberOfLines={1} className="flex dark:text-white">
-                                    Avec {trip?.users
-                                        ?.filter(u => u._id !== me?._id)
-                                        .map(u => u.name)
-                                        .join(", ")}
-
-                                </Text>
-                            </View>
-                        </Button>
+                            <Button className="" onPress={() =>
+                                router.push({
+                                    pathname: "/[id]/attendees",
+                                    params: { id: String(id) }
+                                })
+                            }>
+                                <View className="gap-1 flex-1 items-start">
+                                    <AvatarsGroup
+                                        maxLength={5}
+                                        size2="sm"
+                                        avatars={otherUsers.map(u => ({
+                                            avatar: u?.avatar,
+                                            alt: u?.name?.charAt(0)
+                                        }))}
+                                    />
+                                    <Text numberOfLines={1} ellipsizeMode="tail" className="dark:text-white text-sm">
+                                        Avec {displayUsers.map(u => u.name).join(", ")}{hasMore && "..."}
+                                    </Text>
+                                </View>
+                            </Button>
+                        </View>
                         <View className="flex my-5 gap-3">
                             <TripActionCard
                                 icon={{
@@ -287,7 +284,7 @@ export default function ItemDetails() {
                         <BottomSheetView style={{ flex: 1, padding: 10, minHeight: 150 }}>
                             <View className="flex flex-grow gap-5 p-1 divide-y-5 divide-solid dark:divide-white">
                                 <Button onPress={handleShare}
-                                     className="flex flex-row gap-5 items-center" >
+                                    className="flex flex-row gap-5 items-center" >
                                     <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
                                         <Animated.View entering={FadeIn} exiting={FadeOut}>
                                             <IconSymbol name="doc.on.doc" size={30} />

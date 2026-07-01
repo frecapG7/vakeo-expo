@@ -4,12 +4,12 @@ import useColors from "@/hooks/styles/useColors";
 import { getDatesBetween } from "@/lib/utils";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
-import { useFieldArray, useWatch } from "react-hook-form";
+import { useFieldArray, useFormState, useWatch } from "react-hook-form";
 import { Modal, Pressable, Text, View } from "react-native";
-import { Calendar } from "react-native-calendars";
 import Animated, { SlideInUp, SlideOutDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "../ui/Button";
+import { DateRangeCalendar } from "../ui/DateRangeCalendar";
 import { IconSymbol } from "../ui/IconSymbol";
 
 export const DateOptionItem = ({
@@ -42,7 +42,7 @@ export const DateOptionItem = ({
                 {hasDates ? (
                     <View className="flex-row items-center gap-2">
                         <IconSymbol name="calendar" color="#3b82f6" size={18} />
-                        <Text className="text-sm dark:text-white">
+                        <Text className="text-sm dark:text-white capitalize">
                             {formatRange(dayjs(option.startDate), dayjs(option.endDate))}
                         </Text>
                     </View>
@@ -75,9 +75,13 @@ export const DatesPollOptionsForm = ({ control }: { control: any }) => {
     const colors = useColors();
     const { formatRange } = useI18nTime();
 
-    const { fields: options, append, remove, update } = useFieldArray({
+    const formState = useFormState({ control });
+    const { fields: options, append, remove, update } = useFieldArray<{ startDate?: string; endDate?: string }>({
         control,
         name: "options",
+        rules: {
+            validate: value => value.every(opt => opt.startDate && opt.endDate) || "All options need dates"
+        }
     });
 
     // Add default option on mount
@@ -151,7 +155,11 @@ export const DatesPollOptionsForm = ({ control }: { control: any }) => {
                     onRemove={() => remove(index)}
                 />
             ))}
-
+            {formState.errors.options?.message && (
+                <Text className="text-red-500 text-sm ml-2 m    t-1">
+                    Toutes les options doivent avoir une date de début et une date de fin
+                </Text>
+            )}
             <Button
                 onPress={() => append({ startDate: "", endDate: "" })}
                 className="mt-3 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg justify-start"
@@ -184,46 +192,13 @@ export const DatesPollOptionsForm = ({ control }: { control: any }) => {
                         Sélectionne une date de début et de fin
                     </Text>
 
-                    <Calendar
-                        enableSwipeMonths
-                        theme={{
-                            backgroundColor: colors.calendarBackground,
-                            calendarBackground: colors.calendarBackground,
-                            textSectionTitleColor: colors.text,
-                            dayTextColor: colors.text,
-                            textSectionTitleDisabledColor: '#d9e1e8',
-                            selectedDayBackgroundColor: '#fdb140',
-                            selectedDayTextColor: colors.primary,
-                            todayTextColor: '#00adf5',
-                            todayBackgroundColor: '#a2daf1ff',
-                            textDisabledColor: '#828485ff',
-                            dotColor: '#00adf5',
-                            selectedDotColor: '#ffffff',
-                            arrowColor: 'orange',
-                            disabledArrowColor: '#d9e1e8',
-                            monthTextColor: colors.text,
-                            indicatorColor: colors.text,
+                    <DateRangeCalendar
+                        startDate={startDate}
+                        endDate={endDate}
+                        onChange={({ startDate: newStart, endDate: newEnd }) => {
+                            setStartDate(newStart);
+                            setEndDate(newEnd);
                         }}
-                        markingType="period"
-                        onDayPress={({ dateString }) => {
-                            if (!startDate) {
-                                setEndDate("");
-                                setStartDate(dateString);
-                            } else if (endDate) {
-                                setEndDate("");
-                                setStartDate(dateString);
-                            } else {
-                                setEndDate(dateString);
-                            }
-                        }}
-                        markedDates={markedDates}
-                        renderArrow={(direction) => (
-                            <IconSymbol
-                                name={direction === 'left' ? 'chevron.left' : 'chevron.right'}
-                                size={24}
-                                color={colors.primary}
-                            />
-                        )}
                     />
                     {(startDate && endDate) && (
                         <View className="my-4">

@@ -58,7 +58,7 @@ export const PollOption = ({
                         ) : includeUser ? (
                             <IconSymbol
                                 name="checkmark.circle.fill"
-                                color="blue"
+                                color="#3b82f6"
                                 size={22}
                             />
                         ) : null}
@@ -66,7 +66,7 @@ export const PollOption = ({
 
                     {/* Label - improved typography */}
                     <Text
-                        className="text-md capitalize flex-1 dark:text-white"
+                        className="text-sm capitalize flex-1 dark:text-white"
                         numberOfLines={2}
                         ellipsizeMode="tail"
                     >
