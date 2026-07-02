@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
+import { TripContext } from "@/context/TripContext";
 import { useGetTrip } from "@/hooks/api/useTrips";
 import { useDeleteTripStop, useGetTripStops, usePostTripStop, usePutTripStop } from "@/hooks/api/useTripStop";
 import dayjs from "@/lib/dayjs-config";
 import { TripStop } from "@/types/models";
 import { Image } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Alert, Modal, Pressable, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { SlideInRight, SlideOutRight } from "react-native-reanimated";
@@ -20,23 +21,22 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TripLocation() {
 
-
     const { id } = useLocalSearchParams();
     const { data: trip } = useGetTrip(id);
 
-
     const [selectedTripStop, setSelectedTripStop] = useState<TripStop | undefined>();
-
 
     const now = dayjs();
 
     const [openModal, setOpenModal] = useState(false);
     const [openLocationWizard, setOpenLocationWizard] = useState(false);
 
+    const { me } = useContext(TripContext);
+
     const { data: tripStops, isLoading, isRefetching, refetch } = useGetTripStops(id);
-    const postTripStop = usePostTripStop(id);
-    const putTripStop = usePutTripStop(id);
-    const deleteTripStop = useDeleteTripStop(id);
+    const postTripStop = usePostTripStop(id, me?._id);
+    const putTripStop = usePutTripStop(id, me?._id);
+    const deleteTripStop = useDeleteTripStop(id, me?._id);
 
 
     const onDelete = (tripStop: TripStop) => {
@@ -60,81 +60,106 @@ export default function TripLocation() {
                     className="flex-1"
                     data={tripStops}
                     keyExtractor={(i) => i?._id}
-                    renderItem={({ item, index }) =>
-                        <Animated.View className="mx-2 mb-3">
-                            <View className="flex-row justify-between items-end my-2 ">
-                                <Text className="text-2xl dark:text-white ml-4 font-bold "
-                                    onLongPress={() => {
-                                        setSelectedTripStop(item);
-                                        setOpenModal(true);
-                                    }}>
-                                    {item.name}
-                                </Text>
-                                <View className="flex-row gap-4 mx-5 items-center">
-                                    <Button
+                    renderItem={({ item, index }) => {
+                        const openPollsCount = item.polls?.filter(poll => !poll.isClosed).length || 0;
+                        return (
+                            <Animated.View className="mx-2 mb-3">
+                                {/* Header with name and badge */}
+                                <View className="flex-row justify-between items-center my-2">
+                                    <View className="flex-row items-center gap-3">
+                                        <Text
+                                            className="text-2xl dark:text-white font-bold"
+                                            onLongPress={() => {
+                                                setSelectedTripStop(item);
+                                                setOpenModal(true);
+                                            }}
+                                        >
+                                            {item.name}
+                                        </Text>
+                                        {openPollsCount > 0 && (
+                                            <View className={`rounded-full px-2 py-0.5 min-w-[24px] items-center justify-center ${item.polls?.filter(p => !p.isClosed)
+                                                    .every(poll => poll.hasSelected?.some(user => user._id === me?._id))
+                                                    ? 'bg-green-500'
+                                                    : 'bg-red-500'
+                                                }`}>
+                                                <Text className="text-white text-xs font-bold">
+                                                    {openPollsCount}
+                                                </Text>
+                                            </View>
+                                        )}
+                                    </View>
+
+                                    <View className="flex-row gap-3 mx-2">
+                                        <Button
+                                            onPress={() => {
+                                                setSelectedTripStop(item);
+                                                setOpenModal(true);
+                                            }}
+                                            className="p-2 rounded-full border border-blue-400 bg-blue-100 dark:bg-blue-900/30"
+                                        >
+                                            <IconSymbol name="pencil" color="blue" size={18} />
+                                        </Button>
+                                        <Button
+                                            onPress={() => onDelete(item)}
+                                            className="p-2 rounded-full border border-red-400 bg-white dark:bg-gray-900"
+                                        >
+                                            <IconSymbol name="trash.fill" color="red" size={18} />
+                                        </Button>
+                                    </View>
+                                </View>
+
+                                {/* Card body with improved styling */}
+                                <View className="p-3 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 rounded-xl shadow-sm">
+                                    {/* Location Section */}
+                                    <Pressable
                                         onPress={() => {
                                             setSelectedTripStop(item);
-                                            setOpenModal(true);
+                                            setOpenLocationWizard(true)
                                         }}
-                                        className="p-1 rounded-full border border-blue-400 bg-blue-100 ">
-                                        <IconSymbol
-                                            name="pencil"
-                                            color="blue"
-                                            size={18} />
-                                    </Button>
-                                    <Button
-                                        onPress={() => onDelete(item)}
-                                        className="p-1 rounded-full border border-red-400 bg-white dark:bg-gray-900">
-                                        <IconSymbol
-                                            name="trash.fill"
-                                            color="red"
-                                            size={18} />
-                                    </Button>
-                                </View>
-                            </View>
-                            <View className="p-2 border-b-2 border-l-1 border-r-1 border-orange-400 bg-white  dark:bg-gray-900 rounded-xl">
-                                <Pressable onPress={() => {
-                                    setSelectedTripStop(item);
-                                    setOpenLocationWizard(true)
-                                }}>
-                                    <Animated.View
-                                        entering={SlideInRight}
-                                        exiting={SlideOutRight}
-                                        className="flex-row p-2 items-center gap-4"
+                                        className="mb-2"
                                     >
-                                        <View className="p-2 rounded-full bg-orange-100 dark:bg-orange-900/30">
-                                            <IconSymbol name="mappin" size={24} color="orange" />
+                                        <Animated.View
+                                            entering={SlideInRight}
+                                            exiting={SlideOutRight}
+                                            className="flex-row p-2 items-center gap-4"
+                                        >
+                                            <View className="p-2 rounded-full bg-orange-100 dark:bg-orange-900/30">
+                                                <IconSymbol name="mappin" size={24} color="orange" />
+                                            </View>
+                                            <View className="flex-1 flex-shrink py-2 border-b border-gray-200 dark:border-gray-700">
+                                                <Text className="text-gray-600 dark:text-gray-400" numberOfLines={2}>
+                                                    {item?.location ? item?.location?.displayName : "Ajouter une adresse"}
+                                                </Text>
+                                            </View>
+                                        </Animated.View>
+                                    </Pressable>
 
-                                        </View>
-                                        <View className="flex-1 flex-shrink py-2 border-b border-gray-200">
-                                            <Text className="text-gray-600 dark:text-gray-400" numberOfLines={4} ellipsizeMode="tail">
-                                                {item?.location ? item?.location?.displayName : "Ajouter une adresse"}
-                                            </Text>
-                                        </View>
-                                    </Animated.View>
-                                </Pressable>
-                                <Pressable onPress={() => {
-                                    setSelectedTripStop(item);
-                                    setOpenLocationWizard(true)
-                                }}>
-                                    <Animated.View
-                                        entering={SlideInRight}
-                                        exiting={SlideOutRight}
-                                        className="flex-row p-2 items-center gap-4"
+                                    {/* Accommodation Section */}
+                                    <Pressable
+                                        onPress={() => {
+                                            setSelectedTripStop(item);
+                                            setOpenLocationWizard(true)
+                                        }}
                                     >
-                                        <View className="p-2 rounded-full bg-orange-100 dark:bg-orange-900/30">
-                                            <IconSymbol name="house.fill" size={24} color="orange" />
-                                        </View>
-                                        <View className="flex-shrink py-2 items-center">
-                                            <Text className="text-gray-600 dark:text-gray-400" numberOfLines={4} ellipsizeMode="tail">
-                                                {item?.accommodation ? item?.accommodation?.title : "Ajouter un hébergement"}
-                                            </Text>
-                                        </View>
-                                    </Animated.View>
-                                </Pressable>
-                            </View>
-                        </Animated.View>
-                    }
+                                        <Animated.View
+                                            entering={SlideInRight}
+                                            exiting={SlideOutRight}
+                                            className="flex-row p-2 items-center gap-4"
+                                        >
+                                            <View className="p-2 rounded-full bg-orange-100 dark:bg-orange-900/30">
+                                                <IconSymbol name="house.fill" size={24} color="orange" />
+                                            </View>
+                                            <View className="flex-1 py-2">
+                                                <Text className="text-gray-600 dark:text-gray-400" numberOfLines={2}>
+                                                    {item?.accommodation ? item?.accommodation?.title : "Ajouter un hébergement"}
+                                                </Text>
+                                            </View>
+                                        </Animated.View>
+                                    </Pressable>
+                                </View>
+                            </Animated.View>
+                        )
+                    }}
                     ItemSeparatorComponent={() =>
                         <View className="flex h-14">
                             <Image
@@ -229,6 +254,12 @@ export default function TripLocation() {
                         }}
                         trip={trip}
                         tripStop={selectedTripStop}
+                        onSubmit={async (data) => {
+                            await putTripStop.mutateAsync(data);
+                            setSelectedTripStop(undefined);
+                            setOpenLocationWizard(false);
+                        }}
+                        isSubmitting={putTripStop.isPending}
                     />
                 }
 

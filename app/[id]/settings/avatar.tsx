@@ -32,7 +32,7 @@ const avatars = [
 export default function AvatarSetting() {
 
     const router = useRouter();
-    const { id } = useLocalSearchParams();
+    const { id } = useLocalSearchParams<{id : string}>();
     const { me: user } = useContext(TripContext);
 
     const { data: trip } = useGetTrip(id);
@@ -58,7 +58,7 @@ export default function AvatarSetting() {
     };
 
     const getUserNameForAvatar = (uri: string): string => {
-        const disabledUser = trip?.users.filter(u => u._id !== user._id)
+        const disabledUser = trip?.users.filter(u => u._id !== user?._id)
             ?.find(u => u.avatar === uri);
         if (disabledUser) {
             return disabledUser.name;

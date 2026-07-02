@@ -8,9 +8,10 @@ export default function PollDetailsLayout() {
         <Stack screenOptions={{
             headerShown: false
         }}>
-            <Stack.Screen name="index" options={{
-                headerShown: false
-            }} />
+            <Stack.Screen name="index"
+                options={{
+                    headerShown: false
+                }} />
         </Stack>
     )
 }
