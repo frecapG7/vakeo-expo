@@ -22,12 +22,8 @@ export default function TripMessages() {
     const messages = useMemo(() => data?.pages.flatMap((page) => page.messages), [data]);
 
     const onSend = useCallback(async (values: IMessage[]) => {
-        const newMessage = await postMessage.mutateAsync(values[0]);
-        GiftedChat.append(messages,
-            [newMessage],
-            Platform.OS !== "web"
-        );
-    }, []);
+        await postMessage.mutateAsync(values[0]);
+    }, [postMessage]);
 
 
     const insets = useSafeAreaInsets();
@@ -59,10 +55,6 @@ export default function TripMessages() {
                         );
                     }
                     }
-                    timeTextStyle={{
-                        left: { color: 'red' },
-                        right: { color: 'yellow' },
-                    }}
                     placeholder="Aa"
                     maxInputLength={250}
                     loadEarlier={hasNextPage}
