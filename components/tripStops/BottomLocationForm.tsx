@@ -11,16 +11,14 @@ import { IconSymbol } from "../ui/IconSymbol";
 
 interface LocationSearchProps {
     control: Control<TripStop>;
-    onCancel: () => void;
-    onSubmit: () => Promise<void>;
 }
 
-export const BottomLocationForm = ({ control, onCancel, onSubmit }: LocationSearchProps) => {
+export const BottomLocationForm = ({ control}: LocationSearchProps) => {
     const [input, setInput] = useState<string>("");
     const [enableQuery, setEnableQuery] = useState<boolean>(false);
 
 
-    const { isDirty, isSubmitting } = useFormState({
+    const { isSubmitting } = useFormState({
         control
     });
     const { field: { value: location, onChange: setLocation } } = useController({
@@ -33,7 +31,6 @@ export const BottomLocationForm = ({ control, onCancel, onSubmit }: LocationSear
     const [editMode, setEditMode] = useState(!location);
 
     useEffect(() => setEditMode(!location), [location]);
-
 
     const { inputPlaceHolder } = useColors();
     const { data: geocode, isSuccess } = useGeocode(input, enableQuery);
@@ -65,7 +62,6 @@ export const BottomLocationForm = ({ control, onCancel, onSubmit }: LocationSear
     const handleSubmitGeocode = () => {
         setLocation(geocode);
         setInput("");
-        onSubmit();
     };
 
 
@@ -93,13 +89,6 @@ export const BottomLocationForm = ({ control, onCancel, onSubmit }: LocationSear
                         </Text>
                     </View>
                 </Button>
-
-                <View className="flex-row justify-center items-center my-4 gap-4" >
-                    <Button
-                        variant="outlined"
-                        title="Annuler"
-                        onPress={onCancel} />
-                </View>
             </Animated.View>
         )
 
@@ -120,18 +109,12 @@ export const BottomLocationForm = ({ control, onCancel, onSubmit }: LocationSear
                         placeholderTextColor={inputPlaceHolder}
                         placeholder="Saisir le lieu ou le code postal"
                     />
-                    {editMode ? (
-                        <Pressable onPress={() => setEnableQuery(true)}>
-                            <IconSymbol name="magnifyingglass" color="blue" />
-                        </Pressable>
-                    ) : (
-                        <Pressable onPress={onMapClick}>
-                            <IconSymbol name="map" color="blue" />
-                        </Pressable>
-                    )}
+                    <Pressable onPress={() => setEnableQuery(true)}>
+                        <IconSymbol name="magnifyingglass" color="blue" />
+                    </Pressable>
                 </View>
             }
-            {editMode && geocode && (
+            {geocode && (
                 <Animated.View entering={SlideInLeft} exiting={SlideOutRight}>
                     <Pressable
                         onPress={handleSubmitGeocode}
@@ -144,13 +127,6 @@ export const BottomLocationForm = ({ control, onCancel, onSubmit }: LocationSear
                     </Pressable>
                 </Animated.View>
             )}
-            <View className="flex-row justify-center items-center my-4 gap-4" >
-                <Button
-                    variant="outlined"
-                    title="Annuler"
-                    disabled={isSubmitting}
-                    onPress={onCancel} />
-            </View>
         </View>
     );
 };

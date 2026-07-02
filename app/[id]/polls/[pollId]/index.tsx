@@ -1,3 +1,4 @@
+import { AddOptionModal } from "@/components/modals/AddOptionModal";
 import { PickUsersModal } from "@/components/modals/PickUsersModal";
 import { HousingOptions } from "@/components/polls/HousingOptions";
 import { PollOption } from "@/components/polls/PollOption";
@@ -7,182 +8,252 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
-import { useGetPoll, useUnvotePoll, useVotePoll } from "@/hooks/api/usePolls";
-import useI18nNumbers from "@/hooks/i18n/useI18nNumbers";
+import { useGetPoll, usePutPoll, useUnvotePoll, useVotePoll } from "@/hooks/api/usePolls";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import dayjs from "@/lib/dayjs-config";
+
+import { PollOption as Option } from "@/types/models";
 import { useLocalSearchParams } from "expo-router";
 import { useContext, useState } from "react";
 import { Text, View } from "react-native";
 import Animated from "react-native-reanimated";
-
-
-
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PollDetailsPage() {
-    const { id, pollId } = useLocalSearchParams();
-
+    const { id, pollId } = useLocalSearchParams<{ id: string, pollId: string }>();
 
     const { me } = useContext(TripContext);
     const { data: poll } = useGetPoll(id, pollId);
-
-    const votePoll = useVotePoll(id, pollId);
-    const unvotePoll = useUnvotePoll(id, pollId);
+    const updatePoll = usePutPoll(id, pollId, me?._id);
+    const votePoll = useVotePoll(id, pollId, me?._id);
+    const unvotePoll = useUnvotePoll(id, pollId, me?._id);
 
     const { formatDuration, formatRange } = useI18nTime();
 
-    const { formatPercent } = useI18nNumbers();
 
-    const [selectedOption, setSelectedOption] = useState(null);
+    const [selectedOption, setSelectedOption] = useState<Option | null>(null);
+    const [loadingOptionId, setLoadingOptionId] = useState<string | null>(null);
+    const [showAddOption, setShowAddOption] = useState(false);
+
+    const insets = useSafeAreaInsets();
 
     const handleClick = async (option: any, includeMe: boolean) => {
-        if (includeMe)
-            unvotePoll.mutateAsync({
-                option: option?._id,
-                user: me
-            })
-        else
-            await votePoll.mutateAsync({
-                options: [option?._id],
-                user: me
-            });
-
+        setLoadingOptionId(option._id);
+        try {
+            if (includeMe)
+                await unvotePoll.mutateAsync({
+                    option: option?._id,
+                })
+            else
+                await votePoll.mutateAsync({
+                    options: [option?._id],
+                });
+        } finally {
+            setLoadingOptionId(null);
+        }
     }
+
+    const handleUpdate = async (option: Option) => {
+        try {
+            await updatePoll.mutateAsync({ newOptions: [option] });
+            setShowAddOption(false);
+        } catch (error) {
+            // Leave modal open on error so user can retry
+        }
+    }
+
+    // Keep it case headerTitle is shown in stack
+    // useFocusEffect(
+    //     useCallback(() => {
+    //         navigation.setOptions({
+    //             title: poll?.question || 'Chargement...',
+    //             headerBackTitle: 'Retour',
+    //         });
+    //     }, [navigation, poll?.question])
+    // );
 
 
 
     if (!poll)
         return (
             <View style={styles.container}>
-                <View className="flex-row gap-2 items-center">
-                    <Skeleton variant="circular" />
-                    <View className="w-40">
-                        <Skeleton height={5} />
-
+                <View className="flex-row gap-3 items-center p-4">
+                    <Skeleton variant="circular" size="md" />
+                    <View className="flex-1 gap-2">
+                        <Skeleton height={8} width="60%" />
+                        <Skeleton height={6} width="40%" />
                     </View>
                 </View>
-                <View className="gap-5 my-5">
-                    <Skeleton height={40} />
-                    <Skeleton height={40} />
-                    <Skeleton height={40} />
-
+                <View className="gap-4 my-4 px-4">
+                    <Skeleton height={50} />
+                    <Skeleton height={50} />
+                    <Skeleton height={50} />
                 </View>
-
             </View>
         );
 
 
 
     return (
-        <Animated.ScrollView style={styles.container}>
-
-            <View className="flex-row gap-2 items-center my-2">
-                <Avatar src={poll?.createdBy?.avatar}
+        <Animated.ScrollView
+            style={{
+                ...styles.container,
+                marginBottom: insets.bottom
+            }}
+            showsVerticalScrollIndicator={false}
+        >
+            {/* Enhanced Header */}
+            <View className="flex-row gap-3 items-center p-4">
+                <Avatar
+                    src={poll?.createdBy?.avatar}
                     alt={poll?.createdBy?.name?.charAt(0)}
                     size2="md"
                 />
-                <View>
+                <View className="flex-1">
                     <Text className="font-bold text-lg dark:text-white">
                         {poll?.createdBy?.name}
                     </Text>
-                    <Text className="dark:text-white">{formatDuration(poll?.createdAt)}</Text>
+                    <View className="flex-row items-center gap-1">
+                        <IconSymbol name="clock" color="gray" size={14} />
+                        <Text className="text-sm text-gray-500 dark:text-gray-400">
+                            {formatDuration(poll?.createdAt)}
+                        </Text>
+                    </View>
                 </View>
             </View>
 
-            <View className="m-2 mb-10 rounded-xl p-2 border border-gray-200">
-                <View className="mb-5">
-                    <Text className="text-xl font-bold dark:text-white">
+            {/* Poll Card */}
+            <View className="m-2 mb-4 rounded-2xl p-4 border border-gray-200 dark:border-gray-600 shadow-sm bg-white dark:bg-gray-800"
+            >
+                {/* Question Section */}
+                <View className="mb-6">
+                    <Text className="text-2xl font-bold dark:text-white mb-2">
                         {poll?.question}
                     </Text>
-                    <Text className="text-gray-600 dark:text-gray-300 text-lg">
-                        {poll?.hasSelected.length} votes
-                    </Text>
+                    <View className="flex-row items-center gap-2">
+                        <View className="flex-row items-center">
+                            <IconSymbol name="person.2" color="orange" size={16} />
+                            <Text className="text-orange-600 dark:text-orange-400 font-medium ml-1">
+                                {poll?.hasSelected.length}
+                            </Text>
+                        </View>
+                        <Text className="text-gray-500 dark:text-gray-400">
+                            {poll?.hasSelected.length === 1 ? 'vote' : 'votes'}
+                        </Text>
+                    </View>
                 </View>
 
-
-
-                {poll?.type === "HousingPoll" &&
-                    <View className="mb-5">
+                {/* Options Section */}
+                {poll?.type === "HousingPoll" ? (
+                    <View className="mb-4">
                         <HousingOptions
                             poll={poll}
                             user={me}
                             onVote={(option) => handleClick(option, false)}
                             onUnVote={(option) => handleClick(option, true)}
-                            onSelected={(option) => setSelectedOption(option)} />
+                            onSelected={(option) => setSelectedOption(option)}
+                        />
                     </View>
-                }
-                {poll?.type !== "HousingPoll" &&
-                    <View className="gap-5 mb-5">
+                ) : (
+                    <View className="gap-4 mb-4">
                         {poll?.options?.map((option) => {
                             const includeMe = option?.selectedBy?.map(u => u._id).includes(me?._id);
-                            // const percent = Math.round(getPercent(option?.selectedBy?.length, poll?.hasSelected.length) * 100);
+                            const isLoading = loadingOptionId === option._id;
                             return (
                                 <Button
-                                    disabled={poll?.isClosed || votePoll?.isPending}
                                     key={option?._id}
+                                    disabled={poll?.isClosed || votePoll?.isPending || isLoading}
                                     onPress={() => handleClick(option, includeMe)}
                                     onLongPress={() => setSelectedOption(option)}
+                                    className={`rounded-xl border-2 ${includeMe
+                                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-800/30'
+                                        : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800'
+                                        }`}
                                 >
                                     <PollOption
-                                        label={poll?.type === "DatesPoll" ? 
-                                            formatRange(dayjs(option.startDate), dayjs(option.endDate)) :
-                                             option.value}
+                                        label={poll?.type === "DatesPoll"
+                                            ? formatRange(dayjs(option.startDate), dayjs(option.endDate))
+                                            : option.value}
                                         selectedBy={option.selectedBy}
                                         percent={option.percent}
                                         isAnonymous={poll.isAnonymous}
                                         includeUser={includeMe}
+                                        isLoading={isLoading}
                                     />
                                 </Button>
                             );
-
                         })}
                     </View>
-                }
+                )}
 
-
-                <View className="flex-row justify-between items-center my-2">
-                    <View className="flex-row items-center">
-                        <View className="flex-row -gap-1">
-                            <IconSymbol name="checkmark.circle.fill" color="gray" size={16} />
-                            {!poll?.isSingleAnswer &&
-                                <View className="-ml-1.5">
-                                    <IconSymbol name="checkmark.circle.fill" color="gray" size={16} />
-                                </View>
-                            }
-                        </View>
-                        <Text className="text-xs text-gray-500">
-                            Séléctionne {poll?.isSingleAnswer ? "une option" : "plusieurs options"}
+                {/* Poll Settings Footer */}
+                <View className="flex-row justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-600">
+                    <View className="flex-row items-center gap-2">
+                        {poll?.isSingleAnswer ? (
+                            <IconSymbol name="checkmark.circle.fill" color="gray" size={18} />
+                        ) : (
+                            <View className="flex-row">
+                                <IconSymbol name="checkmark.circle.fill" color="gray" size={18} />
+                                <IconSymbol name="checkmark.circle.fill" color="gray" size={18}  style={{ marginLeft: -6 }} />
+                            </View>
+                        )}
+                        <Text className="text-sm text-gray-500 dark:text-gray-400">
+                            {poll?.isSingleAnswer ? "Une option" : "Options multiples"}
                         </Text>
                     </View>
 
-
-
-                    <View className="flex-row gap-1 items-center" >
-                        <IconSymbol name={poll?.isAnonymous ? "eye.slash" : "eye"} color="gray" size={16} />
-                        <Text className="text-gray-500 text-xs">
+                    <View className="flex-row gap-1 items-center">
+                        <IconSymbol
+                            name={poll?.isAnonymous ? "eye.slash.fill" : "eye.fill"}
+                            color={poll?.isAnonymous ? "purple" : "green"}
+                            size={18}
+                        />
+                        <Text className="text-sm text-gray-500 dark:text-gray-400">
                             Vote {poll?.isAnonymous ? "anonyme" : "public"}
                         </Text>
                     </View>
                 </View>
+
+                {/* Closed Poll Indicator */}
+                {poll?.isClosed ? (
+                    <View className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-700">
+                        <View className="flex-row items-center gap-2">
+                            <IconSymbol name="lock.fill" color="amber" size={18} />
+                            <Text className="text-amber-700 dark:text-amber-300 font-medium">
+                                Sondage terminé
+                            </Text>
+                        </View>
+                    </View>)
+                    :
+                    <View className="mt-3">
+
+                        <Button variant="contained"
+                            size="small"
+                            icon="plus"
+                            title="Ajouter une option"
+                            onPress={() => setShowAddOption(true)}
+                        />
+                    </View>
+                }
             </View>
 
-            {/* <View className="mb-20 px-5">
-                <Pressable
-                    className="rounded-full bg-blue-400 py-4 flex items-center">
-                    <Text className="text-white font-bold">Modifier</Text>
-                </Pressable>
-            </View> */}
+            <AddOptionModal
+                open={showAddOption}
+                onClose={() => setShowAddOption(false)}
+                poll={poll}
+                onAdd={handleUpdate}
+                isLoading={updatePoll.isPending}
+            />
 
-
-
-            <PickUsersModal open={!!selectedOption && !poll.isAnonymous}
+            <PickUsersModal
+                open={!!selectedOption && !poll.isAnonymous}
                 onClose={() => setSelectedOption(null)}
-                users={selectedOption?.selectedBy}
+                users={selectedOption?.selectedBy || []}
                 disabled
                 title="Votants"
             />
         </Animated.ScrollView>
-    )
+    );
 
 
 }

@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/Button";
+import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
@@ -167,9 +168,11 @@ export default function DatesPage() {
                             <Text className="text-lg font-bold dark:text-white">Aucune date sélectionnée</Text>
                         )}
                     </View>
-                    <PollStatus id={id}
-                        selectedUser={me}
-                    />
+                    <View className="flex-row justify-start">
+                        <PollStatus id={id}
+                            selectedUser={me}
+                        />
+                    </View>
                 </View>
 
                 <View className="flex-1 m-2 py-5 rounded-xl bg-white dark:bg-gray-900">
@@ -215,6 +218,13 @@ export default function DatesPage() {
                                     }), {})
                                 : {}
                         }
+                        renderArrow={(direction) => (
+                            <IconSymbol
+                                name={direction === 'left' ? 'chevron.left' : 'chevron.right'}
+                                size={24}
+                                color={colors.primary}
+                            />
+                        )}
                     />
                     {hasError &&
                         <Animated.View entering={SlideInDown} exiting={SlideOutUp}>

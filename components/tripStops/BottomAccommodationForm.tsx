@@ -16,14 +16,12 @@ import { Skeleton } from "../ui/Skeleton";
 
 interface AccommodationFormProps {
     control: Control<TripStop>;
-    onCancel: () => void;
-    onSubmit: () => Promise<void>;
 }
 
-export const BottomAccommodationForm = ({ control, onCancel, onSubmit }: AccommodationFormProps) => {
+export const BottomAccommodationForm = ({ control }: AccommodationFormProps) => {
     const [input, setInput] = useState<string>("");
 
-    const { isDirty, isSubmitting } = useFormState({
+    const { isSubmitting } = useFormState({
         control
     });
     const { field: { value: accommodation, onChange: setAccommodation } } = useController({
@@ -41,7 +39,6 @@ export const BottomAccommodationForm = ({ control, onCancel, onSubmit }: Accommo
     const handleSubmitLink = async (data: Link) => {
         setAccommodation(data);
         setInput("");
-        await onSubmit();
     };
 
     const onLinkClick = async () => {
@@ -147,60 +144,42 @@ export const BottomAccommodationForm = ({ control, onCancel, onSubmit }: Accommo
                     </View>
 
                 </Button>
-
-                <View className="flex-row justify-center items-center my-4 gap-4" >
-                    <Button
-                        variant="outlined"
-                        title="Annuler"
-                        onPress={onCancel} />
-                </View>
             </Animated.View>
         )
-
-
     }
 
+    return (
+        <View className="gap-1">
+            <View className="flex-row bg-gray-100 dark:bg-gray-600 border focus:border-blue-400 items-center px-2 rounded-xl h-12">
+                <IconSymbol name="house.fill" color="gray" size={16} />
+                <BottomSheetTextInput
+                    value={input}
+                    onChangeText={setInput}
+                    className="flex-1 text-dark dark:text-white h-full normal-case"
+                    placeholderTextColor={inputPlaceHolder}
+                    placeholder="Coller le lien de l'hébergement"
+                    keyboardType="url"
+                    autoCapitalize="none"
+                    maxLength={37}
+                    editable={false}
 
+                />
+                <View>
+                    <Animated.View
+                        entering={BounceIn}
+                        exiting={BounceOut}>
+                        <Button
+                            className="bg-gray-200 rounded-lg p-1 shadow"
+                            disabled={postLinkPreview.isPending}
+                            onPress={onPaste}
+                        >
+                            <IconSymbol name="doc.on.doc" size={16} color="blue" />
+                        </Button>
+                    </Animated.View>
+                </View>
 
-
-    return (<View className="gap-1">
-        <View className="flex-row bg-gray-100 dark:bg-gray-600 border focus:border-blue-400 items-center px-2 rounded-xl h-12">
-            <IconSymbol name="house.fill" color="gray" size={16} />
-            <BottomSheetTextInput
-                value={input}
-                onChangeText={setInput}
-                className="flex-1 text-dark dark:text-white h-full normal-case"
-                placeholderTextColor={inputPlaceHolder}
-                placeholder="Coller le lien de l'hébergement"
-                keyboardType="url"
-                autoCapitalize="none"
-                maxLength={37}
-                editable={false}
-
-            />
-            <View>
-                <Animated.View
-                    entering={BounceIn}
-                    exiting={BounceOut}>
-                    <Button
-                        className="bg-gray-200 rounded-lg p-1 shadow"
-                        disabled={postLinkPreview.isPending}
-                        onPress={onPaste}
-                    >
-                        <IconSymbol name="doc.on.doc" size={16} color="blue" />
-                    </Button>
-                </Animated.View>
             </View>
-
         </View>
-        <View className="flex-row justify-center items-center my-4 gap-4" >
-            <Button
-                variant="outlined"
-                title="Annuler"
-                disabled={isSubmitting}
-                onPress={onCancel} />
-        </View>
-    </View>
     );
 
 };
