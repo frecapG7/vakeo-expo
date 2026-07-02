@@ -34,14 +34,14 @@ export const useGetMessages = (tripId: any) => {
 }
 
 
-const postMessage = async (tripId: any, message: IMessage): Promise<void> => {
+const postMessage = async (tripId: any, message: IMessage): Promise<IMessage> => {
     const response = await axios.post(`/trips/${tripId}/messages`, message);
     return response.data;
 }
 
 export const usePostMessage = (tripId: any) => {
     const queryClient = useQueryClient();
-    return useMutation<void, Error, IMessage>({
+    return useMutation<IMessage, Error, IMessage>({
         mutationFn: (message) => postMessage(tripId, message),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["trips", tripId, "messages"] })
     });

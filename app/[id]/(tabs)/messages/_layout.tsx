@@ -5,25 +5,17 @@ import { TripContext } from "@/context/TripContext";
 import { useGetTrip } from "@/hooks/api/useTrips";
 import { Stack, useGlobalSearchParams, useRouter } from "expo-router";
 import { useContext } from "react";
-import { Platform, Pressable, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Pressable, Text, View } from "react-native";
 
 export default function MessagesLayout() {
 
-    const { id } = useGlobalSearchParams();
+    const { id } = useGlobalSearchParams<{id: string}>();
     const router = useRouter();
     const { data: trip } = useGetTrip(id);
     const { me } = useContext(TripContext);
 
-
-    const insets = useSafeAreaInsets();
-    const bottomPadding = Platform.OS === 'ios' ? insets.bottom : 0;
-
     return (
-        <View className="flex-1"
-            style={{
-                // paddingBottom: bottomPadding
-            }}>
+        <View className="flex-1">
             <Stack screenOptions={{
                 headerShown: true,
                 title: "Messages",
@@ -36,7 +28,7 @@ export default function MessagesLayout() {
                             onPressOut={() => router.navigate({
                                 pathname: "/[id]/settings",
                                 params: {
-                                    id: String(id)
+                                    id
                                 }
                             })}>
                             <Text className="text-white font-bold text-sm">
