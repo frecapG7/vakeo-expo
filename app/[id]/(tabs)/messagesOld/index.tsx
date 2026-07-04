@@ -4,9 +4,8 @@ import { useGetMessages, usePostMessage } from "@/hooks/api/useMessages";
 import dayjs from "@/lib/dayjs-config";
 import { useGlobalSearchParams } from "expo-router";
 import { useCallback, useContext, useMemo } from "react";
-import { Platform, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { GiftedChat, IMessage, Send } from 'react-native-gifted-chat';
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
 export default function TripMessages() {
@@ -26,8 +25,6 @@ export default function TripMessages() {
     }, [postMessage]);
 
 
-    const insets = useSafeAreaInsets();
-    const tabBarHeight = 20; // Default Expo Router tab bar height
 
     return (
             <View className="flex-1">
@@ -105,7 +102,7 @@ export default function TripMessages() {
                     // composerHeight={Platform.OS === 'ios' ? 50 : 44}
                     bottomOffset={0}
                     keyboardShouldPersistTaps="handled"
-                      minInputToolbarHeight={Platform.OS === 'ios' ? 50 : tabBarHeight + insets.bottom}
+                    //   minInputToolbarHeight={Platform.OS === 'ios' ? 50 : tabBarHeight + insets.bottom}
                 />
             </View>
 

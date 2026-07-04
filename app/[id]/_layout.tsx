@@ -91,7 +91,6 @@ export default function TripDetailsLayout() {
                 <Stack.Screen name="share"
                     options={{
                         headerShown: true,
-                        presentation: "modal",
                         title: "",
                     }}
                 />

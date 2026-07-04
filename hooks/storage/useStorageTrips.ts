@@ -59,9 +59,7 @@ export const useAddStorageTrip = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (trip: StorageTrip) => addTripStorage(trip),
-        onSuccess: () => queryClient.invalidateQueries({
-            queryKey: ["storage", "trips"]
-        })
+        onSuccess: () => queryClient.invalidateQueries()
     })
 }
 
@@ -74,18 +72,33 @@ const updateStorageTrip = (id: string, trip: StorageTrip): Promise<StorageTrip> 
 }
 
 
-
-
 export const useUpdateStorageTrip = (id: string) => {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: (trip: StorageTrip) => updateStorageTrip(id, trip),
-        onSuccess: () => Promise.all([
-            queryClient.invalidateQueries({ queryKey: ["storage", "trips"] }),
-            queryClient.invalidateQueries({ queryKey: ["trips", id] })
-        ])
+        onSuccess: () => queryClient.invalidateQueries()
     })
+}
+
+const deleteStorageTrip = (id: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        try {
+            storage.delete(`trips.${id}`);
+            resolve();
+        } catch (err) {
+            console.error(err);
+            reject(err);
+        }
+    });
+}
+
+export const useDeleteStorageTrip = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: string) => deleteStorageTrip(id),
+        onSuccess: () => queryClient.invalidateQueries()
+    });
 }
 
 
