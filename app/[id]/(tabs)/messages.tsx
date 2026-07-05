@@ -143,7 +143,7 @@ export default function TripMessages() {
                     )
                 }}
                 bottomOffset={bottomOffset}
-                minInputToolbarHeight={bottomOffset}
+                minInputToolbarHeight={44}
                 keyboardShouldPersistTaps="never"
             />
         </View>

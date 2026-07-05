@@ -16,7 +16,7 @@ import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from "@go
 import { ImageBackground } from "expo-image";
 import { useGlobalSearchParams, useRouter } from "expo-router";
 import { useContext, useRef } from "react";
-import { ActivityIndicator, Platform, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Platform, Pressable, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -36,17 +36,32 @@ export default function ItemDetails() {
 
     const colors = useColors();
 
-    const {formatRange } = useI18nTime();
+    const { formatRange } = useI18nTime();
 
     const handleShare = async () => {
         bottomSheetModalRef.current?.close();
         router.push({ pathname: "/[id]/share", params: { id: String(id) } })
     }
-    const handleDelete = async () => {
-        bottomSheetModalRef.current?.close();
-        // You'll implement the delete logic here
+
+
+    const onDelete = async () => {
         await deleteTrip.mutateAsync(id);
         router.dismissAll();
+    }
+    const handleDelete = async () => {
+        bottomSheetModalRef.current?.close();
+
+        Alert.alert("Supprimer cette escapade ?",
+            "", [
+            {
+                text: "Annuler",
+            },
+            {
+                text: "Supprimer",
+                onPress: onDelete
+            }
+        ]
+        )
     };
 
     const otherUsers = me ? trip?.users?.filter(u => u._id !== me._id) || [] : [];
@@ -222,10 +237,13 @@ export default function ItemDetails() {
                                 <View className="h-px bg-gray-200 dark:bg-gray-700 my-3" />
 
                                 <Button
-                                    onPress={() => router.push({
-                                        pathname: "/[id]/edit-general",
-                                        params: { id: String(id) }
-                                    })}
+                                    onPress={() => {
+                                        bottomSheetModalRef.current?.close();
+                                        router.push({
+                                            pathname: "/[id]/edit-general",
+                                            params: { id: String(id) }
+                                        })
+                                    }}
                                     className="flex-row gap-4 items-center justify-start"
                                 >
                                     <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
