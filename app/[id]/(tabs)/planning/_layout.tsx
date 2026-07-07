@@ -41,7 +41,7 @@ export default function PlanningLayout() {
                         <View>
                             <Pressable
                                 onPress={() =>
-                                    router.push({
+                                    router.replace({
                                         pathname: isCalendar
                                             ? "/[id]/(tabs)/planning"
                                             : "/[id]/(tabs)/planning/calendar",

@@ -32,6 +32,5 @@ export default function ItemDetailsLayout() {
                     md="chat" />
             </NativeTabs.Trigger>
         </NativeTabs>
-
     );
 }

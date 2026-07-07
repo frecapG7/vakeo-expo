@@ -6,81 +6,21 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { default as styles } from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetGoodsCount } from "@/hooks/api/useGoods";
-import { useGetPolls } from "@/hooks/api/usePolls";
-import { useGetDashboard, useGetTrip } from "@/hooks/api/useTrips";
+import { useGetTrip } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
+import { useDeleteStorageTrip } from "@/hooks/storage/useStorageTrips";
 import useColors from "@/hooks/styles/useColors";
 import dayjs from "@/lib/dayjs-config";
 import { countDaysBetween } from "@/lib/utils";
-import { Poll, Trip, TripUser } from "@/types/models";
 import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from "@gorhom/bottom-sheet";
 import { ImageBackground } from "expo-image";
 import { useGlobalSearchParams, useRouter } from "expo-router";
 import { useContext, useRef } from "react";
-import { Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Platform, Pressable, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-
-
-const PollsWidget = ({ trip, user, onClick }: { trip: Trip, user: TripUser, onClick: (poll: Poll) => void }) => {
-
-    const { data: page } = useGetPolls(trip._id, {
-        excludeClosed: true,
-        excludeSelectedBy: user?._id
-    });
-
-    const now = dayjs();
-    return (
-        <View className="gap-2">
-            {page?.polls?.map((poll) => (
-                <Pressable
-                    key={poll._id}
-                    onPress={() => onClick(poll)}
-                    className="rounded-xl bg-white dark:bg-gray-900 p-2 gap-2 border-l-4 border-orange-400">
-                    <View className="flex-row border-b border-gray-400 justify-between items-center">
-                        <View className="flex-row fap-2 items-center">
-                            <IconSymbol name="chart.bar.fill" color="orange" />
-                            <Text className="font-bold text-lg dark:text-white">
-                                {poll?.question}
-                            </Text>
-
-                        </View>
-                        <View className="flex-row gap-1 items-center" >
-                            {/* <Text className="rounded-full border-orange-400 border bg-orange-200 p-2 text-orange-600 font-bold text-sm"> */}
-                            <Text className="text-orange-300 font-bold text-sm">
-                                {countDaysBetween(dayjs(poll?.createdAt), now)}j
-                            </Text>
-                            <IconSymbol name="exclamationmark.circle.fill" color="orange" />
-                        </View>
-
-                    </View>
-                    <View className="flex-row justify-between items-center" >
-                        <View className="flex-row items-center gap-2">
-                            <Avatar src={poll.createdBy?.avatar}
-                                alt={poll.createdBy?.name?.charAt(0)}
-                                size2="xs"
-                            />
-                            <Text className="dark:text-white">
-                                {poll.createdBy?.name}
-                            </Text>
-                        </View>
-                        <View className="flex-row items-center gap-5">
-                            <View className="flex-row items-center">
-                                <IconSymbol name="person.2.fill" color="gray" />
-                                <Text className="text-gray-400">
-                                    {poll.hasSelected.length}
-                                </Text>
-                            </View>
-
-                        </View>
-                    </View>
-                </Pressable>
-            ))}
-        </View>
-
-    )
-}
 
 export default function ItemDetails() {
 
@@ -88,7 +28,7 @@ export default function ItemDetails() {
     const { data: trip } = useGetTrip(id, true);
     const { me } = useContext(TripContext);
     const { data: goodsCount } = useGetGoodsCount(id);
-    const { data: dashboard } = useGetDashboard(id, me?._id);
+    const deleteTrip = useDeleteStorageTrip();
 
     const router = useRouter();
 
@@ -96,16 +36,40 @@ export default function ItemDetails() {
 
     const colors = useColors();
 
-    const { formatDate, formatRange } = useI18nTime();
+    const { formatRange } = useI18nTime();
 
     const handleShare = async () => {
         bottomSheetModalRef.current?.close();
         router.push({ pathname: "/[id]/share", params: { id: String(id) } })
     }
 
+
+    const onDelete = async () => {
+        await deleteTrip.mutateAsync(id);
+        router.dismissAll();
+    }
+    const handleDelete = async () => {
+        bottomSheetModalRef.current?.close();
+
+        Alert.alert("Supprimer cette escapade ?",
+            "", [
+            {
+                text: "Annuler",
+            },
+            {
+                text: "Supprimer",
+                onPress: onDelete
+            }
+        ]
+        )
+    };
+
     const otherUsers = me ? trip?.users?.filter(u => u._id !== me._id) || [] : [];
     const displayUsers = otherUsers.slice(0, 5);
     const hasMore = otherUsers.length > 5;
+
+    const insets = useSafeAreaInsets();
+    const bottomPadding = Platform.OS === 'ios' ? insets.bottom : 0;
 
     if (!trip)
         return (
@@ -129,9 +93,8 @@ export default function ItemDetails() {
     const isSingleStop = stopsCount === 1;
     const hasStops = stopsCount > 0;
 
-
     return (
-        <GestureHandlerRootView style={{ flex: 1 }}>
+        <GestureHandlerRootView style={{ flex: 1, paddingBottom: bottomPadding }}>
             <BottomSheetModalProvider>
                 <Animated.ScrollView style={{ flex: 1 }}>
                     <View className="h-80 w-full">
@@ -243,48 +206,26 @@ export default function ItemDetails() {
                             />
                         </View>
                     </View>
-
-
-                    <View className="mx-4 p-2 mb-5">
-                        <Text className="text-lg font-bold ml-4 dark:text-white">
-                            Description
-                        </Text>
-                        <Text className="dark:text-white">
-                            {trip?.description}
-                        </Text>
-                    </View>
-                    {dashboard?.polls.pending > 0 &&
-                        <View className="mx-5 my-2">
-                            <View className="">
-                                <Text className="font-bold text-2xl dark:text-white">
-                                    Sondages
-                                </Text>
-                                <Text className="text-md dark:text-white">
-                                    On attend ta réponse sur des sondages
-                                </Text>
-                            </View>
-                            <PollsWidget
-                                trip={trip}
-                                user={me}
-                                onClick={(poll) => router.navigate({
-                                    pathname: "/[id]/polls/[pollId]",
-                                    params: {
-                                        id: String(id),
-                                        pollId: poll._id
-                                    }
-                                })} />
+                    {trip?.description &&
+                        <View className="mx-4 p-2 mb-5">
+                            <Text className="text-lg font-bold ml-4 dark:text-white">
+                                Description
+                            </Text>
+                            <Text className="dark:text-white">
+                                {trip?.description}
+                            </Text>
                         </View>
                     }
-
                     <BottomSheetModal
                         ref={bottomSheetModalRef}
-                        backgroundStyle={{
-                            backgroundColor: colors.background
-                        }}>
-                        <BottomSheetView style={{ flex: 1, padding: 10, minHeight: 150 }}>
-                            <View className="flex flex-grow gap-5 p-1 divide-y-5 divide-solid dark:divide-white">
-                                <Button onPress={handleShare}
-                                    className="flex flex-row gap-5 items-center" >
+                        backgroundStyle={{ backgroundColor: colors.background }}
+                    >
+                        <BottomSheetView style={{ flex: 1 }}>
+                            <View className="flex-col p-4">
+                                <Button
+                                    onPress={handleShare}
+                                    className="flex-row gap-4 items-center justify-start"
+                                >
                                     <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
                                         <Animated.View entering={FadeIn} exiting={FadeOut}>
                                             <IconSymbol name="doc.on.doc" size={30} />
@@ -292,34 +233,36 @@ export default function ItemDetails() {
                                     </View>
                                     <Text className="text-lg dark:text-white">Partager le voyage</Text>
                                 </Button>
-                                <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
-                                <Button onPress={() => router.push({
-                                    pathname: "/[id]/edit-general",
-                                    params: {
-                                        id: String(id)
-                                    }
-                                })}
-                                    className="flex flex-row items-center gap-5">
+
+                                <View className="h-px bg-gray-200 dark:bg-gray-700 my-3" />
+
+                                <Button
+                                    onPress={() => {
+                                        bottomSheetModalRef.current?.close();
+                                        router.push({
+                                            pathname: "/[id]/edit-general",
+                                            params: { id: String(id) }
+                                        })
+                                    }}
+                                    className="flex-row gap-4 items-center justify-start"
+                                >
                                     <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
                                         <IconSymbol name="pencil" size={30} />
                                     </View>
-                                    <Text className=" text-lg dark:text-white">Modifier le voyage</Text>
-                                </Button>
-                                <View className="w-60% bg-black dark:bg-gray-200 h-0.5" />
-                                <Button
-                                    className="flex flex-row items-center gap-5"
-                                    onPress={() => router.push({
-                                        pathname: "/[id]/settings",
-                                        params: {
-                                            id: String(id)
-                                        }
-                                    })}>
-                                    <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-2">
-                                        <IconSymbol name="person" size={30} />
-                                    </View>
-                                    <Text className=" text-lg dark:text-white">Modifier mon profil</Text>
+                                    <Text className="text-lg dark:text-white">Modifier le voyage</Text>
                                 </Button>
 
+                                <View className="h-px bg-gray-200 dark:bg-gray-700 my-3" />
+
+                                <Button
+                                    onPress={handleDelete}
+                                    className="flex-row gap-4 items-center justify-start"
+                                >
+                                    <View className="bg-red-400 dark:bg-red-600 rounded-full p-2">
+                                        {deleteTrip.isPending ? <ActivityIndicator /> : <IconSymbol name="trash" size={30} />}
+                                    </View>
+                                    <Text className="text-lg text-red-500 dark:text-red-400">Supprimer le voyage</Text>
+                                </Button>
                             </View>
                         </BottomSheetView>
                     </BottomSheetModal>
