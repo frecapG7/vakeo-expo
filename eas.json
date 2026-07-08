@@ -22,7 +22,19 @@
     "production": {
       "autoIncrement": true,
       "environment": "production",
-      "credentialsSource": "remote"
+      "credentialsSource": "remote",
+      "app.json": {
+        "expo": {
+          "name": "olyne",
+          "slug": "olyne",
+          "ios": {
+            "bundleIdentifier": "com.frecapg7.olyne"
+          },
+          "android": {
+            "package": "com.frecapg7.olyne"
+          }
+        }
+      }
     }
   },
   "submit": {
