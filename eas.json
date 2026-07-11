@@ -40,7 +40,9 @@
         "serviceAccountKeyPath": "./service-account.json"
       },
       "ios": {
-        "ascApiKeyPath": "./asc-api-key.json"
+        "ascApiKeyPath": "./asc-api-key.json",
+        "ascApiKeyId": "3J7GGXH3X6",
+        "ascApiKeyIssuerId": "c44dbaa3-0315-47ef-bf05-0d90cc340ba2"
       }
     }
   }
