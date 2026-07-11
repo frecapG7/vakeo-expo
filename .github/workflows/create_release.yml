@@ -144,6 +144,5 @@ jobs:
 
       - name: Submit to App Store
         run: |
-          mkdir -p asc
-          echo '${{ secrets.APP_STORE_CONNECT_API_KEY }}' > asc/key.p8
-          eas submit --platform ios --path app-release.ipa --non-interactive --profile production --asc-api-key-path asc/key.p8
+          echo '${{ secrets.APP_STORE_CONNECT_API_KEY }}' > asc-api-key.json
+          eas submit --platform ios --path app-release.ipa --non-interactive --profile production
