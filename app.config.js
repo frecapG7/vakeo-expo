@@ -1,10 +1,11 @@
 const IS_PRODUCTION = process.env.APP_ENVIRONMENT === 'production';
+const packageJson = require('./package.json');
 
 export default {
   expo: {
     name: IS_PRODUCTION ? 'olyne' : 'vakeo-expo',
     slug: 'vakeo-expo',
-    version: '1.0.0',
+    version: packageJson.version,
     orientation: 'portrait',
     icon: './assets/images/icon.png',
     scheme: IS_PRODUCTION ? 'olyne' : 'vakeoexpo',
