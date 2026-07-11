@@ -15,12 +15,12 @@
       }
     },
     "preview": {
+      "autoIncrement": true,
       "distribution": "internal",
       "environment": "preview",
       "credentialsSource": "remote"
     },
     "production": {
-      "autoIncrement": true,
       "environment": "production",
       "credentialsSource": "remote",
       "app.json": {
