@@ -28,7 +28,12 @@ export default function NewTripUsers() {
             image: result.image,
             user: result.users[0]
         });
-        router.replace(`./${result._id}`);
+        router.dismissTo({
+            pathname: "/[id]/(tabs)",
+            params: {
+                id: result._id
+            }
+        })
     };
 
 
