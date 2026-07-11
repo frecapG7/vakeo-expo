@@ -6,7 +6,10 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "APP_ENVIRONMENT": "development"
+      }
     },
     "ios-simulator": {
       "extends": "development",
@@ -18,11 +21,17 @@
       "autoIncrement": true,
       "distribution": "internal",
       "environment": "preview",
-      "credentialsSource": "remote"
+      "credentialsSource": "remote",
+      "env": {
+        "APP_ENVIRONMENT": "preview"
+      }
     },
     "production": {
       "environment": "production",
-      "credentialsSource": "remote"
+      "credentialsSource": "remote",
+      "env": {
+        "APP_ENVIRONMENT": "production"
+      }
     }
   },
   "submit": {
