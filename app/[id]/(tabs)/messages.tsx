@@ -7,7 +7,6 @@ export default function Messages() {
     const router = useRouter();
 
     useFocusEffect(() => {
-        console.log("messages");
         router.replace({
             pathname: "/[id]/chat",
             params : {
