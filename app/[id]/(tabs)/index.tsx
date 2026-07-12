@@ -97,7 +97,7 @@ export default function ItemDetails() {
                                         onPressOut={() => router.push({
                                             pathname: "/[id]/settings",
                                             params: {
-                                                id: String(id)
+                                                id
                                             }
                                         })}>
                                         <Avatar src={me?.avatar}

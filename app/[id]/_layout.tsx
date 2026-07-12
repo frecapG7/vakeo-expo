@@ -100,6 +100,12 @@ export default function TripDetailsLayout() {
                         title: "Mon profil",
                     }}
                 />
+                <Stack.Screen name="chat"
+                    options={{
+                        headerShown: true,
+                        title: "Messagerie",
+                    }}
+                />
             </Stack>
 
         </TripContext.Provider>
