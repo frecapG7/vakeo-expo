@@ -27,7 +27,6 @@
       }
     },
     "production": {
-      "autoincrement": "true",
       "environment": "production",
       "credentialsSource": "remote",
       "env": {
