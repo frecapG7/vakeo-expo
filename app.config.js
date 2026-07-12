@@ -27,8 +27,7 @@ export default {
         foregroundImage: './assets/images/adaptive-icon.png',
         backgroundColor: '#ffffff',
       },
-      package: IS_PRODUCTION ? 'com.frecapg7.olyne' : 'com.frecapg7.vakeoexpo',
-      versionCode: packageJson.version.split('.').reduce((acc, part, i) => acc + parseInt(part, 10) * Math.pow(100, 2 - i), 0)
+      package: IS_PRODUCTION ? 'com.frecapg7.olyne' : 'com.frecapg7.vakeoexpo'
     },
     web: {
       bundler: 'metro',

@@ -102,5 +102,5 @@ export function IconSymbol({
   weight?: SymbolWeight;
 }) {
   const { colorScheme } = useColorScheme();
-  return <MaterialIcons color={color ? color : colorScheme === "dark" ? "dark" : "white"} size={size} name={MAPPING[name]} style={style} />;
+  return <MaterialIcons color={color ? color : colorScheme === "dark" ? "black" : "white"} size={size} name={MAPPING[name]} style={style} />;
 }

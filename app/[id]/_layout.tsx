@@ -1,18 +1,21 @@
 import { BackgroundHeader } from "@/components/header/BackgroundHeader";
+import { Avatar } from "@/components/ui/Avatar";
+import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetTrip, useGetTripUser } from "@/hooks/api/useTrips";
 import { useGetStorageTrip } from "@/hooks/storage/useStorageTrips";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect } from "react";
+import { Pressable } from "react-native";
 
 export default function TripDetailsLayout() {
 
     const router = useRouter();
-    const { id } = useLocalSearchParams();
+    const { id } = useLocalSearchParams<{id : string}>();
 
-    const { data: storageTrip } = useGetStorageTrip(String(id));
-    const { data: trip } = useGetTrip(String(id), true);
+    const { data: storageTrip } = useGetStorageTrip(id);
+    const { data: trip } = useGetTrip(id, true);
 
     const { data: me } = useGetTripUser(id, storageTrip?.user, {
         enabled: !!storageTrip?.user
@@ -98,6 +101,29 @@ export default function TripDetailsLayout() {
                     options={{
                         headerShown: true,
                         title: "Mon profil",
+                    }}
+                />
+                <Stack.Screen name="chat"
+                    options={{
+                        headerShown: true,
+                        title: "Messagerie",
+                        headerLeft: () => (
+                            <Pressable onPress={() => router.replace({
+                                pathname: "/[id]/(tabs)",
+                                params: {id}
+                            })}>
+                                <IconSymbol name="arrow.left" color="white" />
+                            </Pressable>
+                        ),
+                        headerRight: () => (
+                            <Pressable onPress={() => router.navigate('./settings')}>
+                                <Avatar
+                                    src={me?.avatar}
+                                    alt={me?.name?.charAt(0)}
+                                    size2="sm"
+                                />
+                            </Pressable>
+                        ),
                     }}
                 />
             </Stack>
