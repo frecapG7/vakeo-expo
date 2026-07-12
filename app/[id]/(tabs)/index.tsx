@@ -73,7 +73,7 @@ export default function ItemDetails() {
 
     return (
         <MenuProvider>
-            <Animated.ScrollView style={{ flex: 1, paddingBottom: bottomPadding }}>
+            <Animated.ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: bottomPadding }}>
                 <View className="h-80 w-full">
                     <ImageBackground source={trip?.image}
                         style={{

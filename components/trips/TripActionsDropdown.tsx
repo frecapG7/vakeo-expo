@@ -20,9 +20,20 @@ export function TripActionsDropdown({
   const colors = useColors();
 
   const handleDeletePress = () => {
+    if(isDeleting) return;
     Alert.alert("Supprimer cette escapade ?", "", [
       { text: "Annuler" },
-      { text: "Supprimer", onPress: onDelete, style: "destructive" }
+      {
+        text: "Supprimer",
+        onPress: async () => {
+          try {
+            await onDelete();
+          } catch (error) {
+            console.error("Delete failed:", error);
+          }
+        },
+        style: "destructive"
+      }
     ]);
   };
 

@@ -6,7 +6,7 @@ import dayjs from "@/lib/dayjs-config";
 import { useLocalSearchParams } from "expo-router";
 import { useCallback, useContext, useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
-import { GiftedChat, IMessage, Send } from 'react-native-gifted-chat';
+import { GiftedChat, IMessage, InputToolbar, Send } from 'react-native-gifted-chat';
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 
@@ -35,6 +35,7 @@ export default function TripMessages() {
                 messages={messages}
                 onSend={onSend}
                 user={me}
+                renderInputToolbar={(props) => me?._id ? <InputToolbar {...props} /> : null}
                 infiniteScroll
                 renderUsernameOnMessage
                 showUserAvatar
