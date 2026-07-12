@@ -1,8 +1,7 @@
-import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
+import { useFocusEffect, useGlobalSearchParams, useRouter } from "expo-router";
 
 export default function Messages() {
-    const { id } = useLocalSearchParams<{ id: string }>();
-
+    const { id } = useGlobalSearchParams<{ id: string }>();
 
     const router = useRouter();
 

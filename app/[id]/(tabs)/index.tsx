@@ -10,7 +10,6 @@ import { useGetGoodsCount } from "@/hooks/api/useGoods";
 import { useGetTrip } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import { useDeleteStorageTrip } from "@/hooks/storage/useStorageTrips";
-import useColors from "@/hooks/styles/useColors";
 import dayjs from "@/lib/dayjs-config";
 import { countDaysBetween } from "@/lib/utils";
 import { ImageBackground } from "expo-image";
@@ -32,12 +31,10 @@ export default function ItemDetails() {
 
     const router = useRouter();
 
-    const colors = useColors();
-
     const { formatRange } = useI18nTime();
 
     const handleShare = () => {
-        router.push({ pathname: "/[id]/share", params: { id: String(id) } })
+        router.push({ pathname: "/[id]/share", params: { id } })
     }
 
     const onDelete = async () => {
@@ -110,7 +107,7 @@ export default function ItemDetails() {
                                         onShare={handleShare}
                                         onEdit={() => router.push({
                                             pathname: "/[id]/edit-general",
-                                            params: { id: String(id) }
+                                            params: { id }
                                         })}
                                         onDelete={onDelete}
                                         isDeleting={deleteTrip.isPending}
@@ -126,7 +123,7 @@ export default function ItemDetails() {
                         <Button className="" onPress={() =>
                             router.push({
                                 pathname: "/[id]/attendees",
-                                params: { id: String(id) }
+                                params: { id }
                             })
                         }>
                             <View className="gap-1 flex-1 items-start">
@@ -155,7 +152,7 @@ export default function ItemDetails() {
                             onPress={() => router.push({
                                 pathname: "/[id]/dates",
                                 params: {
-                                    id: String(id)
+                                    id
                                 }
                             })} />
 
@@ -172,7 +169,7 @@ export default function ItemDetails() {
                             onPress={() => router.push({
                                 pathname: "/[id]/location",
                                 params: {
-                                    id: String(id)
+                                    id
                                 }
                             })}
                         />
@@ -185,7 +182,7 @@ export default function ItemDetails() {
                             onPress={() => router.push({
                                 pathname: "/[id]/goods",
                                 params: {
-                                    id: String(id)
+                                    id
                                 }
                             })}
                         />
