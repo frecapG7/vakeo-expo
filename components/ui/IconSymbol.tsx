@@ -1,8 +1,8 @@
 // Fallback for using MaterialIcons on Android and web.
 
+import useColors from "@/hooks/styles/useColors";
 import MaterialIcons from "@react-native-vector-icons/material-icons/static";
 import { SymbolViewProps, SymbolWeight } from 'expo-symbols';
-import { useColorScheme } from 'nativewind';
 import { ComponentProps } from 'react';
 import { OpaqueColorValue, type StyleProp, type TextStyle } from 'react-native';
 
@@ -101,6 +101,6 @@ export function IconSymbol({
   style?: StyleProp<TextStyle>;
   weight?: SymbolWeight;
 }) {
-  const { colorScheme } = useColorScheme();
-  return <MaterialIcons color={color ? color : colorScheme === "dark" ? "black" : "white"} size={size} name={MAPPING[name]} style={style} />;
+  const { text } = useColors();
+  return <MaterialIcons color={color ? color : text} size={size} name={MAPPING[name]} style={style} />;
 }
