@@ -49,11 +49,11 @@ export default function EditEventUsers() {
 
     if (!trip)
         return (
-            <Animated.View>
+            <SafeAreaView style={styles.container}>
                 <View className="flex flex-1 gap-2 p-4 my-10">
                     <Skeleton height={60} />
                 </View>
-            </Animated.View>
+            </SafeAreaView>
 
         )
     return (
