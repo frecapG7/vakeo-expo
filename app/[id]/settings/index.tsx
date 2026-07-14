@@ -1,4 +1,5 @@
 import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Switch } from "@/components/ui/Switch";
 import { RestrictionIcon } from "@/components/users/RestrictionIcon";
@@ -7,7 +8,7 @@ import { TripContext } from "@/context/TripContext";
 import { useGetTripUser, useUpdateTripUser } from "@/hooks/api/useTrips";
 import { router, useLocalSearchParams } from "expo-router";
 import { useContext, useMemo } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 
 
@@ -65,15 +66,21 @@ export default function TripSettings() {
                 <Avatar src={user?.avatar} size2="xl" alt={user?.name.charAt(0)} />
                 <View className="flex-row gap-5 items-end">
                     <Text className="dark:text-white text-3xl font-bold">{user?.name}</Text>
-                    <Pressable className="rounded-full border-blue-400"
-                        onPress={() => router.push({
-                            pathname: "/[id]/settings/avatar",
-                            params: {
-                                id: String(id)
-                            }
-                        })} >
-                        <Text className="text-lg dark:text-white">Modifier</Text>
-                    </Pressable>
+                    <View className="flex-row items-center gap-2">
+                        <Button
+                            onPress={() => router.push({ pathname: "/[id]/settings/avatar", params: { id: String(id) } })}
+                            variant="none"
+                            className="px-0 ">
+                            <Text>Modifier avatar</Text>
+                        </Button>
+                        <Text className="">|</Text>
+                        <Button
+                            onPress={() => router.push({ pathname: "/[id]/settings/username", params: { id: String(id) } })}
+                            variant="none"
+                            className="px-0">
+                            <Text>Modifier nom</Text>
+                        </Button>
+                    </View>
                 </View>
             </View>
 
@@ -152,7 +159,7 @@ export default function TripSettings() {
 
 
 
-          
+
         </Animated.View>
     )
 }

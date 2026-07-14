@@ -1,5 +1,5 @@
 import { containsUser } from "@/lib/utils";
-import { Trip } from "@/types/models";
+import { Event, Trip } from "@/types/models";
 import { Control, useFieldArray, useFormState } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import AnimatedCheckbox from "react-native-checkbox-reanimated";

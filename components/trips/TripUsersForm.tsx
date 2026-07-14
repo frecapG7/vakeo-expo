@@ -85,14 +85,16 @@ export const TripUsersForm = ({ control, selected = -1  }: { control: Control<Tr
                                     required: true,
                                     maxLength: 25
                                 }}
+                                disabled={!!item._id}
                                 endAdornment={
                                     <Pressable
                                         className="mx-2"
                                         onPress={() => selected !== index && remove(index)}>
                                         {selected === index ?
                                             <Text className="font-bold bg-blue-600 p-1 text-white">Moi</Text> :
-                                            !item._id && <IconSymbol name="xmark.circle" size={24} color="black" />}
+                                            !item._id && <IconSymbol name="xmark.circle" size={24} />}
                                     </Pressable>}
+                                    
                             />
                         </Animated.View>
                     ))}
@@ -102,7 +104,7 @@ export const TripUsersForm = ({ control, selected = -1  }: { control: Control<Tr
                         >
                             <Pressable className="rounded-b-lg"
                                 onPress={() => {
-                                    append({ name: "" });
+                                    append({ name: "", _id: "" });
                                 }}>
                                 <Text className="text-md font-bold text-blue-500 p-2">
                                     Ajouter un participant

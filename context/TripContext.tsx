@@ -1,9 +1,12 @@
-import { TripUser } from "@/types/models";
+import { Trip, TripUser } from "@/types/models";
 import { createContext } from "react";
 
 interface ITripContext {
-    me: TripUser,
+    trip: Trip,
+    me?: TripUser,
 }
 
 
-export const TripContext = createContext<ITripContext>({});
+export const TripContext = createContext<ITripContext>({
+    trip: null!
+});
