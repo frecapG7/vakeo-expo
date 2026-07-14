@@ -6,7 +6,7 @@ import { RestrictionIcon } from "@/components/users/RestrictionIcon";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetTripUser, useUpdateTripUser } from "@/hooks/api/useTrips";
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import { useContext, useMemo } from "react";
 import { Text, View } from "react-native";
 import Animated from "react-native-reanimated";
@@ -16,13 +16,10 @@ import Animated from "react-native-reanimated";
 export default function TripSettings() {
 
 
-    const { id } = useLocalSearchParams();
-    const { me } = useContext(TripContext);
+    const { me, trip } = useContext(TripContext);
 
-    const { data: user } = useGetTripUser(String(id), String(me?._id), {
-        enabled: (!!id && !!me?._id),
-    })
-    const updateTripUser = useUpdateTripUser(String(id), String(me?._id));
+    const { data: user } = useGetTripUser(trip._id, me?._id);
+    const updateTripUser = useUpdateTripUser(trip._id, user?._id);
 
     const restrictions = useMemo(() => user?.restrictions || [], [user]);
 

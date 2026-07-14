@@ -86,14 +86,18 @@ export const TripUsersForm = ({ control, selected = -1  }: { control: Control<Tr
                                     maxLength: 25
                                 }}
                                 disabled={!!item._id}
-                                endAdornment={
-                                    <Pressable
-                                        className="mx-2"
-                                        onPress={() => selected !== index && remove(index)}>
-                                        {selected === index ?
-                                            <Text className="font-bold bg-blue-600 p-1 text-white">Moi</Text> :
-                                            !item._id && <IconSymbol name="xmark.circle" size={24} />}
-                                    </Pressable>}
+                                 endAdornment={
+                                    (selected === index || !item._id) ? (
+                                        <Pressable
+                                            className="mx-2"
+                                            disabled={selected===index}
+                                            onPress={() => selected !== index && remove(index)}>
+                                            {selected === index ?
+                                                <Text className="font-bold bg-blue-600 p-1 text-white">Moi</Text> :
+                                                <IconSymbol name="xmark.circle" size={24} />}
+                                        </Pressable>
+                                    ) : null
+                                }
                                     
                             />
                         </Animated.View>

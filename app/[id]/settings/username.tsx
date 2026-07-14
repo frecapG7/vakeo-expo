@@ -20,7 +20,7 @@ export default function UsernameSetting() {
     const colors = useColors();
 
     const { control, handleSubmit } = useForm({
-        defaultValues: {
+        values: {
             name: user?.name || ""
         }
     });

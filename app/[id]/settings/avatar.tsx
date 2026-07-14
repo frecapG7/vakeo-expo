@@ -5,7 +5,7 @@ import { TripContext } from "@/context/TripContext";
 import { useGetTripUser, useUpdateTripUser } from "@/hooks/api/useTrips";
 import useColors from "@/hooks/styles/useColors";
 import { useRouter } from "expo-router";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -32,12 +32,11 @@ const avatars = [
 export default function AvatarSetting() {
 
     const router = useRouter();
-    const { me , trip} = useContext(TripContext);
+    const { me, trip } = useContext(TripContext);
     const { data: user } = useGetTripUser(trip._id, me?._id);
     const updateUser = useUpdateTripUser(trip._id, user?._id);
     const colors = useColors();
     const [selectedAvatar, setSelectedAvatar] = React.useState<string | null>(user?.avatar || null);
-
 
     const disabledAvatars = trip?.users.filter(u => u._id !== user?._id)?.map(u => u.avatar);
 
@@ -45,8 +44,13 @@ export default function AvatarSetting() {
         setSelectedAvatar(uri);
     };
 
+    useEffect(() => {
+        if (user?.avatar)
+            setSelectedAvatar(user.avatar);
+    }, [user?.avatar]);
+
     const handleSave = async () => {
-        if (selectedAvatar)
+        if (selectedAvatar && user)
             await updateUser.mutateAsync({
                 ...user,
                 avatar: selectedAvatar
