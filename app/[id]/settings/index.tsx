@@ -65,14 +65,14 @@ export default function TripSettings() {
                     <Text className="dark:text-white text-3xl font-bold">{user?.name}</Text>
                     <View className="flex-row items-center gap-2">
                         <Button
-                            onPress={() => router.push({ pathname: "/[id]/settings/avatar", params: { id: String(id) } })}
+                            onPress={() => router.push({ pathname: "/[id]/settings/avatar", params: { id: trip._id } })}
                             variant="none"
                             className="px-0 ">
                             <Text>Modifier avatar</Text>
                         </Button>
                         <Text className="">|</Text>
                         <Button
-                            onPress={() => router.push({ pathname: "/[id]/settings/username", params: { id: String(id) } })}
+                            onPress={() => router.push({ pathname: "/[id]/settings/username", params: { id: trip._id } })}
                             variant="none"
                             className="px-0">
                             <Text>Modifier nom</Text>
