@@ -69,13 +69,10 @@ export const TripStopDetailsEditor = ({
     const { control, handleSubmit, reset, formState: { isDirty } } = useForm<TripStop>();
 
     useEffect(() => {
-        if (tripStop)
-            reset(tripStop);
-        else
-            reset({
-                name: ""
-            })
-    }, [tripStop, reset]);
+        if (visible) {
+            reset(tripStop || { name: "" });
+        }
+    }, [tripStop, reset, visible]);
 
 
     return (

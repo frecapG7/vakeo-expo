@@ -112,7 +112,7 @@ export const BottomAccommodationForm = ({ control }: AccommodationFormProps) => 
                             borderTopLeftRadius: 16,
                             borderTopRightRadius: 16
                         }}
-                        // contentFit="cover"
+                        contentFit="cover"
                     >
                         <View className="flex-1 items-end p-3 w-full">
                             <View className="flex-1 justify-between">
