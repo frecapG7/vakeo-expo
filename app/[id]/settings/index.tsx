@@ -24,6 +24,7 @@ export default function TripSettings() {
     const restrictions = useMemo(() => user?.restrictions || [], [user]);
 
     const onSwitch = async (value: boolean, name: string) => {
+        if(!user) return;
         let newRestrictions = user?.restrictions || [];
         if (value)
             newRestrictions = [...newRestrictions, name]
