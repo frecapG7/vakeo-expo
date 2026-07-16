@@ -2,11 +2,11 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { TripContext } from "@/context/TripContext";
-import { useGetTrip, useUpdateTripUser } from "@/hooks/api/useTrips";
+import { useGetTripUser, useUpdateTripUser } from "@/hooks/api/useTrips";
 import useColors from "@/hooks/styles/useColors";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useContext } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { useRouter } from "expo-router";
+import React, { useContext, useEffect } from "react";
+import { Pressable, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -32,14 +32,11 @@ const avatars = [
 export default function AvatarSetting() {
 
     const router = useRouter();
-    const { id } = useLocalSearchParams<{id : string}>();
-    const { me: user } = useContext(TripContext);
-
-    const { data: trip } = useGetTrip(id);
-    const updateUser = useUpdateTripUser(id, user?._id)
+    const { me, trip } = useContext(TripContext);
+    const { data: user } = useGetTripUser(trip._id, me?._id);
+    const updateUser = useUpdateTripUser(trip._id, user?._id);
     const colors = useColors();
     const [selectedAvatar, setSelectedAvatar] = React.useState<string | null>(user?.avatar || null);
-
 
     const disabledAvatars = trip?.users.filter(u => u._id !== user?._id)?.map(u => u.avatar);
 
@@ -47,8 +44,13 @@ export default function AvatarSetting() {
         setSelectedAvatar(uri);
     };
 
+    useEffect(() => {
+        if (user?.avatar)
+            setSelectedAvatar(user.avatar);
+    }, [user?.avatar]);
+
     const handleSave = async () => {
-        if (selectedAvatar)
+        if (selectedAvatar && user)
             await updateUser.mutateAsync({
                 ...user,
                 avatar: selectedAvatar
@@ -79,17 +81,12 @@ export default function AvatarSetting() {
                 backgroundColor: colors.background,
             }}
         >
-            <ScrollView
+            <Animated.ScrollView
                 contentContainerStyle={{
                     paddingVertical: 16,
                     paddingHorizontal: 16,
                 }}
             >
-                <Pressable onPress={() => router.back()} className="mb-4 flex-row items-center">
-                    <IconSymbol name="xmark.circle" color={colors.text} />
-                    <Text className="text-lg" style={{ color: colors.text }}>Annuler</Text>
-                </Pressable>
-
                 {/* Header */}
                 <Animated.View entering={FadeIn} className="mb-6">
                     <Text
@@ -174,7 +171,7 @@ export default function AvatarSetting() {
                         title="Enregistrer mon avatar"
                     />
                 </Animated.View>
-            </ScrollView>
+            </Animated.ScrollView>
         </SafeAreaView>
     );
 }

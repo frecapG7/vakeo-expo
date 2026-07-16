@@ -30,6 +30,7 @@ export default function TripDetailsLayout() {
     return (
         <TripContext.Provider value={{
             me,
+            trip
         }}>
             <Stack screenOptions={{
                 headerTintColor: "white",
@@ -99,7 +100,7 @@ export default function TripDetailsLayout() {
                 />
                 <Stack.Screen name="settings"
                     options={{
-                        headerShown: true,
+                        headerShown: false,
                         title: "Mon profil",
                     }}
                 />

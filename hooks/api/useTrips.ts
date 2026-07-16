@@ -61,15 +61,16 @@ export const useUpdateTrip = (tripId: any) => {
   })
 }
 
-const getTripUser = async (tripId: string, userId: string): Promise<TripUser> => {
+const getTripUser = async (tripId: string, userId?: string): Promise<TripUser> => {
   const response = await axios.get(`/trips/${tripId}/users/${userId}`);
   return response.data;
 }
 
-export const useGetTripUser = (tripId: string, userId: string, options: any) => {
+export const useGetTripUser = (tripId: string, userId?: string, options?: any) => {
   return useQuery<TripUser>({
     queryKey: ["trips", tripId, "users", userId],
     queryFn: () => getTripUser(tripId, userId),
+    enabled: !!userId,
     ...options
   });
 }

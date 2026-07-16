@@ -19,10 +19,17 @@ const sizeToMap = {
     'small': 'px-4 py-2 text-sm'
 }
 
+const variantToTitleClassMap = {
+    'none': 'text-neutral-900 dark:text-neutral-100',
+    'contained': 'text-white font-bold',
+    'outlined': 'text-blue-600 font-semibold'
+}
+
 const ButtonTitle = ({ title, variant, size, isLoading }: { title?: string, variant: ButtonVariant, size: ButtonSize, isLoading: boolean }) => {
 
     const colors = useColors();
     const sizeClass = sizeToMap[size];
+    const variantTitleClass = variantToTitleClassMap[variant];
 
     if (isLoading)
         return (
@@ -34,10 +41,7 @@ const ButtonTitle = ({ title, variant, size, isLoading }: { title?: string, vari
 
     return (
         <Animated.View entering={FadeIn} exiting={FadeOut}>
-            <Text className={`${sizeClass} ${variant === "contained" ? "text-white font-bold" :
-                variant === "outlined" ? "text-blue-600 font-semibold" :
-                    "text-blue-400"
-                }`} numberOfLines={1}>
+            <Text className={`${sizeClass} ${variantTitleClass}`} numberOfLines={1}>
                 {title}
             </Text>
         </Animated.View>

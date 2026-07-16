@@ -5,7 +5,7 @@ import { RestrictionIcon } from "@/components/users/RestrictionIcon";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetTripUser, useUpdateTripUser } from "@/hooks/api/useTrips";
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import { useContext, useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
@@ -15,17 +15,15 @@ import Animated from "react-native-reanimated";
 export default function TripSettings() {
 
 
-    const { id } = useLocalSearchParams();
-    const { me } = useContext(TripContext);
+    const { me, trip } = useContext(TripContext);
 
-    const { data: user } = useGetTripUser(String(id), String(me?._id), {
-        enabled: (!!id && !!me?._id),
-    })
-    const updateTripUser = useUpdateTripUser(String(id), String(me?._id));
+    const { data: user } = useGetTripUser(trip._id, me?._id);
+    const updateTripUser = useUpdateTripUser(trip._id, user?._id);
 
     const restrictions = useMemo(() => user?.restrictions || [], [user]);
 
     const onSwitch = async (value: boolean, name: string) => {
+        if (!user) return;
         let newRestrictions = user?.restrictions || [];
         if (value)
             newRestrictions = [...newRestrictions, name]
@@ -65,15 +63,23 @@ export default function TripSettings() {
                 <Avatar src={user?.avatar} size2="xl" alt={user?.name.charAt(0)} />
                 <View className="flex-row gap-5 items-end">
                     <Text className="dark:text-white text-3xl font-bold">{user?.name}</Text>
-                    <Pressable className="rounded-full border-blue-400"
-                        onPress={() => router.push({
-                            pathname: "/[id]/settings/avatar",
-                            params: {
-                                id: String(id)
-                            }
-                        })} >
-                        <Text className="text-lg dark:text-white">Modifier</Text>
-                    </Pressable>
+                    <View className="flex-1 flex-row items-center gap-2 ">
+                        <Pressable
+                            onPress={() => router.push({ pathname: "/[id]/settings/avatar", params: { id: trip._id } })}
+                        >
+                            <Text className="text-neutral-900 dark:text-neutral-100">
+                                Modifier avatar
+                            </Text>
+                        </Pressable>
+                        <Text className="text-neutral-900 dark:text-neutral-100">|</Text>
+                        <Pressable
+                            onPress={() => router.push({ pathname: "/[id]/settings/username", params: { id: trip._id } })}
+                        >
+                            <Text className="text-neutral-900 dark:text-neutral-100">
+                                Modifier nom
+                            </Text>
+                        </Pressable>
+                    </View>
                 </View>
             </View>
 
@@ -152,7 +158,7 @@ export default function TripSettings() {
 
 
 
-          
+
         </Animated.View>
     )
 }

@@ -85,14 +85,20 @@ export const TripUsersForm = ({ control, selected = -1  }: { control: Control<Tr
                                     required: true,
                                     maxLength: 25
                                 }}
-                                endAdornment={
-                                    <Pressable
-                                        className="mx-2"
-                                        onPress={() => selected !== index && remove(index)}>
-                                        {selected === index ?
-                                            <Text className="font-bold bg-blue-600 p-1 text-white">Moi</Text> :
-                                            !item._id && <IconSymbol name="xmark.circle" size={24} color="black" />}
-                                    </Pressable>}
+                                disabled={!!item._id}
+                                 endAdornment={
+                                    (selected === index || !item._id) ? (
+                                        <Pressable
+                                            className="mx-2"
+                                            disabled={selected===index}
+                                            onPress={() => selected !== index && remove(index)}>
+                                            {selected === index ?
+                                                <Text className="font-bold bg-blue-600 p-1 text-white">Moi</Text> :
+                                                <IconSymbol name="xmark.circle" size={24} />}
+                                        </Pressable>
+                                    ) : null
+                                }
+                                    
                             />
                         </Animated.View>
                     ))}
@@ -102,7 +108,7 @@ export const TripUsersForm = ({ control, selected = -1  }: { control: Control<Tr
                         >
                             <Pressable className="rounded-b-lg"
                                 onPress={() => {
-                                    append({ name: "" });
+                                    append({ name: "", _id: "" });
                                 }}>
                                 <Text className="text-md font-bold text-blue-500 p-2">
                                     Ajouter un participant

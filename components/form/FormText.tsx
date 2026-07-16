@@ -4,13 +4,14 @@ import { useController } from "react-hook-form";
 import { TextInput, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 
-export const FormText = ({ control, name, placeholder, rules, endAdornment, autoFocus }: {
+export const FormText = ({ control, name, placeholder, rules, endAdornment, autoFocus, disabled }: {
     control: any,
     name: string,
     placeholder?: string,
     rules?: object,
     endAdornment?: React.ReactNode,
-    autoFocus?: boolean
+    autoFocus?: boolean,
+    disabled?: boolean
 }) => {
 
     const { field: { value, onChange },
@@ -51,7 +52,7 @@ export const FormText = ({ control, name, placeholder, rules, endAdornment, auto
 
     return (
         <Animated.View style={animatedStyle}
-            className="flex-row items-center bg-white dark:bg-gray-600  border focus:border focus:border-blue-500 rounded-xl h-12">
+            className={`flex-row items-center ${disabled ? 'bg-gray-200 dark:bg-gray-700 opacity-60' : 'bg-white dark:bg-gray-600'} border focus:border focus:border-blue-500 rounded-xl h-12`}>
             <TextInput
                 onChangeText={onChange}
                 value={value}
@@ -63,6 +64,7 @@ export const FormText = ({ control, name, placeholder, rules, endAdornment, auto
                     textAlignVertical: "top",
                 }}
                 autoFocus={autoFocus}
+                editable={!disabled}
 
             />
             {endAdornment &&
