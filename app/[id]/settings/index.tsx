@@ -1,5 +1,4 @@
 import { Avatar } from "@/components/ui/Avatar";
-import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Switch } from "@/components/ui/Switch";
 import { RestrictionIcon } from "@/components/users/RestrictionIcon";
@@ -8,7 +7,7 @@ import { TripContext } from "@/context/TripContext";
 import { useGetTripUser, useUpdateTripUser } from "@/hooks/api/useTrips";
 import { router } from "expo-router";
 import { useContext, useMemo } from "react";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 
 
@@ -24,7 +23,7 @@ export default function TripSettings() {
     const restrictions = useMemo(() => user?.restrictions || [], [user]);
 
     const onSwitch = async (value: boolean, name: string) => {
-        if(!user) return;
+        if (!user) return;
         let newRestrictions = user?.restrictions || [];
         if (value)
             newRestrictions = [...newRestrictions, name]
@@ -64,20 +63,22 @@ export default function TripSettings() {
                 <Avatar src={user?.avatar} size2="xl" alt={user?.name.charAt(0)} />
                 <View className="flex-row gap-5 items-end">
                     <Text className="dark:text-white text-3xl font-bold">{user?.name}</Text>
-                    <View className="flex-row items-center gap-2">
-                        <Button
+                    <View className="flex-1 flex-row items-center gap-2 ">
+                        <Pressable
                             onPress={() => router.push({ pathname: "/[id]/settings/avatar", params: { id: trip._id } })}
-                            variant="none"
-                            className="px-0 ">
-                            <Text>Modifier avatar</Text>
-                        </Button>
-                        <Text className="">|</Text>
-                        <Button
+                        >
+                            <Text className="text-neutral-900 dark:text-neutral-100">
+                                Modifier avatar
+                            </Text>
+                        </Pressable>
+                        <Text className="text-neutral-900 dark:text-neutral-100">|</Text>
+                        <Pressable
                             onPress={() => router.push({ pathname: "/[id]/settings/username", params: { id: trip._id } })}
-                            variant="none"
-                            className="px-0">
-                            <Text>Modifier nom</Text>
-                        </Button>
+                        >
+                            <Text className="text-neutral-900 dark:text-neutral-100">
+                                Modifier nom
+                            </Text>
+                        </Pressable>
                     </View>
                 </View>
             </View>
