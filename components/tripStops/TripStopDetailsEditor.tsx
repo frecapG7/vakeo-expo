@@ -66,7 +66,7 @@ export const TripStopDetailsEditor = ({
 
 
 
-    const { control, handleSubmit, reset, formState: { isSubmitSuccessful } } = useForm<TripStop>();
+    const { control, handleSubmit, reset, formState: { isDirty } } = useForm<TripStop>();
 
     useEffect(() => {
         if (tripStop)
@@ -213,6 +213,7 @@ export const TripStopDetailsEditor = ({
                         title="Modifier"
                         onPress={handleSubmit(onSubmit)}
                         isLoading={isSubmitting}
+                        disabled={!isDirty}
                     />
                 </View>
             </BottomSheetView>
