@@ -7,7 +7,7 @@ import * as Clipboard from 'expo-clipboard';
 import { Image, ImageBackground } from "expo-image";
 import React, { useEffect, useState } from "react";
 import { Control, useController, useFormState } from "react-hook-form";
-import { Linking, Text, View } from "react-native";
+import { Linking, Pressable, Text, View } from "react-native";
 import Animated, { BounceIn, BounceOut, SlideInLeft, SlideOutRight } from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
 import { Button } from "../ui/Button";
@@ -98,11 +98,10 @@ export const BottomAccommodationForm = ({ control }: AccommodationFormProps) => 
                 entering={SlideInLeft}
                 exiting={SlideOutRight}
                 className="">
-                <Button
+                <Pressable
                     onPress={onLinkClick}
-                    className="rounded-xl bg-white dark:bg-gray-800 shadow-sm dark:shadow-gray-900/20  gap-1 pb-2 overflow-hidden"
+                    className="rounded-xl bg-white dark:bg-gray-800 shadow-sm dark:shadow-gray-900/20  gap-1 pb-2 overflow-hidden active:opacity-70"
                 >
-
                     <ImageBackground
                         source={accommodation?.image}
                         style={{
@@ -142,8 +141,7 @@ export const BottomAccommodationForm = ({ control }: AccommodationFormProps) => 
                             Voir le détail
                         </Text>
                     </View>
-
-                </Button>
+                </Pressable>
             </Animated.View>
         )
     }
