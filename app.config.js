@@ -1,6 +1,12 @@
 const IS_PRODUCTION = process.env.APP_ENVIRONMENT === 'production';
 const packageJson = require('./package.json');
 
+
+const computeVersionCode = (version) => {
+  const [major, minor, patch] = version.split('.').map(Number);
+  return major * 10000 + minor * 100 + patch;
+}
+
 export default {
   expo: {
     name: IS_PRODUCTION ? 'olyne' : 'vakeo-expo',
@@ -23,6 +29,7 @@ export default {
       },
     },
     android: {
+      versionCode: computeVersionCode(packageJson.version),
       adaptiveIcon: {
         foregroundImage: './assets/images/adaptive-icon.png',
         backgroundColor: '#ffffff',
