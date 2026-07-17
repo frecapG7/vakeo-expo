@@ -195,6 +195,7 @@ export default function TripCalendar() {
                         <Button variant="contained"
                             title="Ajouter"
                             size="small"
+                            className="my-2"
                             onPress={() => router.push({
                                 pathname: "/[id]/events/new",
                                 params: {
