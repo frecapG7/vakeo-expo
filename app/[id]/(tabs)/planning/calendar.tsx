@@ -102,7 +102,7 @@ export default function TripCalendar() {
     };
 
     return (
-        <Animated.View style={styles.container}>
+        <Animated.ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
             <Calendar
                 current={currentDate}
                 onMonthChange={(date) => setCurrentDate(date.dateString)}
@@ -141,7 +141,7 @@ export default function TripCalendar() {
 
             />
             {selectedDay && (
-                <Animated.ScrollView
+                <Animated.View
                     entering={SlideInDown.duration(300)}
                     exiting={SlideOutDown.duration(200)}
                 >
@@ -205,8 +205,8 @@ export default function TripCalendar() {
                             })}
                         />
                     </View>
-                </Animated.ScrollView>
+                </Animated.View>
             )}
-        </Animated.View>
+        </Animated.ScrollView>
     )
 }
