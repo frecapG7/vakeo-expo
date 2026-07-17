@@ -102,7 +102,7 @@ export default function TripCalendar() {
     };
 
     return (
-        <Animated.View style={styles.container}>
+        <Animated.ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
             <Calendar
                 current={currentDate}
                 onMonthChange={(date) => setCurrentDate(date.dateString)}
@@ -141,7 +141,7 @@ export default function TripCalendar() {
 
             />
             {selectedDay && (
-                <Animated.ScrollView
+                <Animated.View
                     entering={SlideInDown.duration(300)}
                     exiting={SlideOutDown.duration(200)}
                 >
@@ -195,6 +195,7 @@ export default function TripCalendar() {
                         <Button variant="contained"
                             title="Ajouter"
                             size="small"
+                            className="my-2"
                             onPress={() => router.push({
                                 pathname: "/[id]/events/new",
                                 params: {
@@ -205,8 +206,8 @@ export default function TripCalendar() {
                             })}
                         />
                     </View>
-                </Animated.ScrollView>
+                </Animated.View>
             )}
-        </Animated.View>
+        </Animated.ScrollView>
     )
 }

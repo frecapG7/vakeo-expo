@@ -72,10 +72,7 @@ export default function PlanningLayout() {
             }}>
                 <Stack.Screen name="index" />
                 <Stack.Screen name="calendar" />
-                <Stack.Screen name="day" options={{
-                    presentation: "modal",
-
-                }} />
+                <Stack.Screen name="day" />
             </Stack>
         </View>
 
