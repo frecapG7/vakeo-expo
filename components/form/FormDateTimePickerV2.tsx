@@ -8,8 +8,6 @@ import { Pressable, Text, View } from "react-native";
 import { Calendar, CalendarUtils } from "react-native-calendars";
 import Animated, { FadeIn, FadeOut, StretchInY, StretchOutY } from "react-native-reanimated";
 
-
-
 const hoursItems = Array.from({ length: 24 }).map((_, index) => ({
     value: index,
     label: index < 10 ? "0" + index : index
@@ -35,11 +33,9 @@ const WheelTimePicker = ({ value, onChangeHour, onChangeMinute }: { value?: Date
                 }}
                 itemTextStyle={{
                     color: colors.text,
-                    // backgroundColor:colors.neutral
                 }}
                 overlayItemStyle={{
                     backgroundColor: colors.neutral
-                    // marHorizontal: 10
                 }}
             />
             <WheelPicker
@@ -53,23 +49,21 @@ const WheelTimePicker = ({ value, onChangeHour, onChangeMinute }: { value?: Date
                 }}
                 itemTextStyle={{
                     color: colors.text,
-                    // backgroundColor:colors.neutral
                 }}
                 overlayItemStyle={{
                     backgroundColor: colors.neutral
-                    // marHorizontal: 10
                 }}
             />
         </View>)
 }
 
-export const FormDateTimePickerV2 = ({ control, rules }:
+// 🚨 Ajout de initialDate dans les props du composant
+export const FormDateTimePickerV2 = ({ control, rules, initialDate }:
     {
         control: any;
-        rules: any
+        rules: any;
+        initialDate?: string | Date;
     }) => {
-
-
 
     const { field: { value: startDate, onChange: setStartDate } } = useController({
         control,
@@ -99,7 +93,6 @@ export const FormDateTimePickerV2 = ({ control, rules }:
     const [showEndDateTimePicker, setShowEndDateTimePicker] = useState(false);
     const { formatDate, formatHour } = useI18nTime();
 
-
     return (
         <View className="gap-2">
             <View>
@@ -124,6 +117,9 @@ export const FormDateTimePickerV2 = ({ control, rules }:
                         exiting={StretchOutY}
                     >
                         <Calendar
+                            // ✨ LA MAGIE OPÈRE ICI : Si on a déjà choisi une date, on ouvre le calendrier dessus. 
+                            // Sinon, on s'ouvre sur la date de début du séjour (initialDate).
+                            initialDate={startDate ? String(startDate) : (initialDate ? String(initialDate) : undefined)}
                             enableSwipeMonths
                             theme={{
                                 backgroundColor: colors.calendarBackground,
@@ -289,5 +285,3 @@ export const FormDateTimePickerV2 = ({ control, rules }:
         </View >
     )
 }
-
-
