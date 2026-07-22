@@ -12,7 +12,12 @@ type TripActionCardProps = {
   onPress: () => void;
   showChevron?: boolean;
   disabled?: boolean;
-  capitalizeTitle ?: boolean;
+  capitalizeTitle?: boolean;
+  badge?: {
+    color: string;
+    text?: string;
+    icon?: string;
+  };
 };
 
 export const TripActionCard = ({
@@ -22,11 +27,12 @@ export const TripActionCard = ({
   onPress,
   showChevron = true,
   disabled = false,
-  capitalizeTitle = false
+  capitalizeTitle = false,
+  badge
 }: TripActionCardProps) => {
   return (
     <Button
-      className={`flex-row items-center p-1 py-2 rounded-xl dark:bg-gray-800 shadow-sm will-change-variable ${disabled ? "opacity-60" : "active:bg-gray-50 dark:active:bg-gray-700"}`}
+      className={`flex-row items-center p-1 py-2 rounded-xl dark:bg-gray-800 shadow-sm will-change-variable relative ${disabled ? "opacity-60" : "active:bg-gray-50 dark:active:bg-gray-700"}`}
       onPress={onPress}
       disabled={disabled}
     >
@@ -43,9 +49,20 @@ export const TripActionCard = ({
           </Text>
         )}
       </View>
-      {showChevron && (
-        <IconSymbol name="chevron.right" size={20} color="#9CA3AF" />
-      )}
+      <View className="flex-row items-center relative">
+        {showChevron && (
+          <IconSymbol name="chevron.right" size={20} color="#9CA3AF" />
+        )}
+      </View>
+        {badge && (
+          <View className="rounded-full p-1 absolute -top-3 right-0" style={{ backgroundColor: badge.color }}>
+            {badge.icon ? (
+              <IconSymbol name={badge.icon} size={14} color="white" />
+            ) : (
+              <Text className="text-white text-xs font-bold px-1">{badge.text || ""}</Text>
+            )}
+          </View>
+        )}
     </Button>
   );
 };

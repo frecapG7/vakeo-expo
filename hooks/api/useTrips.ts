@@ -1,5 +1,6 @@
 import axios from "@/lib/axios";
-import { Dashboard, Trip, TripUser } from "@/types/models";
+import { Trip, TripUser } from "@/types/models";
+import { Dashboard } from "@/types/responses";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const postTrip = async (trip: Omit<Trip, '_id'>): Promise<Trip> => {
@@ -106,10 +107,10 @@ export const useShareTrip = (id: string) => {
 
 
 
-const getDashboard = async (tripId: string, user: string): Promise<Dashboard> => {
+const getDashboard = async (tripId: string, userId?: string): Promise<Dashboard> => {
   const response = await axios.get(`/trips/${tripId}/dashboard`, {
-    params: {
-      user
+    headers: {
+      ...(userId && { "x-user-id": userId })
     }
   });
   return response.data;
@@ -117,11 +118,10 @@ const getDashboard = async (tripId: string, user: string): Promise<Dashboard> =>
 
 
 
-export const useGetDashboard = (tripId: any, user: any, options?: any) => {
+export const useGetDashboard = (tripId: string, userId?: string, enabled ?: boolean) => {
   return useQuery<Dashboard>({
     queryKey: ["trips", tripId, "dashboard"],
-    queryFn: () => getDashboard(tripId, user),
-    enabled: !!tripId && !!user,
-    ...options
+    queryFn: () => getDashboard(tripId, userId),
+    enabled
   })
 }

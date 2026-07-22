@@ -6,14 +6,13 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { default as styles } from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
-import { useGetGoodsCount } from "@/hooks/api/useGoods";
-import { useGetTrip } from "@/hooks/api/useTrips";
+import { useGetDashboard } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import { useDeleteStorageTrip } from "@/hooks/storage/useStorageTrips";
 import dayjs from "@/lib/dayjs-config";
 import { countDaysBetween } from "@/lib/utils";
 import { ImageBackground } from "expo-image";
-import { useGlobalSearchParams, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useContext } from "react";
 import { Platform, Pressable, Text, View } from "react-native";
 import { MenuProvider } from "react-native-popup-menu";
@@ -23,10 +22,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function ItemDetails() {
 
-    const { id } = useGlobalSearchParams<{ id: string }>();
-    const { data: trip } = useGetTrip(id, true);
-    const { me } = useContext(TripContext);
-    const { data: goodsCount } = useGetGoodsCount(id);
+    const { me, trip } = useContext(TripContext);
+    const { data: dashboard } = useGetDashboard(trip?._id, me?._id, !!trip && (!trip?.isPrivate || !!me?._id))
     const deleteTrip = useDeleteStorageTrip();
 
     const router = useRouter();
@@ -34,11 +31,11 @@ export default function ItemDetails() {
     const { formatRange } = useI18nTime();
 
     const handleShare = () => {
-        router.push({ pathname: "/[id]/share", params: { id } })
+        router.push({ pathname: "/[id]/share", params: { id: trip._id } })
     }
 
     const onDelete = async () => {
-        await deleteTrip.mutateAsync(id);
+        await deleteTrip.mutateAsync(trip._id);
         router.dismissAll();
     };
 
@@ -67,9 +64,8 @@ export default function ItemDetails() {
         );
 
 
-    const stopsCount = trip?.stops?.length || 0;
-    const isSingleStop = stopsCount === 1;
-    const hasStops = stopsCount > 0;
+    const isSingleStop = Number(dashboard?.stops?.count) === 1;
+    const hasStops = Number(dashboard?.stops?.count) > 0;
 
     return (
         <MenuProvider>
@@ -94,7 +90,7 @@ export default function ItemDetails() {
                                         onPressOut={() => router.push({
                                             pathname: "/[id]/settings",
                                             params: {
-                                                id
+                                                id: trip._id
                                             }
                                         })}>
                                         <Avatar src={me?.avatar}
@@ -107,7 +103,7 @@ export default function ItemDetails() {
                                         onShare={handleShare}
                                         onEdit={() => router.push({
                                             pathname: "/[id]/edit-general",
-                                            params: { id }
+                                            params: { id: trip._id }
                                         })}
                                         onDelete={onDelete}
                                         isDeleting={deleteTrip.isPending}
@@ -119,13 +115,16 @@ export default function ItemDetails() {
                 </View>
                 <View className="shadow mx-4 -mt-10 mb-5 px-2 pt-4 rounded-xl gap-5 bg-white dark:bg-gray-900 flex" >
                     <View className="gap-1">
-                        <Text className="text-4xl font-bold dark:text-white" numberOfLines={2}>{trip?.name}</Text>
-                        <Button className="" onPress={() =>
-                            router.push({
-                                pathname: "/[id]/attendees",
-                                params: { id }
-                            })
-                        }>
+                        <Text className="text-4xl font-bold dark:text-white" numberOfLines={2}>
+                            {trip?.name}
+                        </Text>
+                        <Button className=""
+                            onPress={() =>
+                                router.push({
+                                    pathname: "/[id]/attendees",
+                                    params: { id: trip._id }
+                                })
+                            }>
                             <View className="gap-1 flex-1 items-start">
                                 <AvatarsGroup
                                     maxLength={5}
@@ -149,12 +148,17 @@ export default function ItemDetails() {
                             title={trip?.startDate ? formatRange(trip?.startDate, trip?.endDate, { compactWeekday: true, compactMonth: true }) : "Choisir des dates"}
                             capitalizeTitle
                             subtitle={trip?.startDate && `${countDaysBetween(dayjs(trip?.startDate), dayjs(trip?.endDate))} jours`}
+                            badge={dashboard?.polls?.hasDatePoll ? {
+                                color: dashboard?.polls?.hasPendingDatePoll ? "#EF4444" : "#22C55E",
+                                icon: dashboard?.polls?.hasPendingDatePoll ? "exclamationmark" : "checkmark"
+                            } : undefined}
                             onPress={() => router.push({
                                 pathname: "/[id]/dates",
                                 params: {
-                                    id
+                                    id: trip._id
                                 }
-                            })} />
+                            })}
+                        />
 
                         <TripActionCard
                             icon={{
@@ -163,13 +167,17 @@ export default function ItemDetails() {
                             title={Number(trip?.stops?.length) > 0 ? `${Number(trip.stops?.length) > 1 ? `Voir les ${trip.stops?.length} étapes` : "Voir le lieu"}` : "Choisir un lieu"}
                             subtitle={hasStops
                                 ? isSingleStop
-                                    ? trip.stops?.[0].name
-                                    : `De ${trip.stops?.[0].name} à ${String(trip.stops?.[stopsCount - 1].name)}`
+                                    ? dashboard?.stops?.first
+                                    : `De ${dashboard?.stops?.first} à ${dashboard?.stops?.last}`
                                 : ""}
+                            badge={dashboard?.polls?.hasStopPoll ? {
+                                color: dashboard?.polls?.hasPendingStopPoll ? "#EF4444" : "#22C55E",
+                                icon: dashboard?.polls?.hasPendingStopPoll ? "exclamationmark" : "checkmark"
+                            } : undefined}
                             onPress={() => router.push({
                                 pathname: "/[id]/location",
                                 params: {
-                                    id
+                                    id: trip._id
                                 }
                             })}
                         />
@@ -178,11 +186,11 @@ export default function ItemDetails() {
                                 name: "list.bullet"
                             }}
                             title="Voir la liste partagée"
-                            subtitle={`${goodsCount?.totalCount ?? 0} élément(s) - ${goodsCount?.checkedCount ?? 0} validé(s)`}
+                            subtitle={`${dashboard?.goods?.total ?? 0} élément(s) - ${dashboard?.goods?.missing ?? 0} manquant(s)`}
                             onPress={() => router.push({
                                 pathname: "/[id]/goods",
                                 params: {
-                                    id
+                                    id: trip._id
                                 }
                             })}
                         />
@@ -198,6 +206,36 @@ export default function ItemDetails() {
                         </Text>
                     </View>
                 }
+
+                {dashboard?.events?.nextEvent && (
+                    <View className="mx-4 my-5">
+                        <Text className="text-lg font-bold mb-2 dark:text-white">Prochain événement</Text>
+                        <Button
+                            className="flex-row items-center rounded-2xl bg-white dark:bg-gray-800 shadow-md p-4 border border-gray-100 dark:border-gray-700"
+                            onPress={() => router.push({
+                                pathname: "/[id]/events/[eventId]",
+                                params: {
+                                    id: trip._id,
+                                    eventId: dashboard.events.nextEvent?._id
+                                }
+                            })}
+                        >
+                            <View className="flex-row gap-3 items-center flex-1">
+                                <IconSymbol name="calendar" size={24} color="#F97316" />
+                                <View className="flex-1">
+                                    <Text className="text-lg font-bold dark:text-white" numberOfLines={1}>
+                                        {dashboard.events.nextEvent.name}
+                                    </Text>
+                                    <Text className="text-sm text-gray-500 dark:text-gray-400">
+                                        {dayjs(dashboard.events.nextEvent.startDate).format("DD MMM YYYY, HH:mm")} - {dayjs(dashboard.events.nextEvent.endDate).format("HH:mm")}
+                                    </Text>
+                                </View>
+                                <IconSymbol name="chevron.right" size={20} color="#9CA3AF" />
+                            </View>
+                        </Button>
+                    </View>
+                )}
+
             </Animated.ScrollView>
         </MenuProvider>
     )
