@@ -1,4 +1,4 @@
-import { EventIcon } from "@/components/events/EventIcon";
+import { EventIcon, getEventIconSource } from "@/components/events/EventIcon";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
@@ -174,7 +174,7 @@ export default function TripCalendar() {
                                         }
                                     })}>
                                     <View className="mb-2 p-3 bg-gray-100 dark:bg-gray-800 rounded-lg flex-row items-center gap-3">
-                                        <EventIcon name={event.type} size="sm" />
+                                        <EventIcon source={getEventIconSource(event.type)} size="sm" />
                                         <View className="flex-1">
                                             <Text className="font-medium text-text dark:text-white">
                                                 {event.name}

@@ -81,7 +81,8 @@ const MAPPING = {
   "number.circle": "add-circle-outline",
   "number.circle.fill": "add-circle",
   "doc.plaintext" : "text-snippet",
-  "bubble.left.fill": "chat-bubble"
+  "bubble.left.fill": "chat-bubble",
+  "exclamationmark": "warning",
 } as IconMapping;
 
 /**
