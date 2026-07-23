@@ -5,7 +5,7 @@ import { Event, TripUser } from "@/types/models";
 import { useMemo } from "react";
 import { Text, View } from "react-native";
 import Animated from "react-native-reanimated";
-import { EventIcon } from "./EventIcon";
+import { EventIcon, getEventIconSource } from "./EventIcon";
 
 export const EventItem = ({ event, user, onPress }: { event: Event, user: TripUser, onPress?: () => void }) => {
 
@@ -20,7 +20,7 @@ export const EventItem = ({ event, user, onPress }: { event: Event, user: TripUs
     >
       <View className="flex-row gap-3 items-center">
         <View className="mt-1">
-          <EventIcon name={event.type} size="md" />
+          <EventIcon source={getEventIconSource(event.type)} size="md" />
         </View>
         <View className="flex-1 gap-2 justify-between">
           <View className="flex-row items-center justify-between">
@@ -46,14 +46,14 @@ export const EventItem = ({ event, user, onPress }: { event: Event, user: TripUs
               <IconSymbol name="clock" color="gray" size={14} />
               {event?.startDate && (
                 <Text className="text-sm text-gray-500 dark:text-gray-400">
-                  {dayjs(event?.startDate).format("HH:mm")}-{dayjs(event?.endDate).format("HH:mm")}
+                  {dayjs(event?.startDate).format("HH:mm")}{event.endDate ? `-${dayjs(event.endDate).format("HH:mm")}` : ''}
                 </Text>
               )}
             </View>
             <View className="flex-row items-center gap-1">
               <IconSymbol name="person.2.fill" color="gray" size={14} />
               <Text className="text-sm text-gray-500 dark:text-gray-400">
-                {event?.attendees?.length}
+                {event?.attendees?.length ?? 0}
               </Text>
             </View>
             <View className="flex-row items-center gap-1">

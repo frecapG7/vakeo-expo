@@ -14,7 +14,7 @@ import { countDaysBetween } from "@/lib/utils";
 import { ImageBackground } from "expo-image";
 import { useRouter } from "expo-router";
 import { useContext } from "react";
-import { Platform, Pressable, Text, View } from "react-native";
+import { Platform, Pressable, RefreshControl, Text, View } from "react-native";
 import { MenuProvider } from "react-native-popup-menu";
 import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -23,7 +23,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 export default function ItemDetails() {
 
     const { me, trip } = useContext(TripContext);
-    const { data: dashboard } = useGetDashboard(trip?._id, me?._id, !!trip && (!trip?.isPrivate || !!me?._id))
+    const { data: dashboard, refetch, isRefetching } = useGetDashboard(trip?._id, me?._id, !!trip && (!trip?.isPrivate || !!me?._id))
     const deleteTrip = useDeleteStorageTrip();
 
     const router = useRouter();
@@ -69,7 +69,13 @@ export default function ItemDetails() {
 
     return (
         <MenuProvider>
-            <Animated.ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: bottomPadding }}>
+            <Animated.ScrollView
+                style={{ flex: 1 }}
+                contentContainerStyle={{ paddingBottom: bottomPadding }}
+                refreshControl={
+                    <RefreshControl refreshing={isRefetching} onRefresh={refetch}/>
+                }
+            >
                 <View className="h-80 w-full">
                     <ImageBackground source={trip?.image}
                         style={{
@@ -227,7 +233,14 @@ export default function ItemDetails() {
                                         {dashboard.events.nextEvent.name}
                                     </Text>
                                     <Text className="text-sm text-gray-500 dark:text-gray-400">
-                                        {dayjs(dashboard.events.nextEvent.startDate).format("DD MMM YYYY, HH:mm")} - {dayjs(dashboard.events.nextEvent.endDate).format("HH:mm")}
+                                        {dashboard.events.nextEvent.startDate
+                                            ? dayjs(dashboard.events.nextEvent.startDate).format("DD MMM YYYY, HH:mm")
+                                            : "Date à confirmer"
+                                        }
+                                        {dashboard.events.nextEvent.endDate
+                                            ? ` - ${dayjs(dashboard.events.nextEvent.endDate).format("HH:mm")}`
+                                            : ""
+                                        }
                                     </Text>
                                 </View>
                                 <IconSymbol name="chevron.right" size={20} color="#9CA3AF" />

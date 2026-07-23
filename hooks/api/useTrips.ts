@@ -120,7 +120,7 @@ const getDashboard = async (tripId: string, userId?: string): Promise<Dashboard>
 
 export const useGetDashboard = (tripId: string, userId?: string, enabled ?: boolean) => {
   return useQuery<Dashboard>({
-    queryKey: ["trips", tripId, "dashboard"],
+    queryKey: ["trips", tripId, "dashboard", userId ?? null],
     queryFn: () => getDashboard(tripId, userId),
     enabled
   })

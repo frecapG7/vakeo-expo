@@ -1,4 +1,4 @@
-import { EventIcon } from "@/components/events/EventIcon";
+import { EventIcon, getEventIconSource } from "@/components/events/EventIcon";
 import { EventInfo } from "@/components/events/EventInfo";
 import { EventsGoodsList } from "@/components/events/EventsGoodsList";
 import { EventUserList } from "@/components/events/EventsUsersList";
@@ -93,7 +93,7 @@ export default function EventDetails() {
                 </LinearGradient>
                 <View className="flex-row justify-center" style={{ marginTop: -60 - insets.top }}>
                     <View className="rounded-full bg-white p-1 border-2 border-orange-600">
-                        <EventIcon name={event?.type} size="lg" />
+                        <EventIcon source={getEventIconSource(event?.type)} size="lg" />
                     </View>
                 </View>
                 <View className="my-4">

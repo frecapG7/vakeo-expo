@@ -1,4 +1,4 @@
-import { EventIcon } from "@/components/events/EventIcon";
+import { EventIcon, getEventIconSource } from "@/components/events/EventIcon";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
@@ -58,7 +58,7 @@ export default function NewEventType() {
                                 <IconSymbol name="checkmark" size={16} color="white" />
                             </Animated.View>
                         }
-                        <EventIcon name={eventType} size="sm" />
+                        <EventIcon source={getEventIconSource(eventType)} size="sm" />
                         <Text className={`capitalize ${eventType === type ? "font-bold text-white" : "dark:text-gray-400"}`}>
                             {toLabel({ type: eventType })}
                         </Text>

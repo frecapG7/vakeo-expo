@@ -5,7 +5,7 @@ import PartyEventIcon from "@/assets/icons/party_event_icon.png";
 import RestaurantEventIcon from "@/assets/icons/restaurant_event_icon.png";
 import SportEventIcon from "@/assets/icons/sport_event_icon.png";
 import { EventType } from "@/types/models";
-import { Image } from "expo-image";
+import { Image, ImageSource } from "expo-image";
 import { View } from "react-native";
 
 
@@ -26,15 +26,25 @@ const nameToSource = {
     "MEAL": MealEventIcon,
     "PARTY": PartyEventIcon,
     "SPORT": SportEventIcon,
-    "RESTAURANT": RestaurantEventIcon
-}
+    "RESTAURANT": RestaurantEventIcon,
+    "VISITATION": PartyEventIcon,
+    "OTHER": PartyEventIcon
+};
+
+const fallbackSource = PartyEventIcon;
 
 
-export const EventIcon = ({ name, size = "md" }: { name: EventType, size: ImageSize }) => {
+export const getEventIconSource = (name: EventType | string | undefined): ImageSource => {
+    if (!name) return fallbackSource;
+    const source = nameToSource[name as EventType];
+    return source ?? fallbackSource;
+};
+
+
+export const EventIcon = ({ source, size = "md" }: { source: ImageSource, size: ImageSize }) => {
 
 
     const sizeClass = sizeToClassMap[size];
-    const source = nameToSource[name];
 
     return (
         <View className={`rounded-full items-center p-1 ${sizeClass}`}>
@@ -51,4 +61,4 @@ export const EventIcon = ({ name, size = "md" }: { name: EventType, size: ImageS
         </View>
     )
 
-}
+};
