@@ -100,7 +100,7 @@ export default function TripConversations() {
         );
     }
 
-    if (conversations.length === 0) {
+    if (conversations?.length === 0) {
         return (
             <View className="flex-1 justify-center items-center p-4">
                 <Text className="text-gray-500 dark:text-gray-400 text-center">
