@@ -1,6 +1,5 @@
 import { BackgroundHeader } from "@/components/header/BackgroundHeader";
 import { Avatar } from "@/components/ui/Avatar";
-import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetTrip, useGetTripUser } from "@/hooks/api/useTrips";
@@ -107,15 +106,7 @@ export default function TripDetailsLayout() {
                 <Stack.Screen name="chat"
                     options={{
                         headerShown: true,
-                        title: "Messagerie",
-                        headerLeft: () => (
-                            <Pressable onPress={() => router.replace({
-                                pathname: "/[id]/(tabs)",
-                                params: {id}
-                            })}>
-                                <IconSymbol name="arrow.left" color="white" />
-                            </Pressable>
-                        ),
+                        title: "General",
                         headerRight: () => (
                             <Pressable onPress={() => router.navigate('./settings')}>
                                 <Avatar

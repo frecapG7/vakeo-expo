@@ -9,7 +9,7 @@ import { useCheckGood, useDeleteGood, useGetGoods, usePostGood, usePutGood } fro
 import useColors from "@/hooks/styles/useColors";
 import { Good } from "@/types/models";
 import BottomSheet, { BottomSheetFlatList, BottomSheetView } from "@gorhom/bottom-sheet";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Alert, Pressable, Text, View } from "react-native";
@@ -73,22 +73,22 @@ const GoodEvents = ({ id, good }: { id: any, good?: Good }) => {
 
 export default function TripGoods() {
 
-    const { id } = useLocalSearchParams();
-    const { me } = useContext(TripContext);
+    const { eventId, title } = useLocalSearchParams<{ eventId?: string, title?: string }>();
+    const { trip, me } = useContext(TripContext);
 
 
     const [unchecked, setUnchecked] = useState(false);
-    const { data, isLoading, isFetching, isFetchingNextPage, hasNextPage, fetchNextPage, refetch } = useGetGoods(id, {
-        ...(unchecked && { unchecked: true })
+    const { data, isLoading, isFetching, isFetchingNextPage, hasNextPage, fetchNextPage, refetch } = useGetGoods(trip?._id, {
+        ...(unchecked && { unchecked: true }),
+        ...eventId && { event: eventId }
     });
 
-    const checkGood = useCheckGood(id);
-    const putGood = usePutGood(id);
-    const postGood = usePostGood(id);
-    const deleteGood = useDeleteGood(id);
+    const checkGood = useCheckGood(trip._id);
+    const putGood = usePutGood(trip._id);
+    const postGood = usePostGood(trip._id);
+    const deleteGood = useDeleteGood(trip._id);
 
     const onCheck = async (data: Good) => await checkGood.mutateAsync(data);
-
 
     const goods = useMemo(() => data?.pages.flatMap((page) => page?.goods), [data]);
 
@@ -98,9 +98,10 @@ export default function TripGoods() {
 
 
     const defaultValues = useMemo(() => ({
-        trip: String(id),
-        createdBy: me
-    }), [id, me]);
+        trip: trip._id,
+        createdBy: me,
+        ...(eventId && { event: { _id: eventId } })
+    }), [trip._id, me, eventId]);
 
 
     const { control, handleSubmit, reset, formState: { isSubmitSuccessful } } = useForm<Good>({
@@ -121,7 +122,6 @@ export default function TripGoods() {
         }
     }
     const onDelete = async (data: Good) => {
-
         await deleteGood.mutateAsync(data);
         reset(defaultValues);
         Toast.success("Élément supprimé")
@@ -133,10 +133,19 @@ export default function TripGoods() {
             reset({
                 name: "",
                 quantity: "",
-                trip: String(id),
-                createdBy: me
+                trip: trip._id,
+                createdBy: me,
+                ...(eventId && { event: { _id: eventId } })
             })
-    }, [isSubmitSuccessful, reset, id, me])
+    }, [isSubmitSuccessful, reset, trip._id, me, eventId])
+
+
+    const navigation = useNavigation();
+    useEffect(() => {
+        navigation.setOptions({
+            title: title ?? "General"
+        })
+    })
 
 
 
@@ -271,7 +280,7 @@ export default function TripGoods() {
 
                         {bottomSheetIndex > 2 &&
                             <Animated.View entering={FadeIn} exiting={FadeOut}>
-                                <GoodEvents id={id} good={currentGood} />
+                                <GoodEvents id={trip._id} good={currentGood} />
                             </Animated.View>
 
                         }

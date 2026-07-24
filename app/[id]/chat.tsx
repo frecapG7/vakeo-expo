@@ -1,33 +1,44 @@
 import { Avatar } from "@/components/ui/Avatar";
 import { TripContext } from "@/context/TripContext";
-import { useGetMessages, usePostMessage } from "@/hooks/api/useMessages";
-import { useGetTrip } from "@/hooks/api/useTrips";
+import { useGetMessages, useMarkAllAsRead, usePostMessage } from "@/hooks/api/useMessages";
 import dayjs from "@/lib/dayjs-config";
-import { useLocalSearchParams } from "expo-router";
-import { useCallback, useContext, useMemo } from "react";
+import { useLocalSearchParams, useNavigation } from "expo-router";
+import { useCallback, useContext, useEffect, useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
 import { GiftedChat, IMessage, InputToolbar, Send } from 'react-native-gifted-chat';
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 
 export default function TripMessages() {
 
+    const { me, trip } = useContext(TripContext);
+    const { eventId, title } = useLocalSearchParams<{ eventId?: string, title?: string }>();
+    const { data, fetchNextPage, hasNextPage } = useGetMessages(trip._id, eventId);
+    const postMessage = usePostMessage(trip._id, me?._id, eventId);
+    const markAllAsRead = useMarkAllAsRead(trip._id, me?._id, eventId, true);
 
-    const { id } = useLocalSearchParams<{ id: string }>();
-
-    const { me } = useContext(TripContext);
-
-    const { data: trip } = useGetTrip(id);
-    const { data, fetchNextPage, hasNextPage } = useGetMessages(id);
-    const postMessage = usePostMessage(id);
-
-    const messages = useMemo(() => data?.pages.flatMap((page) => page.messages), [data]);
+    const messages = useMemo(() => data?.pages.flatMap((page) => page.messages) ?? [], [data]);
 
     const onSend = useCallback(async (values: IMessage[]) => {
         await postMessage.mutateAsync(values[0]);
     }, [postMessage]);
 
-    const insets = useSafeAreaInsets();
+
+
+    const navigation = useNavigation();
+
+    useEffect(() => {
+        navigation.setOptions({
+            title: title ?? "General"
+        })
+    })
+
+    const handleEndReached = useCallback(({ distanceFromEnd }: { distanceFromEnd: number }) => {
+        // Only trigger when user is very close to the bottom (within 50px)
+        if (messages?.length > 0 && distanceFromEnd < 50) {
+            markAllAsRead.mutate();
+        }
+    }, [messages, markAllAsRead]);
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -104,6 +115,8 @@ export default function TripMessages() {
                     )
                 }}
                 keyboardShouldPersistTaps="never"
+                onEndReached={handleEndReached}
+                bottomOffset={100}
             />
         </SafeAreaView>
     )
