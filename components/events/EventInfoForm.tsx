@@ -5,13 +5,15 @@ import { Text, View } from "react-native"
 import { FormDateTimePickerV2 } from "../form/FormDateTimePickerV2"
 import { FormText } from "../form/FormText"
 import { FormTextArea } from "../form/FormTextArea"
-
-
+// 🚨 Ajout des imports pour récupérer le Trip
+import { useContext } from "react"
+import { TripContext } from "@/context/TripContext"
 
 export const EventInfoForm = ({ control }: { control: Control<Event> }) => {
 
     const { text } = useColors();
-
+    // 🚨 On récupère le voyage depuis la mémoire
+    const { trip } = useContext(TripContext);
 
     const startDate = useWatch({
         control,
@@ -32,7 +34,6 @@ export const EventInfoForm = ({ control }: { control: Control<Event> }) => {
                         required: true,
                         maxLength: 55
                     }} />
-
             </View>
 
             <View className="">
@@ -61,11 +62,11 @@ export const EventInfoForm = ({ control }: { control: Control<Event> }) => {
                         rules={{
                             required: false
                         }}
+                        // ✨ On passe la fameuse prop demandée par ton dev !
+                        initialDate={trip?.startDate}
                     />
                 </View>
             </View>
-
-
         </View>
     )
 }
