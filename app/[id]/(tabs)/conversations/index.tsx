@@ -1,4 +1,6 @@
 import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
+import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { TripContext } from "@/context/TripContext";
 import { useGetConversations, useMarkAllAsRead } from "@/hooks/api/useMessages";
@@ -6,13 +8,13 @@ import useI18nTime from "@/hooks/i18n/useI18nTime";
 import { Conversation } from "@/types/responses";
 import { useRouter } from "expo-router";
 import { useContext } from "react";
-import { Pressable, RefreshControl, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 
 export default function TripConversations() {
     const { me, trip } = useContext(TripContext);
-    const { data: conversationsData, isLoading, isRefetching, refetch } = useGetConversations(trip?._id, me?._id);
+    const { data: conversationsData, isFetching, isRefetching, refetch } = useGetConversations(trip?._id, me?._id);
     const markAllAsRead = useMarkAllAsRead(trip?._id, me?._id);
 
     const conversations = conversationsData?.conversations ?? [];
@@ -88,31 +90,6 @@ export default function TripConversations() {
         );
     };
 
-    if (isLoading) {
-        return (
-            <View className="gap-1 pt-2">
-                <ConversationSkeleton />
-                <ConversationSkeleton />
-                <ConversationSkeleton />
-                <ConversationSkeleton />
-                <ConversationSkeleton />
-            </View>
-        );
-    }
-
-    if (conversations?.length === 0) {
-        return (
-            <View className="flex-1 justify-center items-center p-4">
-                <Text className="text-gray-500 dark:text-gray-400 text-center">
-                    No conversations yet
-                </Text>
-                <Text className="text-gray-400 dark:text-gray-500 text-center text-sm mt-1">
-                    Start a new conversation to get chatting
-                </Text>
-            </View>
-        );
-    }
-
     return (
         <Animated.FlatList
             data={conversations}
@@ -123,7 +100,7 @@ export default function TripConversations() {
             ItemSeparatorComponent={() => (
                 <View className="h-px bg-gray-200 dark:bg-gray-700 mx-14" />
             )}
-            ListHeaderComponent={() => <View className="flex-row items-center justify-between px-4 py-2">
+            ListHeaderComponent={() =>!isFetching && <View className="flex-row items-center justify-between px-4 py-2">
                 <Text className="font-medium text-gray-700 dark:text-gray-300 text-xl">
                     Non lues ({totalUnreadCount > 9 ? '9+' : totalUnreadCount})
                 </Text>
@@ -137,8 +114,49 @@ export default function TripConversations() {
                     </Animated.View>
                 }
             </View>}
-            refreshControl={
-                <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
+            refreshing={isRefetching}
+            onRefresh={refetch}
+            ListEmptyComponent={() => isFetching ?
+                <View className="gap-5">
+                    <View className="flex-row gap-2">
+                        <Skeleton variant="circular" height={20} />
+                        <View className="flex-1 px-5 justify-between">
+                            <Skeleton height={10} />
+
+                            <Skeleton height={5} />
+                        </View>
+                    </View>
+                    <View className="flex-row gap-2">
+                        <Skeleton variant="circular" height={20} />
+                        <View className="flex-1 px-5 justify-between">
+                            <Skeleton height={10} />
+
+                            <Skeleton height={5} />
+                        </View>
+                    </View>
+
+                </View>
+                :
+                <View className="flex-1 justify-center items-center p-8">
+                    <View className="rounded-full bg-gray-100 dark:bg-gray-800 p-6 mb-4">
+                        <IconSymbol name="bubble.left.fill" size={40} color="gray" />
+                    </View>
+
+                    <Text className="text-xl font-semibold text-gray-700 dark:text-gray-300 text-center mb-2">
+                        Aucune conversation pour le moment
+                    </Text>
+
+
+                    <Button
+                        onPress={() => router.push({
+                            pathname: "/[id]/chat",
+                            params: { id: trip?._id, title: "General" }
+                        })}
+                        variant="outlined"
+                        title="Nouvelle discussion"
+                    >
+                    </Button>
+                </View>
             }
         />
     );
