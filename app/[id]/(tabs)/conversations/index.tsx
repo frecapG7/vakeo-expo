@@ -23,15 +23,6 @@ export default function TripConversations() {
 
     const router = useRouter();
 
-    const ConversationSkeleton = () => (
-        <View className="flex-row items-center gap-3 p-3">
-            <Skeleton height={50} />
-            <View className="flex-1 gap-2">
-                <Skeleton height={16} width="60%" />
-                <Skeleton height={14} width="40%" />
-            </View>
-        </View>
-    );
 
     const totalUnreadCount = conversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
 
@@ -94,7 +85,7 @@ export default function TripConversations() {
         <Animated.FlatList
             data={conversations}
             renderItem={renderConversation}
-            keyExtractor={(item) => item.conversationId ?? String(Math.random())}
+            keyExtractor={(item) => item.conversationId ?? "general"}
             className="flex-1"
             contentContainerStyle={{ paddingVertical: 8 }}
             ItemSeparatorComponent={() => (

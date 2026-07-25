@@ -27,7 +27,7 @@ const getMessages = async (tripId: any, limit: number, cursor?: string, eventId?
 
 export const useGetMessages = (tripId: any, eventId?: string) => {
     return useInfiniteQuery<IPage, Error>({
-        queryKey: ["trips", tripId, eventId ? "events" : "messages", eventId ?? null],
+        queryKey: ["trips", tripId, "messages", eventId ?? null],
         queryFn: ({ pageParam }) => getMessages(tripId, 25, String(pageParam), eventId),
         getNextPageParam: (lastPage) => {
             return lastPage.nextCursor;
@@ -77,7 +77,7 @@ const getUnreadCount = async (tripId: any, userId: string): Promise<number> => {
 
 export const useGetUnreadCount = (tripId: any, userId?: string) => {
     return useQuery<number, Error>({
-        queryKey: ["trips", tripId, "conversations", "unread", "count"],
+        queryKey: ["trips", tripId, "conversations", "unread", "count", userId ?? null],
         queryFn: () => getUnreadCount(tripId, userId!),
         enabled: !!tripId && !!userId
     });
@@ -135,7 +135,7 @@ export const useMarkAllAsRead = (
             return markAllAsRead(tripId, userId, eventId, isGeneral);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["trips", tripId, "messages"] });
+            queryClient.invalidateQueries({ queryKey: ["trips", tripId, "messages", eventId ?? null] });
             queryClient.invalidateQueries({ queryKey: ["trips", tripId, "conversations"] });
         },
     });

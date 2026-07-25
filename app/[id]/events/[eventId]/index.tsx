@@ -21,8 +21,8 @@ export default function EventDetails() {
     const { trip, me } = useContext(TripContext);
     const insets = useSafeAreaInsets();
 
-    const { data: event } = useGetEvent(trip._id, eventId);
-    const updateEvent = useUpdateEvent(trip._id, eventId);
+    const { data: event } = useGetEvent(trip?._id, eventId);
+    const updateEvent = useUpdateEvent(trip?._id, eventId);
 
     const isAttendee = useMemo(() => containsUser(me, event?.attendees), [me, event]);
 
@@ -111,8 +111,8 @@ export default function EventDetails() {
                         <Button onPress={() => router.push({
                             pathname: "/[id]/events/[eventId]/edit-users",
                             params: {
-                                id: String(id),
-                                eventId: String(eventId)
+                                id: trip._id,
+                                eventId
                             }
                         })}>
                             <Text className="text-blue-400">
@@ -155,7 +155,11 @@ export default function EventDetails() {
                         <Pressable
                             onPress={() => router.push({
                                 pathname: "/[id]/chat",
-                                params: { id: trip._id, eventId, title: event.name }
+                                params: {
+                                    id: trip._id,
+                                    eventId,
+                                    title: event.name
+                                }
                             })}
                             className="flex-1 items-center py-4 rounded-xl bg-blue-50 dark:bg-blue-900/20
                    border border-blue-300 dark:border-blue-700

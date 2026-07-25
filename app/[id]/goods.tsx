@@ -78,15 +78,15 @@ export default function TripGoods() {
 
 
     const [unchecked, setUnchecked] = useState(false);
-    const { data, isLoading, isFetching, isFetchingNextPage, hasNextPage, fetchNextPage, refetch } = useGetGoods(trip?._id, {
+    const { data, isFetching, hasNextPage, fetchNextPage, refetch } = useGetGoods(trip?._id, {
         ...(unchecked && { unchecked: true }),
         ...eventId && { event: eventId }
     });
 
-    const checkGood = useCheckGood(trip._id);
-    const putGood = usePutGood(trip._id);
-    const postGood = usePostGood(trip._id);
-    const deleteGood = useDeleteGood(trip._id);
+    const checkGood = useCheckGood(trip?._id);
+    const putGood = usePutGood(trip?._id);
+    const postGood = usePostGood(trip?._id);
+    const deleteGood = useDeleteGood(trip?._id);
 
     const onCheck = async (data: Good) => await checkGood.mutateAsync(data);
 
@@ -143,7 +143,7 @@ export default function TripGoods() {
     const navigation = useNavigation();
     useEffect(() => {
         navigation.setOptions({
-            title: title ?? "General"
+            title: title ?? "La liste générale"
         })
     })
 

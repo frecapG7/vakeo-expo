@@ -2,7 +2,6 @@ import { BackgroundHeader } from "@/components/header/BackgroundHeader";
 import { Avatar } from "@/components/ui/Avatar";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
-import useColors from "@/hooks/styles/useColors";
 import { Stack, useRouter } from "expo-router";
 import { useContext } from "react";
 import { Platform, Pressable, View } from "react-native";
@@ -12,9 +11,6 @@ export default function ConversationLayout() {
 
     const router = useRouter();
     const { me , trip} = useContext(TripContext);
-
-    const colors = useColors();
-
 
     const insets = useSafeAreaInsets();
     const bottomPadding = Platform.OS === 'ios' ? insets.bottom : 0;
@@ -34,7 +30,8 @@ export default function ConversationLayout() {
                     <View className="flex flex-row justify-end items-center my-2 gap-2">
                         <Pressable
                             className="items-center"
-                            onPress={() => router.push({
+                            disabled={!trip}
+                            onPress={() => trip && router.push({
                                 pathname: "/[id]/settings",
                                 params: {
                                     id: trip._id
