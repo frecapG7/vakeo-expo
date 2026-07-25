@@ -25,7 +25,7 @@ const getGoods = async (tripId: any, params: IParams): Promise<IPage> => {
 }
 
 
-export const useGetGoods = (tripId: any, params: any, options?: any) => {
+export const useGetGoods = (tripId: any, params: any, options ?: {enabled ?: boolean}) => {
     return useInfiniteQuery<IPage, Error>({
         queryKey: ["trips", tripId, "goods", params],
         queryFn: ({ pageParam }) => getGoods(tripId, {
@@ -34,8 +34,8 @@ export const useGetGoods = (tripId: any, params: any, options?: any) => {
             ...params
         }),
         getNextPageParam: (lastPage) => lastPage?.nextCursor,
-        enabled: (!!tripId && options?.enabled),
-        ...options
+        initialPageParam:"",
+        enabled: !!tripId && (options?.enabled ?? true)
     })
 }
 

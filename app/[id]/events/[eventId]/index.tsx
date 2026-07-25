@@ -1,6 +1,5 @@
 import { EventIcon, getEventIconSource } from "@/components/events/EventIcon";
 import { EventInfo } from "@/components/events/EventInfo";
-import { EventsGoodsList } from "@/components/events/EventsGoodsList";
 import { EventUserList } from "@/components/events/EventsUsersList";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
@@ -12,18 +11,18 @@ import { containsUser } from "@/lib/utils";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
 import { useContext, useMemo } from "react";
-import { KeyboardAvoidingView, Text, View } from "react-native";
+import { KeyboardAvoidingView, Pressable, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function EventDetails() {
 
-    const { id, eventId } = useLocalSearchParams();
-    const { me } = useContext(TripContext);
+    const { eventId } = useLocalSearchParams<{ eventId: string }>();
+    const { trip, me } = useContext(TripContext);
     const insets = useSafeAreaInsets();
 
-    const { data: event } = useGetEvent(id, eventId);
-    const updateEvent = useUpdateEvent(id, eventId);
+    const { data: event } = useGetEvent(trip?._id, eventId);
+    const updateEvent = useUpdateEvent(trip?._id, eventId);
 
     const isAttendee = useMemo(() => containsUser(me, event?.attendees), [me, event]);
 
@@ -106,14 +105,14 @@ export default function EventDetails() {
                         <View className="flex-row items-center gap-2">
                             <IconSymbol name="person.2.fill" size={18} color="orange" />
                             <Text className="text-xl font-bold dark:text-white">
-                                Participants
+                                Participants {Number(event?.attendees?.length) > 0 && `(${event?.attendees?.length})`}
                             </Text>
                         </View>
                         <Button onPress={() => router.push({
                             pathname: "/[id]/events/[eventId]/edit-users",
                             params: {
-                                id: String(id),
-                                eventId: String(eventId)
+                                id: trip._id,
+                                eventId
                             }
                         })}>
                             <Text className="text-blue-400">
@@ -126,13 +125,57 @@ export default function EventDetails() {
                     />
                 </View>
 
-                <View className="px-4 my-2">
-                    <EventsGoodsList
-                        event={event}
-                        user={me}
-                    />
-                </View>
+                <View className="my-6">
+                    <View className="border-t border-gray-200 dark:border-gray-700 my-4" />
 
+                    <View className="flex-row mx-4 gap-4">
+                        <Pressable
+                            onPress={() => router.push({
+                                pathname: "/[id]/goods",
+                                params: {
+                                    id: trip._id,
+                                    title: event.name,
+                                    eventId
+                                }
+                            })}
+                            className="flex-1 items-center py-4 rounded-xl bg-orange-50 dark:bg-orange-900/20
+                   border border-orange-300 dark:border-orange-700
+                   active:opacity-80 active:scale-[0.98]"
+                        >
+                            <View className="flex-row items-center justify-center gap-2">
+                                <Text className="text-orange-600 dark:text-orange-400 font-medium">
+                                    Ajouter des articles
+                                </Text>
+                            </View>
+                            <Text className="text-xs text-center text-gray-500 dark:text-gray-400 mt-1">
+                                Liste partagée
+                            </Text>
+                        </Pressable>
+
+                        <Pressable
+                            onPress={() => router.push({
+                                pathname: "/[id]/chat",
+                                params: {
+                                    id: trip._id,
+                                    eventId,
+                                    title: event.name
+                                }
+                            })}
+                            className="flex-1 items-center py-4 rounded-xl bg-blue-50 dark:bg-blue-900/20
+                   border border-blue-300 dark:border-blue-700
+                   active:opacity-80 active:scale-[0.98]"
+                        >
+                            <View className="flex-row items-center justify-center gap-2">
+                                <Text className="text-blue-600 dark:text-blue-400 font-medium">
+                                    Voir les messages
+                                </Text>
+                            </View>
+                            <Text className="text-xs text-center text-gray-500 dark:text-gray-400 mt-1">
+                                Discussion
+                            </Text>
+                        </Pressable>
+                    </View>
+                </View>
             </Animated.ScrollView>
         </KeyboardAvoidingView>
     )
