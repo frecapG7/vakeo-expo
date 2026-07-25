@@ -105,7 +105,7 @@ export default function EventDetails() {
                         <View className="flex-row items-center gap-2">
                             <IconSymbol name="person.2.fill" size={18} color="orange" />
                             <Text className="text-xl font-bold dark:text-white">
-                                Participants
+                                Participants {Number(event?.attendees?.length) > 0 && `(${event?.attendees?.length})`}
                             </Text>
                         </View>
                         <Button onPress={() => router.push({

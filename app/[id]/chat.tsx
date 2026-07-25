@@ -15,7 +15,7 @@ export default function TripMessages() {
     const { eventId, title } = useLocalSearchParams<{ eventId?: string, title?: string }>();
     const { data, fetchNextPage, hasNextPage } = useGetMessages(trip?._id, eventId);
     const postMessage = usePostMessage(trip?._id, me?._id, eventId);
-    const {mutate: markAllAsRead} = useMarkAllAsRead(trip?._id, me?._id, eventId, true);
+    const { mutate: markAllAsRead } = useMarkAllAsRead(trip?._id, me?._id, eventId, true);
 
     const messages = useMemo(() => data?.pages.flatMap((page) => page.messages) ?? [], [data]);
 
@@ -35,8 +35,9 @@ export default function TripMessages() {
     // Add this right after your useEffect for navigation options
     useFocusEffect(
         useCallback(() => {
+            if (!trip?._id || me?._id) return
             markAllAsRead();
-        }, [markAllAsRead])
+        }, [markAllAsRead, trip?._id, me?._id])
     );
 
     return (

@@ -1,4 +1,3 @@
-import { useGetGoodsCount } from "@/hooks/api/useGoods";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import dayjs from "@/lib/dayjs-config";
 import { Event } from "@/types/models";
@@ -10,30 +9,10 @@ import { InfoCard } from "./InfoCard";
 export const EventInfo = ({ event }: { event: Event }) => {
     const { formatHour, formatDurationCompact, formatDate } = useI18nTime();
 
-    const { data: count } = useGetGoodsCount(event.trip, {
-        event: event._id
-    });
 
     return (
         <View className="gap-2 mx-1">
             <View className="flex-row flex-wrap justify-between">
-                {/* Number of participants */}
-                <View className="w-[48%]">
-                    <InfoCard icon="person.2.fill"
-                        label={`${event.attendees?.length || 0} Participants`}
-                    />
-                </View>
-                {/* Number of goods */}
-                <View className="w-[48%]">
-                    <InfoCard
-                        icon="list.bullet"
-                        label={`${count?.totalCount || 0} Éléments`}
-                    // badge={{
-                    //     text: `${count?.checkedCount} ✔️`,
-                    //     variant: "success"
-                    // }}
-                    />
-                </View>
                 {event?.startDate &&
                     <View className="w-[48%]">
                         <InfoCard
