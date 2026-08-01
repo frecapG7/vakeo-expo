@@ -76,14 +76,13 @@ export default function TripDetailsLayout() {
                 />
                 <Stack.Screen name="goods"
                     options={{
-                        headerShown: true,
+                        headerShown: false,
                         title: "La liste partagée",
                     }}
                 />
                 <Stack.Screen name="events"
                     options={{
                         headerShown: false,
-                        title: "La liste de course",
                     }}
                 />
                 <Stack.Screen name="attendees"

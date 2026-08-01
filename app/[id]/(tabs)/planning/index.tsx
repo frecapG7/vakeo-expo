@@ -1,6 +1,5 @@
-import { EventIcon } from "@/components/events/EventIcon";
 import { EventItem } from "@/components/events/EventItem";
-import { Button } from "@/components/ui/Button";
+import { FloatingAddButton } from "@/components/ui/FloatingAddButton";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
@@ -8,7 +7,7 @@ import { TripContext } from "@/context/TripContext";
 import { useGetEvents } from "@/hooks/api/useEvents";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import dayjs from "@/lib/dayjs-config";
-import { Event, TripUser } from "@/types/models";
+import { Event } from "@/types/models";
 import { useGlobalSearchParams, useRouter } from "expo-router";
 import { useContext, useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
@@ -59,7 +58,7 @@ const typeFilters = [
 
 export default function TripPlanning() {
 
-    const { id } = useGlobalSearchParams<{id: string}>();
+    const { id } = useGlobalSearchParams<{ id: string }>();
     const [search, setSearch] = useState("");
     const [typeFilter, setTypeFilter] = useState("");
     const [onlyAttendee, setOnlyAttendee] = useState(false);
@@ -162,7 +161,7 @@ export default function TripPlanning() {
                 onRefresh={refetch}
 
             />
-            <Pressable className="absolute bottom-10 right-6 p-2 rounded-full border border-white bg-orange-400 items-center justify-center shadow"
+            {/* <Pressable className="absolute bottom-10 right-6 p-2 rounded-full border border-white bg-orange-400 items-center justify-center shadow"
                 onPress={() => router.push({
                     pathname: "/[id]/events/new",
                     params: {
@@ -170,7 +169,13 @@ export default function TripPlanning() {
                     }
                 })}>
                 <IconSymbol name="plus" color="white" size={26} />
-            </Pressable>
+            </Pressable> */}
+            <FloatingAddButton onPress={() => router.push({
+                pathname: "/[id]/events/new",
+                params: {
+                    id: String(id)
+                }
+            })} />
         </Animated.View>
     )
 }

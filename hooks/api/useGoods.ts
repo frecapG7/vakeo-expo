@@ -40,6 +40,32 @@ export const useGetGoods = (tripId: any, params: any, options ?: {enabled ?: boo
 }
 
 
+const getGood = async (tripId : string, goodId: string): Promise<Good> => {
+    // const response = await axios.get(`/trips/${tripId}/goods/${goodId}`);
+    // return response.data;
+
+    //TODO
+    return ({
+        _id: "123456",
+        name: "Ketchup",
+        quantityNumber: 2,
+        unit: "piece",
+        createdBy: {
+            _id: "123",
+            name: "TODO",
+        },
+        trip: tripId,
+        checked: false
+    })
+}
+export const useGetGood = (tripId : string, goodId: string) => {
+    return useQuery<Good>({
+        queryKey:["trips", tripId, "goods", goodId],
+        queryFn: () => getGood(tripId, goodId)
+    });
+}
+
+
 const postGood = async (tripId: any, good: Good) => {
     const response = await axios.post(`/trips/${tripId}/goods`, good);
     return response.data
@@ -79,12 +105,12 @@ export const useCheckGood = (tripId: any) => {
     })
 }
 
-const deleteGood = async (tripId: any, goodId: any) => {
+const deleteGood = async (tripId: string, goodId: string) => {
     const response = await axios.delete(`/trips/${tripId}/goods/${goodId}`);
     return response.data;
 }
 
-export const useDeleteGood = (tripId: any) => {
+export const useDeleteGood = (tripId: string) => {
     const queryClient = useQueryClient();
 
     return useMutation<Good, Error, Good>({

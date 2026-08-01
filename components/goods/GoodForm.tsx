@@ -1,65 +1,64 @@
 import { Good } from "@/types/models";
-import { Control, useWatch } from "react-hook-form";
-import { ActivityIndicator, Alert, Pressable, View } from "react-native";
+import { Control, useFormState, useWatch } from "react-hook-form";
+import { Text, View } from "react-native";
+import { FormNumberV2 } from "../form/FormNumberV2";
 import { FormText } from "../form/FormText";
-import { Button } from "../ui/Button";
-import { IconSymbol } from "../ui/IconSymbol";
 
-export const GoodForm = ({ control, onSubmit, onDelete, isSubmitting, autoFocus }: {
-    control: Control<Good>,
-    onSubmit: () => Promise<void>,
-    onDelete?: () => Promise<void>,
-    isSubmitting?: boolean,
-    autoFocus?: boolean
+export const GoodForm = ({ control }: {
+    control: Control<Partial<Good>>
 }) => {
 
-    const _id = useWatch({
-        control,
-        name: "_id"
-    });
-
+    const { isSubmitting } = useFormState({ control });
+    const unitValue = useWatch({ control, name: 'unit' });
+    const quantityValue = useWatch({ control, name: 'quantityNumber' });
 
     return (
-        <View className="flex-row gap-2 items-center">
-            <Button className=""
-                disabled={isSubmitting}
-                onPress={onSubmit}>
-                {isSubmitting ?
-                    <ActivityIndicator size="small" />
-                    :
-                    <IconSymbol
-                        name={_id ? "pencil" : "plus"}
-                        color="gray"
-                        size={24} />
-                }
-            </Button>
-            <View className="flex-1">
+        <View className="gap-4">
+            <View className="gap-1">
+                <Text className="text-sm font-medium text-gray-700 dark:text-gray-300">Nom de l'article</Text>
                 <FormText
                     control={control}
                     name="name"
-                    rules={{
-                        required: true,
-                        maxLength: 255
-                    }}
-                    placeholder="Ajoute un élément"
-                    autoFocus={autoFocus}
-                    endAdornment={!!onDelete && 
-                    <Pressable
-                        onPress={() => Alert.alert("Retirer de la liste ?",
-                            "", [
-                            {
-                                text: "Annuler",
-                            },
-                            {
-                                text: "Supprimer",
-                                onPress: onDelete
-                            }
-                        ])}
-                        className="mx-2 rounded-full p-1 bg-gray-200">
-                        <IconSymbol name="trash.fill" color="red" size={16} />
-                    </Pressable>}
+                    placeholder="Nom de l'article"
+                    rules={{ required: true }}
+                    autoFocus
+                    disabled={isSubmitting}
                 />
             </View>
+            <View className="flex-row gap-2">
+                <View className="flex-1 gap-1">
+                    <Text className="text-sm font-medium text-gray-700 dark:text-gray-300">Quantité</Text>
+                    <FormNumberV2
+                        control={control}
+                        name="quantityNumber"
+                        placeholder="0"
+                        rules={{
+                            validate: (value) => {
+                                if (unitValue && (value === undefined || value === null || value === '')) {
+                                    return 'Requis si une unité est saisie';
+                                }
+                                return true;
+                            }
+                        }}
+                    />
+                </View>
+                <View className="flex-1 gap-1">
+                    <Text className="text-sm font-medium text-gray-700 dark:text-gray-300">Unité</Text>
+                    <FormText
+                        control={control}
+                        name="unit"
+                        placeholder="kg, L, etc."
+                        rules={{
+                            validate: (value) => {
+                                if (quantityValue && (value === undefined || value === null || value === '')) {
+                                    return 'Requis si une quantité est saisie';
+                                }
+                                return true;
+                            }
+                        }}
+                    />
+                </View>
+            </View>
         </View>
-    )
+    );
 }
