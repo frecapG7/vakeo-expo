@@ -5,68 +5,13 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { ToggleButton } from "@/components/ui/ToggleButton";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
-import { useCheckGood, useDeleteGood, useGetGoods, usePostGood, usePutGood } from "@/hooks/api/useGoods";
+import { useCheckGood, useGetGoods } from "@/hooks/api/useGoods";
 import useColors from "@/hooks/styles/useColors";
 import { Good } from "@/types/models";
-import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
-import { Toast } from "toastify-react-native";
-
-
-const GoodEvents = ({ id, good }: { id: any, good?: Good }) => {
-
-
-    const enabled = useMemo(() => !!good?._id, [good]);
-
-    const { data } = useGetGoods(id, {
-        search: good?.name
-    }, {
-        enabled
-    })
-
-
-    if (!good?._id)
-        return <></>;
-
-
-    return (
-        <BottomSheetFlatList
-            data={data?.pages.flatMap((page) => page?.goods?.filter(g => g._id !== good._id))}
-            keyExtractor={(i) => i?._id}
-            renderItem={({ item }) =>
-                <View className="flex-row items-center gap-4">
-                    <Text className="text-xs dark:text-white">
-                        {'\u2B24'}
-                    </Text>
-                    <View className="justify-center">
-                        <Text className={`${item.checked && "line-through"} dark:text-white capitalize`}>
-                            {item?.name}
-                        </Text>
-                        {item?.event &&
-                            <Text className="text-gray-400 italic text-sm">
-                                {item?.event?.name}
-                            </Text>
-                        }
-                    </View>
-                </View>}
-            ListHeaderComponent={<Text className="font-bold text-gray-400">
-                Éléments similaires trouvés
-            </Text>
-            }
-            ListEmptyComponent={<Text className="text-sm text-gray-400">
-                Aucun autre élément
-            </Text>}
-            contentContainerClassName="border-t border-gray-400 m-5"
-
-        />
-    )
-
-
-}
 
 
 export default function TripGoods() {
@@ -76,68 +21,18 @@ export default function TripGoods() {
 
 
     const [unchecked, setUnchecked] = useState(false);
-    const { data, isFetching, hasNextPage, fetchNextPage, refetch } = useGetGoods(trip?._id, {
+    const { data, isFetching, hasNextPage, fetchNextPage, refetch } = useGetGoods(trip._id, {
         ...(unchecked && { unchecked: true }),
         ...eventId && { event: eventId }
     });
 
-    const checkGood = useCheckGood(trip?._id);
-    const putGood = usePutGood(trip?._id);
-    const postGood = usePostGood(trip?._id);
-    const deleteGood = useDeleteGood(trip?._id);
+    const checkGood = useCheckGood(trip._id, me?._id);
 
     const onCheck = async (data: Good) => await checkGood.mutateAsync(data);
 
     const goods = useMemo(() => data?.pages.flatMap((page) => page?.goods), [data]);
 
     const colors = useColors();
-    const bottomSheetRef = useRef<BottomSheet>(null);
-    const [bottomSheetIndex, setBottomSheetIndex] = useState(0);
-
-
-    const defaultValues = useMemo(() => ({
-        trip: trip._id,
-        createdBy: me,
-        ...(eventId && { event: { _id: eventId } })
-    }), [trip._id, me, eventId]);
-
-
-    const { control, handleSubmit, reset, formState: { isSubmitSuccessful } } = useForm<Good>({
-        defaultValues
-    });
-    const currentGood = useWatch({
-        control
-    });
-
-    const onSubmit = async (data: Good) => {
-        if (data._id) {
-            await putGood.mutateAsync(data);
-            Toast.success("Liste modifiée");
-        }
-        else {
-            await postGood.mutateAsync(data);
-            Toast.success("Élément ajouté");
-        }
-    }
-    const onDelete = async (data: Good) => {
-        await deleteGood.mutateAsync(data);
-        reset(defaultValues);
-        Toast.success("Élément supprimé")
-        bottomSheetRef.current?.snapToIndex(0)
-    }
-
-    useEffect(() => {
-        if (isSubmitSuccessful)
-            reset({
-                name: "",
-                quantity: "",
-                trip: trip._id,
-                createdBy: me,
-                ...(eventId && { event: { _id: eventId } })
-            })
-    }, [isSubmitSuccessful, reset, trip._id, me, eventId])
-
-
     const navigation = useNavigation();
     useEffect(() => {
         navigation.setOptions({
@@ -145,11 +40,8 @@ export default function TripGoods() {
         })
     })
 
-
-
     return (
         <View style={styles.container}>
-            {/* <GestureHandlerRootView style={{ flex: 1 }}> */}
             <Animated.FlatList
                 data={goods}
                 refreshing={isFetching}
@@ -180,11 +72,18 @@ export default function TripGoods() {
                                     {item.name}
                                 </Text>
                             </Text>
-                            {item?.event &&
-                                <Text className="text-gray-400 text-xs">
-                                    {item.event?.name}
-                                </Text>
-                            }
+                            <View className="flex-row items-center justify-between mt-1">
+                                <View>
+                                    {item?.event && (
+                                        <Text className="text-gray-400 text-xs">{item.event?.name}</Text>
+                                    )}
+                                </View>
+                                <View className="flex-row items-center gap-2">
+                                    <Text className="text-xs text-gray-500 dark:text-gray-400">
+                                        Ajouté par {item.createdBy?.name}
+                                    </Text>
+                                </View>
+                            </View>
 
                         </Pressable>
 
@@ -229,66 +128,6 @@ export default function TripGoods() {
                 }
                 ListFooterComponent={<View className="my-5" />}
             />
-            {/* <BottomSheet ref={bottomSheetRef}
-                    index={1}
-                    backgroundStyle={{
-                        backgroundColor: colors.background,
-                        ...styles.bottomSheet
-                    }}
-                    enablePanDownToClose={false}
-                    enableOverDrag={false}
-                    keyboardBehavior="interactive"
-                    keyboardBlurBehavior="restore"
-                    snapPoints={["5%", "15%", "50%"]}
-                    onChange={(index) => {
-                        if (index === 0)
-                            reset(defaultValues)
-                        setBottomSheetIndex(index);
-                    }}
-                >
-                    <BottomSheetView style={{ flex: 1 }} className="gap-2 py-5 px-2">
-
-                        {(currentGood?._id && bottomSheetIndex > 2) &&
-
-                            <Animated.View
-                                entering={FadeIn}
-                                exiting={FadeOut}
-                                className="flex-row justify-end">
-                                <Button
-                                    className="rounded-full bg-red-200 p-1"
-                                    onPress={() => Alert.alert("Retirer de la liste ?",
-                                        "", [
-                                        {
-                                            text: "Annuler",
-                                        },
-                                        {
-                                            text: "Supprimer",
-                                            onPress: () => onDelete(currentGood)
-                                        }
-                                    ])}>
-                                    <IconSymbol name="trash" color="red" />
-                                </Button>
-                            </Animated.View>
-                        }
-                        <GoodBottomForm control={control}
-                            onSubmit={handleSubmit(onSubmit)}
-                            onCancel={() => {
-                                reset(defaultValues);
-                                bottomSheetRef.current?.snapToIndex(1);
-                            }}
-                            isSubmitting={postGood.isPending || putGood.isPending}
-                        />
-
-                        {bottomSheetIndex > 2 &&
-                            <Animated.View entering={FadeIn} exiting={FadeOut}>
-                                <GoodEvents id={trip._id} good={currentGood} />
-                            </Animated.View>
-
-                        }
-
-                    </BottomSheetView>
-                </BottomSheet>
-            </GestureHandlerRootView> */}
             <FloatingAddButton onPress={() => router.push({
                 pathname: "/[id]/goods/new",
                 params: {

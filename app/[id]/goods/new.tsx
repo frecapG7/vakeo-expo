@@ -1,37 +1,46 @@
 import { GoodForm } from "@/components/goods/GoodForm";
 import { Button } from "@/components/ui/Button";
+import { TripContext } from "@/context/TripContext";
 import { usePostGood } from "@/hooks/api/useGoods";
 import { Good } from "@/types/models";
 import { useLocalSearchParams } from "expo-router";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Text, View } from "react-native";
+import { Toast } from "toastify-react-native";
+
+
+const defaultValues = {
+    name: "",
+    checked: false
+};
+type GoodFormInputs = Omit<Good, '_id' | 'createdBy' | 'checked'>;
+
 
 export default function NewGood() {
-    const { id: tripId } = useLocalSearchParams<{ id: string }>();
+    const { eventId } = useLocalSearchParams<{ id: string, eventId?: string }>();
 
-    const { control, handleSubmit, reset } = useForm<Partial<Good>>({
-        defaultValues: {
-            name: "",
-            quantity: "",
-            unit: ""
-        }
+
+    const {me, trip} = useContext(TripContext);
+    const { control, handleSubmit, reset } = useForm<GoodFormInputs>({
+        defaultValues
     });
 
-    const { mutate: postGood, isPending, isSuccess } = usePostGood(tripId);
+    const { mutateAsync: postGood, isPending, isSuccess } = usePostGood(trip._id, me?._id);
 
     useEffect(() => {
         if (isSuccess) {
-            reset();
+            reset(defaultValues);
         }
     }, [isSuccess, reset]);
 
-    const onSubmit = (data: Partial<Good>) => {
-        postGood({
+    const onSubmit = async (data: any) => {
+        await postGood({
             ...data,
-            name: data.name!,
-            trip: tripId!
-        } as Good);
+            trip: trip._id,
+            ...(eventId && { event: eventId })
+        });
+        Toast.success("Ajouté avec succès")
     };
 
     return (

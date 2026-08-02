@@ -1,32 +1,32 @@
 import { GoodForm } from "@/components/goods/GoodForm";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { TripContext } from "@/context/TripContext";
 import { useDeleteGood, useGetGood, useGetGoods, usePutGood } from "@/hooks/api/useGoods";
 import { Good } from "@/types/models";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert, Pressable, Text, View } from "react-native";
 import { Toast } from "toastify-react-native";
 
 export default function EditGood() {
-    const { id: tripId, goodId } = useLocalSearchParams<{ id: string, goodId: string }>();
+    const { goodId } = useLocalSearchParams<{ id: string, goodId: string }>();
+    const { trip, me} = useContext(TripContext);
     const router = useRouter();
 
-    const { data: good, isLoading } = useGetGood(tripId, goodId);
-    const { mutate: putGood, isPending, isSuccess } = usePutGood(tripId);
-    const deleteGood = useDeleteGood(tripId);
+    const { data: good, isLoading } = useGetGood(trip?._id, goodId);
+    const { mutateAsync: putGood, isPending, isSuccess } = usePutGood(trip?._id, me?._id);
+    const deleteGood = useDeleteGood(trip?._id, me?._id);
     const [showSimilar, setShowSimilar] = useState(false);
 
-    const { data: similarGoods } = useGetGoods(tripId, { search: good?.name }, {
+    const { data: similarGoods } = useGetGoods(trip?._id, { search: good?.name }, {
         enabled: showSimilar && !!good?.name
     });
 
     const { control, handleSubmit, reset } = useForm<Partial<Good>>({
         defaultValues: {
             name: "",
-            quantity: "",
-            unit: ""
         }
     });
 
@@ -43,13 +43,9 @@ export default function EditGood() {
         }
     }, [isSuccess, router]);
 
-    const onSubmit = (data: Partial<Good>) => {
-        putGood({
-            ...good,
-            ...data,
-            _id: goodId,
-            trip: tripId
-        } as Good);
+    const onSubmit = async (data: Partial<Good>) => {
+       await putGood(data);
+       Toast.success("Modifié avec succès");
     };
 
     const onDelete = async (data: Good) => {
@@ -121,7 +117,6 @@ export default function EditGood() {
                         onPress={handleSubmit(onSubmit)}
                         isLoading={isPending || isLoading}
                         variant="contained"
-                        disabled //Disabled until api update
                         className="w-full"
                     />
                 </View>
