@@ -51,7 +51,7 @@ export const FormNumberV2 = ({ control, name, placeholder, rules, endAdornment, 
 
     const handleChangeText = (text: string) => {
         const numericValue = text.replace(/[^0-9]/g, '');
-        onChange(numericValue === '' ? '' : Number(numericValue));
+        onChange(numericValue === '' ? undefined : Number(numericValue));
     };
 
     return (

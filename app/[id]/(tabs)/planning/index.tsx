@@ -8,7 +8,7 @@ import { useGetEvents } from "@/hooks/api/useEvents";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import dayjs from "@/lib/dayjs-config";
 import { Event } from "@/types/models";
-import { useGlobalSearchParams, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useContext, useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
@@ -58,7 +58,6 @@ const typeFilters = [
 
 export default function TripPlanning() {
 
-    const { id } = useGlobalSearchParams<{ id: string }>();
     const [search, setSearch] = useState("");
     const [typeFilter, setTypeFilter] = useState("");
     const [onlyAttendee, setOnlyAttendee] = useState(false);
@@ -66,16 +65,16 @@ export default function TripPlanning() {
 
 
     const router = useRouter();
-    const { me } = useContext(TripContext);
+    const { me, trip } = useContext(TripContext);
     const { formatDate, formatDay, formatHour } = useI18nTime();
 
-    const { data, hasNextPage, fetchNextPage, isLoading, refetch, isRefetching } = useGetEvents(String(id), {
+    const { data, hasNextPage, fetchNextPage, isLoading, refetch, isRefetching } = useGetEvents(trip?._id, {
         type: typeFilter,
         search,
         ...(onlyAttendee && { attendee: String(me?._id) }),
         ...(onlyOwner && { owner: String(me?._id) }),
     }, {
-        enabled: !!id,
+        enabled: !!trip,
     });
     const events = useMemo(() => data?.pages.flatMap((page) => page?.events), [data?.pages]);
 
@@ -128,11 +127,14 @@ export default function TripPlanning() {
                                 </Text>
                             </View>
                         }
-                        <EventItem event={item}
+                            <EventItem event={item}
                             user={me}
                             onPress={() => router.navigate({
                                 pathname: "/[id]/events/[eventId]",
-                                params: { id: String(id), eventId: item._id }
+                                params: {
+                                    id: trip._id,
+                                    eventId: item._id
+                                }
                             })} />
                     </View>
 
@@ -173,7 +175,7 @@ export default function TripPlanning() {
             <FloatingAddButton onPress={() => router.push({
                 pathname: "/[id]/events/new",
                 params: {
-                    id: String(id)
+                    id: trip._id
                 }
             })} />
         </Animated.View>

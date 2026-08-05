@@ -12,7 +12,7 @@ import { Toast } from "toastify-react-native";
 
 export default function EditGood() {
     const { goodId } = useLocalSearchParams<{ id: string, goodId: string }>();
-    const { trip, me} = useContext(TripContext);
+    const { trip, me } = useContext(TripContext);
     const router = useRouter();
 
     const { data: good, isLoading } = useGetGood(trip?._id, goodId);
@@ -44,8 +44,8 @@ export default function EditGood() {
     }, [isSuccess, router]);
 
     const onSubmit = async (data: Partial<Good>) => {
-       await putGood(data);
-       Toast.success("Modifié avec succès");
+        await putGood(data);
+        Toast.success("Modifié avec succès");
     };
 
     const onDelete = async (data: Good) => {
@@ -57,7 +57,9 @@ export default function EditGood() {
     return (
         <View className="flex-1 p-4">
             <View className="mb-6 flex-row justify-between items-center">
-                <Text className="text-2xl font-bold text-dark dark:text-white">Modifier l'article</Text>
+                <Text className="text-2xl font-bold text-dark dark:text-white">
+                    Modifier l'article
+                </Text>
                 <Button
                     title="Supprimer"
                     onPress={() => Alert.alert("Retirer de la liste ?",
@@ -67,11 +69,12 @@ export default function EditGood() {
                         },
                         {
                             text: "Supprimer",
-                            onPress: () => onDelete(good)
+                            onPress: () => good && onDelete(good)
                         }
                     ])}
                     variant="danger"
                     size="small"
+                    disabled={!good}
                 />
             </View>
             <View className="flex-1">
@@ -92,25 +95,28 @@ export default function EditGood() {
                                 <View key={item._id} className="flex-row items-center gap-3 p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
                                     <IconSymbol name={item.checked ? "circle.fill" : "circle"} size={12} color="gray" />
                                     <View className="flex-1">
-                                        <Text className={`dark:text-white capitalize ${item.checked ? "line-through" : ""}`}>
-                                            {item.name}
-                                        </Text>
-                                        {item.event?.name && (
-                                            <Text className="text-sm text-gray-500 dark:text-gray-400 italic">
-                                                {item.event.name}
+                                        <View className="flex-row flex-wrap items-baseline gap-2">
+                                            <Text className={`dark:text-white capitalize ${item.checked ? "line-through" : ""}`}>
+                                                {item.name}
+                                            </Text>
+                                            {item.quantityNumber !== null && (
+                                                <Text className={`text-sm text-gray-500 dark:text-gray-400 ${item.checked ? "line-through" : ""}`}>
+                                                    {item.quantityNumber} {item.unit}
+                                                </Text>
+                                            )}
+                                        </View>
+                                        {(item.event?.name || item.createdBy?.name) && (
+                                            <Text className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                                {item.event?.name}
+                                                {item.event?.name && item.createdBy?.name ? " • " : ""}
+                                                {item.createdBy?.name && `ajouté par ${item.createdBy.name}`}
                                             </Text>
                                         )}
                                     </View>
-                                    {item.quantityNumber && (
-                                        <Text className={`text-sm text-gray-500 dark:text-gray-400 ${item.checked ? "line-through" : ""}`}>
-                                            {item.quantityNumber} {item.unit}
-                                        </Text>
-                                    )}
                                 </View>
                             ))}
                     </View>
                 )}
-
                 <View className="mt-6">
                     <Button
                         title="Modifier"

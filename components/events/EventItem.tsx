@@ -7,7 +7,7 @@ import { Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { EventIcon, getEventIconSource } from "./EventIcon";
 
-export const EventItem = ({ event, user, onPress }: { event: Event, user: TripUser, onPress?: () => void }) => {
+export const EventItem = ({ event, user, onPress }: { event: Event, user?: TripUser, onPress?: () => void }) => {
 
   const isAttendee = useMemo(() => event.attendees?.some(u => u._id === user?._id), [user, event]);
   const isOwner = useMemo(() => event.owners?.some(u => u._id === user?._id), [user, event]);

@@ -15,7 +15,7 @@ export const GoodForm = ({ control }: {
     return (
         <View className="gap-4">
             <View className="gap-1">
-                <Text className="text-sm font-medium text-gray-700 dark:text-gray-300">Nom de l'article</Text>
+                <Text className="text-sm font-medium text-gray-700 dark:text-gray-300">Nom de l&apos;article</Text>
                 <FormText
                     control={control}
                     name="name"
