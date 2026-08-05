@@ -4,6 +4,7 @@ import { Avatar, AvatarsGroup } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { StatCard } from "@/components/ui/StatCard";
 import { default as styles } from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetDashboard } from "@/hooks/api/useTrips";
@@ -13,7 +14,7 @@ import dayjs from "@/lib/dayjs-config";
 import { countDaysBetween } from "@/lib/utils";
 import { ImageBackground } from "expo-image";
 import { useRouter } from "expo-router";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Platform, Pressable, RefreshControl, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -41,6 +42,7 @@ export default function ItemDetails() {
     const otherUsers = me ? trip?.users?.filter(u => u._id !== me._id) || [] : [];
     const displayUsers = otherUsers.slice(0, 5);
     const hasMore = otherUsers.length > 5;
+    const [descriptionExpanded, setDescriptionExpanded] = useState(false);
 
     const insets = useSafeAreaInsets();
     const bottomPadding = Platform.OS === 'ios' ? insets.bottom : 0;
@@ -143,6 +145,22 @@ export default function ItemDetails() {
                             </Text>
                         </View>
                     </Button>
+                    {trip?.description && (
+                      <>
+                        <Text
+                          numberOfLines={descriptionExpanded ? undefined : 2}
+                          ellipsizeMode="tail"
+                          className="text-gray-600 dark:text-gray-300 text-sm mt-2"
+                        >
+                          {trip.description}
+                        </Text>
+                        <Pressable onPress={() => setDescriptionExpanded(!descriptionExpanded)}>
+                          <Text className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            {descriptionExpanded ? "Moins" : "Plus"}
+                          </Text>
+                        </Pressable>
+                      </>
+                    )}
                 </View>
                 <View className="flex my-5 gap-3">
                     <TripActionCard
@@ -185,32 +203,27 @@ export default function ItemDetails() {
                             }
                         })}
                     />
-                    <TripActionCard
-                        icon={{
-                            name: "list.bullet"
-                        }}
-                        title="Voir la liste partagée"
-                        subtitle={`${dashboard?.goods?.total ?? 0} élément(s) - ${dashboard?.goods?.missing ?? 0} manquant(s)`}
-                        onPress={() => router.push({
-                            pathname: "/[id]/goods",
-                            params: {
-                                id: trip._id
-                            }
-                        })}
-                    />
                 </View>
             </View>
-            {trip?.description &&
-                <View className="mx-4 p-2 mb-5">
-                    <Text className="text-lg font-bold ml-4 dark:text-white">
-                        Description
-                    </Text>
-                    <Text className="dark:text-white">
-                        {trip?.description}
-                    </Text>
-                </View>
-            }
-
+            <View className="flex-row gap-3 mx-2">
+                <StatCard
+                    icon="list.bullet"
+                    count={dashboard?.goods?.total ?? 0}
+                    label="Liste partagée"
+                    color="orange"
+                    onPress={() => router.push({
+                        pathname: "/[id]/goods",
+                        params: { id: trip._id }
+                    })}
+                />
+                <StatCard
+                    icon="exclamationmark.triangle"
+                    count={dashboard?.users?.restrictionCount}
+                    label="Restrictions"
+                    color="orange-dark"
+                    onPress={() => { }}
+                />
+            </View>
             {dashboard?.events?.nextEvent && (
                 <View className="mx-4 my-5">
                     <Text className="text-lg font-bold mb-2 dark:text-white">Prochain événement</Text>
