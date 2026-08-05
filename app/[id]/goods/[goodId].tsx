@@ -58,7 +58,7 @@ export default function EditGood() {
         <View className="flex-1 p-4">
             <View className="mb-6 flex-row justify-between items-center">
                 <Text className="text-2xl font-bold text-dark dark:text-white">
-                    Modifier l'article
+                    Modifier l&apos;article
                 </Text>
                 <Button
                     title="Supprimer"

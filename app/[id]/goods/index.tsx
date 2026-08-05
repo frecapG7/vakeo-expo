@@ -128,7 +128,7 @@ export default function TripGoods() {
                             </View>
                             <Text className="text-3xl font-bold dark:text-white text-center">Aucun article</Text>
                             <Text className="text-base text-gray-500 dark:text-gray-400 text-center max-w-xs">
-                                Appuyez sur "+" pour ajouter un article
+                                Appuyez sur &quot;+&quot; pour ajouter un article
                             </Text>
                         </View>
                 }

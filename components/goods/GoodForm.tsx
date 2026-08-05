@@ -19,7 +19,7 @@ export const GoodForm = ({ control }: {
                 <FormText
                     control={control}
                     name="name"
-                    placeholder="Nom de l'article"
+                    placeholder="Nom de l&apos;article"
                     rules={{ required: true }}
                     autoFocus
                     disabled={isSubmitting}
