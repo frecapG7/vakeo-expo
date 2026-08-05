@@ -218,7 +218,7 @@ export default function ItemDetails() {
                 />
                 <StatCard
                     icon="exclamationmark.triangle"
-                    count={dashboard?.users?.restrictionCount}
+                    count={dashboard?.users?.restrictionCount ?? 0}
                     label="Restrictions"
                     color="orange-dark"
                     onPress={() => { }}

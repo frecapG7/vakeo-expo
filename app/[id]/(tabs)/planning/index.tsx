@@ -129,7 +129,7 @@ export default function TripPlanning() {
                         }
                             <EventItem event={item}
                             user={me}
-                            onPress={() => router.navigate({
+                            onPress={() => trip?._id && router.navigate({
                                 pathname: "/[id]/events/[eventId]",
                                 params: {
                                     id: trip._id,
@@ -172,12 +172,14 @@ export default function TripPlanning() {
                 })}>
                 <IconSymbol name="plus" color="white" size={26} />
             </Pressable> */}
-            <FloatingAddButton onPress={() => router.push({
-                pathname: "/[id]/events/new",
-                params: {
-                    id: trip._id
-                }
-            })} />
+            {trip?._id && (
+                <FloatingAddButton onPress={() => router.push({
+                    pathname: "/[id]/events/new",
+                    params: {
+                        id: trip._id
+                    }
+                })} />
+            )}
         </Animated.View>
     )
 }

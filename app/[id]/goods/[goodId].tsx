@@ -99,7 +99,7 @@ export default function EditGood() {
                                             <Text className={`dark:text-white capitalize ${item.checked ? "line-through" : ""}`}>
                                                 {item.name}
                                             </Text>
-                                            {item.quantityNumber !== null && (
+                                            {item.quantityNumber != null && (
                                                 <Text className={`text-sm text-gray-500 dark:text-gray-400 ${item.checked ? "line-through" : ""}`}>
                                                     {item.quantityNumber} {item.unit}
                                                 </Text>

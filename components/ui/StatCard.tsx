@@ -1,11 +1,11 @@
-import { IconSymbol } from "./IconSymbol";
+import { IconSymbol, IconSymbolName } from "./IconSymbol";
 import useColors from "@/hooks/styles/useColors";
 import { Pressable, PressableProps, Text, View } from "react-native";
 
 type StatCardColor = "orange" | "orange-dark" | "blue" | "blue-dark" | "green" | "green-dark" | "red" | "red-dark";
 
 interface StatCardProps extends PressableProps {
-  icon: string;
+  icon: IconSymbolName;
   count: number | string;
   label: string;
   color?: StatCardColor;
