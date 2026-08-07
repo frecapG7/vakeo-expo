@@ -63,7 +63,11 @@ export const useUpdateTrip = (tripId: any) => {
 }
 
 const getTripUser = async (tripId: string, userId?: string): Promise<TripUser> => {
-  const response = await axios.get(`/trips/${tripId}/users/${userId}`);
+  const response = await axios.get(`/trips/${tripId}/users/${userId}`, {
+    headers: {
+      ...(userId && { "x-user-id": userId })
+    }
+  });
   return response.data;
 }
 
@@ -118,7 +122,7 @@ const getDashboard = async (tripId: string, userId?: string): Promise<Dashboard>
 
 
 
-export const useGetDashboard = (tripId: string, userId?: string, enabled ?: boolean) => {
+export const useGetDashboard = (tripId: string, userId?: string, enabled?: boolean) => {
   return useQuery<Dashboard>({
     queryKey: ["trips", tripId, "dashboard", userId ?? null],
     queryFn: () => getDashboard(tripId, userId),

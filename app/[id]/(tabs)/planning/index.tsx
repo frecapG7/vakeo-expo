@@ -1,6 +1,5 @@
-import { EventIcon } from "@/components/events/EventIcon";
 import { EventItem } from "@/components/events/EventItem";
-import { Button } from "@/components/ui/Button";
+import { FloatingAddButton } from "@/components/ui/FloatingAddButton";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
@@ -8,8 +7,8 @@ import { TripContext } from "@/context/TripContext";
 import { useGetEvents } from "@/hooks/api/useEvents";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import dayjs from "@/lib/dayjs-config";
-import { Event, TripUser } from "@/types/models";
-import { useGlobalSearchParams, useRouter } from "expo-router";
+import { Event } from "@/types/models";
+import { useRouter } from "expo-router";
 import { useContext, useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
@@ -59,7 +58,6 @@ const typeFilters = [
 
 export default function TripPlanning() {
 
-    const { id } = useGlobalSearchParams<{id: string}>();
     const [search, setSearch] = useState("");
     const [typeFilter, setTypeFilter] = useState("");
     const [onlyAttendee, setOnlyAttendee] = useState(false);
@@ -67,16 +65,16 @@ export default function TripPlanning() {
 
 
     const router = useRouter();
-    const { me } = useContext(TripContext);
+    const { me, trip } = useContext(TripContext);
     const { formatDate, formatDay, formatHour } = useI18nTime();
 
-    const { data, hasNextPage, fetchNextPage, isLoading, refetch, isRefetching } = useGetEvents(String(id), {
+    const { data, hasNextPage, fetchNextPage, isLoading, refetch, isRefetching } = useGetEvents(trip?._id, {
         type: typeFilter,
         search,
         ...(onlyAttendee && { attendee: String(me?._id) }),
         ...(onlyOwner && { owner: String(me?._id) }),
     }, {
-        enabled: !!id,
+        enabled: !!trip,
     });
     const events = useMemo(() => data?.pages.flatMap((page) => page?.events), [data?.pages]);
 
@@ -129,11 +127,14 @@ export default function TripPlanning() {
                                 </Text>
                             </View>
                         }
-                        <EventItem event={item}
+                            <EventItem event={item}
                             user={me}
-                            onPress={() => router.navigate({
+                            onPress={() => trip?._id && router.navigate({
                                 pathname: "/[id]/events/[eventId]",
-                                params: { id: String(id), eventId: item._id }
+                                params: {
+                                    id: trip._id,
+                                    eventId: item._id
+                                }
                             })} />
                     </View>
 
@@ -162,7 +163,7 @@ export default function TripPlanning() {
                 onRefresh={refetch}
 
             />
-            <Pressable className="absolute bottom-10 right-6 p-2 rounded-full border border-white bg-orange-400 items-center justify-center shadow"
+            {/* <Pressable className="absolute bottom-10 right-6 p-2 rounded-full border border-white bg-orange-400 items-center justify-center shadow"
                 onPress={() => router.push({
                     pathname: "/[id]/events/new",
                     params: {
@@ -170,7 +171,15 @@ export default function TripPlanning() {
                     }
                 })}>
                 <IconSymbol name="plus" color="white" size={26} />
-            </Pressable>
+            </Pressable> */}
+            {trip?._id && (
+                <FloatingAddButton onPress={() => router.push({
+                    pathname: "/[id]/events/new",
+                    params: {
+                        id: trip._id
+                    }
+                })} />
+            )}
         </Animated.View>
     )
 }

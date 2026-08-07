@@ -4,7 +4,7 @@ import { useController } from "react-hook-form";
 import { TextInput, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 
-export const FormText = ({ control, name, placeholder, rules, endAdornment, autoFocus, disabled }: {
+export const FormNumberV2 = ({ control, name, placeholder, rules, endAdornment, autoFocus, disabled }: {
     control: any,
     name: string,
     placeholder?: string,
@@ -49,13 +49,17 @@ export const FormText = ({ control, name, placeholder, rules, endAdornment, auto
             textInputRef.current?.focus();
     }, [error]);
 
+    const handleChangeText = (text: string) => {
+        const numericValue = text.replace(/[^0-9]/g, '');
+        onChange(numericValue === '' ? undefined : Number(numericValue));
+    };
 
     return (
         <Animated.View style={animatedStyle}
             className={`flex-row items-center ${disabled ? 'bg-gray-200 dark:bg-gray-700 opacity-60' : 'bg-white dark:bg-gray-600'} border focus:border focus:border-blue-500 rounded-xl h-12`}>
             <TextInput
-                onChangeText={onChange}
-                value={value}
+                onChangeText={handleChangeText}
+                value={value !== undefined && value !== null ? String(value) : ''}
                 className="flex-1 text-dark dark:text-white h-full items-start normal-case p-3"
                 placeholderTextColor={inputPlaceHolder}
                 ref={textInputRef}
@@ -65,7 +69,7 @@ export const FormText = ({ control, name, placeholder, rules, endAdornment, auto
                 }}
                 autoFocus={autoFocus}
                 editable={!disabled}
-
+                keyboardType="numeric"
             />
             {endAdornment &&
                 <View

@@ -62,7 +62,9 @@ export interface Event {
 export interface Good {
     _id: string,
     name: string,
-    quantity: string,
+    quantity?: string,
+    quantityNumber ?: number,
+    unit ?: string,
     createdBy: TripUser,
     event?: Event,
     checked: boolean

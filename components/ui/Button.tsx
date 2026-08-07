@@ -4,14 +4,15 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { IconSymbol, IconSymbolName } from "./IconSymbol";
 
 
-type ButtonVariant = 'none' | 'contained' | 'outlined';
+type ButtonVariant = 'none' | 'contained' | 'outlined' | 'danger';
 
 type ButtonSize = 'medium' | 'small';
 
 const variantToClassMap = {
     'none': 'flex-row justify-center items-center',
     'contained': 'bg-blue-400 dark:bg-blue-600 rounded-xl shadow-sm shadow-blue-400 flex-row justify-center items-center',
-    'outlined': 'border-2 border-blue-500 dark:border-blue-400 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex-row justify-center items-center active:bg-blue-100 dark:active:bg-blue-900/30'
+    'outlined': 'border-2 border-blue-500 dark:border-blue-400 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex-row justify-center items-center active:bg-blue-100 dark:active:bg-blue-900/30',
+    'danger': 'border-2 border-red-500 dark:border-red-400 rounded-xl bg-red-50 dark:bg-red-900/20 flex-row justify-center items-center active:bg-red-100 dark:active:bg-red-900/30'
 }
 
 const sizeToMap = {
@@ -22,7 +23,8 @@ const sizeToMap = {
 const variantToTitleClassMap = {
     'none': 'text-neutral-900 dark:text-neutral-100',
     'contained': 'text-white font-bold',
-    'outlined': 'text-blue-600 font-semibold'
+    'outlined': 'text-blue-600 font-semibold',
+    'danger': 'text-red-600 font-semibold'
 }
 
 const ButtonTitle = ({ title, variant, size, isLoading }: { title?: string, variant: ButtonVariant, size: ButtonSize, isLoading: boolean }) => {
