@@ -4,7 +4,7 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { TripContext } from "@/context/TripContext";
 import { useDeleteGood, useGetGood, useGetGoods, usePutGood } from "@/hooks/api/useGoods";
 import { Good } from "@/types/models";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert, Pressable, Text, View } from "react-native";
@@ -19,6 +19,7 @@ export default function EditGood() {
     const { mutateAsync: putGood, isPending, isSuccess } = usePutGood(trip?._id, me?._id);
     const deleteGood = useDeleteGood(trip?._id, me?._id);
     const [showSimilar, setShowSimilar] = useState(false);
+    const navigation = useNavigation();
 
     const { data: similarGoods } = useGetGoods(trip?._id, { search: good?.name }, {
         enabled: showSimilar && !!good?.name
@@ -43,41 +44,51 @@ export default function EditGood() {
         }
     }, [isSuccess, router]);
 
+
     const onSubmit = async (data: Partial<Good>) => {
         await putGood(data);
         Toast.success("Modifié avec succès");
     };
 
     const onDelete = async (data: Good) => {
-        await deleteGood.mutateAsync(data);
         router.back();
-        Toast.success("Élément supprimé")
+        deleteGood.mutate(data, {
+            onSuccess: () => {
+                Toast.success("Élément supprimé")
+            }
+        });
     }
+    useEffect(() => {
+        navigation.setOptions({
+            headerRight: () => (
+                <Pressable onPress={() => good && Alert.alert("Retirer de la liste ?",
+                    "", [
+                    {
+                        text: "Annuler",
+                    },
+                    {
+                        text: "Supprimer",
+                        onPress: () => good && onDelete(good)
+                    }
+                ])}>
+                    <IconSymbol name="trash" size={24} />
+                </Pressable>
+            )
+        });
+    }, [good]);
 
     return (
         <View className="flex-1 p-4">
-            <View className="mb-6 flex-row justify-between items-center">
-                <Text className="text-2xl font-bold text-dark dark:text-white">
-                    Modifier l&apos;article
-                </Text>
+            {/* <View className="mb-6 flex-row justify-end items-center">
                 <Button
                     title="Supprimer"
-                    onPress={() => Alert.alert("Retirer de la liste ?",
-                        "", [
-                        {
-                            text: "Annuler",
-                        },
-                        {
-                            text: "Supprimer",
-                            onPress: () => good && onDelete(good)
-                        }
-                    ])}
+                   
                     variant="danger"
                     size="small"
                     disabled={!good}
                 />
-            </View>
-            <View className="flex-1">
+            </View> */}
+            <View className="flex-1 mt-6">
                 <GoodForm control={control} />
 
                 <Pressable
@@ -98,12 +109,10 @@ export default function EditGood() {
                                         <View className="flex-row flex-wrap items-baseline gap-2">
                                             <Text className={`dark:text-white capitalize ${item.checked ? "line-through" : ""}`}>
                                                 {item.name}
+                                                {item.quantityNumber && item.unit && (
+                                                    <Text className="text-sm text-gray-500 dark:text-gray-400"> ({item.quantityNumber} {item.unit})</Text>
+                                                )}
                                             </Text>
-                                            {item.quantityNumber != null && (
-                                                <Text className={`text-sm text-gray-500 dark:text-gray-400 ${item.checked ? "line-through" : ""}`}>
-                                                    {item.quantityNumber} {item.unit}
-                                                </Text>
-                                            )}
                                         </View>
                                         {(item.event?.name || item.createdBy?.name) && (
                                             <Text className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">

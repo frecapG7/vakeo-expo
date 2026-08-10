@@ -77,7 +77,7 @@ export default function TripDetailsLayout() {
                 <Stack.Screen name="goods"
                     options={{
                         headerShown: false,
-                        title: "La liste partagée",
+                        title: "La liste de course",
                     }}
                 />
                 <Stack.Screen name="events"

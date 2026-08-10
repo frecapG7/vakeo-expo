@@ -6,7 +6,7 @@ import { Good } from "@/types/models";
 import { useLocalSearchParams } from "expo-router";
 import { useContext, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { Toast } from "toastify-react-native";
 
 
@@ -45,10 +45,7 @@ export default function NewGood() {
 
     return (
         <View className="flex-1 p-4">
-            <View className="mb-6">
-                <Text className="text-2xl font-bold text-dark dark:text-white">Nouvel article</Text>
-            </View>
-            <View className="flex-1">
+            <View className="flex-1 mt-6">
                 <GoodForm control={control} />
                 <View className="mt-6">
                     <Button
