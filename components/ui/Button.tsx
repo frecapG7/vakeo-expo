@@ -1,7 +1,8 @@
 import useColors from "@/hooks/styles/useColors";
-import { ActivityIndicator, Pressable, Text } from "react-native";
+import { Pressable, Text } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { IconSymbol, IconSymbolName } from "./IconSymbol";
+import { Spinner } from "./Spinner";
 
 
 type ButtonVariant = 'none' | 'contained' | 'outlined' | 'danger';
@@ -36,8 +37,7 @@ const ButtonTitle = ({ title, variant, size, isLoading }: { title?: string, vari
     if (isLoading)
         return (
             <Animated.View entering={FadeIn} exiting={FadeOut}>
-                <ActivityIndicator size={size === "medium" ? "large" : "small"}
-                    color={colors.text} />
+                <Spinner size={size === "medium" ? "medium" : "small"} color={colors.text} />
             </Animated.View>
         );
 

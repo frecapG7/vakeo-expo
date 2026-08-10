@@ -1,6 +1,8 @@
+import { GROCERY_UNITS } from "@/constants/Units";
 import { Good } from "@/types/models";
 import { Control, useFormState, useWatch } from "react-hook-form";
 import { Text, View } from "react-native";
+import { FormAutocomplete } from "../form/FormAutocomplete";
 import { FormNumberV2 } from "../form/FormNumberV2";
 import { FormText } from "../form/FormText";
 
@@ -44,10 +46,12 @@ export const GoodForm = ({ control }: {
                 </View>
                 <View className="flex-1 gap-1">
                     <Text className="text-sm font-medium text-gray-700 dark:text-gray-300">Unité</Text>
-                    <FormText
+                    <FormAutocomplete
                         control={control}
                         name="unit"
                         placeholder="kg, L, etc."
+                        suggestions={GROCERY_UNITS}
+                        disabled={isSubmitting}
                         rules={{
                             validate: (value) => {
                                 if (quantityValue && (value === undefined || value === null || value === '')) {

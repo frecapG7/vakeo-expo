@@ -89,12 +89,15 @@ export default function TripGoods() {
                             <Text className={`dark:text-white capitalize  ${item.checked && "line-through"}`}>
                                 <Text className="text-lg">
                                     {item.name}
+                                    {item.quantityNumber && item.unit && (
+                                        <Text className="text-base"> ({item.quantityNumber} {item.unit})</Text>
+                                    )}
                                 </Text>
                             </Text>
                             <View className="flex-row items-center justify-between mt-1">
-                                <View>
+                                <View className="max-w-[50%]">
                                     {item?.event && (
-                                        <Text className="text-gray-400 text-xs">{item.event?.name}</Text>
+                                        <Text className="text-gray-400 text-xs" numberOfLines={2}>{item.event?.name}</Text>
                                     )}
                                 </View>
                                 <View className="flex-row items-center gap-2">

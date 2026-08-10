@@ -6,7 +6,7 @@
     "test": "jest --watchAll",
     "start": "cross-env APP_ENVIRONMENT=development expo start",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "cross-env APP_ENVIRONMENT=production expo run:android",
+    "android": "cross-env APP_ENVIRONMENT=development expo run:android",
     "ios": "cross-env APP_ENVIRONMENT=development expo run:ios",
     "web": "cross-env APP_ENVIRONMENT=development expo start --web",
     "lint": "expo lint"

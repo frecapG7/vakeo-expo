@@ -207,9 +207,9 @@ export default function ItemDetails() {
             </View>
             <View className="flex-row gap-3 mx-2">
                 <StatCard
-                    icon="list.bullet"
+                    icon="cart"
                     count={dashboard?.goods?.total ?? 0}
-                    label="Liste partagée"
+                    label="Liste de course"
                     color="orange"
                     onPress={() => router.push({
                         pathname: "/[id]/goods",
