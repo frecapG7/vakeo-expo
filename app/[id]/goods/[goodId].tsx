@@ -2,12 +2,12 @@ import { GoodForm } from "@/components/goods/GoodForm";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { TripContext } from "@/context/TripContext";
-import { useDeleteGood, useGetGood, useGetGoods, usePutGood } from "@/hooks/api/useGoods";
+import { useGetGood, useGetGoods, usePutGood } from "@/hooks/api/useGoods";
 import { Good } from "@/types/models";
-import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Alert, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { Toast } from "toastify-react-native";
 
 export default function EditGood() {
@@ -17,9 +17,7 @@ export default function EditGood() {
 
     const { data: good, isLoading } = useGetGood(trip?._id, goodId);
     const { mutateAsync: putGood, isPending, isSuccess } = usePutGood(trip?._id, me?._id);
-    const deleteGood = useDeleteGood(trip?._id, me?._id);
     const [showSimilar, setShowSimilar] = useState(false);
-    const navigation = useNavigation();
 
     const { data: similarGoods } = useGetGoods(trip?._id, { search: good?.name }, {
         enabled: showSimilar && !!good?.name
@@ -37,7 +35,6 @@ export default function EditGood() {
         }
     }, [good, reset]);
 
-
     useEffect(() => {
         if (isSuccess) {
             router.back();
@@ -50,47 +47,10 @@ export default function EditGood() {
         Toast.success("Modifié avec succès");
     };
 
-    const onDelete = async (data: Good) => {
-        router.back();
-        deleteGood.mutate(data, {
-            onSuccess: () => {
-                Toast.success("Élément supprimé")
-            }
-        });
-    }
-    useEffect(() => {
-        navigation.setOptions({
-            headerRight: () => (
-                <Pressable onPress={() => good && Alert.alert("Retirer de la liste ?",
-                    "", [
-                    {
-                        text: "Annuler",
-                    },
-                    {
-                        text: "Supprimer",
-                        onPress: () => good && onDelete(good)
-                    }
-                ])}>
-                    <IconSymbol name="trash" size={24} />
-                </Pressable>
-            )
-        });
-    }, [good]);
-
     return (
         <View className="flex-1 p-4">
-            {/* <View className="mb-6 flex-row justify-end items-center">
-                <Button
-                    title="Supprimer"
-                   
-                    variant="danger"
-                    size="small"
-                    disabled={!good}
-                />
-            </View> */}
             <View className="flex-1 mt-6">
                 <GoodForm control={control} />
-
                 <Pressable
                     className="mt-4 flex-row items-center gap-2"
                     onPress={() => setShowSimilar(!showSimilar)}>

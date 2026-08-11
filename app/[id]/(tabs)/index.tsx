@@ -47,7 +47,7 @@ export default function ItemDetails() {
     const insets = useSafeAreaInsets();
     const bottomPadding = Platform.OS === 'ios' ? insets.bottom : 0;
 
-    if (!trip)
+    if (!trip && !dashboard)
         return (
             <Animated.ScrollView style={styles.container}>
                 <View className="h-80 bg-gray-600">
