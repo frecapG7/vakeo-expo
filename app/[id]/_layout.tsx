@@ -90,6 +90,13 @@ export default function TripDetailsLayout() {
                         title: "Participants",
                     }}
                 />
+                <Stack.Screen name="restrictions"
+                    options={{
+                        title: "Restrictions alimentaires",
+                        headerShown: false, 
+                        presentation: "modal"
+                    }}
+                />
                 <Stack.Screen name="share"
                     options={{
                         headerShown: true,

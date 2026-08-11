@@ -221,7 +221,10 @@ export default function ItemDetails() {
                     count={dashboard?.users?.restrictionCount ?? 0}
                     label="Restrictions"
                     color="orange-dark"
-                    onPress={() => { }}
+                    onPress={() => router.push({
+                        pathname: "/[id]/restrictions",
+                        params: { id: trip._id }
+                    })}
                 />
             </View>
             {dashboard?.events?.nextEvent && (

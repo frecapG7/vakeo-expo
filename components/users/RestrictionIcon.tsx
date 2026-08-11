@@ -1,14 +1,6 @@
-
-import HalalIcon from "@/assets/icons/halal-sign.png";
-import KosherIcon from "@/assets/icons/kosher.png";
-import NoAlcoholIcon from "@/assets/icons/no-alcohol.png";
-import NoPorkIcon from "@/assets/icons/no-pork.png";
-import VeganIcon from "@/assets/icons/vegan.png";
-import { Image } from "expo-image";
-import { View } from "react-native";
+import { Text, View } from "react-native";
 
 type ImageSize = 'xs' | 'sm' | 'sm2' | 'md' | 'lg' | 'xl';
-
 
 const sizeToClassMap = {
     xs: 'w-6 h-6',
@@ -19,34 +11,21 @@ const sizeToClassMap = {
     xl: 'w-36 h-36'
 };
 
-
-const valueToSource = {
-    "hasHalal": HalalIcon,
-    "hasKasher": KosherIcon,
-    "hasNoPork": NoPorkIcon,
-    "hasVegan": VeganIcon,
-    "hasNoAlcohol": NoAlcoholIcon,
-}
-
+const valueToEmoji: Record<string, string> = {
+    "hasHalal": "🌙",
+    "hasKasher": "✡️",
+    "hasNoPork": "🐷",
+    "hasVegan": "🌱",
+    "hasNoAlcohol": "🍷",
+};
 
 export const RestrictionIcon = ({ value, size = "md" }: { value: string, size: ImageSize }) => {
-
-
     const sizeClass = sizeToClassMap[size];
-    const source = valueToSource[value];
+    const emoji = valueToEmoji[value] || "❓";
 
     return (
-        <View className={`rounded-full items-center p-1 ${sizeClass}`}>
-            <Image
-                source={source}
-                style={{
-                    width: "100%",
-                    height: "100%",
-                }}
-                contentFit="contain"
-            />
-
+        <View className={`rounded-full items-center justify-center ${sizeClass}`}>
+            <Text className="text-xl">{emoji}</Text>
         </View>
-    )
-
-}
+    );
+};
