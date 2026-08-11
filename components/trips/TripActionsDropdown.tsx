@@ -41,7 +41,7 @@ export function TripActionsDropdown({
     <Menu>
       <MenuTrigger>
         <View className="bg-gray-800 rounded-full p-2">
-          <IconSymbol name="ellipsis.circle" color="white" />
+          <IconSymbol name="ellipsis" color="white" />
         </View>
       </MenuTrigger>
       <MenuOptions
