@@ -69,7 +69,7 @@ const MAPPING = {
   "sportscourt": "sports-gymnastics",
   "moon.stars.fill": "nights-stay",
   "info.circle" : "info-outline",
-  "line.horizontal.3": "drag-indicator",
+  "line.horizontal.3": "view-headline",
   "eye": "visibility",
   "eye.slash": "visibility-off",
   "bag.fill":"shopping-bag",

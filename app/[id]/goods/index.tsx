@@ -77,11 +77,24 @@ export default function TripGoods() {
                         <IconSymbol name="ellipsis" size={24} color={colors.text} />
                     </MenuTrigger>
                     <MenuOptions customStyles={popupMenuStyles(colors)}>
-                        <MenuOption onSelect={() => setUnchecked(!unchecked)} customStyles={{ optionWrapper: popupMenuStyles(colors).optionWrapper }}>
-                            <Text className="dark:text-white">Afficher uniquement les articles manquant</Text>
+                        <MenuOption onSelect={() => setUnchecked(!unchecked)}
+                            customStyles={{ optionWrapper: popupMenuStyles(colors).optionWrapper }}>
+                            <View className={`flex-row items-center gap-2 ${unchecked ? 'bg-orange-100 dark:bg-orange-900/30' : ''}`}>
+                                <View className={`p-1 rounded-full`}>
+                                    <IconSymbol
+                                        name="line.horizontal.3"
+                                        size={18}
+                                        color={unchecked ? "orange" : colors.text}
+                                    />
+                                </View>
+                                <Text className="dark:text-white">Afficher uniquement les articles manquant</Text>
+                            </View>
                         </MenuOption>
                         <MenuOption onSelect={handleCheckAll} customStyles={{ optionWrapper: popupMenuStyles(colors).optionWrapper }}>
-                            <Text className="dark:text-white">Marquer tout comme validé</Text>
+                            <View className="flex-row items-center gap-2">
+                                <IconSymbol name="checkmark.circle" size={18} color={colors.text} />
+                                <Text className="dark:text-white">Cocher tous les éléments manquant</Text>
+                            </View>
                         </MenuOption>
                     </MenuOptions>
                 </Menu>
