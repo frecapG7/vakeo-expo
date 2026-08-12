@@ -62,7 +62,7 @@ export const UserRestrictionsForm = ({ control }: UserRestrictionsFormProps) => 
                     <View className="rounded-full bg-white">
                         <RestrictionIcon value="hasNoAlcohol" size="sm" />
                     </View>
-                    <Text className="dark:text-white text-lg font-bold">Pas d'alcool</Text>
+                    <Text className="dark:text-white text-lg font-bold">Pas d&apos;alcool</Text>
                 </View>
                 <FormSwitch
                     control={control}

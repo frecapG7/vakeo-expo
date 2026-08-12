@@ -16,7 +16,7 @@ export const FormSwitch = ({
     disabled?: boolean
 }) => {
 
-    const { field: { value, onChange }, fieldState: { error } } = useController({
+    const { field: { value, onChange }, fieldState: { error }, formState: {isSubmitting} } = useController({
         name,
         control,
         rules
@@ -54,7 +54,7 @@ export const FormSwitch = ({
             <Switch
                 value={value || false}
                 onSwitch={handleSwitch}
-                disabled={disabled}
+                disabled={disabled || isSubmitting}
             />
         </Animated.View>
     )
