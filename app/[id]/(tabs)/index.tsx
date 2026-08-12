@@ -47,7 +47,7 @@ export default function ItemDetails() {
     const insets = useSafeAreaInsets();
     const bottomPadding = Platform.OS === 'ios' ? insets.bottom : 0;
 
-    if (!trip)
+    if (!dashboard)
         return (
             <Animated.ScrollView style={styles.container}>
                 <View className="h-80 bg-gray-600">
@@ -207,9 +207,9 @@ export default function ItemDetails() {
             </View>
             <View className="flex-row gap-3 mx-2">
                 <StatCard
-                    icon="list.bullet"
+                    icon="cart"
                     count={dashboard?.goods?.total ?? 0}
-                    label="Liste partagée"
+                    label="Liste de course"
                     color="orange"
                     onPress={() => router.push({
                         pathname: "/[id]/goods",
@@ -217,11 +217,14 @@ export default function ItemDetails() {
                     })}
                 />
                 <StatCard
-                    icon="exclamationmark.triangle"
+                    icon="nosign"
                     count={dashboard?.users?.restrictionCount ?? 0}
                     label="Restrictions"
                     color="orange-dark"
-                    onPress={() => { }}
+                    onPress={() => router.push({
+                        pathname: "/[id]/restrictions",
+                        params: { id: trip._id }
+                    })}
                 />
             </View>
             {dashboard?.events?.nextEvent && (

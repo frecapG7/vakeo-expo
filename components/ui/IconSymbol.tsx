@@ -19,6 +19,7 @@ const MAPPING = {
   'house.fill': 'home',
   'paperplane.fill': 'send',
   'chevron.left.forwardslash.chevron.right': 'code',
+  'arrow.clockwise': 'refresh',
   'chevron.right': 'chevron-right',
   'chevron.left': 'chevron-left',
   'xmark.circle': 'cancel',
@@ -33,7 +34,7 @@ const MAPPING = {
   "calendar": "calendar-month",
   "eurosign.circle": "euro-symbol",
   "bed.double": "bed",
-  "ellipsis.circle": "more-horiz",
+  "ellipsis": "more-horiz",
   "flame": "local-fire-department",
   "arrow.left": "arrow-back",
   "arrow.right" : "arrow-forward",
@@ -68,7 +69,7 @@ const MAPPING = {
   "sportscourt": "sports-gymnastics",
   "moon.stars.fill": "nights-stay",
   "info.circle" : "info-outline",
-  "line.horizontal.3": "drag-indicator",
+  "line.horizontal.3": "view-headline",
   "eye": "visibility",
   "eye.slash": "visibility-off",
   "bag.fill":"shopping-bag",
@@ -83,6 +84,7 @@ const MAPPING = {
   "doc.plaintext" : "text-snippet",
   "bubble.left.fill": "chat-bubble",
   "exclamationmark": "warning",
+  "nosign": "do-not-disturb"
 } as IconMapping;
 
 /**

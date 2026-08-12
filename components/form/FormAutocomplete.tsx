@@ -1,76 +1,133 @@
-import { useState } from "react";
+import useColors from "@/hooks/styles/useColors";
+import { useEffect, useRef, useState } from "react";
 import { useController } from "react-hook-form";
 import { FlatList, Pressable, Text, TextInput, View } from "react-native";
-import Animated, { FadeIn, SlideInDown } from "react-native-reanimated";
-import { Button } from "../ui/Button";
-import { IconSymbol } from "../ui/IconSymbol";
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 
-interface Option {
-    key: string,
-    value: string
-};
+export const FormAutocomplete = ({
+    control,
+    name,
+    placeholder,
+    rules,
+    suggestions = [],
+    disabled
+}: {
+    control: any,
+    name: string,
+    placeholder?: string,
+    rules?: object,
+    suggestions?: readonly string[],
+    disabled?: boolean
+}) => {
 
-export const FormAutocomplete = ({ control, name, rules, options = [] }: { control: any, name: string, rules?: any, options?: Option[] }) => {
+    const { field: { value, onChange },
+        fieldState: { error } } = useController({
+            name,
+            control,
+            rules
+        });
 
-
-    const { field: { value, onChange } } = useController({
-        control,
-        name,
-        rules
+    const shakeAnimation = useSharedValue(0);
+    const animatedStyle = useAnimatedStyle(() => {
+        return {
+            transform: [
+                {
+                    translateX: shakeAnimation?.value
+                }
+            ]
+        };
     });
+
+    useEffect(() => {
+        if (error) {
+            shakeAnimation.value = withRepeat(withTiming(20, {
+                duration: 100,
+                easing: Easing.linear,
+            }), 4, true);
+        }
+    }, [error, shakeAnimation]);
+
+    const { inputPlaceHolder } = useColors();
+    const textInputRef = useRef<TextInput>(null);
+
+    useEffect(() => {
+        if (error)
+            textInputRef.current?.focus();
+    }, [error]);
+
     const [showDropdown, setShowDropdown] = useState(false);
+    const [inputValue, setInputValue] = useState<string>(value ?? '');
 
+    useEffect(() => {
+        if (value !== inputValue) {
+            setInputValue(value ?? '');
+        }
+    }, [value]);
 
+    const filteredSuggestions = inputValue.length > 0
+        ? suggestions.filter(s => 
+            s.toLowerCase().includes(inputValue.toLowerCase())
+          )
+        : [];
 
+    const handleChangeText = (text: string) => {
+        setInputValue(text);
+        onChange(text);
+        setShowDropdown(text.length > 0);
+    };
+
+    const handleSelectSuggestion = (suggestion: string) => {
+        setInputValue(suggestion);
+        onChange(suggestion);
+        setShowDropdown(false);
+    };
+
+    const handleFocus = () => {
+        if (inputValue.length > 0) {
+            setShowDropdown(true);
+        }
+    };
+
+    const handleBlur = () => {
+        setTimeout(() => setShowDropdown(false), 200);
+    };
 
     return (
-        <View className="z-10">
-
-            <View className="flex relative  flex-row gap-2 bg-gray-200 justify-between items-center ">
+        <View className="flex-1">
+            <Animated.View style={animatedStyle}
+                className={`flex-row items-center ${disabled ? 'bg-gray-200 dark:bg-gray-700 opacity-60' : 'bg-white dark:bg-gray-600'} border focus:border focus:border-blue-500 rounded-xl h-12`}>
                 <TextInput
-                    value={value}
-                    onChangeText={onChange}
-                    className="flex-grow placeholder-black"
-                    onFocus={() => setShowDropdown(true)}
-                    onBlur={() => setShowDropdown(false)}
-
+                    onChangeText={handleChangeText}
+                    value={inputValue}
+                    className="flex-1 text-dark dark:text-white h-full items-start normal-case p-3"
+                    placeholderTextColor={inputPlaceHolder}
+                    ref={textInputRef}
+                    placeholder={placeholder}
+                    style={{
+                        textAlignVertical: "top",
+                    }}
+                    editable={!disabled}
+                    onFocus={handleFocus}
+                    onBlur={handleBlur}
                 />
-                {value !== "" &&
-                    <Animated.View entering={FadeIn} >
-                        <Button onPress={() => onChange("")}>
-                            <IconSymbol name="xmark.circle" color="black" />
-                        </Button>
-                    </Animated.View>
-                }
-
-
-
-            </View>
-            {showDropdown &&
-                <Animated.View entering={SlideInDown}
-                    // exiting={SlideInUp}
-                    className="absolute top-full left-0 right-0 z-50 border border-blue-300 rounded-lg bg-white dark:bg-gray-200">
+            </Animated.View>
+            {!disabled && showDropdown && filteredSuggestions.length > 0 && (
+                <View className="absolute top-full left-0 right-0 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl mt-1 max-h-40 z-10">
                     <FlatList
-                        data={options}
-                        keyExtractor={(item) => item?.key}
-                        renderItem={({ item, index }) =>
-                            <Pressable onPress={() => {
-                                console.log("Toto");
-                                onChange(item.value);
-                                setShowDropdown(false);
-                            }}>
-                                <Text className="capitalize text-lg">{item?.value}</Text>
+                        data={filteredSuggestions}
+                        keyExtractor={(item) => item}
+                        renderItem={({ item }) => (
+                            <Pressable
+                                onPress={() => handleSelectSuggestion(item)}
+                                className="p-3"
+                            >
+                                <Text className="text-dark dark:text-white">{item}</Text>
                             </Pressable>
-                        }
-                        ItemSeparatorComponent={() =>
-                            <View className="items-center my-1">
-                                <View className="w-80 h-0.5 bg-blue-700 content-center" />
-                            </View>
-                        }
+                        )}
+                        keyboardShouldPersistTaps="always"
                     />
-                </Animated.View>
-
-            }
+                </View>
+            )}
         </View>
-    )
-}
+    );
+};

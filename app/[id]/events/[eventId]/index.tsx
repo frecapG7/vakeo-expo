@@ -147,9 +147,12 @@ export default function EventDetails() {
                                     Ajouter des articles
                                 </Text>
                             </View>
-                            <Text className="text-xs text-center text-gray-500 dark:text-gray-400 mt-1">
-                                Liste partagée
-                            </Text>
+                            <View className="flex-row items-center gap-2">
+                                <IconSymbol name="cart" size={12} color="orange" />
+                                <Text className="text-xs text-center text-gray-500 dark:text-gray-400 mt-1">
+                                    Liste de course
+                                </Text>
+                            </View>
                         </Pressable>
 
                         <Pressable
@@ -170,9 +173,13 @@ export default function EventDetails() {
                                     Voir les messages
                                 </Text>
                             </View>
+                            <View className="flex-row items-center gap-2">
+                            <IconSymbol name="message" size={12} color="blue"/>
                             <Text className="text-xs text-center text-gray-500 dark:text-gray-400 mt-1">
                                 Discussion
                             </Text>
+
+                            </View>
                         </Pressable>
                     </View>
                 </View>

@@ -77,7 +77,7 @@ export default function TripDetailsLayout() {
                 <Stack.Screen name="goods"
                     options={{
                         headerShown: false,
-                        title: "La liste partagée",
+                        title: "La liste de course",
                     }}
                 />
                 <Stack.Screen name="events"
@@ -88,6 +88,13 @@ export default function TripDetailsLayout() {
                 <Stack.Screen name="attendees"
                     options={{
                         title: "Participants",
+                    }}
+                />
+                <Stack.Screen name="restrictions"
+                    options={{
+                        title: "Restrictions alimentaires",
+                        headerShown: false, 
+                        presentation: "modal"
                     }}
                 />
                 <Stack.Screen name="share"
