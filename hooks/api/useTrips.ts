@@ -81,7 +81,11 @@ export const useGetTripUser = (tripId: string, userId?: string, options?: any) =
 }
 
 const updateTripUser = async (tripId: string, userId: string, data: TripUser) => {
-  const response = await axios.put(`/trips/${tripId}/users/${userId}`, data);
+  const response = await axios.put(`/trips/${tripId}/users/${userId}`, data, {
+    headers: {
+      "x-user-id": userId
+    }
+  });
   return response.data;
 }
 
