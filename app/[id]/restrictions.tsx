@@ -16,7 +16,7 @@ export default function TripRestrictions() {
     const users = useMemo(() => trip?.users || [], [trip?.users]);
 
     const {restrictionsByType, totalRestrictions } = useMemo(() => {
-        const result: Record<string, typeof users> = {};
+        const result: Record<string, typeof users> = Object.create(null);
         let total = 0 ;
         users.forEach(u => {
             (u.restrictions || []).forEach(r => {

@@ -87,15 +87,18 @@ export default function TripGoods() {
                                         color={unchecked ? "orange" : colors.text}
                                     />
                                 </View>
-                                <Text className="dark:text-white">Afficher uniquement les articles manquant</Text>
+                                <Text className="dark:text-white">Afficher uniquement les articles manquants</Text>
                             </View>
                         </MenuOption>
-                        <MenuOption onSelect={handleCheckAll} customStyles={{ optionWrapper: popupMenuStyles(colors).optionWrapper }}>
-                            <View className="flex-row items-center gap-2">
-                                <IconSymbol name="checkmark.circle" size={18} color={colors.text} />
-                                <Text className="dark:text-white">Cocher tous les éléments manquant</Text>
-                            </View>
-                        </MenuOption>
+                        {!!me?._id &&
+                            <MenuOption onSelect={handleCheckAll}
+                                customStyles={{ optionWrapper: popupMenuStyles(colors).optionWrapper }}>
+                                <View className="flex-row items-center gap-2">
+                                    <IconSymbol name="checkmark.circle" size={18} color={colors.text} />
+                                    <Text className="dark:text-white">Cocher tous les éléments</Text>
+                                </View>
+                            </MenuOption>
+                        }
                     </MenuOptions>
                 </Menu>
             )
