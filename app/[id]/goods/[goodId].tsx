@@ -69,7 +69,7 @@ export default function EditGood() {
                                         <View className="flex-row flex-wrap items-baseline gap-2">
                                             <Text className={`dark:text-white capitalize ${item.checked ? "line-through" : ""}`}>
                                                 {item.name}
-                                                {item.quantityNumber && item.unit && (
+                                                {item.quantityNumber != null && (
                                                     <Text className="text-sm text-gray-500 dark:text-gray-400"> ({item.quantityNumber} {item.unit})</Text>
                                                 )}
                                             </Text>

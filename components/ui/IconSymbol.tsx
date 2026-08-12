@@ -84,6 +84,7 @@ const MAPPING = {
   "doc.plaintext" : "text-snippet",
   "bubble.left.fill": "chat-bubble",
   "exclamationmark": "warning",
+  "nosign": "do-not-disturb"
 } as IconMapping;
 
 /**

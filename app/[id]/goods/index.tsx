@@ -74,7 +74,7 @@ export default function TripGoods() {
             headerRight: () => (
                 <Menu>
                     <MenuTrigger>
-                        <IconSymbol name="ellipsis.circle" size={24} color={colors.text} />
+                        <IconSymbol name="ellipsis" size={24} color={colors.text} />
                     </MenuTrigger>
                     <MenuOptions customStyles={popupMenuStyles(colors)}>
                         <MenuOption onSelect={() => setUnchecked(!unchecked)} customStyles={{ optionWrapper: popupMenuStyles(colors).optionWrapper }}>
@@ -137,7 +137,7 @@ export default function TripGoods() {
                                 <Text className={`dark:text-white capitalize  ${item.checked && "line-through"}`}>
                                     <Text className="text-lg">
                                         {item.name}
-                                        {item.quantityNumber && item.unit && (
+                                        {item.quantityNumber != null && (
                                             <Text className="text-base"> ({item.quantityNumber} {item.unit})</Text>
                                         )}
                                     </Text>
@@ -182,7 +182,7 @@ export default function TripGoods() {
                                 Aucun article
                             </Text>
                             <Text className="text-gray-400 dark:text-gray-500 text-center max-w-sm">
-                                Votre liste est vide pour l'instant
+                                Votre liste est vide pour l&apos;instant
                             </Text>
                         </View>
                 }

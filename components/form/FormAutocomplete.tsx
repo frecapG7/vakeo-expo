@@ -111,7 +111,7 @@ export const FormAutocomplete = ({
                     onBlur={handleBlur}
                 />
             </Animated.View>
-            {showDropdown && filteredSuggestions.length > 0 && (
+            {!disabled && showDropdown && filteredSuggestions.length > 0 && (
                 <View className="absolute top-full left-0 right-0 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl mt-1 max-h-40 z-10">
                     <FlatList
                         data={filteredSuggestions}

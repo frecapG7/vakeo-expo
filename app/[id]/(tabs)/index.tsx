@@ -47,7 +47,7 @@ export default function ItemDetails() {
     const insets = useSafeAreaInsets();
     const bottomPadding = Platform.OS === 'ios' ? insets.bottom : 0;
 
-    if (!trip && !dashboard)
+    if (!dashboard)
         return (
             <Animated.ScrollView style={styles.container}>
                 <View className="h-80 bg-gray-600">
@@ -217,7 +217,7 @@ export default function ItemDetails() {
                     })}
                 />
                 <StatCard
-                    icon="exclamationmark.triangle"
+                    icon="nosign"
                     count={dashboard?.users?.restrictionCount ?? 0}
                     label="Restrictions"
                     color="orange-dark"
