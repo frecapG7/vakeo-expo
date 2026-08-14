@@ -10,7 +10,7 @@ import { useGetTrip } from "@/hooks/api/useTrips";
 import { useDeleteTripStop, useGetTripStops, usePostTripStop, usePutTripStop } from "@/hooks/api/useTripStop";
 import dayjs from "@/lib/dayjs-config";
 import { TripStop } from "@/types/models";
-import { Image } from "expo-image";
+import { Image, ImageBackground } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
 import { useContext, useState } from "react";
 import { Alert, Modal, Pressable, Text, View } from "react-native";
@@ -78,9 +78,9 @@ export default function TripLocation() {
                                         </Text>
                                         {openPollsCount > 0 && (
                                             <View className={`rounded-full px-2 py-0.5 min-w-[24px] items-center justify-center ${item.polls?.filter(p => !p.isClosed)
-                                                    .every(poll => poll.hasSelected?.some(user => user._id === me?._id))
-                                                    ? 'bg-green-500'
-                                                    : 'bg-red-500'
+                                                .every(poll => poll.hasSelected?.some(user => user._id === me?._id))
+                                                ? 'bg-green-500'
+                                                : 'bg-red-500'
                                                 }`}>
                                                 <Text className="text-white text-xs font-bold">
                                                     {openPollsCount}
@@ -116,7 +116,7 @@ export default function TripLocation() {
                                             setSelectedTripStop(item);
                                             setOpenLocationWizard(true)
                                         }}
-                                        className="mb-2"
+                                        className=""
                                     >
                                         <Animated.View
                                             entering={SlideInRight}
@@ -149,10 +149,47 @@ export default function TripLocation() {
                                             <View className="p-2 rounded-full bg-orange-100 dark:bg-orange-900/30">
                                                 <IconSymbol name="house.fill" size={24} color="orange" />
                                             </View>
+
                                             <View className="flex-1 py-2">
-                                                <Text className="text-gray-600 dark:text-gray-400" numberOfLines={2}>
-                                                    {item?.accommodation ? item?.accommodation?.title : "Ajouter un hébergement"}
-                                                </Text>
+
+                                                {item?.accommodation ? (
+                                                    <View className="rounded-xl overflow-hidden">
+                                                        <ImageBackground
+                                                            source={item?.accommodation?.image}
+                                                            className="flex-1"
+                                                            contentFit="cover"
+                                                            style={{
+                                                                height: 80,
+                                                                width: "100%",
+                                                                flex: 1,
+                                                                alignItems: "flex-end",
+                                                                borderTopLeftRadius: 16,
+                                                                borderTopRightRadius: 16
+                                                            }}
+                                                        >
+                                                            <View className="absolute bottom-0 left-0 right-0 h-1/2 bg-black/40" />
+                                                            {item?.accommodation?.icon && (
+                                                                <View className="absolute bottom-2 right-2">
+                                                                    <Image
+                                                                        source={item?.accommodation?.icon}
+                                                                        style={{
+                                                                            width: 24,
+                                                                            height: 24,
+                                                                            borderRadius: 6
+                                                                        }}
+                                                                    />
+                                                                </View>
+                                                            )}
+                                                        </ImageBackground>
+                                                        <Text className="mt-1 text-sm font-medium dark:text-white" numberOfLines={2}>
+                                                            {item.accommodation.title}
+                                                        </Text>
+                                                    </View>
+                                                ) :
+                                                    <Text className="text-gray-600 dark:text-gray-400" numberOfLines={2}>
+                                                        Ajouter un hébergement
+                                                    </Text>
+                                                }
                                             </View>
                                         </Animated.View>
                                     </Pressable>
