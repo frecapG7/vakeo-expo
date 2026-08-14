@@ -1,14 +1,16 @@
 import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { Switch } from "@/components/ui/Switch";
-import { RestrictionIcon } from "@/components/users/RestrictionIcon";
+import { UserRestrictionsForm } from "@/components/users/UserRestrictionsForm";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetTripUser, useUpdateTripUser } from "@/hooks/api/useTrips";
 import { router } from "expo-router";
-import { useContext, useMemo } from "react";
+import { useContext, useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
-import Animated from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
+import { Toast } from "toastify-react-native";
 
 
 
@@ -20,22 +22,41 @@ export default function TripSettings() {
     const { data: user } = useGetTripUser(trip._id, me?._id);
     const updateTripUser = useUpdateTripUser(trip._id, user?._id);
 
-    const restrictions = useMemo(() => user?.restrictions || [], [user]);
+    const { control, reset, formState: { isDirty }, handleSubmit } = useForm({
+        defaultValues: {
+            hasHalal: false,
+            hasKasher: false,
+            hasNoPork: false,
+            hasNoAlcohol: false
+        }
+    });
 
-    const onSwitch = async (value: boolean, name: string) => {
-        if (!user) return;
-        let newRestrictions = user?.restrictions || [];
-        if (value)
-            newRestrictions = [...newRestrictions, name]
-        else
-            newRestrictions = newRestrictions.filter(v => v !== name);
 
+    useEffect(() => {
+        if (!user)
+            return;
+
+        const formValues = {
+            hasHalal: user.restrictions?.includes("hasHalal"),
+            hasKasher: user.restrictions?.includes("hasKasher"),
+            hasNoPork: user.restrictions?.includes("hasNoPork"),
+            hasNoAlcohol: user.restrictions?.includes("hasNoAlcohol"),
+            hasVegan: user.restrictions?.includes("hasVegan"),
+        };
+        reset(formValues);
+    }, [user, reset])
+
+
+    const onSubmit = async (formData) => {
+        const restrictions = Object.keys(formData).filter(key => formData[key]);
         await updateTripUser.mutateAsync({
             ...user,
-            restrictions: newRestrictions
+             restrictions
         });
+        Toast.success("Profil modifié")
+    };
 
-    }
+
 
     if (!user)
         return (
@@ -92,7 +113,9 @@ export default function TripSettings() {
                         Renseigne tes restrictions alimentaires afin de faciliter l'organisation des repas</Text>
                 </View>
 
-                <View className={`flex-row justify-between items-center border-b ${restrictions.includes("hasHalal") ? "border-blue-400" : "border-gray-800 dark:border-gray-400"} pr-10 pb-1`}>
+                <UserRestrictionsForm control={control} />
+
+                {/* <View className={`flex-row justify-between items-center border-b ${restrictions.includes("hasHalal") ? "border-blue-400" : "border-gray-800 dark:border-gray-400"} pr-10 pb-1`}>
                     <View className="flex-row gap-2 items-center">
                         <View className="rounded-full bg-white">
                             <RestrictionIcon value="hasHalal" size="sm" />
@@ -153,7 +176,19 @@ export default function TripSettings() {
                     <Switch value={restrictions.includes("hasVegan")}
                         onSwitch={(v) => onSwitch(v, "hasVegan")}
                         disabled={updateTripUser?.isPending} />
-                </View>
+                </View> */}
+
+                {isDirty && 
+                
+                    <Animated.View entering={FadeIn}>
+                        <Button
+                            variant="contained"
+                            title="Modifier"
+                            isLoading={updateTripUser.isPending}
+                            onPress={handleSubmit(onSubmit)}
+                            />
+                    </Animated.View>
+                }
             </View>
 
 
