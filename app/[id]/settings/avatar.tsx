@@ -1,6 +1,7 @@
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetTripUser, useUpdateTripUser } from "@/hooks/api/useTrips";
 import useColors from "@/hooks/styles/useColors";
@@ -8,7 +9,6 @@ import { useRouter } from "expo-router";
 import React, { useContext, useEffect } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const avatars = [
     { uri: "https://storage.googleapis.com/vakeo_dev/avatar/femme_neige.png" },
@@ -75,18 +75,7 @@ export default function AvatarSetting() {
     };
 
     return (
-        <SafeAreaView
-            style={{
-                flex: 1,
-                backgroundColor: colors.background,
-            }}
-        >
-            <Animated.ScrollView
-                contentContainerStyle={{
-                    paddingVertical: 16,
-                    paddingHorizontal: 16,
-                }}
-            >
+            <Animated.ScrollView style={styles.container}>
                 {/* Header */}
                 <Animated.View entering={FadeIn} className="mb-6">
                     <Text
@@ -172,6 +161,5 @@ export default function AvatarSetting() {
                     />
                 </Animated.View>
             </Animated.ScrollView>
-        </SafeAreaView>
     );
 }
