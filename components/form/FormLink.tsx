@@ -7,6 +7,14 @@ import { Pressable, TextInput } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
 
+const isValidHttpUrl = (url: string): boolean => {
+    try {
+        const parsed = new URL(url);
+        return parsed.protocol === "http:" || parsed.protocol === "https:";
+    } catch {
+        return false;
+    }
+};
 
 export const FormLink = ({
     control,
@@ -66,7 +74,7 @@ export const FormLink = ({
         const text = await Clipboard.getStringAsync();
 
         // Try direct match first
-        if (pattern.test(text)) {
+        if (isValidHttpUrl(text)) {
             onChange(text);
             await onPaste?.(text);
             Toast.info("Lien collé !");
@@ -82,7 +90,7 @@ export const FormLink = ({
             // Clean trailing punctuation: "https://toto.com." -> "https://toto.com"
             const cleanUrl = extractedUrl.replace(/[.,!?;:)]+$/, '');
 
-            if (pattern.test(cleanUrl)) {
+            if (isValidHttpUrl(cleanUrl)) {
                 onChange(cleanUrl);
                 await onPaste?.(cleanUrl);
                 Toast.info("Lien extrait et collé !");

@@ -18,7 +18,7 @@ export default function LinkForm({
     control
 }: LinkFormProps) {
 
-    const postLinkPreview = usePostLinkPreview();
+    const { mutateAsync: postLinkPreview } = usePostLinkPreview();
     const url = useWatch({ control, name: "url" });
 
 
@@ -32,6 +32,11 @@ export default function LinkForm({
         name: "icon"
     });
 
+    const { field: { value: image, onChange: setImage } } = useController({
+        control,
+        name: "image"
+    });
+
     // Auto-fetch preview when URL changes
     useEffect(() => {
         if (url && isValidUrl(url)) {
@@ -41,8 +46,8 @@ export default function LinkForm({
                     if (response.success && response.data) {
                         // Auto-fill extracted data
                         setTitle(response.data.title || "");
-                        // setValue("description", response.data.description || "");
                         setIcon(response.data.icon || "");
+                        setImage(response.data.image || "");
                     }
                 } catch (error) {
                     console.error("Failed to fetch link preview:", error);

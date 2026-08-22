@@ -23,7 +23,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 export default function ItemDetails() {
 
     const { me, trip } = useContext(TripContext);
-    const { data: dashboard, refetch, isRefetching } = useGetDashboard(trip?._id, me?._id, !!trip && (!trip?.isPrivate || !!me?._id))
+    const { data: dashboard, refetch, isRefetching } = useGetDashboard(trip?._id, me?._id, !!trip?._id)
     const deleteTrip = useDeleteStorageTrip();
 
     const router = useRouter();
@@ -241,7 +241,7 @@ export default function ItemDetails() {
                     />
                     <StatCard
                         icon="link"
-                        count={0}
+                        count={dashboard?.links?.linksCount ?? 0}
                         label="Liens utiles"
                         color="green"
                         onPress={() => router.push({

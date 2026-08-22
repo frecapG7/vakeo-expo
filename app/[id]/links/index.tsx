@@ -160,13 +160,14 @@ export default function TripLinks() {
                 }}
                 ListFooterComponent={<View className="my-5" />}
             />
-            <FloatingAddButton onPress={() => router.push({
-                pathname: "/[id]/links/new",
-                params: {
-                    id: trip._id,
-                }
-            })}
-            />
+            {trip?._id &&
+                <FloatingAddButton onPress={() => router.push({
+                    pathname: "/[id]/links/new",
+                    params: {
+                        id: trip._id,
+                    }
+                })} />
+            }
         </GestureHandlerRootView>
     )
 }
