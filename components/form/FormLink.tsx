@@ -22,8 +22,8 @@ export const FormLink = ({
     placeholder?: string;
     required?: boolean;
     autoFocus?: boolean;
-    pattern ?: RegExp,
-    onPaste ?: (text: string) => void
+    pattern?: RegExp,
+    onPaste?: (text: string) => void
 }) => {
     const {
         field: { value, onChange },
@@ -64,13 +64,42 @@ export const FormLink = ({
 
     const handlePaste = async () => {
         const text = await Clipboard.getStringAsync();
+
+        // Try direct match first
         if (pattern.test(text)) {
             onChange(text);
-            await onPaste?.(text)
+            await onPaste?.(text);
             Toast.info("Lien collé !");
-        } else {
-            Toast.info("Aucun lien valide trouvé");
+            return;
         }
+
+        // Extract first URL from text (e.g., "Join us at https://toto.com")
+        const urlRegex = /(https?:\/\/[^\s]+)/;
+        const match = text.match(urlRegex);
+
+        if (match) {
+            const extractedUrl = match[0];
+            // Clean trailing punctuation: "https://toto.com." -> "https://toto.com"
+            const cleanUrl = extractedUrl.replace(/[.,!?;:)]+$/, '');
+
+            if (pattern.test(cleanUrl)) {
+                onChange(cleanUrl);
+                await onPaste?.(cleanUrl);
+                Toast.info("Lien extrait et collé !");
+                return;
+            }
+        }
+
+        Toast.info("Aucun lien valide trouvé");
+    };
+
+    // Add helper
+    const hasValidLink = value && pattern.test(value);
+
+    // Add clear handler
+    const handleClear = () => {
+        onChange("");
+        textInputRef.current?.focus();
     };
 
     return (
@@ -84,10 +113,17 @@ export const FormLink = ({
                 placeholder={placeholder}
                 style={{ textAlignVertical: "top" }}
                 autoFocus={autoFocus}
+                editable={!hasValidLink}
             />
-            <Pressable onPress={handlePaste} className="p-1 h-full justify-center items-center">
-                <IconSymbol name="doc.on.doc" size={20} color="gray" />
-            </Pressable>
+            {hasValidLink ? (
+                <Pressable onPress={handleClear} className="p-1 h-full justify-center items-center">
+                    <IconSymbol name="xmark.circle" size={20} color="blue" />
+                </Pressable>
+            ) : (
+                <Pressable onPress={handlePaste} className="p-1 h-full justify-center items-center">
+                    <IconSymbol name="doc.on.doc" size={20} color="gray" />
+                </Pressable>
+            )}
         </Animated.View>
     );
 };

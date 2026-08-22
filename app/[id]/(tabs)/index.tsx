@@ -146,20 +146,20 @@ export default function ItemDetails() {
                         </View>
                     </Button>
                     {trip?.description && (
-                      <>
-                        <Text
-                          numberOfLines={descriptionExpanded ? undefined : 2}
-                          ellipsizeMode="tail"
-                          className="text-gray-600 dark:text-gray-300 text-sm mt-2"
-                        >
-                          {trip.description}
-                        </Text>
-                        <Pressable onPress={() => setDescriptionExpanded(!descriptionExpanded)}>
-                          <Text className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                            {descriptionExpanded ? "Moins" : "Plus"}
-                          </Text>
-                        </Pressable>
-                      </>
+                        <>
+                            <Text
+                                numberOfLines={descriptionExpanded ? undefined : 2}
+                                ellipsizeMode="tail"
+                                className="text-gray-600 dark:text-gray-300 text-sm mt-2"
+                            >
+                                {trip.description}
+                            </Text>
+                            <Pressable onPress={() => setDescriptionExpanded(!descriptionExpanded)}>
+                                <Text className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                    {descriptionExpanded ? "Moins" : "Plus"}
+                                </Text>
+                            </Pressable>
+                        </>
                     )}
                 </View>
                 <View className="flex my-5 gap-3">
@@ -205,27 +205,52 @@ export default function ItemDetails() {
                     />
                 </View>
             </View>
-            <View className="flex-row gap-3 mx-2">
-                <StatCard
-                    icon="cart"
-                    count={dashboard?.goods?.total ?? 0}
-                    label="Liste de course"
-                    color="orange"
-                    onPress={() => router.push({
-                        pathname: "/[id]/goods",
-                        params: { id: trip._id }
-                    })}
-                />
-                <StatCard
-                    icon="nosign"
-                    count={dashboard?.users?.restrictionCount ?? 0}
-                    label="Restrictions"
-                    color="orange-dark"
-                    onPress={() => router.push({
-                        pathname: "/[id]/restrictions",
-                        params: { id: trip._id }
-                    })}
-                />
+            <View className="gap-2">
+                <View className="flex-row gap-3 mx-2">
+                    <StatCard
+                        icon="cart"
+                        count={dashboard?.goods?.total ?? 0}
+                        label="Liste de course"
+                        color="orange"
+                        onPress={() => router.push({
+                            pathname: "/[id]/goods",
+                            params: { id: trip._id }
+                        })}
+                    />
+                    <StatCard
+                        icon="nosign"
+                        count={dashboard?.users?.restrictionCount ?? 0}
+                        label="Restrictions"
+                        color="red"
+                        onPress={() => router.push({
+                            pathname: "/[id]/restrictions",
+                            params: { id: trip._id }
+                        })}
+                    />
+                </View>
+                <View className="flex-row gap-3 mx-2">
+                    <StatCard
+                        icon="chart.bar.fill"
+                        count={0}
+                        label="Sondages"
+                        color="blue"
+                        onPress={() => router.push({
+                            pathname: "/[id]/polls",
+                            params: { id: trip._id }
+                        })}
+                    />
+                    <StatCard
+                        icon="link"
+                        count={0}
+                        label="Liens utiles"
+                        color="green"
+                        onPress={() => router.push({
+                            pathname: "/[id]/links",
+                            params: { id: trip._id }
+                        })}
+                    />
+                </View>
+
             </View>
             {dashboard?.events?.nextEvent && (
                 <View className="mx-4 my-5">
