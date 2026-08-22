@@ -80,6 +80,11 @@ export default function TripDetailsLayout() {
                         title: "La liste de course",
                     }}
                 />
+                <Stack.Screen name="links"
+                    options={{
+                        headerShown: false,
+                    }}
+                />
                 <Stack.Screen name="events"
                     options={{
                         headerShown: false,

@@ -10,7 +10,6 @@ interface IParams {
 
 interface IPage {
     nextCursor: string,
-    prevCursor: string,
     totalResults: number,
     events: Event[]
 }

@@ -36,7 +36,7 @@ export const BottomAccommodationForm = ({ control }: AccommodationFormProps) => 
     const { inputPlaceHolder } = useColors();
     const postLinkPreview = usePostLinkPreview();
 
-    const handleSubmitLink = async (data: Link) => {
+    const handleSubmitLink = async (data: Omit<Link, '_id'>) => {
         setAccommodation(data);
         setInput("");
     };
