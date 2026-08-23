@@ -4,10 +4,13 @@ export interface Location {
 }
 
 export interface Link {
+    _id: string,
     image: string,
     icon: string,
     url: string,
-    title: string
+    title: string,
+    description ?: string,
+    type?: string
 }
 
 

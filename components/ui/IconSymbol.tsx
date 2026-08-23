@@ -58,7 +58,7 @@ const MAPPING = {
   "list.bullet": "list",
   "person": "person",
   "person.2.fill": "people",
-  "chart.bar.fill": "poll",
+  "chart.bar.fill": "bar-chart",
   "chevron.down": "keyboard-arrow-down",
   "chevron.up": "keyboard-arrow-up",
   "bookmark.fill": "bookmark",

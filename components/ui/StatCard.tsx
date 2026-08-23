@@ -1,6 +1,6 @@
-import { IconSymbol, IconSymbolName } from "./IconSymbol";
 import useColors from "@/hooks/styles/useColors";
 import { Pressable, PressableProps, Text, View } from "react-native";
+import { IconSymbol, IconSymbolName } from "./IconSymbol";
 
 type StatCardColor = "orange" | "orange-dark" | "blue" | "blue-dark" | "green" | "green-dark" | "red" | "red-dark";
 
@@ -15,7 +15,7 @@ export function StatCard({ icon, count, label, color = "orange", ...props }: Sta
   const colors = useColors();
 
   const bgColorClasses = {
-    orange: "bg-orange-100 dark:bg-orange-900/50",
+    orange: "bg-orange-100 dark:bg-orange-500/50",
     "orange-dark": "bg-orange-200 dark:bg-orange-800/50",
     blue: "bg-blue-100 dark:bg-blue-900/50",
     "blue-dark": "bg-blue-200 dark:bg-blue-800/50",
