@@ -42,7 +42,7 @@ export default function LinkForm({
         if (url && isValidUrl(url)) {
             const fetchPreview = async () => {
                 try {
-                    const response = await postLinkPreview.mutateAsync(url);
+                    const response = await postLinkPreview(url);
                     if (response.success && response.data) {
                         // Auto-fill extracted data
                         setTitle(response.data.title || "");
@@ -64,6 +64,7 @@ export default function LinkForm({
         if (!url) {
             setIcon("");
             setTitle("");
+            setImage("")
         }
     }, [url, setIcon, setTitle]);
 
