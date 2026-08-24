@@ -1,6 +1,6 @@
-import { useController } from "react-hook-form";
+import { useWatch } from "react-hook-form";
 import { Text, View } from "react-native";
-import { Switch } from "../ui/Switch";
+import { FormSwitch } from "../form/FormSwitch";
 
 
 
@@ -9,17 +9,15 @@ import { Switch } from "../ui/Switch";
 
 export const PollSettingsForm = ({ control }: { control: any }) => {
 
-
-
-    const { field: { value: isSingleAnswer, onChange: setIsSingleAnswer } } = useController({
+    const isSingleAnswer = useWatch({
         control,
-        name: "isSingleAnswer",
-    });
+        name: "isSingleAnswer"
+    })
 
-    const { field: { value: isAnonymous, onChange: setIsAnonymous } } = useController({
+    const isAnonymous = useWatch({
         control,
-        name: "isAnonymous",
-    });
+        name: "isAnonymous"
+    })
 
     return (
         <View>
@@ -34,7 +32,9 @@ export const PollSettingsForm = ({ control }: { control: any }) => {
                             Seule réponse à la fois sera possible
                         </Text>
                     </View>
-                    <Switch value={isSingleAnswer} onSwitch={setIsSingleAnswer} />
+                    <FormSwitch control={control}
+                        name="isSingleAnswer"
+                        />
                 </View>
 
                 <View
@@ -47,7 +47,10 @@ export const PollSettingsForm = ({ control }: { control: any }) => {
                             Seul les résultats du vote seront visible
                         </Text>
                     </View>
-                    <Switch value={isAnonymous} onSwitch={setIsAnonymous} />
+                    <FormSwitch
+                        control={control}
+                        name="isAnonymous"
+                        />
                 </View>
             </View>
 

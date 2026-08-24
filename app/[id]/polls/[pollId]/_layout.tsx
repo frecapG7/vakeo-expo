@@ -10,7 +10,7 @@ export default function PollDetailsLayout() {
         }}>
             <Stack.Screen name="index"
                 options={{
-                    headerShown: false
+                    title: "Sondage"
                 }} />
         </Stack>
     )

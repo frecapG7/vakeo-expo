@@ -34,7 +34,7 @@ export default function GoodsLayout() {
                     options={{
                         title: title ?? "La liste de course",
                         headerBackground: () => trip && <BackgroundHeader trip={trip} />,
-                         headerLeft: () => <Button onPress={() => router.back()}
+                        headerLeft: () => <Button onPress={() => router.back()}
                             className="mr-4">
                             <IconSymbol name="arrow.left" />
                         </Button>

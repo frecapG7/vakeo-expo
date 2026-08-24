@@ -1,6 +1,6 @@
-import { IconSymbol } from "./IconSymbol";
 import { Pressable, Text } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { IconSymbol } from "./IconSymbol";
 
 interface ToggleButtonProps {
   active: boolean;
@@ -26,11 +26,14 @@ export const ToggleButton = ({
       }`}
       onPress={onPress}
     >
-      {active && (
-        <Animated.View entering={FadeIn} exiting={FadeOut} className="rounded-full bg-orange-400 p-1">
-          <IconSymbol name={icon} color="white" size={14} />
-        </Animated.View>
-      )}
+      <Animated.View
+        entering={FadeIn}
+        exiting={FadeOut}
+        className={`rounded-full bg-orange-400 p-1 ${active ? 'opacity-100' : 'opacity-0'}`}
+        pointerEvents={active ? "auto" : "none"}
+      >
+        <IconSymbol name={icon} color="white" size={14} />
+      </Animated.View>
       <Text className={`${active ? "font-bold" : ""} text-sm dark:text-white`}>
         {label}
       </Text>

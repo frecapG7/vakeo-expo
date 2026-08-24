@@ -13,22 +13,27 @@ export const PollStatus = ({ poll, selectedUser, onNewClick, onPollClick }: Poll
     const hasVoted = poll?.hasSelected?.some(v => v._id === selectedUser?._id);
 
     if (!poll) return (
-        <Button onPress={onNewClick}>
-            <Text className="text-blue-600 font-medium">+ Créer un sondage</Text>
+        <Button className="bg-gray-200 dark:bg-gray-600 p-2 rounded-xl"
+            onPress={onNewClick}>
+            <Text className="text-blue-600 font-medium">
+                + Créer un sondage
+            </Text>
         </Button>
     );
 
     if (hasVoted) return (
-        <Button className="flex-row items-center gap-2" onPress={() => onPollClick(poll._id)}>
+        <Button className="flex-row items-center gap-2  bg-gray-200 dark:bg-gray-600 p-2 rounded-xl"
+            onPress={() => onPollClick(poll._id)}>
             <Text className="text-xl">✅</Text>
             <Text className="text-green-600 font-medium">Vous avez voté</Text>
         </Button>
     );
 
     return (
-        <Button className="flex-row items-center gap-1" onPress={() => onPollClick(poll._id)}>
-            <Text className="text-xl">⏳</Text>
-            <Text className="text-orange-600 font-medium">Voter maintenant</Text>
+        <Button className="flex-row items-center gap-1 bg-gray-200 dark:bg-gray-600 p-2 rounded-xl"
+            onPress={() => onPollClick(poll._id)}>
+            <Text className="text-base">⏳</Text>
+            <Text className="text-orange-600 font-medium text-sm">Voter maintenant</Text>
         </Button>
     );
 };
