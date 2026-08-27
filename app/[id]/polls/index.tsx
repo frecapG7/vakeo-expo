@@ -54,6 +54,7 @@ export default function PollsPage() {
                             active={!!excludeSelectedBy}
                             onPress={() => setExcludeSelectedBy(!excludeSelectedBy)}
                             label="Sondages en attente"
+                            icon="exclamationmark"
                         />
                     </View>
                 )}
