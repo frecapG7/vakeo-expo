@@ -38,12 +38,12 @@ export function StatCard({ icon, count, label, color = "orange", warning, ...pro
           </View>
           <Text className="text-xl font-bold dark:text-white">{count}</Text>
         </View>
-        {warning && (
-          <View className="flex-row bg-amber-100 dark:bg-amber-500/20 rounded-full px-2 py-0.5">
-            <Text className="text-amber-700 dark:text-amber-300 text-xs font-medium">
+        {Number(warning) > 0 && (
+          <View className="flex-row bg-amber-100 dark:bg-amber-500/20 rounded-full px-2 py-0.5 items-center">
+            <Text className="text-amber-700 dark:text-amber-300 text-base font-medium">
               {warning}
             </Text>
-            <IconSymbol name="exclamationmark" color="orange" size={12}/>
+            <IconSymbol name="exclamationmark" color="orange" size={14}/>
           </View>
         )}
       </View>

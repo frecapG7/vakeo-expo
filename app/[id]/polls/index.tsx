@@ -33,7 +33,7 @@ export default function PollsPage() {
 
     const [excludeSelectedBy, setExcludeSelectedBy] = useState(true);
     const { data: page, isLoading, refetch, isRefetching } = useGetPolls(trip?._id, {
-        ...(excludeSelectedBy && me?._id && {excludeSelectedBy: me?._id})
+        ...(excludeSelectedBy && me?._id && { excludeSelectedBy: me?._id })
     });
 
     const router = useRouter();
@@ -106,21 +106,24 @@ export default function PollsPage() {
 
                         <View className="flex-row flex-1 justify-between items-end">
                             <View className="flex-row flex-1 items-center gap-1">
-                                <AvatarsGroup
-                                    avatars={item.hasSelected.map(u => ({
-                                        avatar: u.avatar,
-                                        alt: u.name.charAt(0)
-                                    }))}
-                                    maxLength={3}
-                                    size2="xs"
-                                />
-                                {item.hasSelected.length > 0 &&
+                                {!item.isAnonymous &&
+                                    <AvatarsGroup
+                                        avatars={item.hasSelected.map(u => ({
+                                            avatar: u.avatar,
+                                            alt: u.name.charAt(0)
+                                        }))}
+                                        maxLength={3}
+                                        size2="xs"
+                                    />
+                                }
+
+                                {!item.isAnonymous && item.hasSelected.length > 0 &&
                                     <Text className="font-bold text-gray-400">
                                         •
                                     </Text>
                                 }
                                 <Text className="text-gray-400">
-                                    {item?.hasSelected?.length} votes
+                                    {item?.hasSelected?.length ?? 0} votes
                                 </Text>
 
                             </View>

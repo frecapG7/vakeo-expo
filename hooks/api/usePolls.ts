@@ -86,7 +86,8 @@ export const useGetPolls = (tripId: any, params?: IParams) => {
 
     return useQuery<IPage, Error>({
         queryKey: ["trips", tripId, "polls", params],
-        queryFn: () => getPolls(tripId, params)
+        queryFn: () => getPolls(tripId, params),
+        enabled: !!tripId
     });
 }
 

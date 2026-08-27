@@ -1,6 +1,7 @@
 import { Pressable, Text } from "react-native";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated";
 import { IconSymbol } from "./IconSymbol";
+import { useEffect } from "react";
 
 interface ToggleButtonProps {
   active: boolean;
@@ -17,6 +18,16 @@ export const ToggleButton = ({
   icon = "checkmark",
   className = "",
 }: ToggleButtonProps) => {
+  const opacity = useSharedValue(active ? 1 : 0);
+
+  useEffect(() => {
+    opacity.value = withTiming(active ? 1 : 0);
+  }, [active]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
+
   return (
     <Pressable
       className={`flex-row rounded-full justify-center items-center gap-1 p-2 shadow ${className} ${
@@ -27,9 +38,8 @@ export const ToggleButton = ({
       onPress={onPress}
     >
       <Animated.View
-        entering={FadeIn}
-        exiting={FadeOut}
-        className={`rounded-full bg-orange-400 p-1 ${active ? 'opacity-100' : 'opacity-0'}`}
+        style={[animatedStyle]}
+        className="rounded-full bg-orange-400 p-1"
         pointerEvents={active ? "auto" : "none"}
       >
         <IconSymbol name={icon} color="white" size={14} />
