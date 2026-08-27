@@ -9,9 +9,10 @@ interface StatCardProps extends PressableProps {
   count: number | string;
   label: string;
   color?: StatCardColor;
+  warning?: number | string
 }
 
-export function StatCard({ icon, count, label, color = "orange", ...props }: StatCardProps) {
+export function StatCard({ icon, count, label, color = "orange", warning, ...props }: StatCardProps) {
   const colors = useColors();
 
   const bgColorClasses = {
@@ -30,12 +31,23 @@ export function StatCard({ icon, count, label, color = "orange", ...props }: Sta
       className="flex-1 bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700"
       {...props}
     >
-      <View className="flex-row items-center gap-3">
-        <View className={`rounded-full p-1.5 ${bgColorClasses[color]}`}>
-          <IconSymbol name={icon} size={24} color={colors.primary} />
+      <View className="flex-row items-center justify-between">
+        <View className="flex-row items-center gap-3">
+          <View className={`rounded-full p-1.5 ${bgColorClasses[color]}`}>
+            <IconSymbol name={icon} size={24} color={colors.primary} />
+          </View>
+          <Text className="text-xl font-bold dark:text-white">{count}</Text>
         </View>
-        <Text className="text-xl font-bold dark:text-white">{count}</Text>
+        {Number(warning) > 0 && (
+          <View className="flex-row bg-amber-100 dark:bg-amber-500/20 rounded-full px-2 py-0.5 items-center">
+            <Text className="text-amber-700 dark:text-amber-300 text-base font-medium">
+              {warning}
+            </Text>
+            <IconSymbol name="exclamationmark" color="orange" size={14}/>
+          </View>
+        )}
       </View>
+
       <Text className="text-sm text-gray-500 dark:text-gray-400 mt-1">
         {label}
       </Text>

@@ -141,7 +141,7 @@ export default function ItemDetails() {
                                 }))}
                             />
                             <Text numberOfLines={1} ellipsizeMode="tail" className="dark:text-white text-sm">
-                                Avec {displayUsers.map(u => u.name).join(", ")}{hasMore && "..."}
+                                Avec {displayUsers.map(u => u.name).join(", ")}{hasMore ? "..." : ""}
                             </Text>
                         </View>
                     </Button>
@@ -210,6 +210,7 @@ export default function ItemDetails() {
                     <StatCard
                         icon="cart"
                         count={dashboard?.goods?.total ?? 0}
+                        warning={dashboard?.goods?.missing ?? 0}
                         label="Liste de course"
                         color="orange"
                         onPress={() => router.push({
@@ -231,7 +232,8 @@ export default function ItemDetails() {
                 <View className="flex-row gap-3 mx-2">
                     <StatCard
                         icon="chart.bar.fill"
-                        count={0}
+                        count={dashboard?.polls?.pollsCount ?? 0}
+                        warning={dashboard?.polls?.pendingPollsCount ?? 0}
                         label="Sondages"
                         color="blue"
                         onPress={() => router.push({

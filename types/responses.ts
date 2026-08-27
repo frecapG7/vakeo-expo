@@ -41,6 +41,8 @@ export interface Dashboard {
         hasPendingStopPoll: boolean;
         hasDatePoll: boolean;
         hasPendingDatePoll: boolean;
+        pollsCount: number;
+        pendingPollsCount : number
     },
     users: {
         restrictionCount: number

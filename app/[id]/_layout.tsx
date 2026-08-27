@@ -56,16 +56,10 @@ export default function TripDetailsLayout() {
                     options={{
                         title: "Dates du séjour",
                     }} />
-                <Stack.Screen name="votes"
-                    options={{
-                        title: "Votes",
-                        headerShown: false
-                    }} />
                 <Stack.Screen name="polls"
                     options={{
-                        headerShown: true,
+                        headerShown: false,
                         title: "Sondages",
-                        
                     }}
                 />
                 <Stack.Screen name="location"

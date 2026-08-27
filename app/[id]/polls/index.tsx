@@ -1,17 +1,18 @@
+import { PollStatus } from "@/components/polls/PollStatus";
 import { Avatar, AvatarsGroup } from "@/components/ui/Avatar";
+import { FloatingAddButton } from "@/components/ui/FloatingAddButton";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { ToggleButton } from "@/components/ui/ToggleButton";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetPolls } from "@/hooks/api/usePolls";
-import { useGetTrip } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import { translateType } from "@/lib/pollUtils";
-import { containsUser } from "@/lib/utils";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useContext } from "react";
+import { useRouter } from "expo-router";
+import { useContext, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 
 
@@ -28,79 +29,85 @@ const typeToColor = {
 
 export default function PollsPage() {
 
+    const { trip, me } = useContext(TripContext);
 
-    const { id } = useLocalSearchParams();
-    const { data: trip } = useGetTrip(id);
-    const { data: page } = useGetPolls(id);
+    const [excludeSelectedBy, setExcludeSelectedBy] = useState(true);
+    const { data: page, isLoading, refetch, isRefetching } = useGetPolls(trip?._id, {
+        ...(excludeSelectedBy && me?._id && { excludeSelectedBy: me?._id })
+    });
 
-
-    const { me } = useContext(TripContext);
     const router = useRouter();
 
     const { formatDate, formatDuration } = useI18nTime();
 
 
     return (
-        <SafeAreaView style={styles.container}>
+        <View style={styles.container}>
             <Animated.FlatList
                 data={page?.polls || []}
+                className="my-2"
                 contentContainerClassName="m-2"
                 keyExtractor={(item) => item._id}
-                renderItem={({ item }) => {
-                    const containUser = containsUser(me, item.hasSelected);
-                    return (
-                        <Pressable
-                            onPress={() => router.push({
-                                pathname: "/[id]/polls/[pollId]",
-                                params: {
-                                    id: String(id),
-                                    pollId: item._id
-                                }
-                            })}
-                            className={`rounded-xl bg-white dark:bg-gray-900  p-3 ${!containUser ? "border-l-4 border-orange-400" : ""}`}>
-                            <View className="flex-row items-center justify-between">
-
-
-                                {item?.status === "CLOSED" &&
-                                    <View className="rounded-full bg-red-200 p-1">
-                                        <Text className="text-red-600 uppercase font-bold">Fermé</Text>
-                                    </View>
-                                }
-                            </View>
-                            <View className="my-2">
-                                <View className="flex-row items-center justify-between gap-1">
-                                    <View className="flex-row items-center gap-2">
-                                        <Avatar
-                                            size2="sm"
-                                            src={item?.createdBy.avatar}
-                                            alt={item.createdBy.name.charAt(0)}
-                                        />
-                                        <Text className="text-lg dark:text-white font-bold">{item.createdBy.name}</Text>
-                                    </View>
-                                    <Text className="text-gray-400">
-                                        {formatDuration(item?.createdAt)}
+                ListHeaderComponent={() => (
+                    <View className="flex-row mb-2">
+                        <ToggleButton
+                            active={!!excludeSelectedBy}
+                            onPress={() => setExcludeSelectedBy(!excludeSelectedBy)}
+                            label="Sondages en attente"
+                            icon="exclamationmark"
+                        />
+                    </View>
+                )}
+                renderItem={({ item }) => (
+                    <Pressable
+                        onPress={() => router.push({
+                            pathname: "/[id]/polls/[pollId]",
+                            params: {
+                                id: trip._id,
+                                pollId: item._id
+                            }
+                        })}
+                        className="rounded-2xl bg-white dark:bg-gray-800 shadow-md p-4 gap-4 border border-gray-100 dark:border-gray-700 active:opacity-55">
+                        <View className="">
+                            <View className="flex-row items-center justify-between gap-1">
+                                <View className="flex-row items-center gap-2">
+                                    <Avatar
+                                        size2="sm"
+                                        src={item?.createdBy.avatar}
+                                        alt={item.createdBy.name.charAt(0)}
+                                    />
+                                    <Text className="text-base dark:text-white font-bold">
+                                        {item.createdBy.name}
                                     </Text>
                                 </View>
-                                <Text className="text-2xl font-bold dark:text-white">{item?.question}</Text>
-                                <View className="flex-row gap-1 mt-2 items-center">
-                                    <View className="flex-row gap-2 items-center">
-                                        <IconSymbol name="chart.bar.fill" color="gray" />
-                                        <Text className="font-bold text-gray-600 dark:text-gray-400 capitalize text-sm">
-                                            {translateType(item.type)}
-                                        </Text>
-                                    </View>
-                                    <Text className="text-gray-400">
-                                        •
-                                    </Text>
-                                    <Text className="font-bold text-gray-600 dark:text-gray-400">{formatDate(item?.createdAt)}</Text>
-
+                                <View>
+                                    <PollStatus poll={item}
+                                        selectedUser={me}
+                                        onNewClick={() => router.push({
+                                            pathname: "/[id]/polls/new",
+                                            params: {
+                                                id: trip._id,
+                                                type: "OtherPoll"
+                                            }
+                                        })}
+                                        onPollClick={() => router.push({
+                                            pathname: "/[id]/polls/[pollId]",
+                                            params: {
+                                                id: trip._id,
+                                                pollId: item._id
+                                            }
+                                        })}
+                                    />
                                 </View>
-
                             </View>
+                            <Text className="text-2xl font-bold dark:text-white">{item?.question}</Text>
+
+                        </View>
 
 
-                            <View className="flex-row flex-1 justify-between items-end">
-                                <View className="flex-row flex-1 items-center gap-1">
+                        <View className="flex-row flex-1 justify-between items-end">
+                            <View className="flex-row flex-1 items-center gap-1">
+                                {!item.isAnonymous &&
                                     <AvatarsGroup
                                         avatars={item.hasSelected.map(u => ({
                                             avatar: u.avatar,
@@ -109,38 +116,91 @@ export default function PollsPage() {
                                         maxLength={3}
                                         size2="xs"
                                     />
-                                    {item.hasSelected.length > 0 &&
-                                        <Text className="font-bold text-gray-400">
-                                            •
-                                        </Text>
-                                    }
-                                    <Text className="text-gray-400">
-                                        {item?.hasSelected?.length} votes
-                                    </Text>
-
-                                </View>
-                                {!containUser &&
-                                    <View className="bg-blue-600 flex-1 rounded-xl p-1 items-center">
-                                        <Text className="text-md text-white uppercase font-bold">Voter</Text>
-                                    </View>
                                 }
 
-                            </View>
-                        </Pressable>
-                    )
+                                {!item.isAnonymous && item.hasSelected.length > 0 &&
+                                    <Text className="font-bold text-gray-400">
+                                        •
+                                    </Text>
+                                }
+                                <Text className="text-gray-400">
+                                    {item?.hasSelected?.length ?? 0} votes
+                                </Text>
 
-                }}
+                            </View>
+                            <View className="flex-row gap-1 items-center">
+                                <Text className="font-bold text-gray-600 dark:text-gray-400 capitalize text-sm">
+                                    {translateType(item.type)}
+                                </Text>
+                                <Text className="text-gray-400">
+                                    •
+                                </Text>
+                                <Text className="font-bold text-gray-600 dark:text-gray-400 text-xs">
+                                    {formatDuration(item?.createdAt)}
+                                </Text>
+
+                            </View>
+
+                        </View>
+                    </Pressable>
+                )
+                }
+                refreshing={isRefetching}
+                onRefresh={refetch}
                 ItemSeparatorComponent={() => <View className="my-2" />}
+                ListEmptyComponent={() =>
+                    isLoading ? (
+                        // Skeleton loaders matching poll card structure
+                        <View className="gap-3 px-1">
+                            <View className="rounded-2xl bg-white dark:bg-gray-800 shadow-md p-4 gap-4 border border-gray-100 dark:border-gray-700">
+                                <View className="flex-row items-center justify-between gap-1">
+                                    <View className="flex-row items-center gap-2">
+                                        <Skeleton variant="circular" height={32} />
+                                        <Skeleton height={4} />
+                                    </View>
+                                    <Skeleton height={8} />
+                                </View>
+                                <Skeleton height={6} />
+                                <View className="flex-row flex-1 justify-between items-end">
+                                    <View className="flex-row items-center gap-1">
+                                        <View className="flex-row -space-x-1">
+                                            <Skeleton variant="circular" height={20} />
+                                            <Skeleton variant="circular" height={20} />
+                                        </View>
+                                        <Skeleton height={3} />
+                                    </View>
+                                    <View className="flex-row gap-1 items-center">
+                                        <Skeleton height={3} />
+                                    </View>
+                                </View>
+                            </View>
+                        </View>
+                    ) : (
+                        // Empty state for polls
+                        <View className="flex-1 items-center justify-center gap-6 py-20 px-4">
+                            <View className="p-7 rounded-3xl bg-gray-50 dark:bg-gray-800 shadow-lg">
+                                <IconSymbol name="chart.bar.fill" size={64} color="gray" />
+                            </View>
+                            <Text className="text-3xl font-bold dark:text-white">
+                                Aucun sondage
+                            </Text>
+                            <Text className="text-gray-400 dark:text-gray-500 text-center max-w-sm">
+                                Créez votre premier sondage pour ce voyage
+                            </Text>
+                        </View>
+                    )
+                }
             />
-            <Pressable className="absolute bottom-20 right-6 w-20 h-20 rounded-full border border-white bg-blue-400 items-center justify-center shadow"
-                onPress={() => router.push({
-                    pathname: "/[id]/polls/new",
-                    params: {
-                        id: String(id)
-                    }
-                })}>
-                <IconSymbol name="plus" color="white" size={40} />
-            </Pressable>
-        </SafeAreaView>
+            {trip?._id &&
+                <FloatingAddButton
+                    onPress={() => router.push({
+                        pathname: "/[id]/polls/new",
+                        params: {
+                            id: trip._id,
+                            type: "OtherPoll"
+                        }
+                    })} />
+            }
+        </View>
     )
 }

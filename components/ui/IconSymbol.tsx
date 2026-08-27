@@ -47,6 +47,7 @@ const MAPPING = {
   "suit.spade": "fastfood",
   "list.dash": "format-list-bulleted",
   "clock": "access-time",
+  "exclamationmark": "priority-high",
   "exclamationmark.triangle": "warning",
   "magnifyingglass": "search",
   "star": "star-border",
@@ -83,7 +84,6 @@ const MAPPING = {
   "number.circle.fill": "add-circle",
   "doc.plaintext" : "text-snippet",
   "bubble.left.fill": "chat-bubble",
-  "exclamationmark": "warning",
   "nosign": "do-not-disturb"
 } as IconMapping;
 

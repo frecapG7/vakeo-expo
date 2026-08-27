@@ -15,7 +15,6 @@ import { useContext, useEffect } from "react";
 import { useController, useForm } from "react-hook-form";
 import { Text, View } from "react-native";
 import Animated from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 
 const placeholder = (type: string): string => {
@@ -48,9 +47,10 @@ export default function NewPoll() {
         }
     });
 
-    const { id, type: typeParam, stop } = useLocalSearchParams<{ id: string, type: string, stop?: string }>();
-    const { me } = useContext(TripContext);
-    const postPoll = usePostPoll(id, me?._id);
+
+    const { type: typeParam, stop } = useLocalSearchParams<{ type: string, stop?: string }>();
+    const { trip, me } = useContext(TripContext);
+    const postPoll = usePostPoll(trip?._id, me?._id);
     const router = useRouter();
 
     const onSubmit = async (data: Omit<Poll, '_id'>) => {
@@ -61,22 +61,12 @@ export default function NewPoll() {
         router.dismissTo({
             pathname: "/[id]/polls/[pollId]",
             params: {
-                id,
+                id: trip?._id,
                 pollId: result._id
 
             }
         });
     }
-    // useEffect(() => {
-    //     if (type === "DatesPoll")
-    //         setValue("question", "Quelles dates ?");
-    //     else if (type === "HousingPoll")
-    //         setValue("question", "Quels hébergement ? ");
-    //     else {
-    //         setValue("question", "Qu'est ce qu'on mange ? ")
-
-    //     }
-    // }, [type,]);
 
     useEffect(() => {
         if (typeParam)
@@ -112,62 +102,58 @@ export default function NewPoll() {
         )
 
     return (
+        <Animated.ScrollView className="flex-1 mt-4 mx-4" showsVerticalScrollIndicator={false}>
+            <View className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-4 shadow-sm border border-gray-100 dark:border-gray-700">
+                <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+                    Question *
+                </Text>
+                <FormText
+                    control={control}
+                    name="question"
+                    rules={{
+                        required: true,
+                        maxLength: 255
+                    }}
+                    placeholder={placeholder(type)}
+                />
+            </View>
 
-        <SafeAreaView style={{ flex: 1 }}>
-            <Animated.ScrollView style={styles.container}>
 
-                <View className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-4 shadow-sm border border-gray-100 dark:border-gray-700">
-                    <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
-                        Question *
-                    </Text>
-                    <FormText
+            <View className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-4 shadow-sm border border-gray-100 dark:border-gray-700">
+                <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+                    Options
+                </Text>
+                {type === "DatesPoll" &&
+                    <DatesPollOptionsForm control={control} />
+                }
+                {type === "OtherPoll" &&
+                    <OtherPollOptionsForm
                         control={control}
-                        name="question"
-                        rules={{
-                            required: true,
-                            maxLength: 255
-                        }}
-                        placeholder={placeholder(type)}
                     />
-                </View>
+                }
+                {type === "HousingPoll" &&
+                    <View className="flex-1 my-2">
+                        <HousingOptionsForm control={control} />
+                    </View>
+                }
+            </View>
 
-                
-                <View className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-4 shadow-sm border border-gray-100 dark:border-gray-700">
-                    <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
-                        Options
-                    </Text>
-                    {type === "DatesPoll" &&
-                        <DatesPollOptionsForm control={control} />
-                    }
-                    {type === "OtherPoll" &&
-                        <OtherPollOptionsForm
-                            control={control}
-                        />
-                    }
-                    {type === "HousingPoll" &&
-                        <View className="flex-1 my-2">
-                            <HousingOptionsForm control={control} />
-                        </View>
-                    }
-                </View>
+            <View className="flex-1 bg-white dark:bg-gray-800 rounded-xl p-4 mb-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+                    Paramètres
+                </Text>
+                <PollSettingsForm control={control} />
+            </View>
 
-                <View className="flex-1 bg-white dark:bg-gray-800 rounded-xl p-4 mb-6 shadow-sm border border-gray-100 dark:border-gray-700">
-                    <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
-                        Paramètres
-                    </Text>
-                    <PollSettingsForm control={control} />
-                </View>
+            <View className="my-4">
+                <Button
+                    variant="contained"
+                    icon="tray"
+                    title="Démarrer le sondage"
+                    onPress={handleSubmit(onSubmit)}
+                    isLoading={postPoll?.isPending} />
+            </View>
 
-                <View className="my-4">
-                    <Button
-                        variant="contained"
-                        icon="tray"
-                        title="Démarrer le sondage"
-                        onPress={handleSubmit(onSubmit)}
-                        isLoading={postPoll?.isPending} />
-                </View>
-
-            </Animated.ScrollView>
-        </SafeAreaView >
+        </Animated.ScrollView>
     )
 }
