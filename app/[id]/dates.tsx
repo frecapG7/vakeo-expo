@@ -1,3 +1,4 @@
+import { PollStatus } from "@/components/polls/PollStatus";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -9,7 +10,7 @@ import useI18nTime from "@/hooks/i18n/useI18nTime";
 import useColors from "@/hooks/styles/useColors";
 import dayjs from "@/lib/dayjs-config";
 import { countDaysBetween } from "@/lib/utils";
-import { Trip, TripUser } from "@/types/models";
+import { Trip } from "@/types/models";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext, useEffect, useMemo } from "react";
 import { useController, useForm } from "react-hook-form";
@@ -17,60 +18,6 @@ import { Text, View } from "react-native";
 import { Calendar, CalendarUtils } from "react-native-calendars";
 import Animated, { SlideInDown, SlideOutUp } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-
-const PollStatus = ({ id, selectedUser }: { id: any, selectedUser?: TripUser }) => {
-    const { data: pagePoll } = useGetPolls(id, { type: "DatesPoll" });
-    const hasPoll = pagePoll?.totalResults !== 0;
-    const hasVoted = pagePoll?.polls[0]?.hasSelected?.some(v => v._id === selectedUser?._id);
-
-    const router = useRouter();
-
-    if (!pagePoll)
-        return (
-            <View className="w-40">
-                <Skeleton height={14} />
-            </View>);
-
-    if (!hasPoll) return (
-        <Button
-            onPress={() => router.push({
-                pathname: "/[id]/polls/new",
-                params: {
-                    id: String(id),
-                    type: "DatesPoll"
-                }
-            })}>
-            <Text className="text-blue-600 font-medium">+ Créer un sondage</Text>
-        </Button>
-    );
-    if (hasVoted) return (
-        <Button className="flex-row items-center gap-2"
-            onPress={() => router.push({
-                pathname: "/[id]/polls/[pollId]",
-                params: {
-                    id: String(id),
-                    pollId: pagePoll.polls[0]._id
-                }
-            })}>
-            <Text className="text-xl">✅</Text>
-            <Text className="text-green-600 font-medium">Vous avez voté</Text>
-        </Button>
-    );
-    return (
-        <Button className="flex-row items-center gap-1"
-            onPress={() => router.push({
-                pathname: "/[id]/polls/[pollId]",
-                params: {
-                    id: String(id),
-                    pollId: pagePoll.polls[0]._id
-                }
-            })}>
-            <Text className="text-xl">⏳</Text>
-            <Text className="text-orange-600 font-medium">Voter maintenant</Text>
-        </Button>
-    );
-};
 
 
 export default function DatesPage() {
@@ -81,6 +28,9 @@ export default function DatesPage() {
     const { data: trip } = useGetTrip(id);
     const updateTrip = useUpdateTrip(id);
     const { me } = useContext(TripContext);
+    const { data: pagePoll } = useGetPolls(id, { type: "DatesPoll" });
+    const poll = pagePoll?.polls[0];
+    const router = useRouter();
 
     const { control, reset, formState: { isDirty, errors }, handleSubmit } = useForm<Trip>();
     const { field: { value: startDate, onChange: setStartDate } } = useController({
@@ -139,7 +89,6 @@ export default function DatesPage() {
         await updateTrip.mutateAsync(body);
     }
 
-    const now = dayjs();
     const { formatRange } = useI18nTime();
 
 
@@ -169,9 +118,30 @@ export default function DatesPage() {
                         )}
                     </View>
                     <View className="flex-row justify-start">
-                        <PollStatus id={id}
-                            selectedUser={me}
-                        />
+                        {!pagePoll ? (
+                            <View className="w-40">
+                                <Skeleton height={14} />
+                            </View>
+                        ) : (
+                            <PollStatus
+                                poll={poll}
+                                selectedUser={me}
+                                onNewClick={() => router.push({
+                                    pathname: "/[id]/polls/new",
+                                    params: {
+                                        id: String(id),
+                                        type: "DatesPoll"
+                                    }
+                                })}
+                                onPollClick={(pollId) => router.push({
+                                    pathname: "/[id]/polls/[pollId]",
+                                    params: {
+                                        id: String(id),
+                                        pollId
+                                    }
+                                })}
+                            />
+                        )}
                     </View>
                 </View>
 
