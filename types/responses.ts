@@ -37,11 +37,7 @@ export interface Dashboard {
         totalAttendings: number;
     };
     polls: {
-        hasStopPoll: boolean;
-        hasPendingStopPoll: boolean;
-        hasDatePoll: boolean;
-        hasPendingDatePoll: boolean;
-        pollsCount: number;
+        openPollsCount: number;
         pendingPollsCount : number
     },
     users: {

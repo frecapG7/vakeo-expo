@@ -1,8 +1,6 @@
-import { BackgroundHeader } from "@/components/header/BackgroundHeader";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { Stack, useRouter } from "expo-router";
 import { useContext } from "react";
@@ -24,15 +22,13 @@ export default function PollsLayout() {
 
             <Stack screenOptions={{
                 headerShown: true,
-                headerTintColor: "white",
-                headerTitleStyle: styles.headerTitle,
-                headerBackground: () => trip && <BackgroundHeader trip={trip} />,
+                headerLargeTitle: true,
+                headerLargeTitleShadowVisible: false,
             }}>
                 <Stack.Screen name="index"
                     options={{
                         headerShown: true,
                         title: "Sondages",
-
                         headerLeft: () =>
                             <Button onPress={() => router.back()}
                                 className="mr-4">
@@ -55,15 +51,16 @@ export default function PollsLayout() {
                             </Button>
                     }}
                 />
-
                 <Stack.Screen name="new"
                     options={{
                         title: "Nouveau sondage",
                         headerBackTitle: "Annuler",
+                        headerLargeTitle: false,
                     }} />
                 <Stack.Screen name="[pollId]"
                     options={{
                         headerShown: true,
+                        headerLargeTitle: false,
                         title: "Détails",
                         headerRight: () =>
                             me && <Button
