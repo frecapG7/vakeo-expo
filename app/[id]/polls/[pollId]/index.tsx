@@ -1,4 +1,3 @@
-import { AddOptionModal } from "@/components/modals/AddOptionModal";
 import { PickUsersModal } from "@/components/modals/PickUsersModal";
 import { HousingOptions } from "@/components/polls/HousingOptions";
 import { PollOption } from "@/components/polls/PollOption";
@@ -8,12 +7,12 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
-import { useGetPoll, usePutPoll, useUnvotePoll, useVotePoll } from "@/hooks/api/usePolls";
+import { useGetPoll, useUnvotePoll, useVotePoll } from "@/hooks/api/usePolls";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import dayjs from "@/lib/dayjs-config";
 
 import { PollOption as Option } from "@/types/models";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext, useState } from "react";
 import { Text, View } from "react-native";
 import Animated from "react-native-reanimated";
@@ -24,55 +23,33 @@ export default function PollDetailsPage() {
 
     const { me } = useContext(TripContext);
     const { data: poll } = useGetPoll(id, pollId);
-    const updatePoll = usePutPoll(id, pollId, me?._id);
     const votePoll = useVotePoll(id, pollId, me?._id);
     const unvotePoll = useUnvotePoll(id, pollId, me?._id);
+    const router = useRouter();
 
     const { formatDuration, formatRange } = useI18nTime();
 
 
     const [selectedOption, setSelectedOption] = useState<Option | null>(null);
     const [loadingOptionId, setLoadingOptionId] = useState<string | null>(null);
-    const [showAddOption, setShowAddOption] = useState(false);
 
     const insets = useSafeAreaInsets();
 
-    const handleClick = async (option: any, includeMe: boolean) => {
+    const handleClick = async (option: Option, includeMe: boolean) => {
         setLoadingOptionId(option._id);
         try {
             if (includeMe)
                 await unvotePoll.mutateAsync({
-                    option: option?._id,
+                    option: option._id,
                 })
             else
                 await votePoll.mutateAsync({
-                    options: [option?._id],
+                    options: [option._id],
                 });
         } finally {
             setLoadingOptionId(null);
         }
     }
-
-    const handleUpdate = async (option: Option) => {
-        try {
-            await updatePoll.mutateAsync({ newOptions: [option] });
-            setShowAddOption(false);
-        } catch (error) {
-            // Leave modal open on error so user can retry
-        }
-    }
-
-    // Keep it case headerTitle is shown in stack
-    // useFocusEffect(
-    //     useCallback(() => {
-    //         navigation.setOptions({
-    //             title: poll?.question || 'Chargement...',
-    //             headerBackTitle: 'Retour',
-    //         });
-    //     }, [navigation, poll?.question])
-    // );
-
-
 
     if (!poll)
         return (
@@ -96,36 +73,36 @@ export default function PollDetailsPage() {
 
     return (
         <Animated.ScrollView
-            style={{
-                ...styles.container,
-                marginBottom: insets.bottom
-            }}
+            style={styles.container}
+            contentContainerStyle={{ paddingBottom: insets.bottom }}
             showsVerticalScrollIndicator={false}
         >
-            {/* Enhanced Header */}
-            <View className="flex-row gap-3 items-center p-4">
-                <Avatar
-                    src={poll?.createdBy?.avatar}
-                    alt={poll?.createdBy?.name?.charAt(0)}
-                    size2="md"
-                />
-                <View className="flex-1">
-                    <Text className="font-bold text-lg dark:text-white">
-                        {poll?.createdBy?.name}
-                    </Text>
-                    <View className="flex-row items-center gap-1">
-                        <IconSymbol name="clock" color="gray" size={14} />
-                        <Text className="text-sm text-gray-500 dark:text-gray-400">
-                            {formatDuration(poll?.createdAt)}
-                        </Text>
-                    </View>
-                </View>
-            </View>
-
             {/* Poll Card */}
             <View className="m-2 mb-4 rounded-2xl p-4 border border-gray-200 dark:border-gray-600 shadow-sm bg-white dark:bg-gray-800"
             >
-                {/* Question Section */}
+                {/* Meta block */}
+                <View className="flex-row items-center gap-2 mb-4">
+                    <Avatar
+                        src={poll?.createdBy?.avatar}
+                        alt={poll?.createdBy?.name?.charAt(0)}
+                        size2="sm"
+                    />
+                    <View className="flex-1">
+                        <Text className="text-sm font-medium text-gray-600 dark:text-gray-300"
+                            numberOfLines={1}
+                            ellipsizeMode="tail">
+                            {poll?.createdBy?.name}
+                        </Text>
+                        <View className="flex-row items-center gap-1">
+                            <IconSymbol name="clock" color="gray" size={12} />
+                            <Text className="text-xs text-gray-500 dark:text-gray-400">
+                                {formatDuration(poll?.createdAt)}
+                            </Text>
+                        </View>
+                    </View>
+                </View>
+
+                {/* Question hero */}
                 <View className="mb-6">
                     <Text className="text-2xl font-bold dark:text-white mb-2">
                         {poll?.question}
@@ -162,7 +139,7 @@ export default function PollDetailsPage() {
                             return (
                                 <Button
                                     key={option?._id}
-                                    disabled={poll?.isClosed || votePoll?.isPending || isLoading}
+                                    disabled={poll?.isClosed || votePoll?.isPending || unvotePoll?.isPending || isLoading}
                                     onPress={() => handleClick(option, includeMe)}
                                     onLongPress={() => setSelectedOption(option)}
                                     className={`rounded-xl border-2 ${includeMe
@@ -189,14 +166,11 @@ export default function PollDetailsPage() {
                 {/* Poll Settings Footer */}
                 <View className="flex-row justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-600">
                     <View className="flex-row items-center gap-2">
-                        {poll?.isSingleAnswer ? (
-                            <IconSymbol name="checkmark.circle.fill" color="gray" size={18} />
-                        ) : (
-                            <View className="flex-row">
-                                <IconSymbol name="checkmark.circle.fill" color="gray" size={18} />
-                                <IconSymbol name="checkmark.circle.fill" color="gray" size={18}  style={{ marginLeft: -6 }} />
-                            </View>
-                        )}
+                        <IconSymbol
+                            name={poll?.isSingleAnswer ? "checkmark.circle.fill" : "list.bullet"}
+                            color="gray"
+                            size={18}
+                        />
                         <Text className="text-sm text-gray-500 dark:text-gray-400">
                             {poll?.isSingleAnswer ? "Une option" : "Options multiples"}
                         </Text>
@@ -231,19 +205,14 @@ export default function PollDetailsPage() {
                             size="small"
                             icon="plus"
                             title="Ajouter une option"
-                            onPress={() => setShowAddOption(true)}
+                            onPress={() => router.push({
+                                pathname: "/[id]/polls/[pollId]/new-option",
+                                params: { id, pollId }
+                            })}
                         />
                     </View>
                 }
             </View>
-
-            <AddOptionModal
-                open={showAddOption}
-                onClose={() => setShowAddOption(false)}
-                poll={poll}
-                onAdd={handleUpdate}
-                isLoading={updatePoll.isPending}
-            />
 
             <PickUsersModal
                 open={!!selectedOption && !poll.isAnonymous}

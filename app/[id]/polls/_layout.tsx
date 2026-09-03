@@ -57,11 +57,11 @@ export default function PollsLayout() {
                         headerBackTitle: "Annuler",
                         headerLargeTitle: false,
                     }} />
-                <Stack.Screen name="[pollId]"
+                <Stack.Screen name="[pollId]/index"
                     options={{
                         headerShown: true,
                         headerLargeTitle: false,
-                        title: "Détails",
+                        title: "",
                         headerRight: () =>
                             me && <Button
                                 onPress={() => router.push({
@@ -77,6 +77,13 @@ export default function PollsLayout() {
                                     alt={me?.name?.charAt(0)}
                                 />
                             </Button>
+                    }} />
+                <Stack.Screen name="[pollId]/new-option"
+                    options={{
+                        presentation: "modal",
+                        headerShown: true,
+                        title: "Ajouter une option",
+                        headerBackTitle: "Annuler",
                     }} />
             </Stack>
         </View>

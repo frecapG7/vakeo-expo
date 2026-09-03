@@ -40,26 +40,35 @@ export const DateRangeCalendar = ({
     };
 
     const markedDates = {
-        ...(start && {
+        ...(start && start !== end && {
             [start]: {
                 startingDay: true,
-                color: '#fdb140',
+                color: colors.calendarPrimary,
                 textColor: colors.neutral,
                 selected: true,
                 disableTouchEvent: true
             }
         }),
-        ...(end && {
+        ...(end && start !== end && {
             [end]: {
                 endingDay: true,
-                color: '#fdb140',
+                color: colors.calendarPrimary,
+                textColor: colors.neutral,
+                selected: true,
+                disableTouchEvent: true
+            }
+        }),
+        ...(start && start === end && {
+            [start]: {
+                startingDay: true,
+                endingDay: true,
+                color: colors.calendarPrimary,
                 textColor: colors.neutral,
                 selected: true,
                 disableTouchEvent: true
             }
         }),
         ...(start && end && getDatesBetween(dayjs(start), dayjs(end))
-            .filter(d => d !== start && d !== end)
             .reduce((acc: Record<string, any>, date) => ({
                 ...acc,
                 [date]: { color: colors.neutral, textColor: colors.text, selected: true, disableTouchEvent: true }
