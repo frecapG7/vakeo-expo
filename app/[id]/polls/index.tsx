@@ -39,6 +39,7 @@ export default function PollsPage() {
                 data={page?.polls || []}
                 className="my-2"
                 contentContainerClassName="m-2"
+                contentInsetAdjustmentBehavior="automatic"
                 showsVerticalScrollIndicator={false}
                 keyExtractor={(item) => item._id}
                 ListHeaderComponent={() => (
