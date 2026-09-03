@@ -7,6 +7,7 @@ import { ToggleButton } from "@/components/ui/ToggleButton";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetPolls } from "@/hooks/api/usePolls";
+import { useGetDashboard } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import { translateType } from "@/lib/pollUtils";
 import { useRouter } from "expo-router";
@@ -15,30 +16,21 @@ import { Pressable, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 
 
-
-const typeToIconColor = {
-    "DatesPoll": "blue",
-    "OtherPoll": "orange"
-}
-
-const typeToColor = {
-    "DatesPoll": "text-blue-400",
-    "OtherPoll": "text-orange-400"
-}
-
-
 export default function PollsPage() {
 
     const { trip, me } = useContext(TripContext);
 
-    const [excludeSelectedBy, setExcludeSelectedBy] = useState(true);
+    const [excludeSelectedBy, setExcludeSelectedBy] = useState(false);
     const { data: page, isLoading, refetch, isRefetching } = useGetPolls(trip?._id, {
         ...(excludeSelectedBy && me?._id && { excludeSelectedBy: me?._id })
     });
+    const { data: dashboard } = useGetDashboard(trip?._id, me?._id, !!trip?._id);
+    const hasPolls = (dashboard?.polls?.openPollsCount ?? 0) > 0;
+    const allAnswered = excludeSelectedBy && hasPolls;
 
     const router = useRouter();
 
-    const { formatDate, formatDuration } = useI18nTime();
+    const { formatDuration } = useI18nTime();
 
 
     return (
@@ -47,6 +39,7 @@ export default function PollsPage() {
                 data={page?.polls || []}
                 className="my-2"
                 contentContainerClassName="m-2"
+                showsVerticalScrollIndicator={false}
                 keyExtractor={(item) => item._id}
                 ListHeaderComponent={() => (
                     <View className="flex-row mb-2">
@@ -55,6 +48,7 @@ export default function PollsPage() {
                             onPress={() => setExcludeSelectedBy(!excludeSelectedBy)}
                             label="Sondages en attente"
                             icon="exclamationmark"
+                            disabled={!hasPolls}
                         />
                     </View>
                 )}
@@ -174,6 +168,19 @@ export default function PollsPage() {
                                     </View>
                                 </View>
                             </View>
+                        </View>
+                    ) : allAnswered ? (
+                        // All polls answered state
+                        <View className="flex-1 items-center justify-center gap-6 py-20 px-4">
+                            <View className="p-7 rounded-3xl bg-green-50 dark:bg-green-900 shadow-lg">
+                                <IconSymbol name="checkmark.circle.fill" size={64} color="#22C55E" />
+                            </View>
+                            <Text className="text-3xl font-bold dark:text-white">
+                                Tout est à jour
+                            </Text>
+                            <Text className="text-gray-400 dark:text-gray-500 text-center max-w-sm">
+                                Vous avez répondu à tous les sondages de ce voyage
+                            </Text>
                         </View>
                     ) : (
                         // Empty state for polls

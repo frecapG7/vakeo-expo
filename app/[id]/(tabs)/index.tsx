@@ -170,10 +170,6 @@ export default function ItemDetails() {
                         title={trip?.startDate ? formatRange(trip?.startDate, trip?.endDate, { compactWeekday: true, compactMonth: true }) : "Choisir des dates"}
                         capitalizeTitle
                         subtitle={trip?.startDate && `${countDaysBetween(dayjs(trip?.startDate), dayjs(trip?.endDate))} jours`}
-                        badge={dashboard?.polls?.hasDatePoll ? {
-                            color: dashboard?.polls?.hasPendingDatePoll ? "#EF4444" : "#22C55E",
-                            icon: dashboard?.polls?.hasPendingDatePoll ? "exclamationmark" : "checkmark"
-                        } : undefined}
                         onPress={() => router.push({
                             pathname: "/[id]/dates",
                             params: {
@@ -192,10 +188,6 @@ export default function ItemDetails() {
                                 ? dashboard?.stops?.first
                                 : `De ${dashboard?.stops?.first} à ${dashboard?.stops?.last}`
                             : ""}
-                        badge={dashboard?.polls?.hasStopPoll ? {
-                            color: dashboard?.polls?.hasPendingStopPoll ? "#EF4444" : "#22C55E",
-                            icon: dashboard?.polls?.hasPendingStopPoll ? "exclamationmark" : "checkmark"
-                        } : undefined}
                         onPress={() => router.push({
                             pathname: "/[id]/location",
                             params: {
@@ -232,7 +224,7 @@ export default function ItemDetails() {
                 <View className="flex-row gap-3 mx-2">
                     <StatCard
                         icon="chart.bar.fill"
-                        count={dashboard?.polls?.pollsCount ?? 0}
+                        count={dashboard?.polls?.openPollsCount ?? 0}
                         warning={dashboard?.polls?.pendingPollsCount ?? 0}
                         label="Sondages"
                         color="blue"
