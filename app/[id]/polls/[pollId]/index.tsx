@@ -75,7 +75,6 @@ export default function PollDetailsPage() {
         <Animated.ScrollView
             style={styles.container}
             contentContainerStyle={{ paddingBottom: insets.bottom }}
-            contentInsetAdjustmentBehavior="automatic"
             showsVerticalScrollIndicator={false}
         >
             {/* Poll Card */}
