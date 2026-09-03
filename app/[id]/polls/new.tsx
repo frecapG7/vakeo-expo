@@ -102,7 +102,7 @@ export default function NewPoll() {
         )
 
     return (
-        <Animated.ScrollView className="flex-1 mt-4 mx-4" showsVerticalScrollIndicator={false}>
+        <Animated.ScrollView className="flex-1 mt-4 mx-4" contentInsetAdjustmentBehavior="automatic" showsVerticalScrollIndicator={false}>
             <View className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-4 shadow-sm border border-gray-100 dark:border-gray-700">
                 <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
                     Question *
