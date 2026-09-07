@@ -1,5 +1,5 @@
-import { EventItem } from "@/components/events/EventItem";
-import { FloatingAddButton } from "@/components/ui/FloatingAddButton";
+import { EventIcon } from "@/components/events/EventIcon";
+import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
@@ -7,8 +7,8 @@ import { TripContext } from "@/context/TripContext";
 import { useGetEvents } from "@/hooks/api/useEvents";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import dayjs from "@/lib/dayjs-config";
-import { Event } from "@/types/models";
-import { useRouter } from "expo-router";
+import { Event, TripUser } from "@/types/models";
+import { useGlobalSearchParams, useRouter } from "expo-router";
 import { useContext, useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
@@ -21,8 +21,6 @@ const showDay = (previous?: Event, current?: Event) => {
     return !dayjs(previous.startDate).isSame(dayjs(current.startDate), 'day');
 
 }
-
-
 
 const typeFilters = [
     {
@@ -53,11 +51,84 @@ const typeFilters = [
         value: "PARTY",
         icon: "moon.stars.fill",
         label: "Soirée"
+    },
+    {
+        value: "TRANSPORT",
+        icon: "map", 
+        label: "Transport"
+    },
+    {
+        value: "EXCURSION",
+        icon: "smiley", 
+        label: "Excursion"
+    },
+    {
+        value: "OTHER",
+        icon: "star", 
+        label: "Autre"
     }
 ]
 
+const EventItem = ({ event, user, onPress }: { event: Event, user: TripUser, onPress: () => void }) => {
+    const isAttendee = useMemo(() => event.attendees?.map(u => u._id).includes(user?._id), [user, event]);
+    const isOwner = useMemo(() => event.owners?.map(u => u._id).includes(user?._id), [user, event])
+
+    return (
+        <Button
+            onPress={onPress}
+            className="flex-row items-center rounded-2xl bg-white dark:bg-gray-800 shadow-md mx-2 p-4 gap-4 border border-gray-100 dark:border-gray-700">
+            <View className="flex-row gap-3 items-center">
+                <View className="mt-1">
+                    <EventIcon name={event.type as any} size="md" />
+                </View>
+                <View className="flex-1 gap-2 justify-between">
+                    <View className="flex-row items-center justify-between">
+                        <View className="flex-row items-center gap-2 flex-1">
+                            <Text className="text-lg text-gray-800 dark:text-white font-bold flex-1"
+                                numberOfLines={2}>
+                                {event.name}
+                            </Text>
+                        </View>
+                        {isAttendee &&
+                            <Animated.View className="flex-row bg-green-200 rounded-lg items-center px-2 py-1">
+                                <IconSymbol name="checkmark" color="green" size={14} />
+                                <Text className="text-xs font-bold text-green-600">Participant</Text>
+                            </Animated.View>}
+                    </View>
+                    {event.details &&
+                        <Text className="text-sm text-gray-500 dark:text-gray-400" numberOfLines={2}>
+                            {event.details}
+                        </Text>}
+                    <View className="flex-row items-center justify-around ">
+                        <View className="flex-row items-center gap-1">
+                            <IconSymbol name="clock" color="gray" size={14} />
+                            {event?.startDate &&
+                                <Text className="text-sm text-gray-500 dark:text-gray-400">
+                                    {dayjs(event?.startDate).format("HH:mm")}-{dayjs(event?.endDate).format("HH:mm")}
+                                </Text>}
+                        </View>
+                        <View className="flex-row items-center gap-1">
+                            <IconSymbol name="person.2.fill" color="gray" size={14} />
+                            <Text className="text-sm text-gray-500 dark:text-gray-400">
+                                {event?.attendees?.length}
+                            </Text>
+                        </View>
+                        <View className="flex-row items-center gap-1">
+                            <IconSymbol name="list.bullet" color="gray" size={14} />
+                            <Text className="text-sm text-gray-500 dark:text-gray-400">
+                                {event?.goodsCount ?? 0}
+                            </Text>
+                        </View>
+                    </View>
+                </View>
+            </View>
+        </Button>
+    )
+}
+
 export default function TripPlanning() {
 
+    const { id } = useGlobalSearchParams<{id: string}>();
     const [search, setSearch] = useState("");
     const [typeFilter, setTypeFilter] = useState("");
     const [onlyAttendee, setOnlyAttendee] = useState(false);
@@ -65,16 +136,16 @@ export default function TripPlanning() {
 
 
     const router = useRouter();
-    const { me, trip } = useContext(TripContext);
+    const { me } = useContext(TripContext);
     const { formatDate, formatDay, formatHour } = useI18nTime();
 
-    const { data, hasNextPage, fetchNextPage, isLoading, refetch, isRefetching } = useGetEvents(trip?._id, {
+    const { data, hasNextPage, fetchNextPage, isLoading, refetch, isRefetching } = useGetEvents(String(id), {
         type: typeFilter,
         search,
         ...(onlyAttendee && { attendee: String(me?._id) }),
         ...(onlyOwner && { owner: String(me?._id) }),
     }, {
-        enabled: !!trip,
+        enabled: !!id,
     });
     const events = useMemo(() => data?.pages.flatMap((page) => page?.events), [data?.pages]);
 
@@ -91,7 +162,7 @@ export default function TripPlanning() {
                                 horizontal
                                 showsHorizontalScrollIndicator={false}
                                 className="flex-row "
-                                contentContainerClassName="gap-5 my-2">
+                                contentContainerClassName="gap-3 px-2 my-2">
                                 {typeFilters.map(item => (
                                     <Pressable
                                         key={item.value}
@@ -127,14 +198,11 @@ export default function TripPlanning() {
                                 </Text>
                             </View>
                         }
-                            <EventItem event={item}
-                            user={me}
-                            onPress={() => trip?._id && router.navigate({
+                        <EventItem event={item}
+                            user={me!}
+                            onPress={() => router.navigate({
                                 pathname: "/[id]/events/[eventId]",
-                                params: {
-                                    id: trip._id,
-                                    eventId: item._id
-                                }
+                                params: { id: String(id), eventId: item._id }
                             })} />
                     </View>
 
@@ -150,7 +218,7 @@ export default function TripPlanning() {
                         </View>
                         :
                         <View className="my-5 flex-1 flex-grow justify-center">
-                            <Text className="text-2xl dark:text-white">
+                            <Text className="text-2xl dark:text-white text-center">
                                 Aucune activité
                             </Text>
                         </View>
@@ -163,7 +231,7 @@ export default function TripPlanning() {
                 onRefresh={refetch}
 
             />
-            {/* <Pressable className="absolute bottom-10 right-6 p-2 rounded-full border border-white bg-orange-400 items-center justify-center shadow"
+            <Pressable className="absolute bottom-10 right-6 p-2 rounded-full border border-white bg-orange-400 items-center justify-center shadow"
                 onPress={() => router.push({
                     pathname: "/[id]/events/new",
                     params: {
@@ -171,15 +239,7 @@ export default function TripPlanning() {
                     }
                 })}>
                 <IconSymbol name="plus" color="white" size={26} />
-            </Pressable> */}
-            {trip?._id && (
-                <FloatingAddButton onPress={() => router.push({
-                    pathname: "/[id]/events/new",
-                    params: {
-                        id: trip._id
-                    }
-                })} />
-            )}
+            </Pressable>
         </Animated.View>
     )
 }
