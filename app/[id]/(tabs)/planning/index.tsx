@@ -84,6 +84,7 @@ export default function TripPlanning() {
             <Animated.FlatList
                 data={events || []}
                 showsVerticalScrollIndicator={false}
+                contentInsetAdjustmentBehavior="automatic"
                 ListHeaderComponent={
                     <View className="gap-4 my-2">
                         <View className="">
