@@ -28,7 +28,7 @@ export default function AttendeesLayout() {
                             <IconSymbol name="chevron.left" />
                         </Pressable>,
                     headerRight: () =>
-                        <Pressable
+                        trip?._id && <Pressable
                             onPress={() => router.push({
                                 pathname: "/[id]/attendees/edit",
                                 params: { id: trip?._id }

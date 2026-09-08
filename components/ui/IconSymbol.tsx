@@ -61,7 +61,7 @@ const MAPPING = {
   "chevron.down": "keyboard-arrow-down",
   "chevron.up": "keyboard-arrow-up",
   'chevron.right': 'keyboard-arrow-right',
-  'chevron.left': 'arrow-back',
+  'chevron.left': 'keyboard-arrow-left',
   "bookmark.fill": "bookmark",
   "bookmark": "bookmark-outline",
   "smiley": "face",

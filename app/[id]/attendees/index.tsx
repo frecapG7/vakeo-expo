@@ -3,7 +3,6 @@ import { Chip } from "@/components/ui/Chip";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
-import { useRouter } from "expo-router";
 import { useContext } from "react";
 import { Text, View } from "react-native";
 import Animated from "react-native-reanimated";
@@ -11,7 +10,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TripAttendees() {
     const { trip, me } = useContext(TripContext);
-    const router = useRouter();
 
     if (!trip) {
         return (
