@@ -35,6 +35,10 @@ export default function PlanningLayout() {
                 title: "Planning",
                 headerTintColor: "white",
                 headerTitleStyle: styles.headerTitle,
+                headerLargeTitleStyle: {
+                    color: "white",
+                    fontWeight: "bold",
+                },
                 headerBackground: () => trip && <BackgroundHeader trip={trip} />,
                 headerRight: () =>
                     <View className="flex flex-row justify-end items-center my-2 gap-2">
@@ -70,7 +74,10 @@ export default function PlanningLayout() {
                         </Pressable>
                     </View>,
             }}>
-                <Stack.Screen name="index" />
+                <Stack.Screen name="index" options={{
+                    headerLargeTitleEnabled: true,
+                    headerTransparent: Platform.OS === "ios",
+                }} />
                 <Stack.Screen name="calendar" />
                 <Stack.Screen name="day" />
             </Stack>

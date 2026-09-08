@@ -87,6 +87,7 @@ export default function TripConversations() {
             renderItem={renderConversation}
             keyExtractor={(item) => item.conversationId ?? "general"}
             className="flex-1"
+            contentInsetAdjustmentBehavior="automatic"
             contentContainerStyle={{ paddingVertical: 8 }}
             ItemSeparatorComponent={() => (
                 <View className="h-px bg-gray-200 dark:bg-gray-700 mx-14" />

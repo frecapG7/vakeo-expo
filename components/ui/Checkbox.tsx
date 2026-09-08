@@ -1,7 +1,5 @@
 import AnimatedCheckbox from "react-native-checkbox-reanimated"
 
-
-
 export const Checkbox = ({ checked = false }: { checked: boolean }) => {
 
     return (

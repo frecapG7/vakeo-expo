@@ -80,7 +80,7 @@ export default function TripSettings() {
 
     return (
         <Animated.View style={styles.container}>
-            <View className="flex gap-2 items-start border-b border-blue-700  pb-2 mx-5">
+            <View className="flex gap-2 items-start border-b border-blue-700  pb-2 m-5">
                 <Avatar src={user?.avatar} size2="xl" alt={user?.name.charAt(0)} />
                 <View className="flex-row gap-5 items-end">
                     <Text className="dark:text-white text-3xl font-bold">{user?.name}</Text>

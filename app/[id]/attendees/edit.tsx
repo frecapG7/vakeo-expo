@@ -2,9 +2,9 @@ import { TripUsersForm } from "@/components/trips/TripUsersForm";
 import { Button } from "@/components/ui/Button";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
-import { useGetTrip, useUpdateTrip } from "@/hooks/api/useTrips";
+import { useUpdateTrip } from "@/hooks/api/useTrips";
 import { Trip } from "@/types/models";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useContext, useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { KeyboardAvoidingView, View } from "react-native";
@@ -12,12 +12,10 @@ import Animated, { ZoomIn } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function EditAttendees() {
-    const { id } = useLocalSearchParams();
 
-    const { me } = useContext(TripContext);
+    const { me, trip } = useContext(TripContext);
 
-    const { data: trip } = useGetTrip(id);
-    const updateTrip = useUpdateTrip(id);
+    const updateTrip = useUpdateTrip(trip?._id);
 
     const { control,
         handleSubmit,
@@ -31,7 +29,7 @@ export default function EditAttendees() {
         control,
         name: "users"
     });
-    const selected = users?.map(u => u?._id).indexOf(me?._id) ?? -1;
+    const selected = me ? users?.map(u => u?._id).indexOf(me?._id) : -1;
 
 
     const router = useRouter();
@@ -41,12 +39,11 @@ export default function EditAttendees() {
     }
 
     return (
-        <SafeAreaView style={{flex: 1}}>
-
+        <SafeAreaView edges={["bottom"]} style={{ flex: 1 }}>
             <KeyboardAvoidingView
                 style={styles.container}
                 behavior="padding">
-                <Animated.ScrollView className="">
+                <Animated.ScrollView className="" contentInsetAdjustmentBehavior="automatic">
                     <View className="mx-2">
                         <TripUsersForm control={control} selected={selected} />
                     </View>

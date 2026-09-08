@@ -111,6 +111,7 @@ export default function TripGoods() {
                 data={goods}
                 refreshing={isFetching}
                 className="flex-1"
+                contentInsetAdjustmentBehavior="automatic"
                 contentContainerClassName="my-5"
                 renderItem={({ item }) =>
                     <Swipeable

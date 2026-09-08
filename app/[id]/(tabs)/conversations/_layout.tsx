@@ -15,6 +15,7 @@ export default function ConversationLayout() {
     const insets = useSafeAreaInsets();
     const bottomPadding = Platform.OS === 'ios' ? insets.bottom : 0;
 
+
     return (
         <View className="flex-1"
             style={{
@@ -25,11 +26,13 @@ export default function ConversationLayout() {
                 title: "Conversations",
                 headerTintColor: "white",
                 headerTitleStyle: styles.headerTitle,
+                headerLargeTitleStyle: {
+                    color: "white",
+                    fontWeight: "bold",
+                },
                 headerBackground: () => trip && <BackgroundHeader trip={trip} />,
-                headerRight: () =>
-                    <View className="flex flex-row justify-end items-center my-2 gap-2">
+                headerRight: () => me && 
                         <Pressable
-                            className="items-center"
                             disabled={!trip}
                             onPress={() => trip && router.push({
                                 pathname: "/[id]/settings",
@@ -39,9 +42,11 @@ export default function ConversationLayout() {
                             })}>
                             <Avatar alt={me?.name?.charAt(0)} src={me?.avatar} />
                         </Pressable>
-                    </View>,
             }}>
-                <Stack.Screen name="index" />
+                <Stack.Screen name="index" options={{
+                    headerLargeTitleEnabled: true,
+                    headerTransparent: Platform.OS === "ios",
+                }} />
             </Stack>
         </View>
 

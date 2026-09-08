@@ -97,11 +97,10 @@ export default function DatesPage() {
 
 
     return (
-        <SafeAreaView style={styles.container} >
-
-            <Animated.ScrollView  >
+        <SafeAreaView edges={["bottom"]} style={styles.container} >
+            <Animated.ScrollView contentInsetAdjustmentBehavior="automatic">
                 {/* // Above calendar */}
-                <View className="mx-2 mb-4 p-4 gap-4 bg-white dark:bg-gray-900 rounded-xl shadow-sm">
+                <View className="m-2 mb-4 p-4 gap-4 bg-white dark:bg-gray-900 rounded-xl shadow-sm">
                     <View className="flex-row items-center gap-2">
                         <Text className="text-xl">📅</Text>
                         {startDate && endDate ? (
