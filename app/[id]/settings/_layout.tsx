@@ -1,9 +1,8 @@
-import { BackgroundHeader } from "@/components/header/BackgroundHeader";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import useColors from "@/hooks/styles/useColors";
+import { useGlassHeaderOptions } from "@/hooks/styles/useGlassHeaderOptions";
 import { Stack, useRouter } from "expo-router";
 import { useContext } from "react";
 import { View } from "react-native";
@@ -19,6 +18,8 @@ export default function SettingsLayout() {
 
     const insets = useSafeAreaInsets();
 
+    const glass = useGlassHeaderOptions();
+
     return (
         <View style={{
             flex: 1,
@@ -27,18 +28,18 @@ export default function SettingsLayout() {
             <Stack screenOptions={{
                 headerShown: true,
                 headerTitle: "Mon profil",
-                headerTintColor: "white",
-                headerTitleStyle: styles.headerTitle,
-                headerBackground: () => trip && <BackgroundHeader trip={trip} />
+                ...glass
             }}>
                 <Stack.Screen name="index" options={{
-                    headerLeft: () => <Button
-                        className="mr-4"
-                        onPress={() => router.back()}
-                    >
-                        <IconSymbol name="arrow.left" color={text} />
-                    </Button>,
-                }} />
+                    headerLeft: () =>
+                        <Button
+                            className="mr-4"
+                            onPress={() => router.back()}
+                        >
+                            <IconSymbol name="chevron.left" color={text} />
+                        </Button>,
+                }}
+                />
                 <Stack.Screen name="username" options={{
                     headerTitle: "Modifier nom",
                 }} />

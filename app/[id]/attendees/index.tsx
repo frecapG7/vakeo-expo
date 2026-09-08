@@ -1,30 +1,24 @@
 import { Avatar } from "@/components/ui/Avatar";
-import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
-import { useGetTrip } from "@/hooks/api/useTrips";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useContext } from "react";
-import { FlatList, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TripAttendees() {
-    const { id } = useLocalSearchParams();
-    const { data: trip } = useGetTrip(id);
+    const { trip, me } = useContext(TripContext);
     const router = useRouter();
-
-
-    const { me } = useContext(TripContext);
 
     if (!trip) {
         return (
             <View className="flex m-4 gap-4">
                 <View className="gap-4">
                     <View className="w-[60%]">
-                        <Skeleton height={10}/>
+                        <Skeleton height={10} />
                     </View>
                 </View>
                 <View className="mx-4 gap-2">
@@ -37,8 +31,10 @@ export default function TripAttendees() {
     }
 
     return (
-        <SafeAreaView style={styles.container} className="m-5">
-            <FlatList
+        <SafeAreaView edges={["bottom"]} style={styles.container} >
+            <Animated.FlatList
+                showsVerticalScrollIndicator={false}
+                contentInsetAdjustmentBehavior="automatic"
                 ListHeaderComponent={() =>
                     <View className="gap-4">
                         <View className="">
@@ -73,22 +69,8 @@ export default function TripAttendees() {
                         </View>
                     </View>
                 )}
-                contentContainerClassName="gap-2"
-                ListFooterComponent={() => <View className="m-5 mt-auto">
-                    <Button
-                        variant="contained"
-                        title="Modifier les participants"
-                        onPress={() => router.push({
-                            pathname: "/[id]/attendees/edit",
-                            params: {
-                                id: String(id)
-                            }
-                        })}
-                    />
-                </View>}
+                contentContainerClassName="gap-2 my-4"
             />
-
-
         </SafeAreaView>
     );
 }

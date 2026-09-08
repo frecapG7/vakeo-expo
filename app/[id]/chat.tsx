@@ -35,13 +35,13 @@ export default function TripMessages() {
     // Add this right after your useEffect for navigation options
     useFocusEffect(
         useCallback(() => {
-            if (!trip?._id || me?._id) return
+            if (!trip?._id || !me?._id) return
             markAllAsRead();
         }, [markAllAsRead, trip?._id, me?._id])
     );
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView edges={["bottom"]} style={{ flex: 1 }}>
             <GiftedChat
                 messages={messages}
                 onSend={onSend}

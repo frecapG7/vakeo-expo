@@ -1,11 +1,10 @@
 import { TripInfoForm } from "@/components/trips/TripInfoForm";
 import { Button } from "@/components/ui/Button";
 import styles from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
 import { useGetTrip, useUpdateTrip } from "@/hooks/api/useTrips";
 import { Trip } from "@/types/models";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { View } from "react-native";
 import Animated, { ZoomIn } from "react-native-reanimated";
@@ -16,12 +15,11 @@ export default function EditTripGeneral() {
 
     const { id } = useLocalSearchParams();
 
-    const { me } = useContext(TripContext);
     const { data: trip } = useGetTrip(id);
     const updateTrip = useUpdateTrip(id);
 
 
-    const { control, reset, handleSubmit, formState: { isDirty } } = useForm<Trip>();
+    const { control, reset, handleSubmit } = useForm<Trip>();
 
     const router = useRouter();
 
@@ -31,20 +29,21 @@ export default function EditTripGeneral() {
     }, [reset, trip]);
 
     const onSubmit = async (data: Trip) => {
+        if(!trip) return;
         await updateTrip.mutateAsync(data);
         Toast.success("Voyage modifié");
         router.dismissTo({
             pathname: "/[id]/(tabs)",
             params: {
-                id: String(id)
+                id: trip._id
             }
         })
     }
 
     return (
-        <SafeAreaView style={styles.container}>
-            <Animated.ScrollView>
-                <View className="mx-2">
+        <SafeAreaView edges={["bottom"]} style={styles.container}>
+            <Animated.ScrollView contentInsetAdjustmentBehavior="automatic">
+                <View className="m-2">
                     <TripInfoForm control={control} />
                 </View>
 

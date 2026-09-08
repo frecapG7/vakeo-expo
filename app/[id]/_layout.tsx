@@ -1,17 +1,16 @@
-import { BackgroundHeader } from "@/components/header/BackgroundHeader";
 import { Avatar } from "@/components/ui/Avatar";
-import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetTrip, useGetTripUser } from "@/hooks/api/useTrips";
 import { useGetStorageTrip } from "@/hooks/storage/useStorageTrips";
+import { useGlassHeaderOptions } from "@/hooks/styles/useGlassHeaderOptions";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect } from "react";
-import { Pressable } from "react-native";
+import { Platform, Pressable } from "react-native";
 
 export default function TripDetailsLayout() {
 
     const router = useRouter();
-    const { id } = useLocalSearchParams<{id : string}>();
+    const { id } = useLocalSearchParams<{ id: string }>();
 
     const { data: storageTrip } = useGetStorageTrip(id);
     const { data: trip } = useGetTrip(id, true);
@@ -19,6 +18,8 @@ export default function TripDetailsLayout() {
     const { data: me } = useGetTripUser(id, storageTrip?.user, {
         enabled: !!storageTrip?.user
     });
+
+    const glass = useGlassHeaderOptions();
 
     useEffect(() => {
         if (!!storageTrip && !storageTrip.user)
@@ -32,9 +33,9 @@ export default function TripDetailsLayout() {
             trip
         }}>
             <Stack screenOptions={{
-                headerTintColor: "white",
-                headerTitleStyle: styles.headerTitle,
-                headerBackground:() => trip && <BackgroundHeader trip={trip} />
+                headerShown: true,
+                headerBackTitle: "Annuler",
+                ...glass
             }}>
                 <Stack.Screen name="(tabs)" options={{
                     headerShown: false,
@@ -46,26 +47,64 @@ export default function TripDetailsLayout() {
                     headerLeft: () => <></>
 
                 }} />
-                <Stack.Screen name="edit-general" options={{
-                    presentation: "modal",
-                    title: "Modifier",
-                    headerBackTitle: "Annuler"
-                }} />
-               
+                <Stack.Screen name="edit-general"
+                    options={{
+                        presentation: "modal",
+                        title: "Modifier",
+                    }} />
+
                 <Stack.Screen name="dates"
                     options={{
                         title: "Dates du séjour",
+                        headerLargeTitleEnabled: true,
+                        headerTransparent: Platform.OS === "ios"
                     }} />
+
+                <Stack.Screen name="location"
+                    options={{
+                        title: "Les étapes",
+                        headerLargeTitleEnabled: true,
+                        headerTransparent: Platform.OS === "ios"
+                    }}
+                />
+
+                <Stack.Screen name="share"
+                    options={{
+                        title: "",
+                    }}
+                />
+                <Stack.Screen name="chat"
+                    options={{
+                        headerBackTitle: "",
+                        title: "General",
+                        headerRight: () => me && (
+                            <Pressable onPress={() => router.navigate('./settings')}>
+                                <Avatar
+                                    src={me?.avatar}
+                                    alt={me?.name?.charAt(0)}
+                                    size2="sm"
+                                />
+                            </Pressable>
+                        ),
+                    }}
+                />
+                <Stack.Screen name="restrictions"
+                    options={{
+                        title: "Restrictions alimentaires",
+                        headerShown: false,
+                        presentation: "modal"
+                    }}
+                />
+                {/* Nested folders */}
+                <Stack.Screen name="attendees"
+                    options={{
+                        headerShown: false,
+                    }}
+                />
                 <Stack.Screen name="polls"
                     options={{
                         headerShown: false,
                         title: "Sondages",
-                    }}
-                />
-                <Stack.Screen name="location"
-                    options={{
-                        headerShown: true,
-                        title: "Les étapes",
                     }}
                 />
                 <Stack.Screen name="goods"
@@ -84,45 +123,13 @@ export default function TripDetailsLayout() {
                         headerShown: false,
                     }}
                 />
-                <Stack.Screen name="attendees"
-                    options={{
-                        title: "Participants",
-                    }}
-                />
-                <Stack.Screen name="restrictions"
-                    options={{
-                        title: "Restrictions alimentaires",
-                        headerShown: false, 
-                        presentation: "modal"
-                    }}
-                />
-                <Stack.Screen name="share"
-                    options={{
-                        headerShown: true,
-                        title: "",
-                    }}
-                />
                 <Stack.Screen name="settings"
                     options={{
                         headerShown: false,
                         title: "Mon profil",
                     }}
                 />
-                <Stack.Screen name="chat"
-                    options={{
-                        headerShown: true,
-                        title: "General",
-                        headerRight: () => (
-                            <Pressable onPress={() => router.navigate('./settings')}>
-                                <Avatar
-                                    src={me?.avatar}
-                                    alt={me?.name?.charAt(0)}
-                                    size2="sm"
-                                />
-                            </Pressable>
-                        ),
-                    }}
-                />
+
             </Stack>
 
         </TripContext.Provider>

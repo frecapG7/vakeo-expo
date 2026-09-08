@@ -54,11 +54,12 @@ export default function TripLocation() {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView edges={["bottom"]} style={styles.container}>
             <GestureHandlerRootView style={{ flex: 1 }}>
                 <Animated.FlatList
                     className="flex-1"
                     data={tripStops}
+                    contentInsetAdjustmentBehavior="automatic"
                     keyExtractor={(i) => i?._id}
                     renderItem={({ item, index }) => {
                         const openPollsCount = item.polls?.filter(poll => !poll.isClosed).length || 0;

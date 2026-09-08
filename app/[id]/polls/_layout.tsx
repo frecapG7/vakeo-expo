@@ -1,10 +1,10 @@
 import { Avatar } from "@/components/ui/Avatar";
-import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { TripContext } from "@/context/TripContext";
+import { useGlassHeaderOptions } from "@/hooks/styles/useGlassHeaderOptions";
 import { Stack, useRouter } from "expo-router";
 import { useContext } from "react";
-import { View } from "react-native";
+import { Platform, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PollsLayout() {
@@ -14,6 +14,7 @@ export default function PollsLayout() {
 
     const router = useRouter();
 
+    const glass = useGlassHeaderOptions();
     return (
         <View style={{
             flex: 1,
@@ -22,20 +23,20 @@ export default function PollsLayout() {
 
             <Stack screenOptions={{
                 headerShown: true,
-                headerLargeTitle: true,
-                headerLargeTitleShadowVisible: false,
+                ...glass,
             }}>
                 <Stack.Screen name="index"
                     options={{
-                        headerShown: true,
+                        headerLargeTitleEnabled: true,
+                        headerTransparent: Platform.OS === "ios",
                         title: "Sondages",
                         headerLeft: () =>
-                            <Button onPress={() => router.back()}
+                            <Pressable onPress={() => router.back()}
                                 className="mr-4">
-                                <IconSymbol name="arrow.left" />
-                            </Button>,
+                                <IconSymbol name="chevron.left" />
+                            </Pressable>,
                         headerRight: () =>
-                            me && <Button
+                            me && <Pressable
                                 onPress={() => router.push({
                                     pathname: "/[id]/settings",
                                     params: {
@@ -48,35 +49,29 @@ export default function PollsLayout() {
                                     src={me?.avatar}
                                     alt={me?.name?.charAt(0)}
                                 />
-                            </Button>
+                            </Pressable>
                     }}
                 />
                 <Stack.Screen name="new"
                     options={{
                         title: "Nouveau sondage",
                         headerBackTitle: "Annuler",
-                        headerLargeTitle: false,
                     }} />
                 <Stack.Screen name="[pollId]/index"
                     options={{
                         headerShown: true,
-                        headerLargeTitle: false,
                         title: "",
-                        headerRight: () =>
-                            me && <Button
-                                onPress={() => router.push({
-                                    pathname: "/[id]/settings",
-                                    params: {
-                                        id: trip?._id
-                                    }
-                                })}
-                                className="ml-4"
-                            >
-                                <Avatar
-                                    src={me?.avatar}
-                                    alt={me?.name?.charAt(0)}
-                                />
-                            </Button>
+                        headerLeft: () =>
+                            <Pressable
+                                onPress={() => router.canGoBack()
+                                    ? router.back()
+                                    : router.replace({
+                                        pathname: "/[id]/polls",
+                                        params: { id: trip?._id }
+                                    })}
+                                className="mr-4">
+                                <IconSymbol name="arrow.left" />
+                            </Pressable>,
                     }} />
                 <Stack.Screen name="[pollId]/new-option"
                     options={{
