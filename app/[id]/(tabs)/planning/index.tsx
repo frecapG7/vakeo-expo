@@ -2,6 +2,7 @@ import { EventIcon } from "@/components/events/EventIcon";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { FloatingAddButton } from "@/components/ui/FloatingAddButton";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetEvents } from "@/hooks/api/useEvents";
@@ -19,7 +20,6 @@ const showDay = (previous?: Event, current?: Event) => {
     if (!previous?.startDate)
         return true;
     return !dayjs(previous.startDate).isSame(dayjs(current.startDate), 'day');
-
 }
 
 const typeFilters = [
@@ -69,7 +69,7 @@ const typeFilters = [
     }
 ]
 
-const EventItem = ({ event, user, onPress }: { event: Event, user: TripUser, onPress: () => void }) => {
+const EventItem = ({ event, user, onPress }: { event: Event, user?: TripUser | null, onPress: () => void }) => {
     const isAttendee = useMemo(() => event.attendees?.map(u => u._id).includes(user?._id), [user, event]);
     const isOwner = useMemo(() => event.owners?.map(u => u._id).includes(user?._id), [user, event])
 
@@ -136,19 +136,21 @@ export default function TripPlanning() {
 
 
     const router = useRouter();
-    const { me } = useContext(TripContext);
+    // ✅ Restauration de l'extraction de 'trip' (demandé par ton collègue)
+    const { me, trip } = useContext(TripContext);
     const { formatDate, formatDay, formatHour } = useI18nTime();
 
-    const { data, hasNextPage, fetchNextPage, isLoading, refetch, isRefetching } = useGetEvents(String(id), {
+    // ✅ Restauration de trip?._id (demandé par ton collègue)
+    const { data, hasNextPage, fetchNextPage, isLoading, refetch, isRefetching } = useGetEvents(trip?._id, {
         type: typeFilter,
         search,
         ...(onlyAttendee && { attendee: String(me?._id) }),
         ...(onlyOwner && { owner: String(me?._id) }),
     }, {
-        enabled: !!id,
+        enabled: !!trip?._id,
     });
+    
     const events = useMemo(() => data?.pages.flatMap((page) => page?.events), [data?.pages]);
-
 
     return (
         <Animated.View style={styles.container}>
@@ -198,9 +200,10 @@ export default function TripPlanning() {
                                 </Text>
                             </View>
                         }
+                        {/* ✅ Restauration : suppression du "!" sur me et ajout du trip?._id dans le onPress */}
                         <EventItem event={item}
-                            user={me!}
-                            onPress={() => router.navigate({
+                            user={me}
+                            onPress={() => trip?._id && router.navigate({
                                 pathname: "/[id]/events/[eventId]",
                                 params: { id: String(id), eventId: item._id }
                             })} />
@@ -231,15 +234,15 @@ export default function TripPlanning() {
                 onRefresh={refetch}
 
             />
-            <Pressable className="absolute bottom-10 right-6 p-2 rounded-full border border-white bg-orange-400 items-center justify-center shadow"
-                onPress={() => router.push({
+            {/* ✅ Restauration du composant FloatingAddButton d'origine */}
+            {trip?._id && (
+                <FloatingAddButton onPress={() => router.push({
                     pathname: "/[id]/events/new",
                     params: {
                         id: String(id)
                     }
-                })}>
-                <IconSymbol name="plus" color="white" size={26} />
-            </Pressable>
+                })} />
+            )}
         </Animated.View>
     )
 }
