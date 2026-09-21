@@ -14,16 +14,13 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import dayjs from "@/lib/dayjs-config";
 
 import { useController, useForm } from "react-hook-form";
-import { Text, View, Pressable, TouchableOpacity, Alert } from "react-native";
+import { Text, View, Pressable, TouchableOpacity } from "react-native";
 import Animated from "react-native-reanimated";
 
 const placeholder = (type: string): string => {
-    if (type === "DatesPoll")
-        return "On part quand?";
-    else if (type === "HousingPoll")
-        return "On loge ou?";
-    else
-        return "On part ou?"
+    if (type === "DatesPoll") return "On part quand?";
+    else if (type === "HousingPoll") return "On loge ou?";
+    else return "On part ou?";
 }
 
 const CreationCalendar = ({ options, onChange }: { options: any[], onChange: (opts: any[]) => void }) => {
@@ -51,10 +48,7 @@ const CreationCalendar = ({ options, onChange }: { options: any[], onChange: (op
             const newOptions = [...options];
             newOptions.splice(existingIndex, 1);
             onChange(newOptions);
-            
-            if (pendingStart && day.isSame(pendingStart, 'day')) {
-                setPendingStart(null);
-            }
+            if (pendingStart && day.isSame(pendingStart, 'day')) setPendingStart(null);
         } else {
             if (!pendingStart) {
                 setPendingStart(day);
@@ -112,46 +106,27 @@ const CreationCalendar = ({ options, onChange }: { options: any[], onChange: (op
                     const isSelected = options.some((opt: any) => day.isSame(dayjs(opt.startDate), 'day'));
 
                     return (
-                        <TouchableOpacity
-                            key={i}
-                            onPress={() => handleToggleDay(day)}
-                            className="w-[14.28%] aspect-square justify-center items-center p-1"
-                        >
-                            <View className={`w-full h-full justify-center items-center rounded-lg 
-                                ${isSelected ? 'bg-orange-500 shadow-sm' : ''} 
-                                ${!isCurrentMonth && !isSelected ? 'opacity-30' : ''}`}
-                            >
-                                <Text className={`font-semibold text-sm ${isSelected ? 'text-white' : 'text-gray-700 dark:text-gray-300'}`}>
-                                    {day.format("D")}
-                                </Text>
+                        <TouchableOpacity key={i} onPress={() => handleToggleDay(day)} className="w-[14.28%] aspect-square justify-center items-center p-1">
+                            <View className={`w-full h-full justify-center items-center rounded-lg ${isSelected ? 'bg-orange-500 shadow-sm' : ''} ${!isCurrentMonth && !isSelected ? 'opacity-30' : ''}`}>
+                                <Text className={`font-semibold text-sm ${isSelected ? 'text-white' : 'text-gray-700 dark:text-gray-300'}`}>{day.format("D")}</Text>
                             </View>
                         </TouchableOpacity>
                     );
                 })}
             </View>
             
-            {pendingStart && (
-                <Text className="text-center text-xs text-orange-400 mt-2">
-                    Sélectionnez la date de fin...
-                </Text>
-            )}
-            
-            {options.length > 0 && (
-                <Text className="text-center text-xs text-orange-500 font-bold mt-2">
-                    {options.length} jour(s) sélectionné(s)
-                </Text>
-            )}
+            {pendingStart && <Text className="text-center text-xs text-orange-400 mt-2">Sélectionnez la date de fin...</Text>}
+            {options.length > 0 && <Text className="text-center text-xs text-orange-500 font-bold mt-2">{options.length} jour(s) sélectionné(s)</Text>}
         </View>
     );
 };
 
 export default function NewPoll() {
-
-    const { control, handleSubmit, setValue, watch } = useForm({
+    // CORRECTION : Plus de defaultView dans le useForm !
+    const { control, handleSubmit, setValue } = useForm({
         defaultValues: {
             question: "",
             type: "",
-            defaultView: "calendar",
             isSingleAnswer: false,
             isAnonymous: false,
             options: [] 
@@ -159,18 +134,15 @@ export default function NewPoll() {
     });
 
     const { field: { value: type, onChange: setType } } = useController({
-        control,
-        name: "type",
-        rules: { required: true }
+        control, name: "type", rules: { required: true }
     });
 
     const { field: { value: optionsValue, onChange: setOptionsValue } } = useController({
-        control,
-        name: "options",
-        defaultValue: []
+        control, name: "options", defaultValue: []
     });
 
-    const defaultView = watch("defaultView");
+    // CORRECTION : C'est une valeur 100% visuelle, gérée par un state local
+    const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
 
     const { type: typeParam, stop } = useLocalSearchParams<{ type: string, stop?: string }>();
     const { trip, me } = useContext(TripContext);
@@ -183,29 +155,13 @@ export default function NewPoll() {
                 ...data,
                 ...(stop && { stop })
             });
-            
-            // CORRECTION DE LA NAVIGATION ICI : on utilise "replace" au lieu de "dismissTo" ou "push"
             router.replace({
                 pathname: "/[id]/polls/[pollId]",
-                params: {
-                    id: trip?._id,
-                    pollId: result._id
-                }
+                params: { id: trip?._id, pollId: result._id }
             });
-            
         } catch (error: any) {
-            Alert.alert("Erreur Serveur", "Le serveur a refusé les données.");
-            console.error(error);
+            console.error("Erreur serveur :", error);
         }
-    }
-
-    const onFormError = (errors: any) => {
-        const champsEnErreur = Object.keys(errors).join(", ");
-        Alert.alert(
-            "Coupable trouvé !", 
-            `Le formulaire bloque à cause du/des champ(s) suivant(s) : ${champsEnErreur}`
-        );
-        console.log("FORM ERRORS DETAILS:", errors);
     }
 
     useEffect(() => {
@@ -218,12 +174,12 @@ export default function NewPoll() {
                 <Text className="text-lg font-bold text-center mt-4">Quel type de sondage veux-tu organiser ? </Text>
                 <View className="flex-row flex-wrap justify-center gap-5 m-5">
                     <Button className="flex bg-orange-200 rounded-xl w-[40%] gap-2 border-blue-50 shadow p-2"
-                        onPress={() => { setValue("defaultView", "calendar"); setType("DatesPoll"); }}>
+                        onPress={() => { setViewMode("calendar"); setType("DatesPoll"); }}>
                         <IconSymbol name="calendar" color="black" size={34} />
                         <Text className="capitalize text-md font-bold text-center"> Dates (Calendrier)</Text>
                     </Button>
                     <Button className="flex bg-orange-200 rounded-xl w-[40%] gap-2 border-blue-50 shadow p-2"
-                        onPress={() => { setValue("defaultView", "list"); setType("DatesPoll"); }}>
+                        onPress={() => { setViewMode("list"); setType("DatesPoll"); }}>
                         <IconSymbol name="list.bullet" color="black" size={34} />
                         <Text className="capitalize text-md font-bold text-center"> Dates (Liste)</Text>
                     </Button>
@@ -246,75 +202,40 @@ export default function NewPoll() {
             
             {type === "DatesPoll" && (
                 <View className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-4 shadow-sm border border-gray-100 dark:border-gray-700">
-                    <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
-                        Affichage par défaut du sondage
-                    </Text>
+                    <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">Affichage par défaut du sondage</Text>
                     <View className="flex-row bg-gray-100 dark:bg-gray-900 p-1 rounded-xl">
-                        <Pressable
-                            onPress={() => setValue('defaultView', 'calendar')}
-                            className={`flex-1 flex-row items-center justify-center py-3 rounded-lg ${defaultView === 'calendar' ? 'bg-white dark:bg-gray-800 shadow-sm' : ''}`}
-                        >
-                            <IconSymbol name="calendar" size={18} color={defaultView === 'calendar' ? '#f97316' : 'gray'} />
-                            <Text className={`ml-2 font-semibold ${defaultView === 'calendar' ? 'text-gray-900 dark:text-white' : 'text-gray-500'}`}>
-                                Calendrier
-                            </Text>
+                        <Pressable onPress={() => setViewMode('calendar')} className={`flex-1 flex-row items-center justify-center py-3 rounded-lg ${viewMode === 'calendar' ? 'bg-white dark:bg-gray-800 shadow-sm' : ''}`}>
+                            <IconSymbol name="calendar" size={18} color={viewMode === 'calendar' ? '#f97316' : 'gray'} />
+                            <Text className={`ml-2 font-semibold ${viewMode === 'calendar' ? 'text-gray-900 dark:text-white' : 'text-gray-500'}`}>Calendrier</Text>
                         </Pressable>
-                        <Pressable
-                            onPress={() => setValue('defaultView', 'list')}
-                            className={`flex-1 flex-row items-center justify-center py-3 rounded-lg ${defaultView === 'list' ? 'bg-white dark:bg-gray-800 shadow-sm' : ''}`}
-                        >
-                            <IconSymbol name="list.bullet" size={18} color={defaultView === 'list' ? '#f97316' : 'gray'} />
-                            <Text className={`ml-2 font-semibold ${defaultView === 'list' ? 'text-gray-900 dark:text-white' : 'text-gray-500'}`}>
-                                Liste
-                            </Text>
+                        <Pressable onPress={() => setViewMode('list')} className={`flex-1 flex-row items-center justify-center py-3 rounded-lg ${viewMode === 'list' ? 'bg-white dark:bg-gray-800 shadow-sm' : ''}`}>
+                            <IconSymbol name="list.bullet" size={18} color={viewMode === 'list' ? '#f97316' : 'gray'} />
+                            <Text className={`ml-2 font-semibold ${viewMode === 'list' ? 'text-gray-900 dark:text-white' : 'text-gray-500'}`}>Liste</Text>
                         </Pressable>
                     </View>
                 </View>
             )}
 
             <View className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-4 shadow-sm border border-gray-100 dark:border-gray-700">
-                <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
-                    Question *
-                </Text>
-                <FormText
-                    control={control}
-                    name="question"
-                    rules={{ required: true, maxLength: 255 }}
-                    placeholder={placeholder(type)}
-                />
+                <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">Question *</Text>
+                <FormText control={control} name="question" rules={{ required: true, maxLength: 255 }} placeholder={placeholder(type)} />
             </View>
 
             <View className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-4 shadow-sm border border-gray-100 dark:border-gray-700">
-                <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
-                    Options
-                </Text>
-                
-                {type === "DatesPoll" && defaultView === "list" && (
-                    <DatesPollOptionsForm control={control} />
-                )}
-                
-                {type === "DatesPoll" && defaultView === "calendar" && (
-                    <CreationCalendar options={optionsValue} onChange={setOptionsValue} />
-                )}
-
+                <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">Options</Text>
+                {type === "DatesPoll" && viewMode === "list" && <DatesPollOptionsForm control={control} />}
+                {type === "DatesPoll" && viewMode === "calendar" && <CreationCalendar options={optionsValue} onChange={setOptionsValue} />}
                 {type === "OtherPoll" && <OtherPollOptionsForm control={control} />}
                 {type === "HousingPoll" && <View className="flex-1 my-2"><HousingOptionsForm control={control} /></View>}
             </View>
 
             <View className="flex-1 bg-white dark:bg-gray-800 rounded-xl p-4 mb-6 shadow-sm border border-gray-100 dark:border-gray-700">
-                <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
-                    Paramètres
-                </Text>
+                <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">Paramètres</Text>
                 <PollSettingsForm control={control} />
             </View>
 
             <View className="my-4">
-                <Button
-                    variant="contained"
-                    icon="tray"
-                    title="Démarrer le sondage"
-                    onPress={handleSubmit(onSubmit, onFormError)}
-                    isLoading={postPoll?.isPending} />
+                <Button variant="contained" icon="tray" title="Démarrer le sondage" onPress={handleSubmit(onSubmit)} isLoading={postPoll?.isPending} />
             </View>
         </Animated.ScrollView>
     )

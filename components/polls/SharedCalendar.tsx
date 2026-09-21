@@ -1,7 +1,19 @@
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import dayjs from "@/lib/dayjs-config";
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
+import { Calendar, DateData } from 'react-native-calendars';
+import { LocaleConfig } from 'react-native-calendars';
+
+// Configuration française pour le calendrier natif
+LocaleConfig.locales['fr'] = {
+  monthNames: ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'],
+  monthNamesShort: ['Janv.','Févr.','Mars','Avril','Mai','Juin','Juil.','Août','Sept.','Oct.','Nov.','Déc.'],
+  dayNames: ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'],
+  dayNamesShort: ['DIM.','LUN.','MAR.','MER.','JEU.','VEN.','SAM.'],
+  today: 'Aujourd\'hui'
+};
+LocaleConfig.defaultLocale = 'fr';
 
 const getUserColor = (userId: string) => {
     const colors = ["#3b82f6", "#ef4444", "#eab308", "#a855f7", "#14b8a6", "#ec4899", "#f97316"];
@@ -20,106 +32,132 @@ const getBgColor = (voteCount: number) => {
 };
 
 export default function SharedCalendar({ poll, me, onToggleDay }: any) {
-    const initialDate = poll?.options?.[0]?.startDate ? dayjs(poll.options[0].startDate) : dayjs();
-    const [currentMonth, setCurrentMonth] = useState(initialDate);
+    
+    const initialDate = poll?.options?.[0]?.startDate ? dayjs(poll.options[0].startDate).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD');
 
-    const calendarDays = useMemo(() => {
-        const startOfMonth = currentMonth.startOf('month');
-        const startOfGrid = startOfMonth.startOf('isoWeek');
-        const endOfGrid = startOfGrid.add(41, 'day');
+    // On pré-calcule un "dictionnaire" des options par date pour que le rendu de chaque jour soit hyper rapide
+    const optionsByDate = useMemo(() => {
+        const map = new Map();
+        poll?.options?.forEach((opt: any) => {
+            const dateStr = dayjs(opt.startDate).format('YYYY-MM-DD');
+            map.set(dateStr, opt);
+        });
+        return map;
+    }, [poll?.options]);
 
-        const days = [];
-        let day = startOfGrid;
-        while (day.isBefore(endOfGrid) || day.isSame(endOfGrid, 'day')) {
-            days.push(day);
-            day = day.add(1, 'day');
-        }
-        return days;
-    }, [currentMonth]);
+    // Fonction de rendu personnalisé pour chaque case du calendrier
+    const renderDay = (date: DateData & { state: string }) => {
+        const dayJsDate = dayjs(date.dateString);
+        const optionForDay = optionsByDate.get(date.dateString);
+        
+        const voters = optionForDay?.selectedBy || [];
+        const voteCount = voters.length;
+        const isSelectedByMe = voters.some((u: any) => u._id === me?._id);
 
-    const handlePreviousMonth = () => setCurrentMonth(prev => prev.subtract(1, 'month'));
-    const handleNextMonth = () => setCurrentMonth(prev => prev.add(1, 'month'));
+        const visibleVoters = voters.slice(0, 3);
+        const extraVoters = voters.length - 3;
+        
+        const isCurrentMonth = date.state !== 'disabled'; // Géré par react-native-calendars
 
-    return (
-        <View className="flex-1 bg-white dark:bg-gray-950">
-            <View className="flex-row items-center justify-between px-6 py-4">
-                <Pressable onPress={handlePreviousMonth} className="p-2">
-                    <IconSymbol name="chevron.left" size={24} color="gray" />
-                </Pressable>
-                <View className="items-center">
-                    <Text className="text-gray-400 font-semibold text-xs uppercase tracking-widest">
-                        Année {currentMonth.format("YYYY")}
-                    </Text>
-                    <Text className="text-2xl font-bold text-gray-900 dark:text-white capitalize">
-                        {currentMonth.format("MMMM")}
+        return (
+            <Pressable
+                disabled={poll.isClosed}
+                onPress={() => onToggleDay(dayJsDate)}
+                className={`w-full aspect-[0.65] border border-gray-200 dark:border-gray-800 p-[2px] 
+                    ${getBgColor(voteCount)} 
+                    ${!isCurrentMonth ? "opacity-40" : ""}
+                    ${isSelectedByMe ? "border-orange-500 border-[1.5px] z-10" : ""}
+                `}
+            >
+                <View className="flex-row justify-between items-start">
+                    <Text className={`text-xs font-semibold ${isCurrentMonth ? "text-gray-800 dark:text-white" : "text-gray-400"}`}>
+                        {date.day}
                     </Text>
                 </View>
-                <Pressable onPress={handleNextMonth} className="p-2">
-                    <IconSymbol name="chevron.right" size={24} color="gray" />
-                </Pressable>
-            </View>
 
-            <View className="flex-row border-b border-gray-200 dark:border-gray-800 pb-2">
-                {["LUN", "MAR", "MER", "JEU", "VEN", "SAM", "DIM"].map((day, i) => (
-                    <View key={i} className="flex-1 items-center">
-                        <Text className="text-gray-400 font-bold text-xs">{day}</Text>
-                    </View>
-                ))}
-            </View>
-
-            <View className="flex-row flex-wrap border-l border-t border-gray-200 dark:border-gray-800">
-                {calendarDays.map((day, index) => {
-                    const isCurrentMonth = day.isSame(currentMonth, 'month');
-                    const optionForDay = poll?.options?.find((opt: any) => 
-                        day.isSame(dayjs(opt.startDate), 'day')
-                    );
-
-                    const voters = optionForDay?.selectedBy || [];
-                    const voteCount = voters.length;
-                    const isSelectedByMe = voters.some((u: any) => u._id === me?._id);
-
-                    const visibleVoters = voters.slice(0, 3);
-                    const extraVoters = voters.length - 3;
-
-                    return (
-                        <Pressable
-                            key={index}
-                            disabled={poll.isClosed}
-                            onPress={() => onToggleDay(day)}
-                            className={`w-[14.28%] aspect-[0.65] border-r border-b border-gray-200 dark:border-gray-800 p-[2px] 
-                                ${getBgColor(voteCount)} 
-                                ${!isCurrentMonth ? "opacity-40" : ""}
-                                ${isSelectedByMe ? "border-orange-500 border-[1.5px] z-10" : ""}
-                            `}
-                        >
-                            <View className="flex-row justify-between items-start">
-                                <Text className={`text-xs font-semibold ${isCurrentMonth ? "text-gray-800 dark:text-white" : "text-gray-400"}`}>
-                                    {day.format("D")}
+                {/* GESTION DE L'ANONYMAT CORRIGÉE */}
+                <View className="flex-1 justify-end overflow-hidden mt-[2px] gap-[1px]">
+                    {poll.isAnonymous ? (
+                        // Si sondage anonyme et qu'il y a des votes, on n'affiche qu'un seul bloc global
+                        voteCount > 0 ? (
+                            <View className="px-[2px] py-[1px] rounded-sm bg-gray-500/80">
+                                <Text className="text-white font-bold text-[7px] text-center" numberOfLines={1}>
+                                    {voteCount} vote{voteCount > 1 ? 's' : ''}
                                 </Text>
                             </View>
+                        ) : null
+                    ) : (
+                        // Si sondage public, on affiche les prénoms avec leurs couleurs
+                        <>
+                            {visibleVoters.map((user: any) => (
+                                <View key={user._id} style={{ backgroundColor: getUserColor(user._id) }} className="px-[2px] py-[1px] rounded-sm">
+                                    <Text className="text-white font-bold text-[7px]" numberOfLines={1} ellipsizeMode="clip">
+                                        {user.name}
+                                    </Text>
+                                </View>
+                            ))}
+                            {extraVoters > 0 && (
+                                <View className="px-[2px] py-[1px] rounded-sm bg-gray-400/50 dark:bg-gray-700/50">
+                                    <Text className="text-gray-900 dark:text-white font-bold text-[7px] text-center">
+                                        +{extraVoters}
+                                    </Text>
+                                </View>
+                            )}
+                        </>
+                    )}
+                </View>
+            </Pressable>
+        );
+    };
 
-                            <View className="flex-1 justify-end overflow-hidden mt-[2px] gap-[1px]">
-                                {visibleVoters.map((user: any) => (
-                                    <View key={user._id} style={{ backgroundColor: getUserColor(user._id) }} className="px-[2px] py-[1px] rounded-sm">
-                                        <Text className="text-white font-bold text-[7px]" numberOfLines={1} ellipsizeMode="clip">
-                                            {poll.isAnonymous ? "Anonyme" : user.name}
-                                        </Text>
-                                    </View>
-                                ))}
-                                {extraVoters > 0 && (
-                                    <View className="px-[2px] py-[1px] rounded-sm bg-gray-400/50 dark:bg-gray-700/50">
-                                        <Text className="text-gray-900 dark:text-white font-bold text-[7px] text-center">
-                                            +{extraVoters}
-                                        </Text>
-                                    </View>
-                                )}
-                            </View>
-                        </Pressable>
-                    );
-                })}
-            </View>
+    return (
+        <View className="flex-1 bg-white dark:bg-gray-950 pb-4">
+            
+            <Calendar
+                current={initialDate}
+                firstDay={1} // Semaine commence le Lundi
+                hideExtraDays={false}
+                
+                // Personnalisation de l'en-tête (Mois / Flèches)
+                renderArrow={(direction: 'left' | 'right') => (
+                    <IconSymbol name={direction === 'left' ? 'chevron.left' : 'chevron.right'} size={24} color="gray" />
+                )}
+                
+                theme={{
+                    calendarBackground: 'transparent',
+                    textSectionTitleColor: '#9ca3af', // Gris pour LUN, MAR, MER...
+                    textSectionTitleDisabledColor: '#d1d5db',
+                    monthTextColor: '#111827',
+                    textMonthFontWeight: 'bold',
+                    textMonthFontSize: 20,
+                    'stylesheet.calendar.header': {
+                        header: {
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            paddingLeft: 10,
+                            paddingRight: 10,
+                            marginTop: 6,
+                            alignItems: 'center',
+                            marginBottom: 10
+                        },
+                        dayHeader: {
+                            marginTop: 2,
+                            marginBottom: 7,
+                            width: 32,
+                            textAlign: 'center',
+                            fontSize: 12,
+                            color: '#9ca3af',
+                            fontWeight: 'bold'
+                        }
+                    }
+                }}
 
-            <View className="flex-row items-center justify-center gap-4 py-6">
+                // Injecte notre rendu visuel personnalisé dans la mécanique du calendrier natif
+                dayComponent={({ date, state }: any) => renderDay({ ...date, state })}
+            />
+
+            {/* LÉGENDE */}
+            <View className="flex-row items-center justify-center gap-4 py-4 border-t border-gray-100 dark:border-gray-900 mt-2">
                 <View className="flex-row items-center gap-1">
                     <View className="w-4 h-4 rounded bg-green-100 border border-green-200" />
                     <Text className="text-gray-500 text-xs font-semibold">1-2</Text>
