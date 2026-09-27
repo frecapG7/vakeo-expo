@@ -45,7 +45,7 @@ export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src, badgeCo
 
     if (!src)
         return (
-            <View className={`relative justify-center items-center rounded-full ${sizeClass} border dark:border-white bg-orange-200 dark:bg-gray-400`}>
+            <View className={`relative justify-center items-center rounded-full ${sizeClass} border dark:border-white bg-amber dark:bg-gray-400`}>
                 <Text className="font-bold uppercase ">
                     {alt}
                 </Text>
@@ -53,7 +53,7 @@ export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src, badgeCo
                     <Animated.View
                         entering={FadeIn}
                         exiting={FadeOut}
-                        className="absolute -top-1 -right-1 bg-orange-600 rounded-full w-6 h-6 justify-center items-center">
+                        className="absolute -top-1 -right-1 bg-amber-deep rounded-full w-6 h-6 justify-center items-center">
                         <Text className="font-bold text-white">
                             {badgeContent}
                         </Text>
@@ -88,7 +88,7 @@ export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src, badgeCo
                 <Animated.View
                     entering={FadeIn}
                     exiting={FadeOut}
-                    className="absolute -top-1 -right-1 bg-orange-600 rounded-full w-6 h-6 justify-center items-center">
+                    className="absolute -top-1 -right-1 bg-amber-deep rounded-full w-6 h-6 justify-center items-center">
                     <Text className="font-bold text-white">{badgeContent}</Text>
                 </Animated.View>
             )}

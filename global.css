@@ -4,3 +4,24 @@
 @import "tailwindcss/utilities.css";
  
 @import "nativewind/theme";
+
+/* Palette « All In » — charte validée 2026-09-26.
+   Classes générées : bg-amber, bg-amber-deep, bg-night, bg-ink, bg-mist (+ text-, border-, dark:, modificateurs d'opacité). */
+@theme {
+  --color-amber: #F7B74A;
+  --color-amber-deep: #EE8B33;
+  --color-night: #16265C;
+  --color-ink: #101736;
+  --color-mist: #F6F8FD;
+}
+
+/* Typographie partagée — spike validée visuellement sur la home.
+   NB : `text-md` n'existe pas en Tailwind v4 (classe fantôme dans le projet),
+   on utilise `text-base` (16px). */
+@utility text-h1 {
+  @apply text-2xl font-bold;
+}
+
+@utility text-label {
+  @apply text-base font-bold dark:text-white;
+}

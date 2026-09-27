@@ -9,7 +9,8 @@
     "android": "cross-env APP_ENVIRONMENT=development expo run:android",
     "ios": "cross-env APP_ENVIRONMENT=development expo run:ios",
     "web": "cross-env APP_ENVIRONMENT=development expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "brand:assets": "node scripts/generate-brand-assets.mjs"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^5.2.6",
@@ -29,6 +30,7 @@
     "expo-constants": "~55.0.7",
     "expo-dev-client": "~55.0.28",
     "expo-font": "~55.0.4",
+    "expo-glass-effect": "~55.0.11",
     "expo-haptics": "~55.0.14",
     "expo-image": "~55.0.9",
     "expo-linear-gradient": "~55.0.13",
@@ -65,6 +67,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@napi-rs/canvas": "^1.0.9",
     "@tailwindcss/postcss": "^4.2.4",
     "@types/jest": "29.5.14",
     "@types/react": "~19.2.10",

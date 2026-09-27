@@ -17,7 +17,7 @@ const variantToClassMap = {
 }
 
 const sizeToMap = {
-    'medium': "px-6 py-3 text-md",  // More horizontal padding
+    'medium': "px-6 py-3 text-base",  // More horizontal padding
     'small': 'px-4 py-2 text-sm'
 }
 

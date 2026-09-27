@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/react-native';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect, useState } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { MenuProvider } from "react-native-popup-menu";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import ToastManager from "toastify-react-native";
@@ -14,7 +15,7 @@ Sentry.init({
   dsn: 'https://837ddb9d49c31b44a1245d82bbe43a23@o4510143029837824.ingest.de.sentry.io/4510143037046864',
 
   // Adds more context data to events (IP address, cookies, user, etc.)
-  // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
+  // For more information, see: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
   sendDefaultPii: true,
 
   // Enable Logs
@@ -54,21 +55,23 @@ export default Sentry.wrap(function RootLayout() {
 
 
   return (
-    <QueryClientProvider client={queryClient}>
-      {/* <ThemeProvider value={colorScheme === "light" ? LightTheme : DarkTheme}> */}
-      <ThemeProvider value={{
-        ...DefaultTheme,
-        colors
-      }}>
-        <SafeAreaProvider>
-          <MenuProvider>
-            <RootNav />
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <QueryClientProvider client={queryClient}>
+        {/* <ThemeProvider value={colorScheme === "light" ? LightTheme : DarkTheme}> */}
+        <ThemeProvider value={{
+          ...DefaultTheme,
+          colors
+        }}>
+          <SafeAreaProvider>
+            <MenuProvider>
+              <RootNav />
 
-            <ToastManager />
-          </MenuProvider>
-        </SafeAreaProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+              <ToastManager />
+            </MenuProvider>
+          </SafeAreaProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 });
 
@@ -77,7 +80,6 @@ const RootNav = () => {
 
 
   return (
-
     <Stack initialRouteName="index">
       <Stack.Screen name="index" options={{
         headerShown: true,
@@ -98,6 +100,7 @@ const RootNav = () => {
         headerShown: false
       }} />
       <Stack.Screen name="token" options={{ headerShown: false }} />
+
     </Stack>
 
   );
