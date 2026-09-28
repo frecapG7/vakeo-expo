@@ -1,42 +1,24 @@
 import { PickUsersModal } from "@/components/modals/PickUsersModal";
-import SharedCalendar from "@/components/polls/SharedCalendar";
+import { HousingOptions } from "@/components/polls/HousingOptions";
 import { PollOption } from "@/components/polls/PollOption";
+import SharedCalendar from "@/components/polls/SharedCalendar";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
+import { TripContext } from "@/context/TripContext";
+import { useGetPoll, usePutPoll, useUnvotePoll, useVotePoll } from "@/hooks/api/usePolls";
 import dayjs from "@/lib/dayjs-config";
-import { Stack } from "expo-router";
-import { useMemo, useState } from "react";
-import { Pressable, Text, View, Modal, TouchableOpacity } from "react-native";
+
+import { PollOption as Option } from "@/types/models";
+import { Stack, useLocalSearchParams } from "expo-router";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { Modal, Text, TouchableOpacity, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const MOCK_ME = { _id: "u_me", name: "Moi", avatar: null };
-const MOCK_USERS = [
-    { _id: "u1", name: "Thomas", avatar: null },
-    { _id: "u2", name: "Marie", avatar: null },
-    { _id: "u3", name: "Lucas", avatar: null },
-    { _id: "u4", name: "Sophie", avatar: null },
-    { _id: "u5", name: "Hugo", avatar: null }
-];
-
-const INITIAL_POLL = {
-    _id: "poll_123",
-    type: "DatesPoll",
-    question: "Quand partez-vous ?",
-    defaultView: "calendar", // Défini par défaut à la création
-    createdBy: MOCK_USERS[0],
-    createdAt: dayjs().subtract(2, 'hour').toISOString(),
-    isAnonymous: false,
-    isClosed: false,
-    hasSelected: ["u1", "u2", "u3", "u4", "u5"], 
-    options: [
-        { _id: "opt_1", startDate: "2024-07-10T00:00:00.000Z", endDate: "2024-07-10T23:59:59.000Z", selectedBy: [MOCK_USERS[0]] },
-        { _id: "opt_2", startDate: "2024-07-11T00:00:00.000Z", endDate: "2024-07-11T23:59:59.000Z", selectedBy: [MOCK_USERS[0], MOCK_USERS[1], MOCK_USERS[2], MOCK_USERS[3]] },
-        { _id: "opt_3", startDate: "2024-07-12T00:00:00.000Z", endDate: "2024-07-12T23:59:59.000Z", selectedBy: [MOCK_USERS[0], MOCK_USERS[1], MOCK_USERS[2], MOCK_USERS[3], MOCK_USERS[4]] },
-    ]
-};
+let MOCK_DB_LOCAL: any = null;
 
 const DateRangePickerModal = ({ visible, onClose, onValidate }: any) => {
     const [currentMonth, setCurrentMonth] = useState(dayjs());
@@ -131,85 +113,196 @@ const DateRangePickerModal = ({ visible, onClose, onValidate }: any) => {
 };
 
 export default function PollDetailsPage() {
+    const { id, pollId, mockType, mockData } = useLocalSearchParams<any>();
     const insets = useSafeAreaInsets();
-    const [poll, setPoll] = useState<any>(INITIAL_POLL);
-    const me = MOCK_ME;
+    const { me, trip } = useContext(TripContext);
+    const meId = me?._id;
 
-    const [selectedOption, setSelectedOption] = useState<any>(null);
-    const [viewMode, setViewMode] = useState<'list' | 'calendar'>(poll.defaultView || 'calendar');
+    const isMock = pollId === "mock_poll_123";
+
+    const { data: realPoll } = useGetPoll(id, pollId);
+    const votePoll = useVotePoll(id, pollId, meId);
+    const unvotePoll = useUnvotePoll(id, pollId, meId);
+    const updatePoll = usePutPoll(id, pollId, meId);
+
+    const [mockPollState, setMockPollState] = useState<any>(null);
     const [isRangePickerOpen, setIsRangePickerOpen] = useState(false);
+    const initializedMock = useRef(false);
+    const isSavingRef = useRef(false);
 
-    const handleToggleDay = (dayJsObj: any) => {
-        setPoll((prevPoll: any) => {
-            const newOptions = [...prevPoll.options];
-            const targetDateStr = dayJsObj.format('YYYY-MM-DD');
-            const optIndex = newOptions.findIndex(opt => dayjs(opt.startDate).format('YYYY-MM-DD') === targetDateStr);
+    // Un votant est "moi" uniquement si son vrai _id correspond à celui de l'utilisateur connecté
+    const isMine = (u: any) => !!meId && (typeof u === "string" ? u : u?._id) === meId;
 
-            if (optIndex !== -1) {
-                const opt = newOptions[optIndex];
-                const hasVoted = opt.selectedBy.some((u: any) => u._id === me._id);
-                if (hasVoted) {
-                    opt.selectedBy = opt.selectedBy.filter((u: any) => u._id !== me._id);
-                    if (opt.selectedBy.length === 0) newOptions.splice(optIndex, 1);
-                } else {
-                    opt.selectedBy.push(me);
+    // On attend que l'utilisateur soit chargé : sinon on enregistrerait un faux utilisateur "Moi"
+    useEffect(() => {
+        if (!isMock || !me) return;
+
+        if (!initializedMock.current) {
+            if (mockData) {
+                try {
+                    const parsed = JSON.parse(mockData);
+                    const parsedOptions = parsed.options.map((opt: any, index: number) => ({
+                        _id: "opt_mock_" + index,
+                        startDate: opt.startDate,
+                        endDate: opt.endDate,
+                        selectedBy: [me]
+                    }));
+
+                    MOCK_DB_LOCAL = {
+                        _id: "mock_poll_123",
+                        type: "DatesPoll",
+                        question: parsed.question,
+                        createdBy: me,
+                        isAnonymous: false,
+                        isClosed: false,
+                        options: parsedOptions
+                    };
+                } catch (e) {
+                    console.error("Erreur de transfert Mock", e);
                 }
-            } else {
-                newOptions.push({
-                    _id: "opt_" + Math.random().toString(36).substr(2, 9),
-                    startDate: dayJsObj.startOf('day').toISOString(),
-                    endDate: dayJsObj.endOf('day').toISOString(),
-                    selectedBy: [me]
-                });
+            } else if (!MOCK_DB_LOCAL) {
+                MOCK_DB_LOCAL = {
+                    _id: "mock_poll_123",
+                    type: "DatesPoll",
+                    question: mockType === "calendar" ? "Mock: Quand êtes-vous disponibles ?\u200B" : "Mock: Sondage Liste",
+                    createdBy: me,
+                    isAnonymous: false,
+                    isClosed: false,
+                    options: []
+                };
             }
-            newOptions.sort((a, b) => dayjs(a.startDate).valueOf() - dayjs(b.startDate).valueOf());
-            return { ...prevPoll, options: newOptions };
+            initializedMock.current = true;
+        }
+        if (MOCK_DB_LOCAL) setMockPollState({ ...MOCK_DB_LOCAL });
+    }, [isMock, mockData, mockType, me]);
+
+    const poll = isMock ? mockPollState : realPoll;
+    const displayPoll = poll ?? null;
+
+    const [selectedOption, setSelectedOption] = useState<Option | null>(null);
+    const [loadingOptionId, setLoadingOptionId] = useState<string | null>(null);
+
+    const isCalendarFormat = displayPoll?.type === "DatesPoll" && displayPoll?.question?.endsWith("\u200B");
+
+    // ---- Mock : ajoute / retire l'utilisateur courant sur une option
+    const mockToggleVote = (optionId: string, hasVoted: boolean) => {
+        MOCK_DB_LOCAL.options = MOCK_DB_LOCAL.options.map((opt: any) => {
+            if (opt._id !== optionId) return opt;
+            return hasVoted
+                ? { ...opt, selectedBy: opt.selectedBy.filter((u: any) => !isMine(u)) }
+                : { ...opt, selectedBy: [...opt.selectedBy, me] };
         });
+        setMockPollState({ ...MOCK_DB_LOCAL });
     };
 
-    const handleAddOptionRange = (start: any, end: any) => {
-        setPoll((prevPoll: any) => {
-            const newOptions = [...prevPoll.options];
-            let currentDay = start.startOf('day');
-            const lastDay = end.startOf('day');
-
-            while (currentDay.isBefore(lastDay) || currentDay.isSame(lastDay, 'day')) {
-                const targetDateStr = currentDay.format('YYYY-MM-DD');
-                const optIndex = newOptions.findIndex(opt => dayjs(opt.startDate).format('YYYY-MM-DD') === targetDateStr);
-
-                if (optIndex !== -1) {
-                    const hasVoted = newOptions[optIndex].selectedBy.some((u: any) => u._id === me._id);
-                    if (!hasVoted) newOptions[optIndex].selectedBy.push(me);
-                } else {
-                    newOptions.push({
-                        _id: "opt_" + Math.random().toString(36).substr(2, 9),
-                        startDate: currentDay.startOf('day').toISOString(),
-                        endDate: currentDay.endOf('day').toISOString(),
-                        selectedBy: [me]
-                    });
-                }
-                currentDay = currentDay.add(1, 'day');
-            }
-
-            newOptions.sort((a, b) => dayjs(a.startDate).valueOf() - dayjs(b.startDate).valueOf());
-            return { ...prevPoll, options: newOptions };
+    // ---- Vrai backend : crée l'option (visible par tous), puis vote dessus si besoin
+    const createOptionAndVote = async (startDate: string, endDate: string) => {
+        const updated: any = await updatePoll.mutateAsync({
+            newOptions: [{ startDate, endDate } as any]
         });
+        const created = updated?.options?.find((o: any) =>
+            dayjs(o.startDate).isSame(dayjs(startDate)) && dayjs(o.endDate).isSame(dayjs(endDate))
+        );
+        if (created && !created.selectedBy?.some(isMine)) {
+            await votePoll.mutateAsync({ options: [created._id] });
+        }
+    };
+
+    // =======================================
+    // GESTION DES CLICS LISTE
+    // =======================================
+    const handleClick = async (option: Option, includeMe: boolean) => {
+        if (!me) return;
+
+        if (isMock) {
+            mockToggleVote(option._id, includeMe);
+            return;
+        }
+
+        setLoadingOptionId(option._id);
+        try {
+            if (includeMe) await unvotePoll.mutateAsync({ option: option._id });
+            else await votePoll.mutateAsync({ options: [option._id] });
+        } finally {
+            setLoadingOptionId(null);
+        }
+    }
+
+    // =======================================
+    // GESTION DES CLICS CALENDRIER FINAL
+    // =======================================
+    const handleToggleDay = async (dayJsObj: any) => {
+        if (!displayPoll || !me || isSavingRef.current) return;
+        const targetDateStr = dayJsObj.format('YYYY-MM-DD');
+        const option = displayPoll.options?.find((opt: any) => dayjs(opt.startDate).format('YYYY-MM-DD') === targetDateStr);
+
+        isSavingRef.current = true;
+        try {
+            // 1. LE JOUR EXISTE DÉJÀ
+            if (option) {
+                const hasVoted = option.selectedBy?.some(isMine);
+
+                if (isMock) mockToggleVote(option._id, hasVoted);
+                else if (hasVoted) await unvotePoll.mutateAsync({ option: option._id });
+                else await votePoll.mutateAsync({ options: [option._id] });
+            }
+            // 2. LE JOUR EST NOUVEAU (clic sur case grise)
+            else {
+                // On force l'heure à midi pour éviter les décalages de fuseau horaire.
+                const safeDate = dayjs(targetDateStr).hour(12).toISOString();
+
+                if (isMock) {
+                    MOCK_DB_LOCAL.options = [...(MOCK_DB_LOCAL.options || []), {
+                        _id: "opt_mock_" + Date.now(),
+                        startDate: safeDate,
+                        endDate: safeDate,
+                        selectedBy: [me]
+                    }];
+                    setMockPollState({ ...MOCK_DB_LOCAL });
+                } else {
+                    await createOptionAndVote(safeDate, safeDate);
+                }
+            }
+        } finally {
+            isSavingRef.current = false;
+        }
+    };
+
+    const handleAddOptionRange = async (start: any, end: any) => {
+        if (!me) return;
+        const safeStart = start.hour(12).toISOString();
+        const safeEnd = end.hour(12).toISOString();
         setIsRangePickerOpen(false);
+
+        if (isMock) {
+            MOCK_DB_LOCAL.options = [...(MOCK_DB_LOCAL.options || []), {
+                _id: "opt_mock_" + Date.now(),
+                startDate: safeStart,
+                endDate: safeEnd,
+                selectedBy: [me]
+            }];
+            setMockPollState({ ...MOCK_DB_LOCAL });
+        } else {
+            await createOptionAndVote(safeStart, safeEnd);
+        }
     };
 
     const groupedOptions = useMemo(() => {
+        if (displayPoll?.type !== "DatesPoll" || !displayPoll?.options) return [];
         const groups: any[] = [];
         let currentGroup: any = null;
+        const sortedOptions = [...displayPoll.options].sort((a: any, b: any) => dayjs(a.startDate).valueOf() - dayjs(b.startDate).valueOf());
 
-        poll.options.forEach((opt: any) => {
+        sortedOptions.forEach((opt: any) => {
             if (!currentGroup) {
                 currentGroup = { ...opt, optionIds: [opt._id] };
             } else {
                 const isConsecutive = dayjs(currentGroup.endDate).add(1, 'day').isSame(dayjs(opt.startDate), 'day');
-                const currentVoters = currentGroup.selectedBy.map((u:any)=>u._id).sort().join(',');
-                const optVoters = opt.selectedBy.map((u:any)=>u._id).sort().join(',');
+                const isSameVotes = displayPoll.isAnonymous 
+                    ? (currentGroup.percent === opt.percent)
+                    : (currentGroup.selectedBy || []).map((u:any)=>u._id).sort().join(',') === (opt.selectedBy || []).map((u:any)=>u._id).sort().join(',');
                 
-                if (isConsecutive && currentVoters === optVoters) {
+                if (isConsecutive && isSameVotes) {
                     currentGroup.endDate = opt.endDate;
                     currentGroup.optionIds.push(opt._id);
                 } else {
@@ -220,99 +313,96 @@ export default function PollDetailsPage() {
         });
         if (currentGroup) groups.push(currentGroup);
         return groups;
-    }, [poll.options]);
+    }, [displayPoll?.options, displayPoll?.type, displayPoll?.isAnonymous]);
 
-    const handleListToggle = (optionIds: string[], includeMe: boolean) => {
-        setPoll((prevPoll: any) => {
-            const newOptions = prevPoll.options.map((opt: any) => {
-                if (optionIds.includes(opt._id)) {
-                    if (includeMe) {
-                        return { ...opt, selectedBy: opt.selectedBy.filter((u: any) => u._id !== me._id) };
-                    } else {
-                        return { ...opt, selectedBy: [...opt.selectedBy, me] };
-                    }
-                }
-                return opt;
-            });
-            return { ...prevPoll, options: newOptions.filter((opt: any) => opt.selectedBy.length > 0) };
-        });
-    };
+    if (!displayPoll)
+        return (
+            <View style={styles.container}>
+                <View className="flex-row gap-3 items-center p-4">
+                    <Skeleton variant="circular" size="md" />
+                    <View className="flex-1 gap-2">
+                        <Skeleton height={8} width="60%" />
+                    </View>
+                </View>
+                <View className="gap-4 my-4 px-4">
+                    <Skeleton height={50} />
+                    <Skeleton height={50} />
+                </View>
+            </View>
+        );
 
     return (
         <Animated.ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: insets.bottom }} showsVerticalScrollIndicator={false}>
-            <Stack.Screen options={{ headerRight: () => null, title: "Détail du sondage" }} />
+            <Stack.Screen options={{ headerRight: () => null, title: isCalendarFormat ? "Disponibilités" : "Détail du sondage" }} />
 
-            <View className={`m-2 mb-4 rounded-2xl border border-gray-200 dark:border-gray-600 shadow-sm bg-white dark:bg-gray-800 ${viewMode === 'calendar' ? 'pb-0 overflow-hidden' : 'p-4'}`}>
+            {isMock && (
+                <View className="bg-red-500 p-2 items-center">
+                    <Text className="text-white font-bold text-xs">⚠️ MODE SIMULATION (MOCK)</Text>
+                </View>
+            )}
+
+            <View className={`m-2 mb-4 rounded-2xl border border-gray-200 dark:border-gray-600 shadow-sm bg-white dark:bg-gray-800 ${isCalendarFormat ? 'pb-0 overflow-hidden' : 'p-4'}`}>
                 
-                <View className={`${viewMode === 'calendar' ? 'p-4 pb-0' : ''}`}>
+                <View className={`${isCalendarFormat ? 'p-4 pb-0' : ''}`}>
                     <View className="flex-row items-center gap-2 mb-4">
-                        <Avatar src={poll.createdBy.avatar} alt={poll.createdBy.name.charAt(0)} size2="sm" />
+                        <Avatar src={displayPoll.createdBy?.avatar} alt={displayPoll.createdBy?.name?.charAt(0)} size2="sm" />
                         <View className="flex-1">
-                            <Text className="text-sm font-medium text-gray-600 dark:text-gray-300">{poll.createdBy.name}</Text>
+                            <Text className="text-sm font-medium text-gray-600 dark:text-gray-300">{displayPoll.createdBy?.name}</Text>
                         </View>
                     </View>
-
                     <View className="mb-4">
-                        <Text className="text-2xl font-bold dark:text-white mb-2">{poll.question}</Text>
-                        
-                        <View className="flex-row bg-gray-100 dark:bg-gray-900 p-1 rounded-xl mt-2">
-                            <Pressable onPress={() => setViewMode('calendar')} className={`flex-1 flex-row items-center justify-center py-2 rounded-lg ${viewMode === 'calendar' ? 'bg-white dark:bg-gray-800 shadow-sm' : ''}`}>
-                                <IconSymbol name="calendar" size={16} color={viewMode === 'calendar' ? '#f97316' : 'gray'} />
-                                <Text className={`ml-2 font-semibold ${viewMode === 'calendar' ? 'text-gray-900 dark:text-white' : 'text-gray-500'}`}>Calendrier</Text>
-                            </Pressable>
-                            <Pressable onPress={() => setViewMode('list')} className={`flex-1 flex-row items-center justify-center py-2 rounded-lg ${viewMode === 'list' ? 'bg-white dark:bg-gray-800 shadow-sm' : ''}`}>
-                                <IconSymbol name="list.bullet" size={16} color={viewMode === 'list' ? '#f97316' : 'gray'} />
-                                <Text className={`ml-2 font-semibold ${viewMode === 'list' ? 'text-gray-900 dark:text-white' : 'text-gray-500'}`}>Liste</Text>
-                            </Pressable>
-                        </View>
+                        <Text className="text-2xl font-bold dark:text-white">{displayPoll.question.replace('\u200B', '')}</Text>
                     </View>
                 </View>
 
-                {viewMode === 'calendar' ? (
-                    <SharedCalendar poll={poll} me={me} onToggleDay={handleToggleDay} />
-                ) : (
+                {isCalendarFormat && (
+                    <SharedCalendar poll={displayPoll} me={me} users={trip?.users} onToggleDay={handleToggleDay} />
+                )}
+
+                {!isCalendarFormat && displayPoll.type === "DatesPoll" && (
                     <View className="gap-4 mb-4">
                         {groupedOptions.map((group: any) => {
-                            const includeMe = group.selectedBy.some((u: any) => u._id === me._id);
+                            const includeMe = group.selectedBy?.some(isMine);
                             const start = dayjs(group.startDate);
                             const end = dayjs(group.endDate);
-                            const label = start.isSame(end, 'day') 
-                                ? start.format("DD MMM YYYY") 
-                                : `${start.format("DD")} au ${end.format("DD MMM YYYY")}`;
+                            const label = start.isSame(end, 'day') ? start.format("DD MMM YYYY") : `${start.format("DD")} au ${end.format("DD MMM YYYY")}`;
 
                             return (
                                 <Button
                                     key={group.optionIds.join('-')}
-                                    onPress={() => handleListToggle(group.optionIds, includeMe)}
+                                    onPress={() => handleClick(group, includeMe)}
                                     onLongPress={() => setSelectedOption(group)}
                                     className={`rounded-xl border-2 ${includeMe ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/30' : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800'}`}
                                 >
-                                    <PollOption
-                                        label={label}
-                                        selectedBy={group.selectedBy}
-                                        percent={(group.selectedBy.length / Math.max(poll.hasSelected.length, 1)) * 100}
-                                        isAnonymous={poll.isAnonymous}
-                                        includeUser={includeMe}
-                                        isLoading={false}
-                                    />
+                                    <PollOption label={label} selectedBy={group.selectedBy || []} percent={group.percent ?? 0} isAnonymous={displayPoll.isAnonymous} includeUser={includeMe} isLoading={loadingOptionId === group._id} />
                                 </Button>
                             );
                         })}
                         
                         <View className="mt-2 border-t border-gray-200 dark:border-gray-700 pt-4">
-                            <Button 
-                                variant="contained" 
-                                size="small" 
-                                icon="plus" 
-                                title="Ajouter une proposition" 
-                                onPress={() => setIsRangePickerOpen(true)} 
-                            />
+                            <Button variant="contained" size="small" icon="plus" title="Ajouter un choix de date" onPress={() => setIsRangePickerOpen(true)} />
                         </View>
+                    </View>
+                )}
+
+                {displayPoll.type === "HousingPoll" && <HousingOptions poll={displayPoll} />}
+
+                {displayPoll.type !== "DatesPoll" && displayPoll.type !== "HousingPoll" && (
+                    <View className="gap-4 mb-4">
+                        {displayPoll.options?.map((opt: Option) => {
+                            const includeMe = opt.selectedBy?.some(isMine);
+                            return (
+                                <Button key={opt._id} onPress={() => handleClick(opt, includeMe)} onLongPress={() => setSelectedOption(opt)} className={`rounded-xl border-2 ${includeMe ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/30' : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800'}`}>
+                                    <PollOption label={opt.label || ''} selectedBy={opt.selectedBy || []} percent={opt.percent ?? 0} isAnonymous={displayPoll.isAnonymous} includeUser={includeMe} isLoading={loadingOptionId === opt._id} />
+                                </Button>
+                            );
+                        })}
                     </View>
                 )}
             </View>
 
-            <PickUsersModal open={!!selectedOption && !poll.isAnonymous} onClose={() => setSelectedOption(null)} users={selectedOption?.selectedBy || []} disabled title="Votants" />
+            <PickUsersModal open={!!selectedOption && !displayPoll.isAnonymous} onClose={() => setSelectedOption(null)} users={selectedOption?.selectedBy || []} disabled title="Votants" />
+            
             <DateRangePickerModal visible={isRangePickerOpen} onClose={() => setIsRangePickerOpen(false)} onValidate={handleAddOptionRange} />
         </Animated.ScrollView>
     );
