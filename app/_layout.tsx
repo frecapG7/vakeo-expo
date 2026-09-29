@@ -1,11 +1,12 @@
 import { Wordmark } from "@/components/brand/Wordmark";
 import useColors from "@/hooks/styles/useColors";
+import { useMigrate } from "@/hooks/api/useMigrate";
 import '@/lib/calendar-config';
 import { DefaultTheme, SplashScreen, Stack, ThemeProvider } from "expo-router";
 import * as Sentry from '@sentry/react-native';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
-import { useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { MenuProvider } from "react-native-popup-menu";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -16,13 +17,12 @@ Sentry.init({
   dsn: 'https://837ddb9d49c31b44a1245d82bbe43a23@o4510143029837824.ingest.de.sentry.io/4510143037046864',
 
   // Adds more context data to events (IP address, cookies, user, etc.)
-  // For more information, see: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
+  // For more information, see docs: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
   sendDefaultPii: true,
 
   // Enable Logs
   // enableLogs: true,
 
-  // Configure Session Replay
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1,
   integrations: [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
@@ -36,6 +36,42 @@ Sentry.init({
 
 const queryClient = new QueryClient({});
 
+// Gate du bootstrap v3 (Phase 2) : désactivé, l'app est 100 % v1 et ne fait
+// AUCUN appel réseau au lancement. Activé, la boucle /migrate tourne avant le
+// montage de la navigation (voir MigrationGate) — Phase 2 + Phase 3 seront
+// livrées dans la même version (cf. plan-migration-v3.md, journal 2026-09-29).
+const V3_ENABLED = process.env.EXPO_PUBLIC_V3_ENABLED === "true";
+
+// La boucle ne doit tourner qu'une fois par lancement de l'app, même si le
+// layout est remonté (fast refresh) : le promise vit au niveau module.
+let migrationRun: Promise<void> | null = null;
+
+const MigrationGate = ({ children, onDone }: { children: ReactNode, onDone: () => void }) => {
+  const { mutateAsync } = useMigrate();
+
+  useEffect(() => {
+    if (!migrationRun) {
+      migrationRun = (async () => {
+        try {
+          const summary = await mutateAsync();
+          console.log(`Migration v3 : ${summary.migrated} migré(s), ${summary.dropped} droppé(s), ${summary.failed} en échec`);
+          if (summary.failed > 0)
+            console.warn(`Migration v3 : ${summary.failed} trip(s) en échec — retentés au prochain lancement`);
+        } catch (err) {
+          // On ne bloque jamais l'app sur le bootstrap : les trips non migrés
+          // sont resumables (clé méta `migration`, cf. hooks/api/useMigrate.ts).
+          console.error("Migration v3 : échec du bootstrap", err);
+        }
+      })();
+    }
+    migrationRun.then(onDone);
+  }, []);
+
+  // Rien n'est monté pendant la migration : le splash couvre l'écran, et aucun
+  // écran ne peut lancer de requête sur des ids en cours de réécriture.
+  return null;
+};
+
 
 export default Sentry.wrap(function RootLayout() {
 
@@ -45,11 +81,15 @@ export default Sentry.wrap(function RootLayout() {
     "Outfit-ExtraBold": require("../assets/fonts/Outfit-ExtraBold.ttf"),
   });
 
-  // Splash masquée dès que les polices sont prêtes (ou en échec) — remplace l'ancien setTimeout(3000).
+  // Migration v3 : démarrée au premier rendu (MigrationGate), "done" quand elle
+  // est terminée (réussie ou non — jamais de blocage sur le splash).
+  const [migrationDone, setMigrationDone] = useState(!V3_ENABLED);
+
+  // Splash masquée quand les polices sont prêtes ET la migration terminée.
   useEffect(() => {
-    if (fontsLoaded || fontError)
+    if ((fontsLoaded || fontError) && migrationDone)
       SplashScreen.hide();
-  }, [fontsLoaded, fontError]);
+  }, [fontsLoaded, fontError, migrationDone]);
 
 
   return (
@@ -62,7 +102,13 @@ export default Sentry.wrap(function RootLayout() {
         }}>
           <SafeAreaProvider>
             <MenuProvider>
-              <RootNav />
+              {migrationDone ? (
+                <RootNav />
+              ) : (
+                <MigrationGate onDone={() => setMigrationDone(true)}>
+                  <RootNav />
+                </MigrationGate>
+              )}
 
               <ToastManager />
             </MenuProvider>

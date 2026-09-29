@@ -1,5 +1,6 @@
 import { BlurView } from "expo-blur";
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
+import type { RefObject } from "react";
 import { Platform, StyleSheet, useColorScheme, View, type ViewProps, type ViewStyle } from "react-native";
 
 const supportsLiquidGlass = Platform.OS === "ios" && isLiquidGlassAvailable();
@@ -16,15 +17,22 @@ type GlassSurfaceProps = ViewProps & {
     isInteractive?: boolean;
     /** Intensité du BlurView (fallbacks). @default 40 */
     intensity?: number;
+    /**
+     * Cible du blur Android (API expo-blur 57) : ref d'un <BlurTargetView>
+     * enveloppant le contenu à flouter derrière la surface.
+     * Sans cible sur Android : pas de blur (overlay translucide) — l'ancien blur
+     * automatique "de tout ce qu'il y a derrière" n'existe plus dans l'API.
+     */
+    blurTarget?: RefObject<View | null>;
 };
 
 /**
  * Surface translucide 3-tier :
- * iOS 26+ → Liquid Glass natif ; sinon BlurView (iOS < 26, Android 12+) ; sinon fond brume translucide.
+ * iOS 26+ → Liquid Glass natif ; sinon BlurView (iOS < 26, Android 12+ avec blurTarget) ; sinon fond brume translucide.
  * Ne jamais appliquer d'opacité < 1 sur ce composant ou son parent : le rendu du verre disparaît.
  * Pour animer, utiliser glassEffectStyle en config { style, animate } plutôt que l'opacité.
  */
-export const GlassSurface = ({ children, style, glassEffectStyle = "regular", tintColor, isInteractive, intensity = 40, ...props }: GlassSurfaceProps) => {
+export const GlassSurface = ({ children, style, glassEffectStyle = "regular", tintColor, isInteractive, intensity = 40, blurTarget, ...props }: GlassSurfaceProps) => {
 
     if (supportsLiquidGlass) {
         return (
@@ -45,7 +53,12 @@ export const GlassSurface = ({ children, style, glassEffectStyle = "regular", ti
                 style={style}
                 intensity={intensity}
                 tint="default"
-                blurMethod={Platform.OS === "android" ? "dimezisBlurViewSdk31Plus" : undefined}
+                blurMethod={
+                    Platform.OS === "android"
+                        ? (blurTarget ? "dimezisBlurViewSdk31Plus" : "none")
+                        : undefined
+                }
+                blurTarget={Platform.OS === "android" ? blurTarget : undefined}
                 {...props}>
                 {!!tintColor && (
                     <View
@@ -76,8 +89,10 @@ export const GlassSurface = ({ children, style, glassEffectStyle = "regular", ti
  * Retire le backgroundColor fourni par défaut (une couleur pleine masquerait le verre),
  * et pose un fond thématique (brume / encre nuit) pour la lisibilité des fallbacks :
  * sans lui, le BlurView laisse le contenu de la page transparaître sous le sheet.
+ * blurTarget : ref d'un <BlurTargetView> enveloppant le contenu sous le sheet
+ * (blur Android explicite, cf. GlassSurface).
  */
-export const GlassSheetBackground = ({ style, ...props }: ViewProps) => {
+export const GlassSheetBackground = ({ style, blurTarget, ...props }: ViewProps & { blurTarget?: RefObject<View | null> }) => {
 
     const colorScheme = useColorScheme();
     const isDark = colorScheme === "dark";
@@ -88,6 +103,7 @@ export const GlassSheetBackground = ({ style, ...props }: ViewProps) => {
     return (
         <GlassSurface
             {...props}
+            blurTarget={blurTarget}
             style={[background, { borderRadius: 24, overflow: "hidden" }]}
             intensity={70}
             tintColor={isDark ? "#101736" : "#F6F8FD"}
