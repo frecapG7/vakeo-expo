@@ -1,4 +1,4 @@
-import { Avatar } from "@/components/ui/Avatar";
+import { AvatarsGroup } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { GlassSheetBackground, GlassSurface } from "@/components/ui/GlassSurface";
 import { IconSymbol } from "@/components/ui/IconSymbol";
@@ -50,13 +50,13 @@ export default function HomePage() {
 
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }} edges={["left", "right", "bottom"]}>
       <Animated.FlatList
         data={trips}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) =>
           <Button
-            className="rounded-2xl h-64 overflow-hidden"
+            className="rounded-2xl h-52 overflow-hidden"
             onPress={() => router.push(`./${item._id}`)}>
 
             <ImageBackground source={item.image}
@@ -71,36 +71,32 @@ export default function HomePage() {
                 colors={['#10173600', '#101736E6']}
                 style={{ flex: 1, justifyContent: 'flex-end' }}>
 
-                <View className="flex-row justify-between items-end px-5 pb-5">
-                  <View className="flex-1 pr-3 gap-2">
-                    <Text className="text-white text-h1" numberOfLines={2}>{item.name}</Text>
-                    {!!item.startDate &&
-                      <GlassSurface
-                        glassEffectStyle="clear"
-                        tintColor="#F7B74A"
-                        style={{ borderRadius: 999, alignSelf: "flex-start" }}>
-                        <Text className="text-ink text-sm font-bold capitalize px-3 py-1">
-                          {formatRange(item.startDate, item.endDate, { hideYear: false })}
-                        </Text>
-                      </GlassSurface>
-                    }
-                    <View className="flex-row gap-3 items-center pt-1">
-                      {item?.users?.slice(0, 5).map((user: any) =>
-                        <View key={user._id} className="items-center">
-                          <Avatar src={user?.avatar} alt={user?.name?.charAt(0)} size2="sm" />
-                          <Text className="font-bold text-white max-w-120" numberOfLines={1}>{user?.name}</Text>
-                        </View>
-                      )}
-                      {(item?.users?.length ?? 0) > 5 &&
-                        <View className="items-center">
-                          <Avatar alt="..." size2="sm" />
-                          <Text className="font-bold text-white">+{item.users.length - 5}</Text>
-                        </View>}
+                <View className="px-5 pb-4 gap-2">
+                  <View className="flex-row items-center gap-2">
+                    <View className="flex-1 min-w-0">
+                      {!!item.startDate &&
+                        <GlassSurface
+                          glassEffectStyle="clear"
+                          tintColor="#F7B74A"
+                          style={{ borderRadius: 999, alignSelf: "flex-start", maxWidth: "100%" }}>
+                          <View className="flex-row items-center gap-1 px-2.5 py-1 min-w-0">
+                            <IconSymbol name="calendar" size={12} color="#16265C" />
+                            <Text className="text-ink text-xs font-bold capitalize min-w-0" numberOfLines={2}>
+                              {formatRange(item.startDate, item.endDate, { hideYear: false })}
+                            </Text>
+                          </View>
+                        </GlassSurface>
+                      }
                     </View>
+                    <AvatarsGroup
+                      avatars={(item?.users ?? []).map((user: any) => ({
+                        avatar: user?.avatar,
+                        alt: user?.name?.charAt(0),
+                      }))}
+                      size2="xs"
+                      maxLength={3} />
                   </View>
-                  <View className="pb-1">
-                    <IconSymbol name="chevron.right" size={30} color="white" />
-                  </View>
+                  <Text className="text-white text-h1" numberOfLines={2}>{item.name}</Text>
                 </View>
 
               </LinearGradient>
@@ -108,10 +104,10 @@ export default function HomePage() {
             </ImageBackground>
           </Button>
         }
-        ItemSeparatorComponent={() => <View className="my-5" />}
+        ItemSeparatorComponent={() => <View className="h-4" />}
         // keyboardDismissMode="on-drag"
         itemLayoutAnimation={LinearTransition}
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 12, paddingTop: 12, paddingBottom: 24 }}
         ListEmptyComponent={
           <TripsEmptyState
             isLoading={isLoading}

@@ -1,10 +1,11 @@
+import { Wordmark } from "@/components/brand/Wordmark";
 import useColors from "@/hooks/styles/useColors";
 import '@/lib/calendar-config';
-import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
+import { DefaultTheme, SplashScreen, Stack, ThemeProvider } from "expo-router";
 import * as Sentry from '@sentry/react-native';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { SplashScreen, Stack } from "expo-router";
-import { useEffect, useState } from "react";
+import { useFonts } from "expo-font";
+import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { MenuProvider } from "react-native-popup-menu";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -40,18 +41,15 @@ export default Sentry.wrap(function RootLayout() {
 
   const colors = useColors();
 
-  const [loaded, setLoaded] = useState(false);
+  const [fontsLoaded, fontError] = useFonts({
+    "Outfit-ExtraBold": require("../assets/fonts/Outfit-ExtraBold.ttf"),
+  });
 
-  // TODO: setLoaded to true when font or else are all loaded
+  // Splash masquée dès que les polices sont prêtes (ou en échec) — remplace l'ancien setTimeout(3000).
   useEffect(() => {
-    setTimeout(() => setLoaded(true), 3000);
-  }, [setLoaded]);
-
-
-  useEffect(() => {
-    if (loaded)
+    if (fontsLoaded || fontError)
       SplashScreen.hide();
-  }, [loaded]);
+  }, [fontsLoaded, fontError]);
 
 
   return (
@@ -83,7 +81,8 @@ const RootNav = () => {
     <Stack initialRouteName="index">
       <Stack.Screen name="index" options={{
         headerShown: true,
-        title: "Mes projets",
+        headerTitle: () => <Wordmark size={22} />,
+        headerTitleAlign: "center",
       }} />
       <Stack.Screen name="new"
         options={{

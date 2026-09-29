@@ -1,6 +1,6 @@
 import { BlurView } from "expo-blur";
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
-import { Platform, StyleSheet, View, type ViewProps, type ViewStyle } from "react-native";
+import { Platform, StyleSheet, useColorScheme, View, type ViewProps, type ViewStyle } from "react-native";
 
 const supportsLiquidGlass = Platform.OS === "ios" && isLiquidGlassAvailable();
 const supportsBlur =
@@ -47,13 +47,25 @@ export const GlassSurface = ({ children, style, glassEffectStyle = "regular", ti
                 tint="default"
                 blurMethod={Platform.OS === "android" ? "dimezisBlurViewSdk31Plus" : undefined}
                 {...props}>
+                {!!tintColor && (
+                    <View
+                        style={{
+                            position: "absolute",
+                            top: 0,
+                            right: 0,
+                            bottom: 0,
+                            left: 0,
+                            backgroundColor: tintColor,
+                            opacity: 0.9,
+                        }} />
+                )}
                 {children}
             </BlurView>
         );
     }
 
     return (
-        <View style={[style, { backgroundColor: "#F6F8FDE0" }]} {...props}>
+        <View style={[style, { backgroundColor: tintColor ? `${tintColor}E6` : "#F6F8FDE0" }]} {...props}>
             {children}
         </View>
     );
@@ -61,9 +73,14 @@ export const GlassSurface = ({ children, style, glassEffectStyle = "regular", ti
 
 /**
  * Fond de BottomSheet (@gorhom/bottom-sheet) en verre.
- * Retire le backgroundColor fourni par défaut (une couleur pleine masquerait le verre).
+ * Retire le backgroundColor fourni par défaut (une couleur pleine masquerait le verre),
+ * et pose un fond thématique (brume / encre nuit) pour la lisibilité des fallbacks :
+ * sans lui, le BlurView laisse le contenu de la page transparaître sous le sheet.
  */
 export const GlassSheetBackground = ({ style, ...props }: ViewProps) => {
+
+    const colorScheme = useColorScheme();
+    const isDark = colorScheme === "dark";
 
     const background = { ...(StyleSheet.flatten(style) as ViewStyle | null ?? {}) };
     delete background.backgroundColor;
@@ -72,7 +89,8 @@ export const GlassSheetBackground = ({ style, ...props }: ViewProps) => {
         <GlassSurface
             {...props}
             style={[background, { borderRadius: 24, overflow: "hidden" }]}
-            intensity={50}
+            intensity={70}
+            tintColor={isDark ? "#101736" : "#F6F8FD"}
         />
     );
 };

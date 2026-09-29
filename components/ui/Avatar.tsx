@@ -27,6 +27,15 @@ const sizeToMarginMap = {
     xl: "-ml-10"
 }
 
+const sizeToTextMap = {
+    xs: 'text-[10px]',
+    sm: 'text-sm',
+    sm2: 'text-lg',
+    md: 'text-lg',
+    lg: 'text-2xl',
+    xl: 'text-3xl'
+}
+
 
 export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src, badgeContent, badgeIcon, ...props }: {
     name?: string,
@@ -41,12 +50,13 @@ export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src, badgeCo
 
 
     const sizeClass = sizeToClassMap[size2];
+    const textClass = sizeToTextMap[size2];
 
 
     if (!src)
         return (
             <View className={`relative justify-center items-center rounded-full ${sizeClass} border dark:border-white bg-amber dark:bg-gray-400`}>
-                <Text className="font-bold uppercase ">
+                <Text className={`font-bold uppercase ${textClass}`}>
                     {alt}
                 </Text>
                 {!!badgeContent && (

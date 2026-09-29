@@ -55,6 +55,7 @@ export default {
           imageWidth: 400,
         },
       ],
+      'expo-status-bar',
       'expo-web-browser',
       [
         '@sentry/react-native/expo',
