@@ -7,22 +7,20 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 export interface StorageTrip {
     /** encodedId v3 (opaque, fourni par l'API — jamais construit côté front). Raw ObjectId avant migration (Phase 2). */
     _id: string,
-    name: string,
-    image: string,
-    /** Raw ObjectId du TripUser local (le seat réclamé). Optionnel : l'anonymat devient un état explicite en v3. Toujours requis pour les URLs settings (GET /trips/:tripId/users/:tripUserId, décision Q2). */
+    /** Raw ObjectId du TripUser local (le seat réclamé). Optionnel : l'anonymat devient un état explicite en v3. Requis pour les URLs settings (GET /trips/:tripId/users/:tripUserId, décision Q2). */
     user?: string,
-    /** Secret token v3 du seat pour CE trip (par trip+user, pas global). Injecté par l'interceptor axios (setTripToken, app/[id]/_layout.tsx). Absent tant que le trip n'est pas migré (Phase 2) ou si le seat n'a pas réclamé sa place. */
+    /** Secret token v3 du seat pour CE trip (par trip+user, pas global). Injecté par l'interceptor axios (setTripToken, app/[id]/_layout.tsx). Absent si le seat n'a pas réclamé sa place. */
     token?: string
 }
 
 
 
 
-export const getStorageTrips = (): Array<StorageTrip> => {
+export const getStorageTrips = (): StorageTrip[] => {
     return storage.getAllKeys()
-        .filter(key => key.startsWith("trips."))
+        .filter((key): key is string => !!key && key.startsWith("trips."))
         .map(key => storage.getString(key))
-        .filter(value => !!value)
+        .filter((value): value is string => !!value)
         .map(value => JSON.parse(value));
 }
 

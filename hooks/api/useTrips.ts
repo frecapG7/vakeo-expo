@@ -4,13 +4,22 @@ import { Trip, TripUser } from "@/types/models";
 import { Dashboard } from "@/types/responses";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-const postTrip = async (trip: Omit<Trip, '_id'>): Promise<Trip> => {
-  const response = await axios.post("/trips", trip);
+// --- Création v3 (Phase 4) ---
+// POST /v3/trips : la réponse n'est plus un Trip complet — encodedId (à stocker tel quel,
+// jamais construit côté front), seats créés, et credentials du créateur (seat token).
+export interface PostTripResponse {
+  encodedId: string,
+  seats?: unknown,
+  credentials: { _id: string, name: string, token: string }
+}
+
+const postTrip = async (trip: Omit<Trip, '_id'>): Promise<PostTripResponse> => {
+  const response = await axios.post(v3Path("/trips"), trip);
   return response?.data;
 };
 
 export const usePostTrip = () => {
-  return useMutation<Trip, Error, Omit<Trip, '_id'>>({
+  return useMutation<PostTripResponse, Error, Omit<Trip, '_id'>>({
     mutationFn: (data) => postTrip(data),
   });
 };
@@ -158,7 +167,7 @@ export interface BatchTrip {
   endDate?: string,
   createdAt: string,
   isPrivate: boolean,
-  users: Array<{ _id: string, name: string, avatar?: string }>
+  users: { _id: string, name: string, avatar?: string }[]
 }
 
 const BATCH_MAX_TRIPS = 30;

@@ -11,8 +11,8 @@ type ButtonSize = 'medium' | 'small';
 
 const variantToClassMap = {
     'none': 'flex-row justify-center items-center',
-    'contained': 'bg-blue-400 dark:bg-blue-600 rounded-xl shadow-sm shadow-blue-400 flex-row justify-center items-center',
-    'outlined': 'border-2 border-blue-500 dark:border-blue-400 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex-row justify-center items-center active:bg-blue-100 dark:active:bg-blue-900/30',
+    'contained': 'bg-amber rounded-xl shadow-sm shadow-amber/40 flex-row justify-center items-center',
+    'outlined': 'border-2 border-night dark:border-white/25 rounded-xl bg-mist dark:bg-transparent flex-row justify-center items-center active:bg-amber/20 dark:active:bg-white/10',
     'danger': 'border-2 border-red-500 dark:border-red-400 rounded-xl bg-red-50 dark:bg-red-900/20 flex-row justify-center items-center active:bg-red-100 dark:active:bg-red-900/30'
 }
 
@@ -22,9 +22,9 @@ const sizeToMap = {
 }
 
 const variantToTitleClassMap = {
-    'none': 'text-neutral-900 dark:text-neutral-100',
-    'contained': 'text-white font-bold',
-    'outlined': 'text-blue-600 font-semibold',
+    'none': 'text-night dark:text-white',
+    'contained': 'text-night font-bold',
+    'outlined': 'text-night dark:text-white font-semibold',
     'danger': 'text-red-600 font-semibold'
 }
 
@@ -77,9 +77,8 @@ export const Button = ({ title,
 
     const variantClass = variantToClassMap[variant];
 
-    const disableClass = (disabled || isLoading) ? "opacity-50 bg-gray-600" : ""
+    const disableClass = (disabled || isLoading) ? "opacity-40" : ""
 
-    //${disabled ? 'bg-neutral-200' : 'bg-blue-400'} 
     return (
         <Pressable
             onPress={onPress}
@@ -91,7 +90,7 @@ export const Button = ({ title,
             {icon && (
                 <Animated.View entering={FadeIn} exiting={FadeOut} className="">
                     <IconSymbol name={icon}
-                        color={variant === "contained" ? "white" : "blue"}
+                        color={variant === "contained" ? "#16265C" : "#EE8B33"}
                         size={size === "medium" ? 22 : 18} />
                 </Animated.View>
             )}

@@ -2,6 +2,7 @@ import { AvatarsGroup } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { GlassSheetBackground, GlassSurface } from "@/components/ui/GlassSurface";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { Screen } from "@/components/ui/Screen";
 import { TripsEmptyState } from "@/components/trips/TripsEmptyState";
 import { default as styles } from "@/constants/Styles";
 import { useBatchTrips, type BatchTrip } from "@/hooks/api/useTrips";
@@ -17,7 +18,6 @@ import { useNavigation, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Text, View, type ViewProps } from "react-native";
 import Animated, { LinearTransition } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 /** Carte de trip de la home. Composant à part : chaque carte porte la ref
  *  <BlurTargetView> de sa propre image (cible du blur Android de la chip date). */
@@ -120,7 +120,7 @@ export default function HomePage() {
 
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={["left", "right", "bottom"]}>
+    <Screen style={{ flex: 1 }}>
       <BlurTargetView ref={sheetBlurTarget} style={{ flex: 1 }}>
         <Animated.FlatList
           data={trips}
@@ -184,7 +184,7 @@ export default function HomePage() {
           </View>
         </BottomSheetView>
       </BottomSheet>
-    </SafeAreaView>
+    </Screen>
   )
 
 }

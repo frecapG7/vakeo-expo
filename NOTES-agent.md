@@ -61,7 +61,7 @@ Détails : voir `docs/architecture-agent.md` (architecture) et `docs/plan-migrat
 
 - **TS : 117 erreurs préexistantes** (`npx tsc --noEmit`) — aucune dans les fichiers des sessions récentes. Baseline à ne pas dégrader.
 - **Lint : 27 erreurs** apparues avec eslint-config-expo 56/57 (règles React Compiler « This value cannot be modified », `no-unescaped-entities` sur les apostrophes françaises, setState-in-effect). À nettoyer par fichier touché.
-- **`text-md` : 15 occurrences** (classe fantôme Tailwind v4) dans 15 fichiers — migration `text-base` au fil de l'eau. `Button.tsx` déjà corrigé.
+- **`text-md` : 11 occurrences** (classe fantôme Tailwind v4) dans 11 fichiers — migration `text-sm`/`text-base` au fil de l'eau. Corrigés le 2026-09-29 : `Button.tsx`, `Chip.tsx`, `TripUsersForm.tsx`, `setup-general.tsx`, `setup-users.tsx`.
 - **`Skeleton` cassé** : classes construites dynamiquement (`h-${height}`) que NativeWind ne compile pas — remplacé par des blocs statiques sur la home ; le composant reste à corriger/remplacer ailleurs.
 - `app/_layout.tsx` : splash masqué dès que les polices sont chargées (l'ancien `setTimeout(3000)` + TODO est réglé) ; `useShareTrip` en `useQuery` (deviendra POST en v3) ; `useVerifyToken` réponse non consommée ; `storage/index.tsx` `encryptionKey` en dur.
 - Doctor : échecs restants connus — 2 faux positifs git (pas de git fiable dans l'env), `@expo/config-plugins` direct (voulu pour le plugin Sentry), conflit icônes (`toastify-react-native` tire l'ancien `react-native-vector-icons`), non-CNG (informatif, workflow prebuild).
@@ -72,6 +72,6 @@ Détails : voir `docs/architecture-agent.md` (architecture) et `docs/plan-migrat
 - **Styles** : motif composant → variante de composant (pattern `Button.tsx`) ; chaîne réutilisable → `@utility` + `@apply` dans `global.css` ; nouvelles couleurs → tokens `@theme` dans `global.css` ; surfaces translucides → `GlassSurface`. `text-md` interdit.
 - Les fichiers agent (`NOTES-agent.md`, `docs/*-agent.md`, `docs/plan-migration-v3.md`) sont en français.
 - Couche API : hooks React Query dans `hooks/api/`, client axios dans `lib/axios.js` (chemins relatifs, headers `x-api-key` + `x-user-id`).
-- Stockage : MMKV, clés `trips.<id>`, shape `StorageTrip` dans `hooks/storage/useStorageTrips.ts`.
+- Stockage : MMKV, clés `trips.<encodedId>`, shape lean `StorageTrip` = `{ _id, user?, token? }` dans `hooks/storage/useStorageTrips.ts` (pas de name/image locaux — affichage via hydrate batch).`n- **Écrans : conteneur standard `Screen`** (`components/ui/Screen.tsx`, posé le 2026-09-29) — SafeAreaView aux edges gauche/droite/bas, le header natif consomme le top ; cas particuliers via la prop `edges` (plein cadre : `edges={[]}`). Adopté sur home, `new/setup-*`, `token/[token]`, `pick-user` ; à propager au fil de l'eau sur les autres écrans.
 - Ne jamais éditer un fichier sans l'avoir lu au préalable dans la session.
 - Outil : le repo est en **CRLF** — l'outil `edit` échoue sur les fichiers non réécrits ce session ; préférer `write_file` complet ou PowerShell `[System.IO.File]::ReadAllText/WriteAllText`.
