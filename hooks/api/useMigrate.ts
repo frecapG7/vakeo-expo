@@ -73,7 +73,10 @@ const migrateTrip = async (trip: StorageTrip): Promise<"migrated" | "dropped"> =
         const response = await axios.post(v3Path("/migrate"), { tripId: trip._id }, {
             headers: {
                 ...(trip.user && { "x-user-id": trip.user })
-            }
+            },
+            // 404 = trip supprimé côté serveur (décision Q6) : drop silencieux, sans
+            // toast de l'interceptor. Les autres échecs (réseau, 5xx…) toastent comme avant.
+            skipToastStatuses: [404]
         });
         const data: MigrateResponse = response.data;
         // Stockage lean v3 : encodedId + credentials. name/image ne sont plus stockés

@@ -50,7 +50,7 @@ export const GlassSurface = ({ children, style, glassEffectStyle = "regular", ti
     if (supportsBlur) {
         return (
             <BlurView
-                style={style}
+                style={[style, { overflow: "hidden" }]}
                 intensity={intensity}
                 tint="default"
                 blurMethod={

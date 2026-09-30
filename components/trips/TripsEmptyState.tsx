@@ -32,7 +32,7 @@ export const TripsEmptyState = ({ isLoading, isError, onRetry, onCreate, onJoin 
         content = (
             <View className="items-center gap-2">
                 <IconSymbol name="exclamationmark.triangle" size={40} color="#EE8B33" />
-                <Text className="text-h1 text-center">Impossible de charger tes voyages</Text>
+                <Text className="text-h1 text-center text-night dark:text-white">Impossible de charger tes voyages</Text>
                 <Text className="text-sm text-center text-gray-500 dark:text-gray-400">
                     Vérifie ta connexion, puis réessaie.
                 </Text>
@@ -48,7 +48,7 @@ export const TripsEmptyState = ({ isLoading, isError, onRetry, onCreate, onJoin 
             <GlassSurface style={{ borderRadius: 24 }}>
                 <View className="items-center gap-3 p-6">
                     <IconSymbol name="map" size={40} color="#EE8B33" />
-                    <Text className="text-h1 text-center">Aucun voyage pour l’instant</Text>
+                    <Text className="text-h1 text-center text-night dark:text-white">Aucun voyage pour l’instant</Text>
                     <Text className="text-sm text-center text-gray-500 dark:text-gray-400">
                         Crée ton premier projet de voyage ou rejoins tes amis via un lien d’invitation.
                     </Text>

@@ -21,7 +21,14 @@ export const getStorageTrips = (): StorageTrip[] => {
         .filter((key): key is string => !!key && key.startsWith("trips."))
         .map(key => storage.getString(key))
         .filter((value): value is string => !!value)
-        .map(value => JSON.parse(value));
+        .flatMap(value => {
+            try{
+                return [JSON.parse(value) as StorageTrip];
+            }catch(err){
+                 console.warn("Stockage : trip corrompu ignoré", err);
+                return [];
+            }
+        });
 }
 
 export const useGetStorageTrips = () => {
