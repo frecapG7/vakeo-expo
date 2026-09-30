@@ -1,12 +1,12 @@
 import { TripInfoForm } from "@/components/trips/TripInfoForm";
 import { Button } from "@/components/ui/Button";
+import { Screen } from "@/components/ui/Screen";
 import styles from "@/constants/Styles";
 import { Trip } from "@/types/models";
 import { useRouter } from "expo-router";
 import { useFormContext } from "react-hook-form";
 import { KeyboardAvoidingView, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 
 export default function NewTripGeneral() {
@@ -16,18 +16,17 @@ export default function NewTripGeneral() {
     const router = useRouter();
 
     return (
-        <SafeAreaView style={styles.container}>
-
+        <Screen style={styles.container}>
             <KeyboardAvoidingView behavior="padding"
                 keyboardVerticalOffset={64}
                 style={styles.container}>
                 <Animated.ScrollView className="flex-1">
                     <View className="gap-2 m-2">
-                        <Text className="text-2xl font-bold dark:text-white">
+                        <Text className="text-h1 text-night dark:text-white">
                             Donne un nom à ton escapade
                         </Text>
-                        <Text className="text-md dark:text-gray-200">
-                            Indique un nom d'escapade qui décrit ce que tu as en tête.
+                        <Text className="text-sm text-night/70 dark:text-white/60">
+                            Indique un nom d&apos;escapade qui décrit ce que tu as en tête.
                             Tu peux également ajouter une description et personnaliser le thème.
                         </Text>
                     </View>
@@ -51,6 +50,6 @@ export default function NewTripGeneral() {
                     </View>
                 </Animated.ScrollView>
             </KeyboardAvoidingView>
-        </SafeAreaView>
+        </Screen>
     )
 }

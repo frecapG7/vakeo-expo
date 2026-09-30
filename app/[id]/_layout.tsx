@@ -3,6 +3,7 @@ import { TripContext } from "@/context/TripContext";
 import { useGetTrip, useGetTripUser } from "@/hooks/api/useTrips";
 import { useGetStorageTrip } from "@/hooks/storage/useStorageTrips";
 import { useGlassHeaderOptions } from "@/hooks/styles/useGlassHeaderOptions";
+import { clearTripToken, setTripToken } from "@/lib/axios";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect } from "react";
 import { Platform, Pressable } from "react-native";
@@ -25,6 +26,16 @@ export default function TripDetailsLayout() {
         if (!!storageTrip && !storageTrip.user)
             router.navigate('./pick-user');
     }, [router, storageTrip]);
+
+    // Auth v3 : ce layout est le seul endroit où un trip est "actif".
+    // Le token posé ici est injecté par l'interceptor axios sur tous les appels.
+    useEffect(() => {
+        if (storageTrip?.token)
+            setTripToken(storageTrip.token);
+        else
+            clearTripToken();
+        return clearTripToken;
+    }, [storageTrip]);
 
 
     return (

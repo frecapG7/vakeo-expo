@@ -1,10 +1,13 @@
+import { Wordmark } from "@/components/brand/Wordmark";
 import useColors from "@/hooks/styles/useColors";
+import { useMigrate } from "@/hooks/api/useMigrate";
 import '@/lib/calendar-config';
-import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
+import { DefaultTheme, SplashScreen, Stack, ThemeProvider } from "expo-router";
 import * as Sentry from '@sentry/react-native';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { SplashScreen, Stack } from "expo-router";
-import { useEffect, useState } from "react";
+import { useFonts } from "expo-font";
+import { ReactNode, useEffect, useState } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { MenuProvider } from "react-native-popup-menu";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import ToastManager from "toastify-react-native";
@@ -14,13 +17,12 @@ Sentry.init({
   dsn: 'https://837ddb9d49c31b44a1245d82bbe43a23@o4510143029837824.ingest.de.sentry.io/4510143037046864',
 
   // Adds more context data to events (IP address, cookies, user, etc.)
-  // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
+  // For more information, see docs: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
   sendDefaultPii: true,
 
   // Enable Logs
   // enableLogs: true,
 
-  // Configure Session Replay
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1,
   integrations: [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
@@ -34,41 +36,86 @@ Sentry.init({
 
 const queryClient = new QueryClient({});
 
+// Gate du bootstrap v3 (Phase 2) : désactivé, l'app est 100 % v1 et ne fait
+// AUCUN appel réseau au lancement. Activé, la boucle /migrate tourne avant le
+// montage de la navigation (voir MigrationGate) — Phase 2 + Phase 3 seront
+// livrées dans la même version (cf. plan-migration-v3.md, journal 2026-09-29).
+const V3_ENABLED = process.env.EXPO_PUBLIC_V3_ENABLED === "true";
+
+// La boucle ne doit tourner qu'une fois par lancement de l'app, même si le
+// layout est remonté (fast refresh) : le promise vit au niveau module.
+let migrationRun: Promise<void> | null = null;
+
+const MigrationGate = ({ children, onDone }: { children: ReactNode, onDone: () => void }) => {
+  const { mutateAsync } = useMigrate();
+
+  useEffect(() => {
+    if (!migrationRun) {
+      migrationRun = (async () => {
+        try {
+          const summary = await mutateAsync();
+          console.log(`Migration v3 : ${summary.migrated} migré(s), ${summary.dropped} droppé(s), ${summary.failed} en échec`);
+          if (summary.failed > 0)
+            console.warn(`Migration v3 : ${summary.failed} trip(s) en échec — retentés au prochain lancement`);
+        } catch (err) {
+          // On ne bloque jamais l'app sur le bootstrap : les trips non migrés
+          // sont resumables (clé méta `migration`, cf. hooks/api/useMigrate.ts).
+          console.error("Migration v3 : échec du bootstrap", err);
+        }
+      })();
+    }
+    migrationRun.then(onDone);
+  }, []);
+
+  // Rien n'est monté pendant la migration : le splash couvre l'écran, et aucun
+  // écran ne peut lancer de requête sur des ids en cours de réécriture.
+  return null;
+};
+
 
 export default Sentry.wrap(function RootLayout() {
 
   const colors = useColors();
 
-  const [loaded, setLoaded] = useState(false);
+  const [fontsLoaded, fontError] = useFonts({
+    "Outfit-ExtraBold": require("../assets/fonts/Outfit-ExtraBold.ttf"),
+  });
 
-  // TODO: setLoaded to true when font or else are all loaded
+  // Migration v3 : démarrée au premier rendu (MigrationGate), "done" quand elle
+  // est terminée (réussie ou non — jamais de blocage sur le splash).
+  const [migrationDone, setMigrationDone] = useState(!V3_ENABLED);
+
+  // Splash masquée quand les polices sont prêtes ET la migration terminée.
   useEffect(() => {
-    setTimeout(() => setLoaded(true), 3000);
-  }, [setLoaded]);
-
-
-  useEffect(() => {
-    if (loaded)
+    if ((fontsLoaded || fontError) && migrationDone)
       SplashScreen.hide();
-  }, [loaded]);
+  }, [fontsLoaded, fontError, migrationDone]);
 
 
   return (
-    <QueryClientProvider client={queryClient}>
-      {/* <ThemeProvider value={colorScheme === "light" ? LightTheme : DarkTheme}> */}
-      <ThemeProvider value={{
-        ...DefaultTheme,
-        colors
-      }}>
-        <SafeAreaProvider>
-          <MenuProvider>
-            <RootNav />
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <QueryClientProvider client={queryClient}>
+        {/* <ThemeProvider value={colorScheme === "light" ? LightTheme : DarkTheme}> */}
+        <ThemeProvider value={{
+          ...DefaultTheme,
+          colors
+        }}>
+          <SafeAreaProvider>
+            <MenuProvider>
+              {migrationDone ? (
+                <RootNav />
+              ) : (
+                <MigrationGate onDone={() => setMigrationDone(true)}>
+                  <RootNav />
+                </MigrationGate>
+              )}
 
-            <ToastManager />
-          </MenuProvider>
-        </SafeAreaProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+              <ToastManager />
+            </MenuProvider>
+          </SafeAreaProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 });
 
@@ -77,11 +124,11 @@ const RootNav = () => {
 
 
   return (
-
     <Stack initialRouteName="index">
       <Stack.Screen name="index" options={{
         headerShown: true,
-        title: "Mes projets",
+        headerTitle: () => <Wordmark size={22} />,
+        headerTitleAlign: "center",
       }} />
       <Stack.Screen name="new"
         options={{
@@ -98,6 +145,7 @@ const RootNav = () => {
         headerShown: false
       }} />
       <Stack.Screen name="token" options={{ headerShown: false }} />
+
     </Stack>
 
   );
