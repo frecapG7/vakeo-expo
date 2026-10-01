@@ -1,9 +1,9 @@
 import { Avatar } from "@/components/ui/Avatar";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { useGetMessages, useMarkAllAsRead, usePostMessage } from "@/hooks/api/useMessages";
 import dayjs from "@/lib/dayjs-config";
 import { useFocusEffect, useLocalSearchParams, useNavigation } from "expo-router";
-import { useCallback, useContext, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
 import { GiftedChat, IMessage, InputToolbar, Send } from 'react-native-gifted-chat';
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -11,7 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TripMessages() {
 
-    const { me, trip } = useContext(TripContext);
+    const { me, trip } = useTrip();
     const { eventId, title } = useLocalSearchParams<{ eventId?: string, title?: string }>();
     const { data, fetchNextPage, hasNextPage } = useGetMessages(trip?._id, eventId);
     const postMessage = usePostMessage(trip?._id, me?._id, eventId);

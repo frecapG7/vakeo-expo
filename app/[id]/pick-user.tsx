@@ -1,11 +1,10 @@
 import { Avatar } from "@/components/ui/Avatar";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { useGetTrip } from "@/hooks/api/useTrips";
 import { useGetStorageTrip, useUpdateStorageTrip } from "@/hooks/storage/useStorageTrips";
 import { TripUser } from "@/types/models";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useContext } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { Screen } from "@/components/ui/Screen";
@@ -17,7 +16,7 @@ export default function PickTripUserPage() {
     const { id } = useLocalSearchParams();
     const { data: trip } = useGetTrip(String(id));
 
-    const {me} = useContext(TripContext);
+    const {me} = useTrip();
 
     const router = useRouter();
 

@@ -49,6 +49,14 @@ Détails : voir `docs/architecture-agent.md` (architecture) et `docs/plan-migrat
 - Espacement : `SafeAreaView edges={["left","right","bottom"]}` (le header gère le top), `contentContainerStyle` paddingHorizontal 12 / paddingTop 12 / paddingBottom 24, séparateur `h-4` (les marges ne fusionnent pas en RN — `my-N` sur un séparateur double l'espacement).
 - **Pattern à propager** : les autres écrans ont probablement le même double-espacement (SafeAreaView edges par défaut sous header natif) — corriger opportunistement.
 
+## Tabs `[id]/(tabs)` — chrome verre (2026-09-30)
+
+- `BackgroundHeader` (photo + scrim noir dans le header natif) **supprimé** — ancienne mécanique, incompatible verre.
+- Planning + conversations : stacks avec `useGlassHeaderOptions` (iOS 26 = Liquid Glass natif, iOS < 26 = blur `regular`, Android = tint plat brume/encre nuit via `headerStyle`). Wordmark en `headerLeft` de l'onglet **racine** uniquement (`WordmarkHomeButton`, tap → `router.dismissAll()` → home) — les écrans poussés (calendar, day) gardent le back natif.
+- Dashboard : header flottant `GlassHeaderBar` (composant, pas de Stack dédié) — photo héro pleine au repos, surface `GlassSurface` qui **glisse en translation** au scroll (jamais d'opacité < 1 sur le verre), crossfade du wordmark (variante `onMedia` blanc/ambre sur photo → variante scheme sur verre), nom du trip en fade-in. Avatar + dropdown migrent dans le header, plus de back flottant.
+- `Wordmark` : prop `onMedia` (variante claire + ombre portée, pour rendu sur photo).
+- Non validé sur device : le scroll-edge iOS 26 et le comportement du GlassView en translation (validation Android flat faite en priorité).
+
 ## Sujets en cours
 
 1. **Migration API v1 → v3** (chantier principal, aucun code fait, plan détaillé dans `docs/plan-migration-v3.md`) :
@@ -62,7 +70,7 @@ Détails : voir `docs/architecture-agent.md` (architecture) et `docs/plan-migrat
 - **TS : 117 erreurs préexistantes** (`npx tsc --noEmit`) — aucune dans les fichiers des sessions récentes. Baseline à ne pas dégrader.
 - **Lint : 27 erreurs** apparues avec eslint-config-expo 56/57 (règles React Compiler « This value cannot be modified », `no-unescaped-entities` sur les apostrophes françaises, setState-in-effect). À nettoyer par fichier touché.
 - **`text-md` : 11 occurrences** (classe fantôme Tailwind v4) dans 11 fichiers — migration `text-sm`/`text-base` au fil de l'eau. Corrigés le 2026-09-29 : `Button.tsx`, `Chip.tsx`, `TripUsersForm.tsx`, `setup-general.tsx`, `setup-users.tsx`.
-- **`Skeleton` cassé** : classes construites dynamiquement (`h-${height}`) que NativeWind ne compile pas — remplacé par des blocs statiques sur la home ; le composant reste à corriger/remplacer ailleurs.
+- **`Skeleton` réparé (2026-09-30)** : tailles via `style` numérique (les classes dynamiques `h-${height}` ne compilent pas en NativeWind), animation de pulsation conservée (construite dans `useAnimatedStyle` — plus d'affectation `.value` en effect, erreur lint réglée), props `width`/`className` optionnels. Réutilisé sur la home et les (tabs) ; les autres écrans qui l'utilisent affichent de nouveau.
 - `app/_layout.tsx` : splash masqué dès que les polices sont chargées (l'ancien `setTimeout(3000)` + TODO est réglé) ; `useShareTrip` en `useQuery` (deviendra POST en v3) ; `useVerifyToken` réponse non consommée ; `storage/index.tsx` `encryptionKey` en dur.
 - Doctor : échecs restants connus — 2 faux positifs git (pas de git fiable dans l'env), `@expo/config-plugins` direct (voulu pour le plugin Sentry), conflit icônes (`toastify-react-native` tire l'ancien `react-native-vector-icons`), non-CNG (informatif, workflow prebuild).
 
@@ -75,4 +83,5 @@ Détails : voir `docs/architecture-agent.md` (architecture) et `docs/plan-migrat
 - Stockage : MMKV, clés `trips.<encodedId>`, shape lean `StorageTrip` = `{ _id, user?, token? }` dans `hooks/storage/useStorageTrips.ts` (pas de name/image locaux — affichage via hydrate batch).
 - **Écrans : conteneur standard `Screen`** (`components/ui/Screen.tsx`, posé le 2026-09-29) — SafeAreaView aux edges gauche/droite/bas, le header natif consomme le top ; cas particuliers via la prop `edges` (plein cadre : `edges={[]}`). Adopté sur home, `new/setup-*`, `token/[token]`, `pick-user` ; à propager au fil de l'eau sur les autres écrans.
 - Ne jamais éditer un fichier sans l'avoir lu au préalable dans la session.
+- **Trip actif : `useTrip()`** depuis `@/context/TripContext` (2026-09-30) — hook dédié, throw si utilisé hors layout `[id]` (plus de `useContext(TripContext)` direct, plus de défaut `null!`). `trip._id` = encodedId v3 (opaque, jamais construit côté front) ; `trip` est en pratique undefined pendant le chargement (typage non-optionnel assumé, à retyper avec les 403 v3).
 - Outil : le repo est en **CRLF** — l'outil `edit` échoue sur les fichiers non réécrits ce session ; préférer `write_file` complet ou PowerShell `[System.IO.File]::ReadAllText/WriteAllText`.

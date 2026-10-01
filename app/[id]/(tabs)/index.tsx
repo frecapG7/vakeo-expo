@@ -2,11 +2,11 @@ import { TripActionCard } from "@/components/trips/TripActionCard";
 import { TripActionsDropdown } from "@/components/trips/TripActionsDropdown";
 import { Avatar, AvatarsGroup } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
+import { GlassHeaderBar } from "@/components/ui/GlassHeaderBar";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { StatCard } from "@/components/ui/StatCard";
-import { default as styles } from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { useGetDashboard } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import { useDeleteStorageTrip } from "@/hooks/storage/useStorageTrips";
@@ -14,15 +14,15 @@ import dayjs from "@/lib/dayjs-config";
 import { countDaysBetween } from "@/lib/utils";
 import { ImageBackground } from "expo-image";
 import { useRouter } from "expo-router";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Platform, Pressable, RefreshControl, Text, View } from "react-native";
-import Animated from "react-native-reanimated";
+import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
 export default function ItemDetails() {
 
-    const { me, trip } = useContext(TripContext);
+    const { me, trip } = useTrip();
     const { data: dashboard, refetch, isRefetching } = useGetDashboard(trip?._id, me?._id, !!trip?._id)
     const deleteTrip = useDeleteStorageTrip();
 
@@ -47,17 +47,22 @@ export default function ItemDetails() {
     const insets = useSafeAreaInsets();
     const bottomPadding = Platform.OS === 'ios' ? insets.bottom : 0;
 
+    // Header flottant verre : la photo héro transparaît au repos, le verre glisse au scroll.
+    const scrollY = useSharedValue(0);
+    const scrollHandler = useAnimatedScrollHandler({
+        onScroll: (event) => {
+            scrollY.value = event.contentOffset.y;
+        },
+    });
+
     if (!dashboard)
         return (
-            <Animated.ScrollView style={styles.container}>
-                <View className="h-80 bg-gray-600">
+            <Animated.ScrollView className="flex-1 bg-mist dark:bg-ink">
+                <View className="h-80 bg-gray-300 dark:bg-gray-700" />
+                <View className="shadow mx-4 -mt-10 bg-white dark:bg-night rounded-xl p-2 pb-10">
+                    <View className="flex w-40"><Skeleton height={20} /></View>
                 </View>
-                <View className="shadow mx-4 -mt-10 bg-yellow-50 dark:bg-gray-400 rounded-lg p-2 pb-10">
-                    <View className="flex w-40">
-                        <Skeleton height={20} />
-                    </View>
-                </View>
-                <View className="mt-10 gap-5">
+                <View className="mt-10 mx-2 gap-5">
                     <Skeleton height={20} />
                     <Skeleton height={20} />
                 </View>
@@ -69,8 +74,11 @@ export default function ItemDetails() {
     const hasStops = Number(dashboard?.stops?.count) > 0;
 
     return (
+        <>
         <Animated.ScrollView
-            style={{ flex: 1 }}
+            className="flex-1 bg-mist dark:bg-ink"
+            onScroll={scrollHandler}
+            scrollEventThrottle={16}
             contentContainerStyle={{ paddingBottom: bottomPadding }}
             refreshControl={
                 <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
@@ -83,45 +91,11 @@ export default function ItemDetails() {
                         width: "100%",
                     }}
                     contentFit="cover"
-                >
-                    <View className="flex-1 justify-between mt-10 p-2">
-                        <View className="flex-row justify-between items-center">
-                            <Pressable className="rounded-full bg-gray-800 p-1 shadow"
-                                onPress={() => router.dismissAll()}>
-                                <IconSymbol name="arrow.left" size={25} color="white" />
-                            </Pressable>
-                            <View className="flex-row gap-5 items-center">
-
-                                <Pressable className="items-center"
-                                    onPressOut={() => router.push({
-                                        pathname: "/[id]/settings",
-                                        params: {
-                                            id: trip._id
-                                        }
-                                    })}>
-                                    <Avatar src={me?.avatar}
-                                        alt={me?.name?.charAt(0)}
-                                        size2="md"
-                                        badgeContent={0} />
-                                    <Text className="text-white font-bold">{me?.name}</Text>
-                                </Pressable>
-                                <TripActionsDropdown
-                                    onShare={handleShare}
-                                    onEdit={() => router.push({
-                                        pathname: "/[id]/edit-general",
-                                        params: { id: trip._id }
-                                    })}
-                                    onDelete={onDelete}
-                                    isDeleting={deleteTrip.isPending}
-                                />
-                            </View>
-                        </View>
-                    </View>
-                </ImageBackground>
+                />
             </View>
-            <View className="shadow mx-4 -mt-10 mb-5 px-2 pt-4 rounded-xl gap-5 bg-white dark:bg-gray-900 flex" >
+            <View className="shadow mx-4 -mt-10 mb-5 px-2 pt-4 rounded-xl gap-5 bg-white dark:bg-night flex" >
                 <View className="gap-1">
-                    <Text className="text-4xl font-bold dark:text-white" numberOfLines={2}>
+                    <Text className="text-4xl font-bold text-night dark:text-white" numberOfLines={2}>
                         {trip?.name}
                     </Text>
                     <Button className=""
@@ -140,7 +114,7 @@ export default function ItemDetails() {
                                     alt: u?.name?.charAt(0)
                                 }))}
                             />
-                            <Text numberOfLines={1} ellipsizeMode="tail" className="dark:text-white text-sm">
+                            <Text numberOfLines={1} ellipsizeMode="tail" className="text-night dark:text-white text-sm">
                                 Avec {displayUsers.map(u => u.name).join(", ")}{hasMore ? "..." : ""}
                             </Text>
                         </View>
@@ -204,7 +178,7 @@ export default function ItemDetails() {
                         count={dashboard?.goods?.total ?? 0}
                         warning={dashboard?.goods?.missing ?? 0}
                         label="Liste de course"
-                        color="orange"
+                        color="amber"
                         onPress={() => router.push({
                             pathname: "/[id]/goods",
                             params: { id: trip._id }
@@ -227,7 +201,7 @@ export default function ItemDetails() {
                         count={dashboard?.polls?.openPollsCount ?? 0}
                         warning={dashboard?.polls?.pendingPollsCount ?? 0}
                         label="Sondages"
-                        color="blue"
+                        color="night"
                         onPress={() => router.push({
                             pathname: "/[id]/polls",
                             params: { id: trip._id }
@@ -237,7 +211,7 @@ export default function ItemDetails() {
                         icon="link"
                         count={dashboard?.links?.linksCount ?? 0}
                         label="Liens utiles"
-                        color="green"
+                        color="amber-deep"
                         onPress={() => router.push({
                             pathname: "/[id]/links",
                             params: { id: trip._id }
@@ -248,9 +222,9 @@ export default function ItemDetails() {
             </View>
             {dashboard?.events?.nextEvent && (
                 <View className="mx-4 my-5">
-                    <Text className="text-lg font-bold mb-2 dark:text-white">Prochain événement</Text>
+                    <Text className="text-lg font-bold mb-2 text-night dark:text-white">Prochain événement</Text>
                     <Button
-                        className="flex-row items-center rounded-2xl bg-white dark:bg-gray-800 shadow-md p-4 border border-gray-100 dark:border-gray-700"
+                        className="flex-row items-center rounded-2xl bg-white dark:bg-night shadow-md p-4 border border-mist dark:border-white/10"
                         onPress={() => router.push({
                             pathname: "/[id]/events/[eventId]",
                             params: {
@@ -260,9 +234,9 @@ export default function ItemDetails() {
                         })}
                     >
                         <View className="flex-row gap-3 items-center flex-1">
-                            <IconSymbol name="calendar" size={24} color="#F97316" />
+                            <IconSymbol name="calendar" size={24} color="#EE8B33" />
                             <View className="flex-1">
-                                <Text className="text-lg font-bold dark:text-white" numberOfLines={1}>
+                                <Text className="text-lg font-bold text-night dark:text-white" numberOfLines={1}>
                                     {dashboard.events.nextEvent.name}
                                 </Text>
                                 <Text className="text-sm text-gray-500 dark:text-gray-400">
@@ -283,7 +257,32 @@ export default function ItemDetails() {
             )}
 
         </Animated.ScrollView>
+        <GlassHeaderBar
+            scrollY={scrollY}
+            title={trip?.name}
+            right={
+                <>
+                    <Pressable onPress={() => router.push({
+                        pathname: "/[id]/settings",
+                        params: { id: trip._id }
+                    })}>
+                        <Avatar src={me?.avatar}
+                            alt={me?.name?.charAt(0)}
+                            size2="sm"
+                            badgeContent={0} />
+                    </Pressable>
+                    <TripActionsDropdown
+                        onShare={handleShare}
+                        onEdit={() => router.push({
+                            pathname: "/[id]/edit-general",
+                            params: { id: trip._id }
+                        })}
+                        onDelete={onDelete}
+                        isDeleting={deleteTrip.isPending}
+                    />
+                </>
+            } />
+        </>
     )
 
 }
-

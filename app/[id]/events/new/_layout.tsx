@@ -1,12 +1,11 @@
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { TripContext } from "@/context/TripContext"; 
+import { useTrip } from "@/context/TripContext"; 
 import { usePostEvent } from "@/hooks/api/useEvents";
 import useColors from "@/hooks/styles/useColors";
 import { Event } from "@/types/models";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { View } from "react-native";
 
@@ -18,7 +17,7 @@ export default function NewEventLayout() {
     // 2️⃣ Fix frecapG7 : On retire 'id' d'ici, il est devenu inutile
     const { startDate, endDate } = useLocalSearchParams();
     
-    const { trip } = useContext(TripContext); 
+    const { trip } = useTrip(); 
 
     const methods = useForm<Omit<Event, "_id">>({
         defaultValues: {

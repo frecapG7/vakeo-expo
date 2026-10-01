@@ -1,16 +1,15 @@
 import { Avatar } from "@/components/ui/Avatar";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { useGlassHeaderOptions } from "@/hooks/styles/useGlassHeaderOptions";
 import { Stack, useRouter } from "expo-router";
-import { useContext } from "react";
 import { Platform, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PollsLayout() {
 
     const insets = useSafeAreaInsets();
-    const { trip, me } = useContext(TripContext);
+    const { trip, me } = useTrip();
 
     const router = useRouter();
 

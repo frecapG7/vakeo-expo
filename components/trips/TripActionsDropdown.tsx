@@ -1,6 +1,5 @@
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import useColors from "@/hooks/styles/useColors";
-import { ActivityIndicator, Alert, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Text, View, useColorScheme } from "react-native";
 import { Menu, MenuOption, MenuOptions, MenuTrigger } from "react-native-popup-menu";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
@@ -17,7 +16,9 @@ export function TripActionsDropdown({
   onDelete,
   isDeleting = false,
 }: TripActionsDropdownProps) {
-  const colors = useColors();
+  const colorScheme = useColorScheme();
+  const menuBackground = colorScheme === "dark" ? "#101736" : "#F6F8FD";
+  const iconColor = colorScheme === "dark" ? "#F7B74A" : "#16265C";
 
   const handleDeletePress = () => {
     if(isDeleting) return;
@@ -40,7 +41,7 @@ export function TripActionsDropdown({
   return (
     <Menu>
       <MenuTrigger>
-        <View className="bg-gray-800 rounded-full p-2">
+        <View className="bg-ink rounded-full p-2">
           <IconSymbol name="ellipsis" color="white" />
         </View>
       </MenuTrigger>
@@ -51,7 +52,7 @@ export function TripActionsDropdown({
             padding: 8,
             marginTop: 8,
             width: 220,
-            backgroundColor: colors.background,
+            backgroundColor: menuBackground,
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.25,
@@ -66,44 +67,44 @@ export function TripActionsDropdown({
       >
         <MenuOption
           onSelect={onShare}
-          customStyles={{ optionWrapper: { backgroundColor: colors.background } }}
+          customStyles={{ optionWrapper: { backgroundColor: menuBackground } }}
         >
           <View className="flex-row gap-3 items-center p-2">
-            <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-1.5">
+            <View className="bg-amber-deep dark:bg-amber/20 rounded-full p-1.5">
               <Animated.View entering={FadeIn} exiting={FadeOut}>
-                <IconSymbol name="doc.on.doc" size={24} />
+                <IconSymbol name="doc.on.doc" size={24} color={iconColor} />
               </Animated.View>
             </View>
-            <Text className="text-base dark:text-white">Partager le voyage</Text>
+            <Text className="text-base text-night dark:text-white">Partager le voyage</Text>
           </View>
         </MenuOption>
 
-        <View className="h-px bg-gray-200 dark:bg-gray-700 my-1" />
+        <View className="h-px bg-gray-200 dark:bg-white/10 my-1" />
 
         <MenuOption
           onSelect={onEdit}
-          customStyles={{ optionWrapper: { backgroundColor: colors.background } }}
+          customStyles={{ optionWrapper: { backgroundColor: menuBackground } }}
         >
           <View className="flex-row gap-3 items-center p-2">
-            <View className="bg-orange-400 dark:bg-gray-200 rounded-full p-1.5">
-              <IconSymbol name="pencil" size={24} />
+            <View className="bg-amber-deep dark:bg-amber/20 rounded-full p-1.5">
+              <IconSymbol name="pencil" size={24} color={iconColor} />
             </View>
-            <Text className="text-base dark:text-white">Modifier le voyage</Text>
+            <Text className="text-base text-night dark:text-white">Modifier le voyage</Text>
           </View>
         </MenuOption>
 
-        <View className="h-px bg-gray-200 dark:bg-gray-700 my-1" />
+        <View className="h-px bg-gray-200 dark:bg-white/10 my-1" />
 
         <MenuOption
           onSelect={handleDeletePress}
-          customStyles={{ optionWrapper: { backgroundColor: colors.background } }}
+          customStyles={{ optionWrapper: { backgroundColor: menuBackground } }}
         >
           <View className="flex-row gap-3 items-center p-2">
             <View className="bg-red-400 dark:bg-red-600 rounded-full p-1.5">
               {isDeleting ? (
                 <ActivityIndicator size="small" color="white" />
               ) : (
-                <IconSymbol name="trash" size={24} />
+                <IconSymbol name="trash" size={24} color="white" />
               )}
             </View>
             <Text className="text-base text-red-500 dark:text-red-400">

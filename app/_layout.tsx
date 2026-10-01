@@ -1,6 +1,7 @@
 import { Wordmark } from "@/components/brand/Wordmark";
+import MaterialIcons from "@react-native-vector-icons/material-icons/static";
 import useColors from "@/hooks/styles/useColors";
-import { useMigrate } from "@/hooks/api/useMigrate";
+import { useMigrate, hasPendingMigrations } from "@/hooks/api/useMigrate";
 import '@/lib/calendar-config';
 import { DefaultTheme, SplashScreen, Stack, ThemeProvider } from "expo-router";
 import * as Sentry from '@sentry/react-native';
@@ -50,6 +51,13 @@ const MigrationGate = ({ children, onDone }: { children: ReactNode, onDone: () =
   const { mutateAsync } = useMigrate();
 
   useEffect(() => {
+    // Dev : les full reloads Metro remontent la gate alors qu'il n'y a plus
+    // rien à migrer — pas de mutation, pas de log, splash levée immédiatement.
+    // Si le log apparaît, c'est qu'il y a du vrai travail (ou des échecs à retenter).
+    if (!hasPendingMigrations()) {
+      onDone();
+      return;
+    }
     if (!migrationRun) {
       migrationRun = (async () => {
         try {
@@ -110,7 +118,20 @@ export default Sentry.wrap(function RootLayout() {
                 </MigrationGate>
               )}
 
-              <ToastManager />
+              {/* Icônes custom : toastify-react-native rend ses icônes par défaut via
+                  l'ancien react-native-vector-icons (fonts non embarquées en Expo ->
+                  glyphes rendus par la police de repli, caractères CJK sur Android).
+                  On passe des ReactNodes via les packages scopés, comme IconSymbol. */}
+              <ToastManager
+                icons={{
+                  success: <MaterialIcons name="check-circle" size={22} color="#22C55E" />,
+                  error: <MaterialIcons name="error-outline" size={22} color="#EF4444" />,
+                  info: <MaterialIcons name="info-outline" size={22} color="#3B82F6" />,
+                  warn: <MaterialIcons name="warning" size={22} color="#F59E0B" />,
+                  default: <MaterialIcons name="info-outline" size={22} color="#3B82F6" />,
+                }}
+                closeIcon={<MaterialIcons name="close" size={20} color="#9CA3AF" />}
+              />
             </MenuProvider>
           </SafeAreaProvider>
         </ThemeProvider>

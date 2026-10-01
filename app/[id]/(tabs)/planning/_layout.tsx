@@ -1,23 +1,20 @@
-import { BackgroundHeader } from "@/components/header/BackgroundHeader";
+import { WordmarkHomeButton } from "@/components/brand/WordmarkHomeButton";
 import { Avatar } from "@/components/ui/Avatar";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import styles from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
-import { useGetTrip } from "@/hooks/api/useTrips";
-import useColors from "@/hooks/styles/useColors";
+import { useTrip } from "@/context/TripContext";
+import { useGlassHeaderOptions } from "@/hooks/styles/useGlassHeaderOptions";
 import { Stack, useGlobalSearchParams, usePathname, useRouter } from "expo-router";
-import { useContext } from "react";
-import { Platform, Pressable, View } from "react-native";
+import { Platform, Pressable, View, useColorScheme } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PlanningLayout() {
 
     const { id } = useGlobalSearchParams<{id: string}>();
     const router = useRouter();
-    const { data: trip } = useGetTrip(id);
-    const { me } = useContext(TripContext);
+    const { me } = useTrip();
 
-    const colors = useColors();
+    const isDark = useColorScheme() === "dark";
+    const iconColor = isDark ? "#F6F8FD" : "#16265C";
 
     const pathname = usePathname();
     const isCalendar = pathname?.includes("calendar") || pathname?.includes("day");
@@ -33,13 +30,7 @@ export default function PlanningLayout() {
             <Stack screenOptions={{
                 headerShown: true,
                 title: "Planning",
-                headerTintColor: "white",
-                headerTitleStyle: styles.headerTitle,
-                headerLargeTitleStyle: {
-                    color: "white",
-                    fontWeight: "bold",
-                },
-                headerBackground: () => trip && <BackgroundHeader trip={trip} />,
+                ...useGlassHeaderOptions(),
                 headerRight: () =>
                     <View className="flex flex-row justify-end items-center my-2 gap-2">
                         <View>
@@ -52,11 +43,11 @@ export default function PlanningLayout() {
                                         params: { id }
                                     })
                                 }
-                                className="p-2 rounded-full bg-gray-200 dark:bg-gray-800">
+                                className="p-2 rounded-full bg-white dark:bg-night border border-gray-200 dark:border-white/15">
                                 <IconSymbol
                                     name={isCalendar ? "list.dash" : "calendar"}
                                     size={20}
-                                    color={colors.text}
+                                    color={iconColor}
                                 />
                             </Pressable>
 
@@ -76,7 +67,8 @@ export default function PlanningLayout() {
             }}>
                 <Stack.Screen name="index" options={{
                     headerLargeTitleEnabled: true,
-                    headerTransparent: Platform.OS === "ios",
+                    // Onglet racine : pas de back natif — le wordmark ramène à la home.
+                    headerLeft: () => <WordmarkHomeButton />,
                 }} />
                 <Stack.Screen name="calendar" />
                 <Stack.Screen name="day" />

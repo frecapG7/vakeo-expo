@@ -1,14 +1,12 @@
 import { EventIcon, getEventIconSource } from "@/components/events/EventIcon";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import styles from "@/constants/Styles";
 import { useGetEvents } from "@/hooks/api/useEvents";
-import { useGetTrip } from "@/hooks/api/useTrips";
-import useColors from "@/hooks/styles/useColors";
+import { useTrip } from "@/context/TripContext";
 import dayjs from "@/lib/dayjs-config";
 import { useGlobalSearchParams, useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, useColorScheme } from "react-native";
 import { Calendar, DateData } from "react-native-calendars";
 import { DayState } from "react-native-calendars/src/types";
 import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
@@ -27,12 +25,12 @@ const DayComponent = ({ date, state, onDayPress, count = 0 }: { date?: DateData,
             key={`${date?.dateString}-${state}-${count}`}
             className={`
                 items-center justify-center rounded-full active:scale-[1.5] aspect-square
-                dark:bg-gray-800
+                dark:bg-night
                 ${isDisabled ? 'opacity-30' : ''}
                 ${isInactive ? 'opacity-50' : ''}
-                ${isSelected ? 'border-2 border-orange-400 bg-orange-50 shadow-md' :
-                    isToday ? 'ring-2 ring-blue-400 bg-blue-50' :
-                        'border border-gray-300'}
+                ${isSelected ? 'border-2 border-amber-deep bg-amber/25 shadow-md' :
+                    isToday ? 'ring-2 ring-amber-deep bg-amber/25' :
+                        'border border-gray-300 dark:border-white/15'}
                 m-1 p-1
                 `}
             disabled={isDisabled || isInactive}
@@ -40,14 +38,14 @@ const DayComponent = ({ date, state, onDayPress, count = 0 }: { date?: DateData,
         >
             <Text
                 className={`
-                dark:text-gray-200 text-lg
-                ${isSelected ? 'font-bold dark:text-white' : isToday ? `font-semibold dark:text-white` : 'text-text'}
+                text-night dark:text-white text-lg
+                ${isSelected ? 'font-bold' : isToday ? `font-semibold` : ''}
                 
             `}>
                 {date?.day}
             </Text>
             {count > 0 &&
-                <View className="absolute -top-2 -right-2 bg-orange-400 rounded-full w-5 h-5 items-center justify-center">
+                <View className="absolute -top-2 -right-2 bg-amber-deep rounded-full w-5 h-5 items-center justify-center">
                     <Text className="text-white text-xs font-bold">
                         {count}
                     </Text>
@@ -62,11 +60,24 @@ export default function TripCalendar() {
     const { id } = useGlobalSearchParams<{ id: string }>();
     const router = useRouter();
 
-    const { data: trip } = useGetTrip(id);
+    const { trip } = useTrip();
     const [currentDate, setCurrentDate] = useState(dayjs(trip?.startDate).format("YYYY-MM-DD"));
     const { date: selectedDay } = useLocalSearchParams<{ date?: string }>();
 
-    const colors = useColors();
+    const colorScheme = useColorScheme();
+    const isDark = colorScheme === "dark";
+    const calendarTheme = {
+        background: isDark ? "#101736" : "#F6F8FD",
+        calendarBackground: isDark ? "#101736" : "#F6F8FD",
+        textSectionTitleColor: isDark ? "#F6F8FD" : "#16265C",
+        dayTextColor: isDark ? "#F6F8FD" : "#16265C",
+        monthTextColor: isDark ? "#F6F8FD" : "#16265C",
+        selectedDayBackgroundColor: "#EE8B33",
+        selectedDayTextColor: "white",
+        todayTextColor: "#EE8B33",
+        arrowColor: "#EE8B33",
+        indicatorColor: "#EE8B33",
+    };
 
     const { data: eventsData, } = useGetEvents(id, {
         startDate: dayjs(currentDate).startOf('month').toISOString(),
@@ -102,24 +113,13 @@ export default function TripCalendar() {
     };
 
     return (
-        <Animated.ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <Animated.ScrollView className="flex-1 bg-mist dark:bg-ink" showsVerticalScrollIndicator={false}>
             <Calendar
                 current={currentDate}
                 onMonthChange={(date) => setCurrentDate(date.dateString)}
                 markedDates={markedDates}
                 markingType="custom"
-                theme={{
-                    backgroundColor: colors.background,
-                    calendarBackground: colors.background,
-                    textSectionTitleColor: colors.text,
-                    dayTextColor: colors.text,
-                    monthTextColor: colors.text,
-                    selectedDayBackgroundColor: colors.primary,
-                    selectedDayTextColor: 'white',
-                    todayTextColor: colors.primary,
-                    arrowColor: colors.primary,
-                    indicatorColor: colors.primary,
-                }}
+                theme={calendarTheme}
                 hideDayNames={false}
                 dayComponent={({ date, state, marking }) => <DayComponent date={date}
                     state={date?.dateString === selectedDay ? 'selected' : state}
@@ -127,15 +127,11 @@ export default function TripCalendar() {
                     count={marking?.count ?? 0}
                 />}
                 firstDay={1}
-                style={{
-                    // flex: 1,
-                    // height: "100%"
-                }}
                 renderArrow={(direction) => (
                     <IconSymbol
                         name={direction === 'left' ? 'chevron.left' : 'chevron.right'}
                         size={24}
-                        color={colors.text}
+                        color={isDark ? "#F6F8FD" : "#16265C"}
                     />
                 )}
 
@@ -145,8 +141,8 @@ export default function TripCalendar() {
                     entering={SlideInDown.duration(300)}
                     exiting={SlideOutDown.duration(200)}
                 >
-                    <View className="flex-row justify-between items-center px-4 py-2 border-t border-gray-200 dark:border-gray-700">
-                        <Text className="text-xl font-semibold text-text dark:text-white capitalize">
+                    <View className="flex-row justify-between items-center px-4 py-2 border-t border-gray-200 dark:border-white/10">
+                        <Text className="text-xl font-semibold text-night dark:text-white capitalize">
                             {dayjs(selectedDay).locale('fr').format('dddd D MMMM')}
                         </Text>
                         <Pressable onPress={() => router.push({
@@ -156,7 +152,7 @@ export default function TripCalendar() {
                                 date: selectedDay
                             },
                         })}>
-                            <Text className="text-orange-400 font-medium">Voir tout</Text>
+                            <Text className="text-amber-deep font-medium">Voir tout</Text>
                         </Pressable>
                     </View>
 
@@ -173,10 +169,10 @@ export default function TripCalendar() {
                                             eventId: event._id
                                         }
                                     })}>
-                                    <View className="mb-2 p-3 bg-gray-100 dark:bg-gray-800 rounded-lg flex-row items-center gap-3">
+                                    <View className="mb-2 p-3 bg-white dark:bg-night rounded-lg flex-row items-center gap-3">
                                         <EventIcon source={getEventIconSource(event.type)} size="sm" />
                                         <View className="flex-1">
-                                            <Text className="font-medium text-text dark:text-white">
+                                            <Text className="font-medium text-night dark:text-white">
                                                 {event.name}
                                             </Text>
                                             <View className="flex-row gap-1">
