@@ -14,6 +14,15 @@ export interface StorageTrip {
 }
 
 
+/**
+ * Prédicat de forme d'un enregistrement `trips.*` : objet non-null avec `_id` string.
+ * Filtre les valeurs JSON parsables mais sémantiquement invalides (null, nombre,
+ * chaîne) — sinon `trip._id` fait crasher tous les consommateurs (preflight
+ * migration, boucle migrate, home). Un enregistrement invalide est ignoré
+ * (warn), jamais supprimé du stockage : il devient inerte, sans perte de donnée.
+ */
+const isStorageTrip = (value: unknown): value is StorageTrip =>
+    !!value && typeof value === "object" && typeof (value as { _id?: unknown })._id === "string";
 
 
 export const getStorageTrips = (): StorageTrip[] => {
@@ -23,7 +32,12 @@ export const getStorageTrips = (): StorageTrip[] => {
         .filter((value): value is string => !!value)
         .flatMap(value => {
             try{
-                return [JSON.parse(value) as StorageTrip];
+                const parsed: unknown = JSON.parse(value);
+                if (!isStorageTrip(parsed)) {
+                    console.warn("Stockage : enregistrement trips.* invalide ignoré", value);
+                    return [];
+                }
+                return [parsed];
             }catch(err){
                  console.warn("Stockage : trip corrompu ignoré", err);
                 return [];
@@ -32,10 +46,7 @@ export const getStorageTrips = (): StorageTrip[] => {
 }
 
 export const useGetStorageTrips = () => {
-    return useQuery({
-        queryKey: ["storage", "trips"],
-        queryFn: getStorageTrips
-    })
+    return useQuery({ queryKey: ["storage", "trips"], queryFn: getStorageTrips })
 }
 
 const getStorageTrip = (id: string): StorageTrip | null => {
@@ -53,7 +64,6 @@ export const useGetStorageTrip = (id: string) => {
 }
 
 
-
 const addTripStorage = (trip: StorageTrip): Promise<void> => {
     return new Promise((resolve, reject) => {
         try {
@@ -68,10 +78,7 @@ const addTripStorage = (trip: StorageTrip): Promise<void> => {
 
 export const useAddStorageTrip = () => {
     const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: (trip: StorageTrip) => addTripStorage(trip),
-        onSuccess: () => queryClient.invalidateQueries()
-    })
+    return useMutation({ mutationFn: (trip: StorageTrip) => addTripStorage(trip), onSuccess: () => queryClient.invalidateQueries() })
 }
 
 const updateStorageTrip = (id: string, trip: StorageTrip): Promise<StorageTrip> => {
@@ -86,10 +93,7 @@ const updateStorageTrip = (id: string, trip: StorageTrip): Promise<StorageTrip> 
 export const useUpdateStorageTrip = (id: string) => {
     const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationFn: (trip: StorageTrip) => updateStorageTrip(id, trip),
-        onSuccess: () => queryClient.invalidateQueries()
-    })
+    return useMutation({ mutationFn: (trip: StorageTrip) => updateStorageTrip(id, trip), onSuccess: () => queryClient.invalidateQueries() })
 }
 
 const deleteStorageTrip = (id: string): Promise<void> => {
@@ -111,4 +115,3 @@ export const useDeleteStorageTrip = () => {
         onSuccess: () => queryClient.invalidateQueries()
     });
 }
-

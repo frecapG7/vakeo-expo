@@ -51,28 +51,36 @@ const MigrationGate = ({ children, onDone }: { children: ReactNode, onDone: () =
   const { mutateAsync } = useMigrate();
 
   useEffect(() => {
-    // Dev : les full reloads Metro remontent la gate alors qu'il n'y a plus
-    // rien à migrer — pas de mutation, pas de log, splash levée immédiatement.
-    // Si le log apparaît, c'est qu'il y a du vrai travail (ou des échecs à retenter).
-    if (!hasPendingMigrations()) {
+    try {
+      // Dev : les full reloads Metro remontent la gate alors qu'il n'y a plus
+      // rien à migrer — pas de mutation, pas de log, splash levée immédiatement.
+      // Si le log apparaît, c'est qu'il y a du vrai travail (ou des échecs à retenter).
+      if (!hasPendingMigrations()) {
+        onDone();
+        return;
+      }
+      if (!migrationRun) {
+        migrationRun = (async () => {
+          try {
+            const summary = await mutateAsync();
+            console.log(`Migration v3 : ${summary.migrated} migré(s), ${summary.dropped} droppé(s), ${summary.failed} en échec`);
+            if (summary.failed > 0)
+              console.warn(`Migration v3 : ${summary.failed} trip(s) en échec — retentés au prochain lancement`);
+          } catch (err) {
+            // On ne bloque jamais l'app sur le bootstrap : les trips non migrés
+            // sont resumables (clé méta `migration`, cf. hooks/api/useMigrate.ts).
+            console.error("Migration v3 : échec du bootstrap", err);
+          }
+        })();
+      }
+      migrationRun.then(onDone);
+    } catch (err) {
+      // Contrat de la gate : quoi qu'il arrive, l'app démarre (splash levée).
+      // Un preflight qui jette (stockage illisible, shape inattendue…) ne doit
+      // jamais briquer le lancement — la migration sera retentée au boot suivant.
+      console.error("Migration v3 : échec du preflight, démarrage sans migration", err);
       onDone();
-      return;
     }
-    if (!migrationRun) {
-      migrationRun = (async () => {
-        try {
-          const summary = await mutateAsync();
-          console.log(`Migration v3 : ${summary.migrated} migré(s), ${summary.dropped} droppé(s), ${summary.failed} en échec`);
-          if (summary.failed > 0)
-            console.warn(`Migration v3 : ${summary.failed} trip(s) en échec — retentés au prochain lancement`);
-        } catch (err) {
-          // On ne bloque jamais l'app sur le bootstrap : les trips non migrés
-          // sont resumables (clé méta `migration`, cf. hooks/api/useMigrate.ts).
-          console.error("Migration v3 : échec du bootstrap", err);
-        }
-      })();
-    }
-    migrationRun.then(onDone);
   }, []);
 
   // Rien n'est monté pendant la migration : le splash couvre l'écran, et aucun

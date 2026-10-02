@@ -37,6 +37,9 @@ export const ViewToggle = ({ mode, onChange }: ViewToggleProps) => {
             <Pressable
                 style={{ width: SEGMENT_WIDTH }}
                 className="py-1.5 items-center justify-center"
+                accessibilityRole="button"
+                accessibilityLabel="Vue liste"
+                accessibilityState={{ selected: mode === "list" }}
                 onPress={() => onChange("list")}
             >
                 <IconSymbol name="list.dash" size={18} color={mode === "list" ? "#FFFFFF" : inactiveColor} />
@@ -44,6 +47,9 @@ export const ViewToggle = ({ mode, onChange }: ViewToggleProps) => {
             <Pressable
                 style={{ width: SEGMENT_WIDTH }}
                 className="py-1.5 items-center justify-center"
+                accessibilityRole="button"
+                accessibilityLabel="Vue calendrier"
+                accessibilityState={{ selected: mode === "calendar" }}
                 onPress={() => onChange("calendar")}
             >
                 <IconSymbol name="calendar" size={18} color={mode === "calendar" ? "#FFFFFF" : inactiveColor} />
