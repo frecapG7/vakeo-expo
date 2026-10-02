@@ -9,12 +9,18 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
 import { TripContext } from "@/context/TripContext";
 import { useGetPoll, usePutPoll, useUnvotePoll, useVotePoll } from "@/hooks/api/usePolls";
+import { useTrip } from "@/context/TripContext";
+import { useGetPoll, useUnvotePoll, useVotePoll } from "@/hooks/api/usePolls";
+import useI18nTime from "@/hooks/i18n/useI18nTime";
 import dayjs from "@/lib/dayjs-config";
 
 import { PollOption as Option } from "@/types/models";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Modal, Text, TouchableOpacity, View } from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useState } from "react";
+import { Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 

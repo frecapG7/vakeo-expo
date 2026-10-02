@@ -3,10 +3,10 @@ import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { UserRestrictionsForm } from "@/components/users/UserRestrictionsForm";
 import styles from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { useGetTripUser, useUpdateTripUser } from "@/hooks/api/useTrips";
 import { router } from "expo-router";
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
@@ -17,7 +17,7 @@ import { Toast } from "toastify-react-native";
 export default function TripSettings() {
 
 
-    const { me, trip } = useContext(TripContext);
+    const { me, trip } = useTrip();
 
     const { data: user } = useGetTripUser(trip._id, me?._id);
     const updateTripUser = useUpdateTripUser(trip._id, user?._id);
@@ -80,7 +80,7 @@ export default function TripSettings() {
 
     return (
         <Animated.View style={styles.container}>
-            <View className="flex gap-2 items-start border-b border-blue-700  pb-2 mx-5">
+            <View className="flex gap-2 items-start border-b border-blue-700  pb-2 m-5">
                 <Avatar src={user?.avatar} size2="xl" alt={user?.name.charAt(0)} />
                 <View className="flex-row gap-5 items-end">
                     <Text className="dark:text-white text-3xl font-bold">{user?.name}</Text>

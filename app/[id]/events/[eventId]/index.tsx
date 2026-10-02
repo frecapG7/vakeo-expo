@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { useGetEvent, useUpdateEvent } from "@/hooks/api/useEvents";
 import { containsUser } from "@/lib/utils";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
-import { useContext, useMemo } from "react";
+import { useMemo } from "react";
 import { KeyboardAvoidingView, Pressable, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -18,7 +18,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 export default function EventDetails() {
 
     const { eventId } = useLocalSearchParams<{ eventId: string }>();
-    const { trip, me } = useContext(TripContext);
+    const { trip, me } = useTrip();
     const insets = useSafeAreaInsets();
 
     const { data: event } = useGetEvent(trip?._id, eventId);

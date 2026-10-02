@@ -7,12 +7,13 @@ import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Avatar } from "@/components/ui/Avatar";
 import styles from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { usePostPoll } from "@/hooks/api/usePolls";
 import { Poll } from "@/types/models";
 import { useLocalSearchParams, useRouter } from "expo-router/build/hooks";
 import { useContext, useEffect, useMemo, useState } from "react";
 import dayjs from "@/lib/dayjs-config";
+import { useEffect } from "react";
 
 import { useController, useForm } from "react-hook-form";
 import { Text, View, TouchableOpacity, Pressable, TextInput, Alert } from "react-native";
@@ -174,7 +175,7 @@ export default function NewPoll() {
     const currentQuestion = watch("question");
 
     const { type: typeParam, stop } = useLocalSearchParams<{ type: string, stop?: string }>();
-    const { trip, me } = useContext(TripContext);
+    const { trip, me } = useTrip();
     const postPoll = usePostPoll(trip?._id, me?._id);
     const router = useRouter();
 

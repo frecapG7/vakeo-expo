@@ -1,26 +1,27 @@
 
 
 
-import { BackgroundHeader } from "@/components/header/BackgroundHeader";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import styles from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
+import { useGlassHeaderOptions } from "@/hooks/styles/useGlassHeaderOptions";
 import { Stack, useRouter } from "expo-router";
-import { useContext } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
 export default function GoodsLayout() {
 
-    const { trip } = useContext(TripContext);
+    const { trip } = useTrip();
 
     const insets = useSafeAreaInsets();
     const bottomPadding = insets.bottom;
 
 
     const router = useRouter();
+
+
+    const glass = useGlassHeaderOptions();
 
     return (
         <View className="flex-1"
@@ -29,13 +30,13 @@ export default function GoodsLayout() {
             }}>
             <Stack screenOptions={{
                 headerShown: true,
+                ...glass
             }}>
                 <Stack.Screen name="index"
                     options={{
                         title: "Les liens utiles",
-                        headerTintColor: "white",
-                        headerTitleStyle: styles.headerTitle,
-                        headerBackground: () => trip && <BackgroundHeader trip={trip} />
+                        headerLargeTitleEnabled: true,
+                        headerTransparent: Platform.OS === "ios"
                     }} />
                 <Stack.Screen name="new"
                     options={{
@@ -48,14 +49,6 @@ export default function GoodsLayout() {
                             <IconSymbol name="xmark" />
                         </Button>
                     }} />
-                {/*
-                <Stack.Screen name="[goodId]"
-                    options={{
-                        presentation: "modal",
-                        title: "Modifier article",
-                        animation:"slide_from_bottom",
-                        headerBackVisible: true,
-                    }} /> */}
             </Stack>
         </View>
     )

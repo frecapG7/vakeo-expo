@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { useGetPolls } from "@/hooks/api/usePolls";
 import { useGetTrip, useUpdateTrip } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
@@ -12,7 +12,7 @@ import dayjs from "@/lib/dayjs-config";
 import { countDaysBetween } from "@/lib/utils";
 import { Trip } from "@/types/models";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useContext, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useController, useForm } from "react-hook-form";
 import { Text, View } from "react-native";
 import { Calendar, CalendarUtils } from "react-native-calendars";
@@ -27,7 +27,7 @@ export default function DatesPage() {
     const { id } = useLocalSearchParams();
     const { data: trip } = useGetTrip(id);
     const updateTrip = useUpdateTrip(id);
-    const { me } = useContext(TripContext);
+    const { me } = useTrip();
     const { data: pagePoll } = useGetPolls(id, { type: "DatesPoll" });
     const poll = pagePoll?.polls[0];
     const router = useRouter();
@@ -97,11 +97,10 @@ export default function DatesPage() {
 
 
     return (
-        <SafeAreaView style={styles.container} >
-
-            <Animated.ScrollView  >
+        <SafeAreaView edges={["bottom"]} style={styles.container} >
+            <Animated.ScrollView contentInsetAdjustmentBehavior="automatic">
                 {/* // Above calendar */}
-                <View className="mx-2 mb-4 p-4 gap-4 bg-white dark:bg-gray-900 rounded-xl shadow-sm">
+                <View className="m-2 mb-4 p-4 gap-4 bg-white dark:bg-gray-900 rounded-xl shadow-sm">
                     <View className="flex-row items-center gap-2">
                         <Text className="text-xl">📅</Text>
                         {startDate && endDate ? (

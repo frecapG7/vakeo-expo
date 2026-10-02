@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
-import { useGetPoll, useUnvotePoll, useVotePoll } from "@/hooks/api/usePolls";
+import { useTrip } from "@/context/TripContext";
+import { useGetPolls } from "@/hooks/api/usePolls";
+import { useGetDashboard } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
+import { translateType } from "@/lib/pollUtils";
 import dayjs from "@/lib/dayjs-config";
 
 import { PollOption as Option } from "@/types/models";
@@ -53,6 +55,7 @@ const DateRangePickerModal = ({ visible, onClose, onValidate }: any) => {
             }
         }
     };
+    const { trip, me } = useTrip();
 
     const handleValidate = () => {
         if (startDay) {

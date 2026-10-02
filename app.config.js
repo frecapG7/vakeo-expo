@@ -32,7 +32,7 @@ export default {
       versionCode: computeVersionCode(packageJson.version),
       adaptiveIcon: {
         foregroundImage: './assets/images/adaptive-icon.png',
-        backgroundColor: '#ffffff',
+        backgroundColor: '#16265C',
       },
       package: IS_PRODUCTION ? 'com.frecapg7.olyne' : 'com.frecapg7.vakeoexpo'
     },
@@ -47,14 +47,15 @@ export default {
         'expo-splash-screen',
         {
           image: './assets/images/splash.png',
-          backgroundColor: '#7BDCB5',
+          backgroundColor: '#F7B74A',
           dark: {
             image: './assets/images/splash-dark.png',
-            backgroundColor: '#000000',
+            backgroundColor: '#101736',
           },
-          imageWidth: 200,
+          imageWidth: 400,
         },
       ],
+      'expo-status-bar',
       'expo-web-browser',
       [
         '@sentry/react-native/expo',

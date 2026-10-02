@@ -1,12 +1,11 @@
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { useGetUnreadCount } from "@/hooks/api/useMessages";
 import { NativeTabs } from "expo-router/unstable-native-tabs";
-import { useContext } from "react";
 
 export default function ItemDetailsLayout() {
 
 
-    const { me, trip } = useContext(TripContext);
+    const { me, trip } = useTrip();
     const { data: unreadCount = 0 } = useGetUnreadCount(trip?._id, me?._id);
 
     return (

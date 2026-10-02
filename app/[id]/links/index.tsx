@@ -4,7 +4,7 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Spinner } from "@/components/ui/Spinner";
 import styles from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { useDeleteLink, useGetLinks } from "@/hooks/api/useLinks";
 import { Link } from "@/types/models";
 import * as Clipboard from 'expo-clipboard';
@@ -12,25 +12,46 @@ import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 import * as Linking from 'expo-linking';
 import { useRouter } from "expo-router";
-import { useContext, useMemo } from "react";
-import { Text, View } from "react-native";
+import { useMemo } from "react";
+import { Alert, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import Animated from "react-native-reanimated";
+import { Toast } from "toastify-react-native";
 
 
 export default function TripLinks() {
 
 
-    const { trip, me } = useContext(TripContext);
+    const { trip, me } = useTrip();
     const router = useRouter();
 
     const { data, hasNextPage, fetchNextPage, isLoading, refetch, isRefetching } = useGetLinks(trip?._id);
     const deleteLink = useDeleteLink(trip?._id, me?._id);
     const links = useMemo(() => data?.pages.flatMap((page) => page?.links), [data?.pages]);
 
-    const handleDelete = async (link: Link) => {
-        await deleteLink.mutateAsync(link);
+    const handleDelete = (link: Link) => {
+        if (!link)
+            return;
+        Alert.alert("Retirer le lien ?",
+            "", [
+            {
+                text: "Annuler",
+            },
+            {
+                text: "Supprimer",
+                onPress: () =>
+                    deleteLink.mutate(link, {
+                        onSuccess: () => {
+                            Toast.success("Lien supprimé")
+                        },
+                        onError: (error) => {
+                            console.error("Delete failed:", error);
+                            Toast.error("Erreur de suppression");
+                        }
+                    })
+            }
+        ]);
     }
 
 
@@ -46,6 +67,7 @@ export default function TripLinks() {
                 refreshing={isRefetching}
                 className="flex-1"
                 contentContainerClassName="my-5"
+                contentInsetAdjustmentBehavior="automatic"
                 renderItem={({ item }) =>
                     <Swipeable
                         renderRightActions={() => (

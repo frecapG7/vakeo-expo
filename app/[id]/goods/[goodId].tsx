@@ -1,18 +1,18 @@
 import { GoodForm } from "@/components/goods/GoodForm";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { useGetGood, useGetGoods, usePutGood } from "@/hooks/api/useGoods";
 import { Good } from "@/types/models";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import { Toast } from "toastify-react-native";
 
 export default function EditGood() {
     const { goodId } = useLocalSearchParams<{ id: string, goodId: string }>();
-    const { trip, me } = useContext(TripContext);
+    const { trip, me } = useTrip();
     const router = useRouter();
 
     const { data: good, isLoading } = useGetGood(trip?._id, goodId);
