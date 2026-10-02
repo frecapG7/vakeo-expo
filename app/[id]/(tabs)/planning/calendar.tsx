@@ -1,4 +1,4 @@
-import { EventIcon, getEventIconSource } from "@/components/events/EventIcon";
+import { EventIcon } from "@/components/events/EventIcon";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useGetEvents } from "@/hooks/api/useEvents";
@@ -124,7 +124,7 @@ export default function TripCalendar() {
                 dayComponent={({ date, state, marking }) => <DayComponent date={date}
                     state={date?.dateString === selectedDay ? 'selected' : state}
                     onDayPress={handleDayPress}
-                    count={marking?.count ?? 0}
+                    count={(marking as { count?: number } | undefined)?.count ?? 0}
                 />}
                 firstDay={1}
                 renderArrow={(direction) => (
@@ -170,7 +170,7 @@ export default function TripCalendar() {
                                         }
                                     })}>
                                     <View className="mb-2 p-3 bg-white dark:bg-night rounded-lg flex-row items-center gap-3">
-                                        <EventIcon source={getEventIconSource(event.type)} size="sm" />
+                                        <EventIcon name={event.type} size="sm" />
                                         <View className="flex-1">
                                             <Text className="font-medium text-night dark:text-white">
                                                 {event.name}
