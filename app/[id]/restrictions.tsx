@@ -1,16 +1,16 @@
 import { RestrictionIcon } from "@/components/users/RestrictionIcon";
 import { default as styles } from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { translateRestriction } from "@/lib/userUtils";
 import { router } from "expo-router";
-import { useContext, useMemo } from "react";
+import { useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TripRestrictions() {
 
-    const { trip, me } = useContext(TripContext);
+    const { trip, me } = useTrip();
 
     // Get all users with their restrictions
     const users = useMemo(() => trip?.users || [], [trip?.users]);

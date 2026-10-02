@@ -1,10 +1,10 @@
 import { GoodForm } from "@/components/goods/GoodForm";
 import { Button } from "@/components/ui/Button";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { usePostGood } from "@/hooks/api/useGoods";
 import { Good } from "@/types/models";
 import { useLocalSearchParams } from "expo-router";
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { View } from "react-native";
 import { Toast } from "toastify-react-native";
@@ -21,7 +21,7 @@ export default function NewGood() {
     const { eventId } = useLocalSearchParams<{ id: string, eventId?: string }>();
 
 
-    const {me, trip} = useContext(TripContext);
+    const {me, trip} = useTrip();
     const { control, handleSubmit, reset } = useForm<GoodFormInputs>({
         defaultValues
     });

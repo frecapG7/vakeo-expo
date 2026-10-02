@@ -1,10 +1,10 @@
 import styles from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import useColors from "@/hooks/styles/useColors";
 import { Poll, Trip, TripStop, TripUser } from "@/types/models";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import Animated, { SlideInRight, SlideOutLeft } from "react-native-reanimated";
@@ -54,7 +54,7 @@ export const TripStopDetailsEditor = ({
     const colors = useColors();
     const bottomSheetRef = useRef<BottomSheet>(null);
     const [tabValue, setTabValue] = useState("location");
-    const { me } = useContext(TripContext);
+    const { me } = useTrip();
     const router = useRouter();
 
     useEffect(() => {

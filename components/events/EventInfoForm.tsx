@@ -6,14 +6,13 @@ import { FormDateTimePickerV2 } from "../form/FormDateTimePickerV2"
 import { FormText } from "../form/FormText"
 import { FormTextArea } from "../form/FormTextArea"
 // 🚨 Ajout des imports pour récupérer le Trip
-import { useContext } from "react"
-import { TripContext } from "@/context/TripContext"
+import { useTrip } from "@/context/TripContext"
 
 export const EventInfoForm = ({ control }: { control: Control<Event> }) => {
 
     const { text } = useColors();
     // 🚨 On récupère le voyage depuis la mémoire
-    const { trip } = useContext(TripContext);
+    const { trip } = useTrip();
 
     const startDate = useWatch({
         control,

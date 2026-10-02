@@ -2,11 +2,11 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { useGetTripUser, useUpdateTripUser } from "@/hooks/api/useTrips";
 import useColors from "@/hooks/styles/useColors";
 import { useRouter } from "expo-router";
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
@@ -32,7 +32,7 @@ const avatars = [
 export default function AvatarSetting() {
 
     const router = useRouter();
-    const { me, trip } = useContext(TripContext);
+    const { me, trip } = useTrip();
     const { data: user } = useGetTripUser(trip._id, me?._id);
     const updateUser = useUpdateTripUser(trip._id, user?._id);
     const colors = useColors();

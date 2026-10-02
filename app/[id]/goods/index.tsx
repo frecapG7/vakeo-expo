@@ -4,13 +4,13 @@ import { FloatingAddButton } from "@/components/ui/FloatingAddButton";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Spinner } from "@/components/ui/Spinner";
 import styles, { popupMenuStyles } from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { useCheckAllGoods, useCheckGood, useDeleteGood, useGetGoods } from "@/hooks/api/useGoods";
 import useColors from "@/hooks/styles/useColors";
 import { Good } from "@/types/models";
 import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
@@ -21,7 +21,7 @@ import { Toast } from "toastify-react-native";
 export default function TripGoods() {
 
     const { eventId } = useLocalSearchParams<{ eventId?: string, title?: string }>();
-    const { trip, me } = useContext(TripContext);
+    const { trip, me } = useTrip();
 
 
     const [unchecked, setUnchecked] = useState(false);
