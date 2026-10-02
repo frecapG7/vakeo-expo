@@ -10,16 +10,8 @@ import dayjs from "@/lib/dayjs-config";
 import { Event, TripUser } from "@/types/models";
 import { useGlobalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, SectionList, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-
-const showDay = (previous?: Event, current?: Event) => {
-    if (!current?.startDate)
-        return false;
-    if (!previous?.startDate)
-        return true;
-    return !dayjs(previous.startDate).isSame(dayjs(current.startDate), 'day');
-}
 
 const typeFilters = [
     {
@@ -68,9 +60,35 @@ const typeFilters = [
     }
 ]
 
+/** Clé de section pour les events sans date (pas d'en-tête de jour rendu). */
+const SANS_DATE_KEY = "sans-date";
+
+type DaySection = { key: string, data: Event[] };
+
+/**
+ * Regroupe les events par jour, en conservant l'ordre d'apparition.
+ * Les events sans startDate forment une section sans en-tête (comportement
+ * historique : ils s'affichent sans titre de jour). GroupBy front assumé :
+ * l'API pagine en cursor plat, le jour est une notion de vue uniquement.
+ */
+const toDaySections = (events: Event[]): DaySection[] => {
+    const sections: DaySection[] = [];
+    const sectionsByKey = new Map<string, DaySection>();
+    for (const event of events) {
+        const key = event.startDate ? dayjs(event.startDate).format("YYYY-MM-DD") : SANS_DATE_KEY;
+        let section = sectionsByKey.get(key);
+        if (!section) {
+            section = { key, data: [] };
+            sectionsByKey.set(key, section);
+            sections.push(section);
+        }
+        section.data.push(event);
+    }
+    return sections;
+};
+
 const EventItem = ({ event, user, onPress }: { event: Event, user?: TripUser | null, onPress: () => void }) => {
-    const isAttendee = useMemo(() => event.attendees?.map(u => u._id).includes(user?._id), [user, event]);
-    const isOwner = useMemo(() => event.owners?.map(u => u._id).includes(user?._id), [user, event])
+    const isAttendee = useMemo(() => !!user && !!event.attendees?.map(u => u._id).includes(user._id), [user, event]);
 
     return (
         <Button
@@ -128,35 +146,31 @@ const EventItem = ({ event, user, onPress }: { event: Event, user?: TripUser | n
 export default function TripPlanning() {
 
     const { id } = useGlobalSearchParams<{id: string}>();
-    const [search, setSearch] = useState("");
     const [typeFilter, setTypeFilter] = useState("");
     const [onlyAttendee, setOnlyAttendee] = useState(false);
-    const [onlyOwner, setOnlyOwner] = useState(false);
 
 
     const router = useRouter();
-    // Restauration de l'extraction de 'trip' (demandé par ton collègue)
     const { me, trip } = useTrip();
-    const { formatDate, formatDay, formatHour } = useI18nTime();
+    const { formatDay } = useI18nTime();
 
-    // Restauration de trip?._id (demandé par ton collègue)
     const { data, hasNextPage, fetchNextPage, isLoading, refetch, isRefetching } = useGetEvents(trip?._id, {
         type: typeFilter,
-        search,
         ...(onlyAttendee && { attendee: String(me?._id) }),
-        ...(onlyOwner && { owner: String(me?._id) }),
     }, {
         enabled: !!trip?._id,
     });
 
     const events = useMemo(() => data?.pages.flatMap((page) => page?.events), [data?.pages]);
+    const sections = useMemo(() => toDaySections(events || []), [events]);
 
     return (
         <Animated.View className="flex-1 bg-mist dark:bg-ink">
-            <Animated.FlatList
-                data={events || []}
+            <SectionList
+                sections={sections}
                 showsVerticalScrollIndicator={false}
                 contentInsetAdjustmentBehavior="automatic"
+                stickySectionHeadersEnabled
                 ListHeaderComponent={
                     <View className="gap-4 my-2">
                         <View className="">
@@ -191,16 +205,17 @@ export default function TripPlanning() {
                         </View>
                     </View>
                 }
-                renderItem={({ item, index, }) =>
-                    <View className="gap-2">
-                        {showDay(events[index - 1], item) &&
-                            <View className="border-b border-amber-deep dark:border-white/20 p-1 mt-6">
-                                <Text className="text-xl font-bold uppercase text-amber-deep dark:text-white">
-                                    {formatDay(item.startDate)}
-                                </Text>
-                            </View>
-                        }
-                        {/* Restauration : suppression du "!" sur me et ajout du trip?._id dans le onPress */}
+                renderSectionHeader={({ section }) =>
+                    section.key === SANS_DATE_KEY ? null : (
+                        <View className="bg-mist dark:bg-ink border-b border-amber-deep dark:border-white/20 p-1 mt-6">
+                            <Text className="text-xl font-bold uppercase text-amber-deep dark:text-white">
+                                {formatDay(section.key)}
+                            </Text>
+                        </View>
+                    )
+                }
+                renderItem={({ item }) =>
+                    <View className="pb-2">
                         <EventItem event={item}
                             user={me}
                             onPress={() => trip?._id && router.navigate({
@@ -210,9 +225,7 @@ export default function TripPlanning() {
                     </View>
 
                 }
-                ItemSeparatorComponent={() => <View className="my-1" />}
                 keyExtractor={(item) => item?._id}
-                contentContainerClassName=""
                 ListEmptyComponent={
                     isLoading ?
                         <View className="gap-3 mx-2">
@@ -234,7 +247,6 @@ export default function TripPlanning() {
                 onRefresh={refetch}
 
             />
-            {/* Restauration du composant FloatingAddButton d'origine */}
             {trip?._id && (
                 <FloatingAddButton onPress={() => router.push({
                     pathname: "/[id]/events/new",

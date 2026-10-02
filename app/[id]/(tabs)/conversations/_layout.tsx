@@ -22,7 +22,7 @@ export default function ConversationLayout() {
             }}>
             <Stack screenOptions={{
                 headerShown: true,
-                title: "Conversations",
+                title: "",
                 ...useGlassHeaderOptions(),
                 headerRight: () => me &&
                         <Pressable

@@ -23,7 +23,7 @@ Détails : voir `docs/architecture-agent.md` (architecture) et `docs/plan-migrat
 
 ## Palette « All In » (validée, en place)
 
-- Couleurs : ambre `#F7B74A`, ambre orangé `#EE8B33`, bleu nuit `#16265C`, encre nuit `#101736`, brume `#F6F8FD`. Plus aucun vert ni corail.
+- Couleurs : ambre `#F7B74A`, ambre orangé `#EE8B33`, bleu nuit `#16265C`, encre nuit `#101736`, brume `#F6F8FD`. Plus aucun vert ni corail. **Ajout 2026-10-02 : `--color-danger` `#E5484D`** (token `@theme`, ton d'alerte — StatCard Restrictions, à valider visuellement sur device).
 - **Déclarées dans `global.css` en tokens `@theme`** → classes `bg-amber`, `bg-amber-deep`, `bg-night`, `bg-ink`, `bg-mist` (+ variantes `dark:`, opacité `/70`).
 - Les hex bruts restent utilisés dans les props `color` d'`IconSymbol` (qui prend une vraie couleur RN, pas une classe) et les couleurs de `LinearGradient`.
 - `constants/Colors.ts` (themes vars) et `hooks/styles/useColors.js` contiennent encore l'ancienne palette — à migrer opportunistement sur les écrans touchés. NB : useColors a des valeurs cassées (`"#rgb(...)"`).
@@ -55,6 +55,9 @@ Détails : voir `docs/architecture-agent.md` (architecture) et `docs/plan-migrat
 - Planning + conversations : stacks avec `useGlassHeaderOptions` (iOS 26 = Liquid Glass natif, iOS < 26 = blur `regular`, Android = tint plat brume/encre nuit via `headerStyle`). Wordmark en `headerLeft` de l'onglet **racine** uniquement (`WordmarkHomeButton`, tap → `router.dismissAll()` → home) — les écrans poussés (calendar, day) gardent le back natif.
 - Dashboard : header flottant `GlassHeaderBar` (composant, pas de Stack dédié) — photo héro pleine au repos, surface `GlassSurface` qui **glisse en translation** au scroll (jamais d'opacité < 1 sur le verre), crossfade du wordmark (variante `onMedia` blanc/ambre sur photo → variante scheme sur verre), nom du trip en fade-in. Avatar + dropdown migrent dans le header, plus de back flottant.
 - `Wordmark` : prop `onMedia` (variante claire + ombre portée, pour rendu sur photo).
+- Dashboard (2026-10-02) : héro `h-64` avec **fallback `LinearGradient` nuit→encre quand `image` est null** (spec batch : image peut être absente) ; rayons `rounded-2xl` + border `mist`/`white/10` + marges `mx-4` unifiés sur toutes les cartes ; StatCard Restrictions en `danger` ; « Prochain événement » remonté au-dessus des stats ; `GlassHeaderBar` : les contrôles vivent sous la barre de statut (`paddingTop: insets.top` sur la rangée — le verre couvre toujours insets.top+44), fix du chevauchement avec l'heure/batterie.
+- Planning (2026-10-02) : `ViewToggle` (`components/ui/ViewToggle.tsx`) — segmented control liste|calendrier, pouce `amber-deep` en spring (animation dans `useAnimatedStyle` avec deps, pattern Skeleton), posé en `headerTitle` **centré** (`headerTitleAlign: "center"` — centrage Android à valider) ; wordmark en `headerLeft` de l'onglet racine uniquement (un headerLeft commun remplace le back natif des poussés — piège) ; titres « Planning » retirés (redondants avec la tab bar) ; liste des events en **`SectionList`** (groupBy par jour côté front, en-têtes **collants** (`stickySectionHeadersEnabled`, fond `bg-mist` obligatoire pour l'épinglage), events sans date en section sans en-tête, `pb-2` par item en remplacement de l'ItemSeparator). **NB : `Animated.SectionList` n'existe pas dans reanimated** (types ni runtime) — crash si utilisé.
+- Dashboard/Planning 2026-10-02 : non validés sur device (voir MR).
 - Non validé sur device : le scroll-edge iOS 26 et le comportement du GlassView en translation (validation Android flat faite en priorité).
 
 ## Sujets en cours
@@ -67,7 +70,7 @@ Détails : voir `docs/architecture-agent.md` (architecture) et `docs/plan-migrat
 
 ## Dette connue
 
-- **TS : 117 erreurs préexistantes** (`npx tsc --noEmit`) — aucune dans les fichiers des sessions récentes. Baseline à ne pas dégrader.
+- **TS : 104 erreurs** (`npx tsc --noEmit`, 2026-10-02 — baseline historique 117, réduite au fil des nettoyages par fichier touché). Baseline à ne pas dégrader.
 - **Lint : 27 erreurs** apparues avec eslint-config-expo 56/57 (règles React Compiler « This value cannot be modified », `no-unescaped-entities` sur les apostrophes françaises, setState-in-effect). À nettoyer par fichier touché.
 - **`text-md` : 11 occurrences** (classe fantôme Tailwind v4) dans 11 fichiers — migration `text-sm`/`text-base` au fil de l'eau. Corrigés le 2026-09-29 : `Button.tsx`, `Chip.tsx`, `TripUsersForm.tsx`, `setup-general.tsx`, `setup-users.tsx`.
 - **`Skeleton` réparé (2026-09-30)** : tailles via `style` numérique (les classes dynamiques `h-${height}` ne compilent pas en NativeWind), animation de pulsation conservée (construite dans `useAnimatedStyle` — plus d'affectation `.value` en effect, erreur lint réglée), props `width`/`className` optionnels. Réutilisé sur la home et les (tabs) ; les autres écrans qui l'utilisent affichent de nouveau.
@@ -79,7 +82,7 @@ Détails : voir `docs/architecture-agent.md` (architecture) et `docs/plan-migrat
 - Le projet est écrit à la main par l'utilisateur, avec des zones de qualité inégale assumées. Amélioration **opportuniste** : on nettoie ce qu'on touche de toute façon, pas de grand refacto à part. Signaler le douteux, corriger dans le périmètre de la tâche.
 - **Styles** : motif composant → variante de composant (pattern `Button.tsx`) ; chaîne réutilisable → `@utility` + `@apply` dans `global.css` ; nouvelles couleurs → tokens `@theme` dans `global.css` ; surfaces translucides → `GlassSurface`. `text-md` interdit.
 - Les fichiers agent (`NOTES-agent.md`, `docs/*-agent.md`, `docs/plan-migration-v3.md`) sont en français.
-- Couche API : hooks React Query dans `hooks/api/`, client axios dans `lib/axios.js` (chemins relatifs, headers `x-api-key` + `x-user-id`).
+- Couche API : hooks React Query dans `hooks/api/`, client axios dans `lib/axios.js` (chemins relatifs, header `x-api-key`). **Auth v3 (2026-10-02) : le header `x-user-token` est injecté par l'interceptor, qui déduit le trip de l'URL (`/trips/<id>/…`, toutes versions) et lit le token dans MMKV au moment de chaque requête** — plus de `setTripToken`/`clearTripToken`, plus d'état global, plus de course au montage (l'ancien mécanisme par effect du layout 403-ait le premier GET des trips privés). leave/rotate-token n'auront qu'à écrire le stockage.
 - Stockage : MMKV, clés `trips.<encodedId>`, shape lean `StorageTrip` = `{ _id, user?, token? }` dans `hooks/storage/useStorageTrips.ts` (pas de name/image locaux — affichage via hydrate batch).
 - **Écrans : conteneur standard `Screen`** (`components/ui/Screen.tsx`, posé le 2026-09-29) — SafeAreaView aux edges gauche/droite/bas, le header natif consomme le top ; cas particuliers via la prop `edges` (plein cadre : `edges={[]}`). Adopté sur home, `new/setup-*`, `token/[token]`, `pick-user` ; à propager au fil de l'eau sur les autres écrans.
 - Ne jamais éditer un fichier sans l'avoir lu au préalable dans la session.

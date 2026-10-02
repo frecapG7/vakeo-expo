@@ -59,7 +59,9 @@ export const GlassHeaderBar = ({ scrollY, title, right }: GlassHeaderBarProps) =
                     tintColor={isDark ? "#101736" : "#F6F8FD"}
                     style={{ flex: 1 }} />
             </Animated.View>
-            <View style={{ height: barHeight, paddingHorizontal: 12 }} className="flex-row items-center justify-between">
+            {/* Le verre couvre insets.top + BAR_HEIGHT (comme un header natif),
+                mais les contrôles vivent sous la barre de statut : paddingTop = insets.top. */}
+            <View style={{ height: barHeight, paddingTop: insets.top, paddingHorizontal: 12 }} className="flex-row items-center justify-between">
                 <View style={{ position: "relative" }}>
                     <Animated.View style={mediaWordmarkStyle}>
                         <WordmarkHomeButton size={18} onMedia />

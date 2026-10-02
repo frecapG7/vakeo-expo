@@ -9,7 +9,7 @@ export interface StorageTrip {
     _id: string,
     /** Raw ObjectId du TripUser local (le seat réclamé). Optionnel : l'anonymat devient un état explicite en v3. Requis pour les URLs settings (GET /trips/:tripId/users/:tripUserId, décision Q2). */
     user?: string,
-    /** Secret token v3 du seat pour CE trip (par trip+user, pas global). Injecté par l'interceptor axios (setTripToken, app/[id]/_layout.tsx). Absent si le seat n'a pas réclamé sa place. */
+    /** Secret token v3 du seat pour CE trip (par trip+user, pas global). Lu par l'interceptor axios dans MMKV au moment de chaque requête (dérivé de l'URL). Absent si le seat n'a pas réclamé sa place. */
     token?: string
 }
 

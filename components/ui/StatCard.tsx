@@ -1,7 +1,7 @@
 import { Pressable, PressableProps, Text, View, useColorScheme } from "react-native";
 import { IconSymbol, IconSymbolName } from "./IconSymbol";
 
-type StatCardColor = "amber" | "amber-deep" | "night" | "red";
+type StatCardColor = "amber" | "amber-deep" | "night" | "danger";
 
 interface StatCardProps extends PressableProps {
   icon: IconSymbolName;
@@ -19,12 +19,12 @@ export function StatCard({ icon, count, label, color = "amber", warning, ...prop
     amber: "bg-amber/30 dark:bg-amber/25",
     "amber-deep": "bg-amber-deep/25 dark:bg-amber-deep/30",
     night: "bg-night/10 dark:bg-white/15",
-    red: "bg-red-100 dark:bg-red-900/50",
+    danger: "bg-danger/15 dark:bg-danger/25",
   };
 
   return (
     <Pressable
-      className="flex-1 bg-white dark:bg-night rounded-xl p-4 shadow-sm border border-mist dark:border-white/10"
+      className="flex-1 bg-white dark:bg-night rounded-2xl p-4 shadow-sm border border-mist dark:border-white/10"
       {...props}
     >
       <View className="flex-row items-center justify-between">

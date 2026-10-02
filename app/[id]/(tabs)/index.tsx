@@ -13,6 +13,7 @@ import { useDeleteStorageTrip } from "@/hooks/storage/useStorageTrips";
 import dayjs from "@/lib/dayjs-config";
 import { countDaysBetween } from "@/lib/utils";
 import { ImageBackground } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Platform, Pressable, RefreshControl, Text, View } from "react-native";
@@ -58,8 +59,8 @@ export default function ItemDetails() {
     if (!dashboard)
         return (
             <Animated.ScrollView className="flex-1 bg-mist dark:bg-ink">
-                <View className="h-80 bg-gray-300 dark:bg-gray-700" />
-                <View className="shadow mx-4 -mt-10 bg-white dark:bg-night rounded-xl p-2 pb-10">
+                <View className="h-64 bg-gray-300 dark:bg-gray-700" />
+                <View className="shadow mx-4 -mt-10 bg-white dark:bg-night rounded-2xl p-2 pb-10">
                     <View className="flex w-40"><Skeleton height={20} /></View>
                 </View>
                 <View className="mt-10 mx-2 gap-5">
@@ -84,16 +85,27 @@ export default function ItemDetails() {
                 <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
             }
         >
-            <View className="h-80 w-full">
-                <ImageBackground source={trip?.image}
-                    style={{
-                        height: "100%",
-                        width: "100%",
-                    }}
-                    contentFit="cover"
-                />
+            <View className="h-64 w-full">
+                {trip?.image ? (
+                    <ImageBackground
+                        source={trip.image}
+                        style={{
+                            height: "100%",
+                            width: "100%",
+                        }}
+                        contentFit="cover"
+                    />
+                ) : (
+                    <LinearGradient
+                        colors={["#16265C", "#101736"]}
+                        style={{
+                            height: "100%",
+                            width: "100%",
+                        }}
+                    />
+                )}
             </View>
-            <View className="shadow mx-4 -mt-10 mb-5 px-2 pt-4 rounded-xl gap-5 bg-white dark:bg-night flex" >
+            <View className="shadow-md mx-4 -mt-10 mb-5 px-2 pt-4 rounded-2xl gap-5 bg-white dark:bg-night border border-mist dark:border-white/10 flex" >
                 <View className="gap-1">
                     <Text className="text-4xl font-bold text-night dark:text-white" numberOfLines={2}>
                         {trip?.name}
@@ -105,18 +117,23 @@ export default function ItemDetails() {
                                 params: { id: trip._id }
                             })
                         }>
-                        <View className="gap-1 flex-1 items-start">
-                            <AvatarsGroup
-                                maxLength={5}
-                                size2="sm"
-                                avatars={otherUsers.map(u => ({
-                                    avatar: u?.avatar,
-                                    alt: u?.name?.charAt(0)
-                                }))}
-                            />
-                            <Text numberOfLines={1} ellipsizeMode="tail" className="text-night dark:text-white text-sm">
-                                Avec {displayUsers.map(u => u.name).join(", ")}{hasMore ? "..." : ""}
-                            </Text>
+                        <View className="flex-row items-center gap-2 flex-1">
+                            <View className="gap-1 flex-1 min-w-0 items-start">
+                                <AvatarsGroup
+                                    maxLength={5}
+                                    size2="sm"
+                                    avatars={otherUsers.map(u => ({
+                                        avatar: u?.avatar,
+                                        alt: u?.name?.charAt(0)
+                                    }))}
+                                />
+                                <Text numberOfLines={1} ellipsizeMode="tail" className="text-night dark:text-white text-sm">
+                                    {otherUsers.length > 0
+                                        ? `Avec ${displayUsers.map(u => u.name).join(", ")}${hasMore ? "..." : ""}`
+                                        : "Personne d'autre pour le moment"}
+                                </Text>
+                            </View>
+                            <IconSymbol name="chevron.right" size={20} color="#9CA3AF" />
                         </View>
                     </Button>
                     {trip?.description && (
@@ -171,57 +188,8 @@ export default function ItemDetails() {
                     />
                 </View>
             </View>
-            <View className="gap-2">
-                <View className="flex-row gap-3 mx-2">
-                    <StatCard
-                        icon="cart"
-                        count={dashboard?.goods?.total ?? 0}
-                        warning={dashboard?.goods?.missing ?? 0}
-                        label="Liste de course"
-                        color="amber"
-                        onPress={() => router.push({
-                            pathname: "/[id]/goods",
-                            params: { id: trip._id }
-                        })}
-                    />
-                    <StatCard
-                        icon="nosign"
-                        count={dashboard?.users?.restrictionCount ?? 0}
-                        label="Restrictions"
-                        color="red"
-                        onPress={() => router.push({
-                            pathname: "/[id]/restrictions",
-                            params: { id: trip._id }
-                        })}
-                    />
-                </View>
-                <View className="flex-row gap-3 mx-2">
-                    <StatCard
-                        icon="chart.bar.fill"
-                        count={dashboard?.polls?.openPollsCount ?? 0}
-                        warning={dashboard?.polls?.pendingPollsCount ?? 0}
-                        label="Sondages"
-                        color="night"
-                        onPress={() => router.push({
-                            pathname: "/[id]/polls",
-                            params: { id: trip._id }
-                        })}
-                    />
-                    <StatCard
-                        icon="link"
-                        count={dashboard?.links?.linksCount ?? 0}
-                        label="Liens utiles"
-                        color="amber-deep"
-                        onPress={() => router.push({
-                            pathname: "/[id]/links",
-                            params: { id: trip._id }
-                        })}
-                    />
-                </View>
-
-            </View>
             {dashboard?.events?.nextEvent && (
-                <View className="mx-4 my-5">
+                <View className="mx-4 mb-5">
                     <Text className="text-lg font-bold mb-2 text-night dark:text-white">Prochain événement</Text>
                     <Button
                         className="flex-row items-center rounded-2xl bg-white dark:bg-night shadow-md p-4 border border-mist dark:border-white/10"
@@ -255,6 +223,55 @@ export default function ItemDetails() {
                     </Button>
                 </View>
             )}
+            <View className="gap-2">
+                <View className="flex-row gap-3 mx-4">
+                    <StatCard
+                        icon="cart"
+                        count={dashboard?.goods?.total ?? 0}
+                        warning={dashboard?.goods?.missing ?? 0}
+                        label="Liste de course"
+                        color="amber"
+                        onPress={() => router.push({
+                            pathname: "/[id]/goods",
+                            params: { id: trip._id }
+                        })}
+                    />
+                    <StatCard
+                        icon="nosign"
+                        count={dashboard?.users?.restrictionCount ?? 0}
+                        label="Restrictions"
+                        color="danger"
+                        onPress={() => router.push({
+                            pathname: "/[id]/restrictions",
+                            params: { id: trip._id }
+                        })}
+                    />
+                </View>
+                <View className="flex-row gap-3 mx-4">
+                    <StatCard
+                        icon="chart.bar.fill"
+                        count={dashboard?.polls?.openPollsCount ?? 0}
+                        warning={dashboard?.polls?.pendingPollsCount ?? 0}
+                        label="Sondages"
+                        color="night"
+                        onPress={() => router.push({
+                            pathname: "/[id]/polls",
+                            params: { id: trip._id }
+                        })}
+                    />
+                    <StatCard
+                        icon="link"
+                        count={dashboard?.links?.linksCount ?? 0}
+                        label="Liens utiles"
+                        color="amber-deep"
+                        onPress={() => router.push({
+                            pathname: "/[id]/links",
+                            params: { id: trip._id }
+                        })}
+                    />
+                </View>
+
+            </View>
 
         </Animated.ScrollView>
         <GlassHeaderBar
