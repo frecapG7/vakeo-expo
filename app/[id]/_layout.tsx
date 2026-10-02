@@ -3,9 +3,8 @@ import { TripContext } from "@/context/TripContext";
 import { useGetTrip, useGetTripUser } from "@/hooks/api/useTrips";
 import { useGetStorageTrip } from "@/hooks/storage/useStorageTrips";
 import { useGlassHeaderOptions } from "@/hooks/styles/useGlassHeaderOptions";
-import { clearTripToken, setTripToken } from "@/lib/axios";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Platform, Pressable } from "react-native";
 
 export default function TripDetailsLayout() {
@@ -22,27 +21,19 @@ export default function TripDetailsLayout() {
 
     const glass = useGlassHeaderOptions();
 
+    // `trip` est undefined pendant le chargement — les écrans [id]/* assument un trip
+    // résolu (typage historique ITripContext.trip non-optionnel). À retyper en
+    // tri-state chargement/anonyme/membre avec les 403 v3 (Phase 5).
+    const contextValue = useMemo(() => ({ me, trip: trip! }), [me, trip]);
+
     useEffect(() => {
         if (!!storageTrip && !storageTrip.user)
             router.navigate('./pick-user');
     }, [router, storageTrip]);
 
-    // Auth v3 : ce layout est le seul endroit où un trip est "actif".
-    // Le token posé ici est injecté par l'interceptor axios sur tous les appels.
-    useEffect(() => {
-        if (storageTrip?.token)
-            setTripToken(storageTrip.token);
-        else
-            clearTripToken();
-        return clearTripToken;
-    }, [storageTrip]);
-
 
     return (
-        <TripContext.Provider value={{
-            me,
-            trip
-        }}>
+        <TripContext.Provider value={contextValue}>
             <Stack screenOptions={{
                 headerShown: true,
                 headerBackTitle: "Annuler",

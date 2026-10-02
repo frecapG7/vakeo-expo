@@ -3,10 +3,10 @@ import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { UserRestrictionsForm } from "@/components/users/UserRestrictionsForm";
 import styles from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { useGetTripUser, useUpdateTripUser } from "@/hooks/api/useTrips";
 import { router } from "expo-router";
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
@@ -17,7 +17,7 @@ import { Toast } from "toastify-react-native";
 export default function TripSettings() {
 
 
-    const { me, trip } = useContext(TripContext);
+    const { me, trip } = useTrip();
 
     const { data: user } = useGetTripUser(trip._id, me?._id);
     const updateTripUser = useUpdateTripUser(trip._id, user?._id);

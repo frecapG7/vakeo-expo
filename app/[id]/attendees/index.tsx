@@ -2,14 +2,13 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Chip } from "@/components/ui/Chip";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
-import { useContext } from "react";
+import { useTrip } from "@/context/TripContext";
 import { Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TripAttendees() {
-    const { trip, me } = useContext(TripContext);
+    const { trip, me } = useTrip();
 
     if (!trip) {
         return (

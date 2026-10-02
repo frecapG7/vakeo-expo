@@ -6,14 +6,14 @@ import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { useGetPoll, useUnvotePoll, useVotePoll } from "@/hooks/api/usePolls";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import dayjs from "@/lib/dayjs-config";
 
 import { PollOption as Option } from "@/types/models";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -21,7 +21,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 export default function PollDetailsPage() {
     const { id, pollId } = useLocalSearchParams<{ id: string, pollId: string }>();
 
-    const { me } = useContext(TripContext);
+    const { me } = useTrip();
     const { data: poll } = useGetPoll(id, pollId);
     const votePoll = useVotePoll(id, pollId, me?._id);
     const unvotePoll = useUnvotePoll(id, pollId, me?._id);

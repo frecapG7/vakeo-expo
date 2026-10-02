@@ -5,14 +5,14 @@ import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { useGetTrip } from "@/hooks/api/useTrips";
 import { useDeleteTripStop, useGetTripStops, usePostTripStop, usePutTripStop } from "@/hooks/api/useTripStop";
 import dayjs from "@/lib/dayjs-config";
 import { TripStop } from "@/types/models";
 import { Image, ImageBackground } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Alert, Modal, Pressable, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { SlideInRight, SlideOutRight } from "react-native-reanimated";
@@ -31,7 +31,7 @@ export default function TripLocation() {
     const [openModal, setOpenModal] = useState(false);
     const [openLocationWizard, setOpenLocationWizard] = useState(false);
 
-    const { me } = useContext(TripContext);
+    const { me } = useTrip();
 
     const { data: tripStops, isLoading, isRefetching, refetch } = useGetTripStops(id);
     const postTripStop = usePostTripStop(id, me?._id);

@@ -1,11 +1,11 @@
 import { TripUsersForm } from "@/components/trips/TripUsersForm";
 import { Button } from "@/components/ui/Button";
 import styles from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { useUpdateTrip } from "@/hooks/api/useTrips";
 import { Trip } from "@/types/models";
 import { useRouter } from "expo-router";
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { KeyboardAvoidingView, View } from "react-native";
 import Animated, { ZoomIn } from "react-native-reanimated";
@@ -13,7 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function EditAttendees() {
 
-    const { me, trip } = useContext(TripContext);
+    const { me, trip } = useTrip();
 
     const updateTrip = useUpdateTrip(trip?._id);
 

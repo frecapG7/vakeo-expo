@@ -68,6 +68,18 @@ const markMigrated = (rawId: string): void => {
     }
 };
 
+/**
+ * True s'il reste des trips à migrer (raw ObjectId non encore traités).
+ * Permet à MigrationGate de ne pas lancer la mutation (ni logger) quand tout
+ * est déjà migré — cas de tous les full reloads en dev une fois la migration faite.
+ */
+export const hasPendingMigrations = (): boolean => {
+    const { migrated } = getMigrationState();
+    return getStorageTrips().some(trip =>
+        RAW_OBJECT_ID.test(trip._id) && !migrated.includes(trip._id)
+    );
+};
+
 const migrateTrip = async (trip: StorageTrip): Promise<"migrated" | "dropped"> => {
     try {
         const response = await axios.post(v3Path("/migrate"), { tripId: trip._id }, {

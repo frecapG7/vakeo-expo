@@ -5,13 +5,13 @@ import { DateRangeCalendar } from "@/components/ui/DateRangeCalendar";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { usePostLinkPreview } from "@/hooks/api/useLinkPreview";
 import { useGetPoll, usePutPoll } from "@/hooks/api/usePolls";
 import { DatePollOption, HousingPollOption, OtherPollOption, PollOption } from "@/types/models";
 import { Image, ImageBackground } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import Animated, { BounceIn, BounceOut } from "react-native-reanimated";
@@ -21,7 +21,7 @@ import { Toast } from "toastify-react-native";
 export default function NewPollOptionPage() {
     const { id, pollId } = useLocalSearchParams<{ id: string, pollId: string }>();
     const router = useRouter();
-    const { me } = useContext(TripContext);
+    const { me } = useTrip();
 
     const { data: poll } = useGetPoll(id, pollId);
     const updatePoll = usePutPoll(id, pollId, me?._id);

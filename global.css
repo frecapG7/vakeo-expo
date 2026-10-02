@@ -6,13 +6,16 @@
 @import "nativewind/theme";
 
 /* Palette « All In » — charte validée 2026-09-26.
-   Classes générées : bg-amber, bg-amber-deep, bg-night, bg-ink, bg-mist (+ text-, border-, dark:, modificateurs d'opacité). */
+   Classes générées : bg-amber, bg-amber-deep, bg-night, bg-ink, bg-mist, bg-danger (+ text-, border-, dark:, modificateurs d'opacité).
+   NB : danger (rouge chaud) est un ajout hors charte initiale, posé le 2026-10-02 pour le ton d'alerte
+   (restrictions, avertissements) — l'ancienne teinte était du Tailwind `red-*` brut. */
 @theme {
   --color-amber: #F7B74A;
   --color-amber-deep: #EE8B33;
   --color-night: #16265C;
   --color-ink: #101736;
   --color-mist: #F6F8FD;
+  --color-danger: #E5484D;
 }
 
 /* Typographie partagée — spike validée visuellement sur la home.

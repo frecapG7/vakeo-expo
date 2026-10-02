@@ -1,6 +1,7 @@
 import { Wordmark } from "@/components/brand/Wordmark";
+import MaterialIcons from "@react-native-vector-icons/material-icons/static";
 import useColors from "@/hooks/styles/useColors";
-import { useMigrate } from "@/hooks/api/useMigrate";
+import { useMigrate, hasPendingMigrations } from "@/hooks/api/useMigrate";
 import '@/lib/calendar-config';
 import { DefaultTheme, SplashScreen, Stack, ThemeProvider } from "expo-router";
 import * as Sentry from '@sentry/react-native';
@@ -50,21 +51,36 @@ const MigrationGate = ({ children, onDone }: { children: ReactNode, onDone: () =
   const { mutateAsync } = useMigrate();
 
   useEffect(() => {
-    if (!migrationRun) {
-      migrationRun = (async () => {
-        try {
-          const summary = await mutateAsync();
-          console.log(`Migration v3 : ${summary.migrated} migré(s), ${summary.dropped} droppé(s), ${summary.failed} en échec`);
-          if (summary.failed > 0)
-            console.warn(`Migration v3 : ${summary.failed} trip(s) en échec — retentés au prochain lancement`);
-        } catch (err) {
-          // On ne bloque jamais l'app sur le bootstrap : les trips non migrés
-          // sont resumables (clé méta `migration`, cf. hooks/api/useMigrate.ts).
-          console.error("Migration v3 : échec du bootstrap", err);
-        }
-      })();
+    try {
+      // Dev : les full reloads Metro remontent la gate alors qu'il n'y a plus
+      // rien à migrer — pas de mutation, pas de log, splash levée immédiatement.
+      // Si le log apparaît, c'est qu'il y a du vrai travail (ou des échecs à retenter).
+      if (!hasPendingMigrations()) {
+        onDone();
+        return;
+      }
+      if (!migrationRun) {
+        migrationRun = (async () => {
+          try {
+            const summary = await mutateAsync();
+            console.log(`Migration v3 : ${summary.migrated} migré(s), ${summary.dropped} droppé(s), ${summary.failed} en échec`);
+            if (summary.failed > 0)
+              console.warn(`Migration v3 : ${summary.failed} trip(s) en échec — retentés au prochain lancement`);
+          } catch (err) {
+            // On ne bloque jamais l'app sur le bootstrap : les trips non migrés
+            // sont resumables (clé méta `migration`, cf. hooks/api/useMigrate.ts).
+            console.error("Migration v3 : échec du bootstrap", err);
+          }
+        })();
+      }
+      migrationRun.then(onDone);
+    } catch (err) {
+      // Contrat de la gate : quoi qu'il arrive, l'app démarre (splash levée).
+      // Un preflight qui jette (stockage illisible, shape inattendue…) ne doit
+      // jamais briquer le lancement — la migration sera retentée au boot suivant.
+      console.error("Migration v3 : échec du preflight, démarrage sans migration", err);
+      onDone();
     }
-    migrationRun.then(onDone);
   }, []);
 
   // Rien n'est monté pendant la migration : le splash couvre l'écran, et aucun
@@ -110,7 +126,20 @@ export default Sentry.wrap(function RootLayout() {
                 </MigrationGate>
               )}
 
-              <ToastManager />
+              {/* Icônes custom : toastify-react-native rend ses icônes par défaut via
+                  l'ancien react-native-vector-icons (fonts non embarquées en Expo ->
+                  glyphes rendus par la police de repli, caractères CJK sur Android).
+                  On passe des ReactNodes via les packages scopés, comme IconSymbol. */}
+              <ToastManager
+                icons={{
+                  success: <MaterialIcons name="check-circle" size={22} color="#22C55E" />,
+                  error: <MaterialIcons name="error-outline" size={22} color="#EF4444" />,
+                  info: <MaterialIcons name="info-outline" size={22} color="#3B82F6" />,
+                  warn: <MaterialIcons name="warning" size={22} color="#F59E0B" />,
+                  default: <MaterialIcons name="info-outline" size={22} color="#3B82F6" />,
+                }}
+                closeIcon={<MaterialIcons name="close" size={20} color="#9CA3AF" />}
+              />
             </MenuProvider>
           </SafeAreaProvider>
         </ThemeProvider>

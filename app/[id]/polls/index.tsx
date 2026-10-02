@@ -5,20 +5,20 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { ToggleButton } from "@/components/ui/ToggleButton";
 import styles from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { useGetPolls } from "@/hooks/api/usePolls";
 import { useGetDashboard } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import { translateType } from "@/lib/pollUtils";
 import { useRouter } from "expo-router";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 
 
 export default function PollsPage() {
 
-    const { trip, me } = useContext(TripContext);
+    const { trip, me } = useTrip();
 
     const [excludeSelectedBy, setExcludeSelectedBy] = useState(false);
     const { data: page, isLoading, refetch, isRefetching } = useGetPolls(trip?._id, {

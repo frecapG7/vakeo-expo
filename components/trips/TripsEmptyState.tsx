@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/Button";
 import { GlassSurface } from "@/components/ui/GlassSurface";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { Text, View } from "react-native";
 
 type TripsEmptyStateProps = {
@@ -23,8 +24,8 @@ export const TripsEmptyState = ({ isLoading, isError, onRetry, onCreate, onJoin 
     if (isLoading)
         content = (
             <View className="gap-5 w-full">
-                <View className="h-64 rounded-2xl bg-gray-200 dark:bg-gray-800" />
-                <View className="h-64 rounded-2xl bg-gray-200 dark:bg-gray-800" />
+                <Skeleton height={256} />
+                <Skeleton height={256} />
             </View>
         );
 

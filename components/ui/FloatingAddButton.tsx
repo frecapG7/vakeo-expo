@@ -3,7 +3,7 @@ import { IconSymbol } from "./IconSymbol";
 
 export const FloatingAddButton = ({ onPress , accessibilityLabel = "Ajouter"}: { onPress: () => void, accessibilityLabel ?: string }) => (
   <Pressable
-    className="absolute bottom-10 right-6 p-2 rounded-full border border-white bg-orange-400 items-center justify-center shadow"
+    className="absolute bottom-10 right-6 p-2 rounded-full border border-white bg-amber-deep items-center justify-center shadow"
     onPress={onPress}
     accessibilityRole="button"
     accessibilityLabel={accessibilityLabel}>

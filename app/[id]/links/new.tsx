@@ -1,11 +1,10 @@
 import LinkForm from "@/components/links/LinkForm";
 import { Button } from "@/components/ui/Button";
 import styles from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { usePostLink } from "@/hooks/api/useLinks";
 import { Link } from "@/types/models";
 import { useRouter } from "expo-router";
-import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { View } from "react-native";
 
@@ -15,7 +14,7 @@ import { View } from "react-native";
 export default function NewLink() {
 
 
-    const {trip, me} = useContext(TripContext);
+    const {trip, me} = useTrip();
     const { control, handleSubmit } = useForm<Omit<Link, '_id'>>();
 
 

@@ -32,15 +32,15 @@ export const TripActionCard = ({
 }: TripActionCardProps) => {
   return (
     <Button
-      className={`flex-row items-center p-1 py-2 rounded-xl dark:bg-gray-800 shadow-sm will-change-variable relative ${disabled ? "opacity-60" : "active:bg-gray-50 dark:active:bg-gray-700"}`}
+      className={`flex-row items-center p-1 py-2 rounded-xl dark:bg-night shadow-sm will-change-variable relative ${disabled ? "opacity-60" : "active:bg-mist dark:active:bg-white/5"}`}
       onPress={onPress}
       disabled={disabled}
     >
-      <View className="bg-orange-100 dark:bg-orange-200/20 p-3 rounded-lg mr-3">
-        <IconSymbol name={icon.name} size={24} color={icon.color || "#F97316"} />
+      <View className="bg-amber/30 dark:bg-amber/20 p-3 rounded-lg mr-3">
+        <IconSymbol name={icon.name} size={24} color={icon.color || "#EE8B33"} />
       </View>
       <View className="flex-1 ">
-        <Text className={`font-medium text-lg dark:text-white ${capitalizeTitle && "capitalize"}`} numberOfLines={2}>
+        <Text className={`font-medium text-lg text-night dark:text-white ${capitalizeTitle && "capitalize"}`} numberOfLines={2}>
           {title}
         </Text>
         {subtitle && (
