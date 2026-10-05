@@ -1,10 +1,11 @@
 import { EventInfoForm } from "@/components/events/EventInfoForm";
 import { Button } from "@/components/ui/Button";
 import { Screen } from "@/components/ui/Screen";
-import { useGetEvent, useUpdateEvent } from "@/hooks/api/useEvents";
+import { useDeleteEvent, useGetEvent, useUpdateEvent } from "@/hooks/api/useEvents";
 import { Event } from "@/types/models";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useEffect } from "react";
+import { Alert, Text } from "react-native";
 import { useForm } from "react-hook-form";
 import Animated, { ZoomIn } from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
@@ -18,6 +19,39 @@ export default function EditTripEvent() {
 
     const { data: event } = useGetEvent(id, eventId);
     const updateEvent = useUpdateEvent(id, eventId);
+    const deleteEvent = useDeleteEvent(id, eventId);
+
+    const onDelete = () => {
+        Alert.alert("Supprimer cette activité ?", "Cette action est définitive.", [
+            {
+                text: "Annuler",
+            },
+            {
+                text: "Supprimer",
+                style: "destructive",
+                onPress: async () => {
+                    await deleteEvent.mutateAsync();
+                    Toast.success("Activité supprimée");
+                    router.dismissTo({
+                        pathname: "/[id]/(tabs)/planning",
+                        params: { id: String(id) }
+                    });
+                }
+            }
+        ]);
+    }
+
+    const navigation = useNavigation();
+
+    useEffect(() => {
+        navigation.setOptions({
+            headerRight: () => (
+                <Button onPress={onDelete} className="ml-4">
+                    <Text className="text-danger font-semibold">Supprimer</Text>
+                </Button>
+            )
+        })
+    })
 
     const router = useRouter();
 

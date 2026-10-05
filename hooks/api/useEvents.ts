@@ -83,3 +83,19 @@ export const useUpdateEvent = (tripId: any, eventId: any) => {
 }
 
 
+
+
+const deleteEvent = async (tripId: string, eventId: string): Promise<void> => {
+    await axios.delete(v3Path(`/trips/${tripId}/events/${eventId}`));
+}
+
+export const useDeleteEvent = (tripId: any, eventId: any) => {
+    const queryClient = useQueryClient();
+    return useMutation<void, Error, void>({
+        mutationFn: () => deleteEvent(tripId, eventId),
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["trips", tripId, "events"] });
+            await queryClient.invalidateQueries({ queryKey: ["trips", tripId, "dashboard"] });
+        }
+    })
+}

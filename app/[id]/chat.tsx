@@ -1,19 +1,19 @@
 import { Avatar } from "@/components/ui/Avatar";
 import { useTrip } from "@/context/TripContext";
 import { useGetMessages, useMarkAllAsRead, usePostMessage } from "@/hooks/api/useMessages";
-import dayjs from "@/lib/dayjs-config";
 import { useFocusEffect, useLocalSearchParams, useNavigation } from "expo-router";
 import { useCallback, useEffect, useMemo } from "react";
-import { Pressable, Text, View } from "react-native";
-import { GiftedChat, IMessage, InputToolbar, Send } from 'react-native-gifted-chat';
+import { Text, useColorScheme } from "react-native";
+import { Bubble, Chat, IMessage, InputToolbar, Send } from "@kesha-antonov/react-native-chat";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 
 export default function TripMessages() {
 
     const { me, trip } = useTrip();
+    const isDark = useColorScheme() === "dark";
     const { eventId, title } = useLocalSearchParams<{ eventId?: string, title?: string }>();
-    const { data, fetchNextPage, hasNextPage } = useGetMessages(trip?._id, eventId);
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetMessages(trip?._id, eventId);
     const postMessage = usePostMessage(trip?._id, me?._id, eventId);
     const { mutate: markAllAsRead } = useMarkAllAsRead(trip?._id, me?._id, eventId, true);
 
@@ -30,9 +30,8 @@ export default function TripMessages() {
         navigation.setOptions({
             title: title ?? "General"
         })
-    })
+    }, [navigation, title])
 
-    // Add this right after your useEffect for navigation options
     useFocusEffect(
         useCallback(() => {
             if (!trip?._id || !me?._id) return
@@ -41,64 +40,84 @@ export default function TripMessages() {
     );
 
     return (
-        <SafeAreaView edges={["bottom"]} style={{ flex: 1 }}>
-            <GiftedChat
+        <SafeAreaView edges={["bottom"]} style={{ flex: 1 }} className={isDark ? "bg-ink" : "bg-mist"}>
+            <Chat
                 messages={messages}
                 onSend={onSend}
                 user={me}
-                renderInputToolbar={(props) => me?._id ? <InputToolbar {...props} /> : null}
-                infiniteScroll
-                renderUsernameOnMessage
-                showUserAvatar
-                renderAvatarOnTop={false}
+                // La racine de l'app monte deja son GestureHandlerRootView.
+                enableGestureHandlerRootView={false}
+                renderBubble={(props) => (
+                    <Bubble
+                        {...props}
+                        wrapperStyle={{
+                            right: { backgroundColor: "#F7B74A" },
+                            left: { backgroundColor: isDark ? "#16265C" : "#FFFFFF" }
+                        }}
+                        textStyle={{
+                            right: { color: "#16265C" },
+                            left: { color: isDark ? "#F6F8FD" : "#101736" }
+                        }}
+                    />
+                )}
+                renderInputToolbar={(props) => me?._id ? (
+                    <InputToolbar
+                        {...props}
+                        containerStyle={{ backgroundColor: isDark ? "#101736" : "#FFFFFF" }}
+                    />
+                ) : null}
+                isUsernameVisible
+                isUserAvatarVisible
+                isAvatarOnTop={false}
                 renderAvatar={({ currentMessage }) =>
                     <Avatar
-                        src={currentMessage.user.avatar}
-                        alt={currentMessage.user.name?.charAt(0)}
+                        src={typeof currentMessage.user.avatar === "string" ? currentMessage.user.avatar : undefined}
+                        alt={String(currentMessage.user.name ?? "").charAt(0)}
                         size2="sm"
                     />
                 }
-                renderUsername={({ _id, name }) => {
-                    if (_id === me?._id) return null;
+                renderUsername={(user) => {
+                    if (user._id === me?._id) return null;
                     return (
-                        <Text className="text-xs font-medium text-gray-500 px-2 py-0.5 ">
-                            {name}
+                        <Text className="text-xs font-medium text-night/60 dark:text-white/60 px-2 py-0.5 ">
+                            {user.name}
                         </Text>
                     );
                 }
                 }
-                placeholder="Aa"
-                maxInputLength={250}
-                loadEarlier={hasNextPage}
-                onLoadEarlier={fetchNextPage}
-                renderTime={({ currentMessage, position }) =>
-                    <View className="items-center justify-end mx-2">
-                        <Text className={`text-[10px] ${position === "right" ? "text-gray-200" : "text-gray-400"}`}>
-                            {dayjs(currentMessage?.createdAt).format('LT')}
-                        </Text>
-                    </View>
-                }
-                renderDay={({ currentMessage, previousMessage }) => {
-                    // Only show day header if there's no previous message or day has changed
-                    if (!previousMessage ||
-                        !dayjs(currentMessage?.createdAt).isSame(dayjs(previousMessage?.createdAt), 'day')) {
-                        return (
-                            <Text className="text-center text-[12px] font-semibold text-white bg-blue-400 dark:bg-blue-200 rounded-full px-4 py-1 mx-auto my-2">
-                                {dayjs(currentMessage?.createdAt).format("ddd D MMM")}
-                            </Text>
-                        );
-                    }
-                    return null;
+                textInputProps={{
+                    placeholder: "Aa",
+                    maxLength: 250,
+                    style: { color: isDark ? "#F6F8FD" : "#101736" }
                 }}
-                renderLoadEarlier={() => hasNextPage && (
-                    <Pressable className="bg-blue-50 rounded-lg p-3 mx-auto mb-4"
-                        onPress={() => fetchNextPage()}>
-                        <Text className="text-center text-blue-600 text-sm font-medium">
-                            Charger les messages précédents
-                        </Text>
-                    </Pressable>
-
-                )}
+                // Time integre : couleur par cote (droite = bulle ambre).
+                timeTextStyle={{
+                    right: { color: "rgba(22,38,92,0.6)" },
+                    left: { color: isDark ? "rgba(246,248,253,0.5)" : "rgba(22,38,92,0.5)" }
+                }}
+                // Jour integre : pill et header flottant styles via le theme du fork.
+                dateFormat="ddd D MMM"
+                theme={{
+                    colors: {
+                        dayPillBackground: "#FFFFFF",
+                        dayPillText: "#101736"
+                    }
+                }}
+                darkTheme={{
+                    colors: {
+                        dayPillBackground: "rgba(255,255,255,0.10)",
+                        dayPillText: "#F6F8FD"
+                    }
+                }}
+                loadEarlierMessagesProps={{
+                    isAvailable: hasNextPage,
+                    isLoading: isFetchingNextPage,
+                    isInfiniteScrollEnabled: true,
+                    onPress: fetchNextPage,
+                    label: "Charger les messages précédents",
+                    containerStyle: { backgroundColor: "rgba(247,183,74,0.15)" },
+                    textStyle: { color: isDark ? "#F7B74A" : "#EE8B33" }
+                }}
                 renderSend={(props) => {
                     return (
                         <Send {...props}
@@ -108,13 +127,13 @@ export default function TripMessages() {
                                 alignSelf: 'center',
                                 marginRight: 15,
                             }}>
-                            <Text className="text-center text-blue-400 font-bold">
+                            <Text className="text-center text-amber-deep dark:text-amber font-bold">
                                 Envoyer
                             </Text>
                         </Send>
                     )
                 }}
-                keyboardShouldPersistTaps="never"
+                listProps={{ keyboardShouldPersistTaps: "never" }}
             />
         </SafeAreaView>
     )

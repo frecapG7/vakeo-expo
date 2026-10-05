@@ -2,7 +2,7 @@ import axios from "@/lib/axios";
 import { v3Path } from "@/lib/api-v3";
 import { ConversationsResponse } from "@/types/responses";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { IMessage } from "react-native-gifted-chat";
+import { IMessage } from "@kesha-antonov/react-native-chat";
 
 interface IPage {
     nextCursor: string,
