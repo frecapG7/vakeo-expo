@@ -17,7 +17,7 @@ export default function ShareTripPage() {
     const { id } = useLocalSearchParams<{ id: string }>();
 
     const { data: trip } = useGetTrip(id);
-    const { data: share } = useShareTrip(id);
+    const { data: share, isError: shareFailed } = useShareTrip(id);
 
     const link = useMemo(() => {
         if (!share?.value) return "";
@@ -48,9 +48,13 @@ export default function ShareTripPage() {
                         <Animated.View>
                             <QRCode value={link} size={200} />
                         </Animated.View> :
-                        <Animated.View className="h-64 w-64">
-                            <Skeleton height={64} />
-                        </Animated.View>
+                        shareFailed ?
+                            <Text className="text-center text-gray-500 dark:text-gray-400 px-6">
+                                Le lien d&apos;invitation est momentanément indisponible. Réessaie plus tard.
+                            </Text> :
+                            <Animated.View className="h-64 w-64">
+                                <Skeleton height={64} />
+                            </Animated.View>
                     }
                 </View>
             </View>

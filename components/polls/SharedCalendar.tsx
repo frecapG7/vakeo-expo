@@ -1,17 +1,16 @@
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import "@/lib/calendarLocale";
 import dayjs from "@/lib/dayjs-config";
 import React, { createContext, useContext, useMemo } from "react";
 import { Pressable, Text, useColorScheme, View } from "react-native";
-import { Calendar, LocaleConfig } from "react-native-calendars";
+import { Calendar } from "react-native-calendars";
 
-LocaleConfig.locales["fr"] = {
-    monthNames: ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"],
-    monthNamesShort: ["Janv.", "Févr.", "Mars", "Avril", "Mai", "Juin", "Juil.", "Août", "Sept.", "Oct.", "Nov.", "Déc."],
-    dayNames: ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
-    dayNamesShort: ["DIM.", "LUN.", "MAR.", "MER.", "JEU.", "VEN.", "SAM."],
-    today: "Aujourd'hui",
-};
-LocaleConfig.defaultLocale = "fr";
+// Tokens de global.css (charte « All In ») en hex : ces valeurs vont dans des props `style`
+// ou dans le thème de react-native-calendars, qui n'acceptent pas de classes Tailwind.
+const NIGHT = "#16265C";
+const INK = "#101736";
+const MIST = "#F6F8FD";
+const AMBER_DEEP = "#EE8B33";
 
 type CalendarDayContextValue = {
     optionsByDate: Map<string, any>;
@@ -25,19 +24,20 @@ type CalendarDayContextValue = {
 
 const CalendarDayContext = createContext<CalendarDayContextValue | null>(null);
 
-const ME_COLOR = "#f97316";
-
-// Palette sans orange (réservé à "Moi") : chaque utilisateur du sondage reçoit une couleur différente
+// Couleurs de données (une par votant) : doivent rester distinctes entre elles, donc hex bruts.
+// Sans ambre/orange (réservés à la charte et à la case « moi ») ni vert (plus dans la charte).
 const USER_COLORS = [
-    "#3b82f6", "#ef4444", "#a855f7", "#14b8a6", "#ec4899", "#ca8a04",
-    "#6366f1", "#65a30d", "#0891b2", "#be123c", "#c026d3", "#78716c",
+    "#3b82f6", "#E5484D", "#a855f7", "#0ea5e9", "#ec4899",
+    "#6366f1", "#64748b", "#be185d", "#0369a1", "#7c3aed",
 ];
 
+// « Chaleur » du nombre de votes : ambre de plus en plus soutenu (remplace l'ancien dégradé vert)
 const getCellBackground = (voteCount: number, dark: boolean) => {
-    if (voteCount === 0) return dark ? "#111827" : "#f9fafb";
-    if (voteCount <= 2) return dark ? "rgba(20, 83, 45, 0.45)" : "#dcfce7";
-    if (voteCount <= 4) return dark ? "rgba(21, 128, 61, 0.65)" : "#86efac";
-    return dark ? "#16a34a" : "#22c55e";
+    if (voteCount === 0) return dark ? INK : MIST;
+    // Sur fond sombre l'ambre translucide vire au brun : on le renforce
+    if (voteCount <= 2) return dark ? "rgba(247, 183, 74, 0.45)" : "rgba(247, 183, 74, 0.28)";
+    if (voteCount <= 4) return dark ? "rgba(247, 183, 74, 0.75)" : "rgba(247, 183, 74, 0.65)";
+    return AMBER_DEEP;
 };
 
 // Un votant peut être un objet utilisateur ou simplement un id
@@ -48,8 +48,7 @@ const optionDateKey = (opt: any) => dayjs(opt.startDate).format("YYYY-MM-DD");
 
 function CalendarDay({ date, state }: any) {
     const ctx = useContext(CalendarDayContext);
-    const colorScheme = useColorScheme();
-    const dark = colorScheme === "dark";
+    const dark = useColorScheme() === "dark";
 
     if (!date?.dateString || !ctx) return <View className="w-full aspect-[0.65]" />;
 
@@ -63,6 +62,9 @@ function CalendarDay({ date, state }: any) {
     const isCurrentMonth = state !== "disabled";
     const dayJsDate = dayjs(date.dateString);
 
+    // Ma pastille : bleu nuit en clair, blanc en sombre (l'ambre est déjà pris par la chaleur des cases)
+    const meChip = dark ? { bg: "#FFFFFF", text: NIGHT } : { bg: NIGHT, text: "#FFFFFF" };
+
     return (
         <Pressable
             disabled={isClosed}
@@ -70,13 +72,13 @@ function CalendarDay({ date, state }: any) {
             className={`w-full aspect-[0.65] p-[2px] ${!isCurrentMonth ? "opacity-40" : ""}`}
             style={{
                 backgroundColor: getCellBackground(voteCount, dark),
-                borderWidth: isSelectedByMe ? 1.5 : 1,
-                borderColor: isSelectedByMe ? "#f97316" : dark ? "#1f2937" : "#e5e7eb",
+                borderWidth: isSelectedByMe ? 2 : 1,
+                borderColor: isSelectedByMe ? AMBER_DEEP : dark ? "rgba(255,255,255,0.1)" : "rgba(22,38,92,0.1)",
                 zIndex: isSelectedByMe ? 10 : 0,
             }}
         >
             <View className="flex-row justify-between items-start">
-                <Text className={`text-xs font-semibold ${isCurrentMonth ? "text-gray-800 dark:text-white" : "text-gray-400"}`}>
+                <Text className={`text-xs font-semibold ${isCurrentMonth ? "text-night dark:text-white" : "text-night/40 dark:text-white/40"}`}>
                     {date.day}
                 </Text>
             </View>
@@ -84,7 +86,7 @@ function CalendarDay({ date, state }: any) {
             <View className="flex-1 justify-end overflow-hidden mt-[2px] gap-[1px]">
                 {isAnonymous ? (
                     voteCount > 0 ? (
-                        <View className="px-[2px] py-[1px] rounded-sm bg-gray-500/80">
+                        <View className="px-[2px] py-[1px] rounded-sm bg-night/70 dark:bg-white/30">
                             <Text className="text-white font-bold text-[7px] text-center" numberOfLines={1}>
                                 {voteCount} vote{voteCount > 1 ? "s" : ""}
                             </Text>
@@ -95,22 +97,24 @@ function CalendarDay({ date, state }: any) {
                         {visibleVoters.map((user: any, index: number) => {
                             const voterId = getVoterId(user);
                             const isMe = !!meId && voterId === meId;
-                            const bgColor = isMe ? ME_COLOR : (voterId && userColors.get(voterId)) || "#9ca3af";
-                            // Pseudo choisi pour ce voyage (trip.users), sinon nom présent dans le vote. Moi = même pseudo, repéré par la couleur orange
+                            const bgColor = isMe ? meChip.bg : (voterId && userColors.get(voterId)) || "#94a3b8";
+                            const textColor = isMe ? meChip.text : "#FFFFFF";
+                            // Pseudo choisi pour ce voyage (trip.users), sinon nom présent dans le vote.
+                            // « Moi » porte le même pseudo que les autres, repéré par sa pastille et la bordure ambre.
                             const displayName = (voterId && userNames.get(voterId)) || user?.name || "...";
                             const uniqueKey = `${date.dateString}-${voterId ?? index}`;
 
                             return (
                                 <View key={uniqueKey} style={{ backgroundColor: bgColor }} className="px-[2px] py-[1px] rounded-sm">
-                                    <Text className="text-white font-bold text-[7px]" numberOfLines={1} ellipsizeMode="clip">
+                                    <Text style={{ color: textColor }} className="font-bold text-[7px]" numberOfLines={1} ellipsizeMode="clip">
                                         {displayName}
                                     </Text>
                                 </View>
                             );
                         })}
                         {extraVoters > 0 && (
-                            <View className="px-[2px] py-[1px] rounded-sm bg-gray-400/50 dark:bg-gray-700/50">
-                                <Text className="text-gray-900 dark:text-white font-bold text-[7px] text-center">
+                            <View className="px-[2px] py-[1px] rounded-sm bg-night/15 dark:bg-white/20">
+                                <Text className="text-night dark:text-white font-bold text-[7px] text-center">
                                     +{extraVoters}
                                 </Text>
                             </View>
@@ -123,6 +127,7 @@ function CalendarDay({ date, state }: any) {
 }
 
 export default function SharedCalendar({ poll, me, users, onToggleDay }: any) {
+    const dark = useColorScheme() === "dark";
     const initialDate = poll?.options?.[0]?.startDate
         ? dayjs(poll.options[0].startDate).format("YYYY-MM-DD")
         : dayjs().format("YYYY-MM-DD");
@@ -136,7 +141,7 @@ export default function SharedCalendar({ poll, me, users, onToggleDay }: any) {
         return map;
     }, [poll?.options]);
 
-    // Couleur stable par utilisateur : on trie les ids puis on distribue la palette (aucun doublon tant qu'il y a <= 12 votants)
+    // Couleur stable par utilisateur : on trie les ids puis on distribue la palette (aucun doublon tant qu'il y a <= 10 votants)
     const userColors = useMemo(() => {
         const ids = new Set<string>();
         poll?.options?.forEach((opt: any) => {
@@ -151,15 +156,16 @@ export default function SharedCalendar({ poll, me, users, onToggleDay }: any) {
     }, [poll?.options]);
 
     // Pseudo de chaque participant pour CE voyage (trip.users)
+    const meName: string | undefined = me?.name;
     const userNames = useMemo(() => {
         const map = new Map<string, string>();
         (users || []).forEach((u: any) => {
             if (u?._id && u?.name) map.set(String(u._id), u.name);
         });
         // Filet de sécurité : mon propre pseudo, même si trip.users n'est pas encore chargé
-        if (me?._id && me?.name && !map.has(String(me._id))) map.set(String(me._id), me.name);
+        if (safeMeId && meName && !map.has(safeMeId)) map.set(safeMeId, meName);
         return map;
-    }, [users, me?._id, me?.name]);
+    }, [users, safeMeId, meName]);
 
     const ctxValue = useMemo(
         () => ({
@@ -188,12 +194,16 @@ export default function SharedCalendar({ poll, me, users, onToggleDay }: any) {
         return marks;
     }, [poll?.options, safeMeId]);
 
-    const calendarTheme = useMemo(
-        () => ({
+    // Le thème suit le mode clair/sombre (le titre du mois était figé en gris foncé)
+    const calendarTheme = useMemo(() => {
+        const text = dark ? "#FFFFFF" : NIGHT;
+        const muted = dark ? "rgba(255,255,255,0.6)" : "rgba(22,38,92,0.6)";
+        return {
             calendarBackground: "transparent",
-            textSectionTitleColor: "#9ca3af",
-            textSectionTitleDisabledColor: "#d1d5db",
-            monthTextColor: "#111827",
+            textSectionTitleColor: muted,
+            textSectionTitleDisabledColor: muted,
+            monthTextColor: text,
+            arrowColor: AMBER_DEEP,
             textMonthFontWeight: "bold" as const,
             textMonthFontSize: 20,
             "stylesheet.calendar.header": {
@@ -212,42 +222,43 @@ export default function SharedCalendar({ poll, me, users, onToggleDay }: any) {
                     width: 32,
                     textAlign: "center" as const,
                     fontSize: 12,
-                    color: "#9ca3af",
+                    color: muted,
                     fontWeight: "bold" as const,
                 },
             },
-        }),
-        []
-    );
+        } as any; // les clés "stylesheet.*" ne sont pas dans le type Theme de react-native-calendars
+    }, [dark]);
+
+    const legend = [
+        { label: "1-2", color: getCellBackground(1, dark) },
+        { label: "3-4", color: getCellBackground(3, dark) },
+        { label: "5+", color: getCellBackground(5, dark) },
+    ];
 
     return (
         <CalendarDayContext.Provider value={ctxValue}>
-            <View className="flex-1 bg-white dark:bg-gray-950 pb-4">
+            <View className="flex-1 bg-white dark:bg-night pb-4">
                 <Calendar
+                    // react-native-calendars fige son style au montage : on le remonte quand le mode clair/sombre change
+                    key={dark ? "dark" : "light"}
                     current={initialDate}
                     firstDay={1}
                     hideExtraDays={false}
                     markedDates={markedDates}
                     dayComponent={CalendarDay}
                     renderArrow={(direction: "left" | "right") => (
-                        <IconSymbol name={direction === "left" ? "chevron.left" : "chevron.right"} size={24} color="gray" />
+                        <IconSymbol name={direction === "left" ? "chevron.left" : "chevron.right"} size={24} color={AMBER_DEEP} />
                     )}
                     theme={calendarTheme}
                 />
 
-                <View className="flex-row items-center justify-center gap-4 py-4 border-t border-gray-100 dark:border-gray-900 mt-2">
-                    <View className="flex-row items-center gap-1">
-                        <View className="w-4 h-4 rounded bg-green-100 border border-green-200" />
-                        <Text className="text-gray-500 text-xs font-semibold">1-2</Text>
-                    </View>
-                    <View className="flex-row items-center gap-1">
-                        <View className="w-4 h-4 rounded bg-green-300 border border-green-400" />
-                        <Text className="text-gray-500 text-xs font-semibold">3-4</Text>
-                    </View>
-                    <View className="flex-row items-center gap-1">
-                        <View className="w-4 h-4 rounded bg-green-500 border border-green-600" />
-                        <Text className="text-gray-500 text-xs font-semibold">5+</Text>
-                    </View>
+                <View className="flex-row items-center justify-center gap-4 py-4 border-t border-night/10 dark:border-white/10 mt-2">
+                    {legend.map(({ label, color }) => (
+                        <View key={label} className="flex-row items-center gap-1">
+                            <View style={{ backgroundColor: color }} className="w-4 h-4 rounded border border-night/10 dark:border-white/10" />
+                            <Text className="text-night/60 dark:text-white/60 text-xs font-semibold">{label}</Text>
+                        </View>
+                    ))}
                 </View>
             </View>
         </CalendarDayContext.Provider>
