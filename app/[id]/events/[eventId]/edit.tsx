@@ -1,14 +1,12 @@
 import { EventInfoForm } from "@/components/events/EventInfoForm";
 import { Button } from "@/components/ui/Button";
-import styles from "@/constants/Styles";
+import { Screen } from "@/components/ui/Screen";
 import { useGetEvent, useUpdateEvent } from "@/hooks/api/useEvents";
-import { useGetTrip } from "@/hooks/api/useTrips";
 import { Event } from "@/types/models";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import Animated, { ZoomIn } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Toast } from "toastify-react-native";
 
 
@@ -18,7 +16,6 @@ export default function EditTripEvent() {
     const { id, eventId } = useLocalSearchParams();
 
 
-    const { data: trip } = useGetTrip(String(id));
     const { data: event } = useGetEvent(id, eventId);
     const updateEvent = useUpdateEvent(id, eventId);
 
@@ -46,7 +43,7 @@ export default function EditTripEvent() {
     }, [event]);
 
     return (
-        <SafeAreaView style={styles.container}>
+        <Screen className="bg-mist dark:bg-ink">
             <Animated.ScrollView style={{ flex: 1 }} className="flex flex-grow">
                 <EventInfoForm control={control} />
 
@@ -59,6 +56,6 @@ export default function EditTripEvent() {
                             isLoading={updateEvent.isPending} />
                     </Animated.View>
             </Animated.ScrollView>
-        </SafeAreaView>
+        </Screen>
     )
 }

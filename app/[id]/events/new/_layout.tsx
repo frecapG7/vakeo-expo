@@ -1,29 +1,28 @@
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { useTrip } from "@/context/TripContext"; 
-import { usePostEvent } from "@/hooks/api/useEvents";
-import useColors from "@/hooks/styles/useColors";
+import { useTrip } from "@/context/TripContext";
+import { useGlassHeaderOptions } from "@/hooks/styles/useGlassHeaderOptions";
 import { Event } from "@/types/models";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { FormProvider, useForm } from "react-hook-form";
-import { View } from "react-native";
+import { View, useColorScheme } from "react-native";
 
-// 1️⃣ Fix Lapin : Typage propre pour accepter 'undefined' sans faire planter TypeScript
 const firstParam = (value: string | string[] | undefined): string | undefined =>
     Array.isArray(value) ? value[0] : value;
 
 export default function NewEventLayout() {
-    // 2️⃣ Fix frecapG7 : On retire 'id' d'ici, il est devenu inutile
     const { startDate, endDate } = useLocalSearchParams();
-    
-    const { trip } = useTrip(); 
+
+    const { trip } = useTrip();
+    const isDark = useColorScheme() === "dark";
+    const text = isDark ? "#F6F8FD" : "#16265C";
 
     const methods = useForm<Omit<Event, "_id">>({
         defaultValues: {
             name: "",
             type: "",
-            // 3️⃣ Fix frecapG7 : Retour en arrière. On ne force plus la date ici pour éviter
+            // Retour arrière assumé : on ne force plus la date ici pour éviter
             // que tous les événements soient créés le 1er jour du séjour.
             ...(startDate && {startDate: firstParam(startDate)}),
             ...(endDate && {endDate: firstParam(endDate)})
@@ -31,31 +30,18 @@ export default function NewEventLayout() {
     });
 
     const router = useRouter();
-    const {text} = useColors();
-    
-    // ✨ Fix frecapG7 / Lapin : On manipule directement l'ID depuis l'objet trip !
-    const postEvent = usePostEvent(trip?._id);
-
-    const onSubmit = async (data: Omit<Event, '_id'>) => {
-        const newEvent = await postEvent.mutateAsync(data);
-        router.navigate({
-            pathname: "/[id]/events/[eventId]",
-            params: {
-                id: trip?._id, // On utilise l'ID sécurisé du trip
-                eventId: newEvent._id
-            }
-        });
-    }
+    const glass = useGlassHeaderOptions();
 
     return (
         <FormProvider {...methods}>
             <Stack screenOptions={{
                 headerShown: true,
-                headerRight: () => 
+                ...glass,
+                headerRight: () =>
                 <Button onPress={() => router.dismissTo({
                     pathname: "/[id]/(tabs)/planning",
                     params: {
-                        id: trip?._id // On utilise l'ID sécurisé du trip
+                        id: trip?._id
                     }
                 })}>
                     <IconSymbol name="xmark" color={text} size={24} />

@@ -19,7 +19,7 @@ Détails : voir `docs/architecture-agent.md` (architecture) et `docs/plan-migrat
 - `npm run lint` — expo lint (eslint-config-expo 57 : 27 erreurs préexistantes, voir Dette)
 - `npm test` — jest (preset jest-expo 57, mode watch ; CI : `npx jest --ci`)
 - `npx expo-doctor` — 16/21 (les échecs restants sont connus/acceptés, voir architecture doc)
-- `npm run brand:assets` — régénère icon/splash depuis la charte (`scripts/generate-brand-assets.mjs`)
+- `npm run brand:assets` — régénère icon/splash depuis la charte (`scripts/generate-brand-assets.mjs`) ; `npm run brand:icons` — réduit les PNG d'icônes d'events (`scripts/optimize-event-icons.mjs`, resize 512px + palette, sharp en devDependency)
 
 ## Palette « All In » (validée, en place)
 
@@ -60,6 +60,18 @@ Détails : voir `docs/architecture-agent.md` (architecture) et `docs/plan-migrat
 - Dashboard/Planning 2026-10-02 : non validés sur device (voir MR).
 - Non validé sur device : le scroll-edge iOS 26 et le comportement du GlassView en translation (validation Android flat faite en priorité).
 
+## Events `app/[id]/events/` — migration + UI (2026-10-02, non validé sur device)
+
+- **Validation en cours (soir 2026-10-02)** : après polish (ratio illustration héro 53%, `elevation` explicite partout — les classes `shadow-*` ne rendent pas sur Android, espacements aérés) + **`npx expo start -c` obligatoire** (Metro cache = demi-style-set), le rendu est « bcp mieux » selon l'utilisateur. Restent à valider demain : héro/pill/grille sur device, owners contre l'API réelle. **Maquette de référence validée : `docs/mockups/events-mockup.html`** (écrans A/B héro, D grille, F/G/H états vides, I participation, J owners — C rejeté, E historique icônes).
+
+- **Migration v3** : `useEvents` était déjà v3 (30/09). Reste fait ce jour : `EventType` aligné dans `types/models.ts` (`TRANSPORT`/`EXCURSION` ajoutés, `VISITATION` fantôme retiré — plus utilisé nulle part) ; fin des doubles fetch `useGetTrip` → `useTrip()` sur `edit`, `edit-users`, `[eventId]/_layout`, `setup-event-users` (le queryKey `includeStops:false` distinct du layout dupliquait la requête) ; `eventId` reste un raw ObjectId (conforme spec v3).
+- **UI palette** : refonte complète du détail selon la maquette validée (`docs/mockups/events-mockup.html`, écrans A/B + F/G/H/I) — **héro** `LinearGradient` nuit→encre `rounded-3xl mx-4` (illustration `EventIcon lg` dans cercle `bg-amber/15`, chip date verre ambre ou chip pointillée « Définir la date » si sans date → tap = Modifier, titre + « Créé par X » = premier owner), **CTA PARTICIPER/PARTICIPANT** en pill chevauchante (`-mt-6`, ambre pleine vs blanche bordée ambre-deep + check), sections épurées (titres uppercase ambre-deep/amber) : description (vide = lien « Ajouter »), participants (pile 3 avatars + « +N », badge étoile ambre-deep sur les owners, chip « Moi », vide = avatar pointillé « + »), tuiles actions (goodsCount affiché). Header du stack `[eventId]` : **nom du trip seul** (le héro porte l'identité de l'event — plus de doublon) ; le fade-in du nom de l'event dans le header au scroll reste un polish non fait.
+- **Owners (2026-10-02)** : réintroduits en display-only — « Créé par » (héro), badge étoile (pile), « (orga) » (décompte), chip étoile dans `EventUsersForm`. Règles : étoile visible uniquement sur les participants (owners ⊆ attendees côté front), décocher un owner retire son étoile, dernière étoile non retirable (toast). Créateur auto-owner au POST (`setup-event-users`). Gestion : tout dans edit-users (checkbox = participation, étoile = orga) — pas d'écran dédié. Si le backend ajoute des permissions owner-seulement, l'UI n'a rien à changer.
+- Flow `new/*` : **grille 2 colonnes** de cartes illustrées (pattern maquette D) — sélection = bordure ambre + check badge ambre-deep ; stack sous `useGlassHeaderOptions`, `Screen` partout ; `onSubmit`/`postEvent` morts du layout retirés.
+- Composants : `EventUsersForm` refait (rows carte, checkbox ambre-deep custom — `react-native-checkbox-reanimated` retiré du composant, étoile orga) ; `EventIcon` réparé (API = `name`, pas `source`/`getEventIconSource`). **Composants morts** après refonte : `EventForm.tsx`, `EventInfo.tsx`, `InfoCard.tsx`, `EventsUsersList.tsx` (plus importés nulle part — candidats Phase 7).
+- `FormDateTimePickerV2` (utilisé uniquement par `EventInfoForm`) : palette complète (calendrier react-native-calendars sur tokens, wheels `#16265C`/brume, chips sélectionnées ambre-deep, erreur en `danger`), `useColors` cassé retiré.
+
+
 ## Sujets en cours
 
 1. **Migration API v1 → v3** (chantier principal, aucun code fait, plan détaillé dans `docs/plan-migration-v3.md`) :
@@ -70,9 +82,11 @@ Détails : voir `docs/architecture-agent.md` (architecture) et `docs/plan-migrat
 
 ## Dette connue
 
-- **TS : 104 erreurs** (`npx tsc --noEmit`, 2026-10-02 — baseline historique 117, réduite au fil des nettoyages par fichier touché). Baseline à ne pas dégrader.
-- **Lint : 27 erreurs** apparues avec eslint-config-expo 56/57 (règles React Compiler « This value cannot be modified », `no-unescaped-entities` sur les apostrophes françaises, setState-in-effect). À nettoyer par fichier touché.
-- **`text-md` : 11 occurrences** (classe fantôme Tailwind v4) dans 11 fichiers — migration `text-sm`/`text-base` au fil de l'eau. Corrigés le 2026-09-29 : `Button.tsx`, `Chip.tsx`, `TripUsersForm.tsx`, `setup-general.tsx`, `setup-users.tsx`.
+- **Icônes d'events réduites + fond découpé (2026-10-02)** : les 5 PNG historiques (5,4-6,4 Mo, ~2000px, fond blanc rectangulaire) sont passés à 512px + palette + **suppression du fond par flood-fill depuis les bords** (blancs intérieurs préservés, érosion 1px + décontamination des franges) — **29,5 Mo → 271 Ko (−99 %)** via `scripts/optimize-event-icons.mjs` (`npm run brand:icons`, sharp devDependency). Originaux récupérables via git. **Rendu à valider visuellement** (seuil blanc 235 : risque de découpe trop agressive sur zones claires, banding éventuel → remonter `quality`). Les autres candidats audit (Outfit non chargées, meal-illustration.jpg, profile.png…) restent.
+
+- **TS : 89 erreurs** (`npx tsc --noEmit`, 2026-10-02 — baseline historique 117, réduite au fil des nettoyages par fichier touché ; events 2026-10-02 : 104 → 89). Baseline à ne pas dégrader.
+- **Lint : 16 erreurs** (`npm run lint`, 2026-10-02 — était 27 ; règles React Compiler « This value cannot be modified », `no-unescaped-entities` sur les apostrophes françaises, setState-in-effect). À nettoyer par fichier touché. NB : `npx eslint .` direct remonte en plus des erreurs `no-undef` sur les fichiers de tests (hors baseline `npm run lint`).
+- **`text-md` : 10 occurrences** (classe fantôme Tailwind v4) — migration `text-sm`/`text-base` au fil de l'eau. Corrigés le 2026-09-29 : `Button.tsx`, `Chip.tsx`, `TripUsersForm.tsx`, `setup-general.tsx`, `setup-users.tsx` ; le 2026-10-02 : `EventsUsersList.tsx` (celui d'`EventForm.tsx` est sur un composant mort).
 - **`Skeleton` réparé (2026-09-30)** : tailles via `style` numérique (les classes dynamiques `h-${height}` ne compilent pas en NativeWind), animation de pulsation conservée (construite dans `useAnimatedStyle` — plus d'affectation `.value` en effect, erreur lint réglée), props `width`/`className` optionnels. Réutilisé sur la home et les (tabs) ; les autres écrans qui l'utilisent affichent de nouveau.
 - `app/_layout.tsx` : splash masqué dès que les polices sont chargées (l'ancien `setTimeout(3000)` + TODO est réglé) ; `useShareTrip` en `useQuery` (deviendra POST en v3) ; `useVerifyToken` réponse non consommée ; `storage/index.tsx` `encryptionKey` en dur.
 - Doctor : échecs restants connus — 2 faux positifs git (pas de git fiable dans l'env), `@expo/config-plugins` direct (voulu pour le plugin Sentry), conflit icônes (`toastify-react-native` tire l'ancien `react-native-vector-icons`), non-CNG (informatif, workflow prebuild).
@@ -84,7 +98,7 @@ Détails : voir `docs/architecture-agent.md` (architecture) et `docs/plan-migrat
 - Les fichiers agent (`NOTES-agent.md`, `docs/*-agent.md`, `docs/plan-migration-v3.md`) sont en français.
 - Couche API : hooks React Query dans `hooks/api/`, client axios dans `lib/axios.js` (chemins relatifs, header `x-api-key`). **Auth v3 (2026-10-02) : le header `x-user-token` est injecté par l'interceptor, qui déduit le trip de l'URL (`/trips/<id>/…`, toutes versions) et lit le token dans MMKV au moment de chaque requête** — plus de `setTripToken`/`clearTripToken`, plus d'état global, plus de course au montage (l'ancien mécanisme par effect du layout 403-ait le premier GET des trips privés). leave/rotate-token n'auront qu'à écrire le stockage.
 - Stockage : MMKV, clés `trips.<encodedId>`, shape lean `StorageTrip` = `{ _id, user?, token? }` dans `hooks/storage/useStorageTrips.ts` (pas de name/image locaux — affichage via hydrate batch).
-- **Écrans : conteneur standard `Screen`** (`components/ui/Screen.tsx`, posé le 2026-09-29) — SafeAreaView aux edges gauche/droite/bas, le header natif consomme le top ; cas particuliers via la prop `edges` (plein cadre : `edges={[]}`). Adopté sur home, `new/setup-*`, `token/[token]`, `pick-user` ; à propager au fil de l'eau sur les autres écrans.
+- **Écrans : conteneur standard `Screen`** (`components/ui/Screen.tsx`, posé le 2026-09-29) — SafeAreaView aux edges gauche/droite/bas, le header natif consomme le top ; cas particuliers via la prop `edges` (plein cadre : `edges={[]}`). Adopté sur home, `new/setup-*` (trips + events), `token/[token]`, `pick-user`, tous les écrans events ; à propager au fil de l'eau sur les autres écrans.
 - Ne jamais éditer un fichier sans l'avoir lu au préalable dans la session.
 - **Trip actif : `useTrip()`** depuis `@/context/TripContext` (2026-09-30) — hook dédié, throw si utilisé hors layout `[id]` (plus de `useContext(TripContext)` direct, plus de défaut `null!`). `trip._id` = encodedId v3 (opaque, jamais construit côté front) ; `trip` est en pratique undefined pendant le chargement (typage non-optionnel assumé, à retyper avec les 403 v3).
 - Outil : le repo est en **CRLF** — l'outil `edit` échoue sur les fichiers non réécrits ce session ; préférer `write_file` complet ou PowerShell `[System.IO.File]::ReadAllText/WriteAllText`.

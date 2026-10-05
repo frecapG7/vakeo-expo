@@ -45,7 +45,7 @@ export interface TripUser {
 }
 
 
-export type EventType = "MEAL" | "RESTAURANT" | "SPORT" | "PARTY" | "VISITATION" | "ACTIVITY" | "OTHER";
+export type EventType = "MEAL" | "RESTAURANT" | "SPORT" | "PARTY" | "TRANSPORT" | "EXCURSION" | "ACTIVITY" | "OTHER";
 
 
 export interface Event {

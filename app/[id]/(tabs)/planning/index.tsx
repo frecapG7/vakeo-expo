@@ -148,6 +148,7 @@ export default function TripPlanning() {
     const { id } = useGlobalSearchParams<{id: string}>();
     const [typeFilter, setTypeFilter] = useState("");
     const [onlyAttendee, setOnlyAttendee] = useState(false);
+    const [onlyOwner, setOnlyOwner] = useState(false);
 
 
     const router = useRouter();
@@ -157,6 +158,7 @@ export default function TripPlanning() {
     const { data, hasNextPage, fetchNextPage, isLoading, refetch, isRefetching } = useGetEvents(trip?._id, {
         type: typeFilter,
         ...(onlyAttendee && { attendee: String(me?._id) }),
+        ...(onlyOwner && { owner: String(me?._id) }),
     }, {
         enabled: !!trip?._id,
     });
@@ -182,7 +184,7 @@ export default function TripPlanning() {
                                 {typeFilters.map(item => (
                                     <Pressable
                                         key={item.value}
-                                        className={`py-2 px-4 items-center rounded-full ${typeFilter === item.value ? "bg-amber-deep border-amber " : "bg-white dark:bg-night border border-gray-200 dark:border-white/15"}`}
+                                        className={`py-2 px-4 items-center rounded-full ${typeFilter === item.value ? "bg-amber-deep border border-amber-deep" : "bg-white dark:bg-night border border-mist dark:border-white/15"}`}
                                         onPress={() => setTypeFilter(typeFilter === item?.value ? "" : item.value)}
                                     >
                                         <Text className={`${typeFilter === item.value ? "font-bold text-night" : "text-night dark:text-white"}`}>
@@ -192,8 +194,8 @@ export default function TripPlanning() {
                                 ))}
                             </Animated.ScrollView>
                         </View>
-                        <View className="flex-row justify-start gap-5">
-                            <Pressable className={`w-[48%] shadow flex-row rounded-full justify-center items-center gap-1 p-2 ${onlyAttendee ? "bg-amber/40 dark:bg-amber/25 border border-amber" : "bg-white dark:bg-night border border-gray-200 dark:border-white/15"}`}
+                        <View className="flex-row gap-3">
+                            <Pressable className={`flex-1 shadow flex-row rounded-full justify-center items-center gap-1 p-2 ${onlyAttendee ? "bg-amber/40 dark:bg-amber/25 border border-amber" : "bg-white dark:bg-night border border-mist dark:border-white/15"}`}
                                 onPress={() => setOnlyAttendee(!onlyAttendee)}>
                                 {onlyAttendee &&
                                     <Animated.View entering={FadeIn} exiting={FadeOut} className="rounded-full bg-amber-deep p-1">
@@ -202,7 +204,16 @@ export default function TripPlanning() {
                                 }
                                 <Text className={`${onlyAttendee ? "font-bold text-night dark:text-white" : ""} text-sm text-night dark:text-white`}>Mes participations</Text>
                             </Pressable>
-                        </View>
+                                                    <Pressable className={`flex-1 shadow flex-row rounded-full justify-center items-center gap-1 p-2 ${onlyOwner ? "bg-amber/40 dark:bg-amber/25 border border-amber" : "bg-white dark:bg-night border border-mist dark:border-white/15"}`}
+                                onPress={() => setOnlyOwner(!onlyOwner)}>
+                                {onlyOwner &&
+                                    <Animated.View entering={FadeIn} exiting={FadeOut} className="rounded-full bg-amber-deep p-1">
+                                        <IconSymbol name="star.fill" color="white" size={14} />
+                                    </Animated.View>
+                                }
+                                <Text className={`${onlyOwner ? "font-bold text-night dark:text-white" : ""} text-sm text-night dark:text-white`}>J&apos;organise</Text>
+                            </Pressable>
+</View>
                     </View>
                 }
                 renderSectionHeader={({ section }) =>

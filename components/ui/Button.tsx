@@ -61,6 +61,7 @@ export const Button = ({ title,
     size = "medium",
     icon,
     children,
+    style,
     ...props
 }: {
     title?: string,
@@ -72,7 +73,8 @@ export const Button = ({ title,
     variant?: ButtonVariant,
     size?: ButtonSize,
     icon?: IconSymbolName,
-    children?: React.ReactNode
+    children?: React.ReactNode,
+    style?: React.ComponentProps<typeof Pressable>["style"],
 }) => {
 
     const variantClass = variantToClassMap[variant];
@@ -85,6 +87,7 @@ export const Button = ({ title,
             onLongPress={onLongPress}
             className={`${variantClass} active:opacity-75 ${className} ${disableClass}`}
             disabled={disabled || isLoading}
+            style={style}
             {...props}
         >
             {icon && (

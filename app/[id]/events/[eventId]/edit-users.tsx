@@ -1,16 +1,15 @@
 import { EventsUsersForm } from "@/components/events/EventUsersForm";
 import { Button } from "@/components/ui/Button";
+import { Screen } from "@/components/ui/Screen";
 import { Skeleton } from "@/components/ui/Skeleton";
-import styles from "@/constants/Styles";
+import { useTrip } from "@/context/TripContext";
 import { useGetEvent, useUpdateEvent } from "@/hooks/api/useEvents";
-import { useGetTrip } from "@/hooks/api/useTrips";
 import { Event } from "@/types/models";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { View } from "react-native";
 import Animated from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Toast } from "toastify-react-native";
 
 export default function EditEventUsers() {
@@ -18,8 +17,7 @@ export default function EditEventUsers() {
 
     const { id, eventId } = useLocalSearchParams<{ id: string, eventId: string }>();
 
-
-    const { data: trip } = useGetTrip(id);
+    const { trip, me } = useTrip();
     const { data: event } = useGetEvent(id, eventId);
     const updateEvent = useUpdateEvent(id, eventId);
 
@@ -49,29 +47,29 @@ export default function EditEventUsers() {
 
     if (!trip)
         return (
-            <SafeAreaView style={styles.container}>
+            <Screen className="bg-mist dark:bg-ink">
                 <View className="flex flex-1 gap-2 p-4 my-10">
                     <Skeleton height={60} />
                 </View>
-            </SafeAreaView>
+            </Screen>
 
         )
     return (
-        <SafeAreaView style={styles.container}>
+        <Screen className="bg-mist dark:bg-ink">
             <Animated.ScrollView style={{
                 flex: 1,
             }}>
                 <View>
-                    <EventsUsersForm trip={trip} control={control} />
+                    <EventsUsersForm trip={trip} me={me} control={control} />
                 </View>
-                <View className="my-2">
+                <View className="my-2 px-4">
                     <Button variant="contained"
-                        title="Modifier"
+                        title="Enregistrer"
                         onPress={handleSubmit(onSubmit)}
                         isLoading={updateEvent.isPending}
                     />
                 </View>
             </Animated.ScrollView>
-        </SafeAreaView>
+        </Screen>
     )
 }
