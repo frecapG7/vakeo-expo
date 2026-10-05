@@ -1,10 +1,12 @@
 import { PickUsersModal } from "@/components/modals/PickUsersModal";
 import { HousingOptions } from "@/components/polls/HousingOptions";
 import { PollOption } from "@/components/polls/PollOption";
+import SharedCalendarPoll, { isCalendarPoll, MOCK_POLL_ID, stripCalendarMarker } from "@/components/polls/SharedCalendarPoll";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { SHARED_CALENDAR_ENABLED } from "@/constants/Features";
 import styles from "@/constants/Styles";
 import { useTrip } from "@/context/TripContext";
 import { useGetPoll, useUnvotePoll, useVotePoll } from "@/hooks/api/usePolls";
@@ -19,10 +21,12 @@ import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PollDetailsPage() {
-    const { id, pollId } = useLocalSearchParams<{ id: string, pollId: string }>();
+    const { id, pollId, mockType, mockData } = useLocalSearchParams<{ id: string, pollId: string, mockType?: string, mockData?: string }>();
 
     const { me } = useTrip();
-    const { data: poll } = useGetPoll(id, pollId);
+    // Sondage simulé (feature calendrier, API injoignable) : rien à charger côté serveur
+    const isMock = pollId === MOCK_POLL_ID;
+    const { data: poll } = useGetPoll(id, isMock ? undefined : pollId);
     const votePoll = useVotePoll(id, pollId, me?._id);
     const unvotePoll = useUnvotePoll(id, pollId, me?._id);
     const router = useRouter();
@@ -50,6 +54,11 @@ export default function PollDetailsPage() {
             setLoadingOptionId(null);
         }
     }
+
+    // Feature calendrier (EXPO_PUBLIC_SHARED_CALENDAR_ENABLED, cf. constants/Features.ts) :
+    // les sondages « calendrier » ont leur propre écran. Désactivée, page sondage classique.
+    if (SHARED_CALENDAR_ENABLED && (isMock || isCalendarPoll(poll)))
+        return <SharedCalendarPoll id={id} pollId={pollId} poll={poll} mockType={mockType} mockData={mockData} />;
 
     if (!poll)
         return (
@@ -105,7 +114,7 @@ export default function PollDetailsPage() {
                 {/* Question hero */}
                 <View className="mb-6">
                     <Text className="text-2xl font-bold dark:text-white mb-2">
-                        {poll?.question}
+                        {stripCalendarMarker(poll?.question)}
                     </Text>
                     <View className="flex-row items-center gap-2">
                         <View className="flex-row items-center">

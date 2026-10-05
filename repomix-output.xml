@@ -1,0 +1,2127 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+[components/votes]/
+  dates/
+    DatesVoteDetails.tsx
+    DatesVoteForm.tsx
+  VoteListItem.tsx
+
+[components/polls]/
+  DatesPollOptionsForm.tsx
+  HousingOptions.tsx
+  HousingOptionsForm.tsx
+  OtherPollOptionsForm.tsx
+  PollOption.tsx
+  PollSettingsForm.tsx
+  PollStatus.tsx
+
+[app/[id]/polls]/
+  [pollId]/
+    index.tsx
+    new-option.tsx
+  _layout.tsx
+  index.tsx
+  new.tsx
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="components/votes/dates/DatesVoteDetails.tsx">
+import { PickUsersModal } from "@/components/modals/PickUsersModal"
+import { AvatarsGroup } from "@/components/ui/Avatar"
+import { Button } from "@/components/ui/Button"
+import { LinearProgress } from "@/components/ui/LinearProgress"
+import useI18nTime from "@/hooks/i18n/useI18nTime"
+import { getPercent } from "@/lib/voteUtils"
+import { TripUser } from "@/types/models"
+import { useState } from "react"
+import { Pressable, Text, View } from "react-native"
+import AnimatedCheckbox from "react-native-checkbox-reanimated"
+
+
+interface IVote {
+    _id: string,
+    startDate: Date,
+    endDate: Date
+    users: [TripUser]
+}
+
+interface IDatesVote {
+    createdBy: TripUser,
+    voters: [TripUser],
+    votes: [IVote],
+    status: string
+}
+
+export const DatesVoteDetails = ({ vote, me, onVote, onUnVote }: { vote?: IDatesVote, me?: TripUser, onVote: (id: string) => void, onUnVote: (id: string) => void }) => {
+
+    const { formatRange } = useI18nTime();
+
+    const [selectedVote, setSelectedVote] = useState(null);
+
+    return (
+        <View>
+            <View className="gap-5">
+                {vote?.votes
+                    ?.sort((a, b) => b?.users.length - a?.users.length)
+                    ?.map((v) => {
+                        const checked = v.users.map(u => u._id).includes(me._id);
+                        const percent = getPercent(v.users.length, vote.voters.length);
+                        return (
+                            <View className="gap-1 bg-orange-200 dark:bg-gray-200 p-2 rounded-lg" key={v._id}>
+                                <View className="flex-row gap-1">
+                                    <Button onPress={() => checked ? onUnVote(v._id) : onVote(v._id)}
+                                        className="w-6 h-8"
+                                        disabled={vote?.status === "CLOSED"}>
+                                        <AnimatedCheckbox
+                                            checked={checked}
+                                            highlightColor="#4444ff"
+                                            checkmarkColor="#483AA0"
+                                            boxOutlineColor="#4444ff"
+                                        />
+                                    </Button>
+
+                                    <View className="flex-grow">
+                                        <View className="flex-row items-end justify-between px-2">
+                                            {/* <Text className="text-xl dark:text-white">{formatDate(v.startDate)} - {formatDate(v.endDate)}</Text> */}
+                                            <View className="flex-row items-end">
+                                                <Text className="text-sm capitalize">{formatRange(v.startDate, v.endDate)}</Text>
+                                            </View>
+                                            
+                                            <Pressable className="flex-row items-center gap-2" onPress={() => setSelectedVote(v)}>
+                                                <AvatarsGroup avatars={v?.users.map(u => ({
+                                                    avatar: u.avatar,
+                                                    alt: u?.name?.charAt(0)
+                                                }))}
+                                                    size2="xs"
+                                                    maxLength={3}
+                                                />
+                                            </Pressable>
+                                        </View>
+                                        <LinearProgress progress={percent} />
+                                    </View>
+
+                                </View>
+
+                            </View>
+
+                        )
+                    }
+                    )}
+            </View>
+
+             <PickUsersModal open={Boolean(selectedVote)}
+                            onClose={() => setSelectedVote(null)}
+                            users={selectedVote?.users}
+                            disabled
+                        />
+
+        </View>
+    )
+
+
+
+}
+</file>
+
+<file path="components/votes/dates/DatesVoteForm.tsx">
+import useI18nNumbers from "@/hooks/i18n/useI18nNumbers";
+import useColors from "@/hooks/styles/useColors";
+import { getDatesBetween } from "@/lib/utils";
+import { getPercent } from "@/lib/voteUtils";
+import { DateVote, TripUser } from "@/types/models";
+import dayjs from "dayjs";
+import { useMemo, useRef, useState } from "react";
+import { useFieldArray, useWatch } from "react-hook-form";
+import { Pressable, Text, View } from "react-native";
+import { CalendarList, DateData } from "react-native-calendars";
+import { DayProps } from "react-native-calendars/src/calendar/day";
+var minMax = require("dayjs/plugin/minMax");
+dayjs.extend(minMax);
+
+interface CustomDayProps extends DayProps {
+}
+
+
+const buildMarkedDays = (votes: DateVote[], user: TripUser) => {
+
+    const result = {};
+
+    votes.forEach(vote => {
+        const startDate = dayjs(vote?.startDate);
+        const endDate = dayjs(vote?.endDate);
+
+        getDatesBetween(startDate, endDate, true)
+            .map(date => dayjs(date).format("YYYY-MM-DD"))
+            .forEach((dateKey) => {
+
+                if (!result[dateKey])
+                    result[dateKey] = {
+                        startingDay: false,
+                        endingDay: false,
+                        users: [],
+                        selected: false
+                    }
+
+                vote.users
+                    .filter(user => !result[dateKey].users.includes(user._id))
+                    .forEach(user => result[dateKey].users.push(user._id))
+
+                if (startDate.format("YYYY-MM-DD") === dateKey)
+                    result[dateKey].startingDay = true;
+                if (endDate.format("YYYY-MM-DD") === dateKey)
+                    result[dateKey].endingDay = true
+                if (result[dateKey].users.includes(user._id))
+                    result[dateKey].selected = true
+            });
+    });
+
+    return result
+};
+
+
+const buildCustomDayClassName = (marking, active) => {
+
+    let output = "text-xl rounded-full w-10 h-10 text-center items-center font-bold dark:text-white"
+
+    if (marking?.startingDay)
+        output = output + " bg-orange-200 dark:bg-gray-200 dark:text-gray-600 ";
+    if (marking?.endingDay)
+        output = output + " bg-orange-400 dark:bg-gray-400 dark:text-gray-600 ";
+
+    if (marking?.selected)
+        output = output + " border dark:border-white"
+
+    if (active)
+        output = output + " bg-blue-200 dark:bg-blue-200 dark:text-gray-600";
+    return output;
+
+}
+
+const CustomDay = ({ date, marking, onPress, theme, percent, active }: { date: DateData, marking?: any, onPress: (day: any) => void, theme?: any, percent: String, active: boolean }) => {
+
+    const className = buildCustomDayClassName(marking, active);
+
+    return (
+        <Pressable className="flex items-center justify-center p-2"
+            onPress={() => onPress(date)}
+            disabled={marking?.selected && !(marking?.startingDay || marking?.endingDay)}
+
+        >
+            <Text className={className}>
+                {date.day}
+            </Text>
+            <Text className="text-sm text-black text-center italic dark:text-white">{percent !== "0 %" && percent}</Text>
+        </Pressable>
+    )
+}
+
+
+export const DatesVoteForm = ({ control, user, disabled = false }: { control: any, user: TripUser, disabled: boolean }) => {
+
+    const colors = useColors();
+
+    const { fields: votes, append, update } = useFieldArray({
+        control,
+        name: "votes",
+        rules: {
+            minLength: 1
+        }
+    });
+
+    const [activeDate, setActiveDate] = useState<string>("");
+
+    const voters = useWatch({
+        control,
+        name: "voters"
+    });
+    const nbOfVoters = useMemo(() => {
+        return voters?.filter(v => v._id !== user._id)?.length + 1
+    }, [voters]);
+
+
+    const calendarRef = useRef();
+
+    const markedDays = useMemo(() => buildMarkedDays(votes, user, nbOfVoters), [votes]);
+
+    const { formatPercent } = useI18nNumbers();
+
+
+    return (
+        <View>
+            <CalendarList
+                ref={calendarRef}
+                theme={{
+                    backgroundColor: colors.background,
+                    calendarBackground: colors.background,
+                    textSectionTitleColor: colors.text,
+                    dayTextColor: colors.text,
+                    textSectionTitleDisabledColor: '#d9e1e8',
+                    selectedDayBackgroundColor: '#00adf5',
+                    selectedDayTextColor: colors.primary,
+                    todayTextColor: '#00adf5',
+                    todayBackgroundColor: '#a2daf1ff',
+                    textDisabledColor: '#828485ff',
+                    dotColor: '#00adf5',
+                    selectedDotColor: '#ffffff',
+                    arrowColor: 'orange',
+                    disabledArrowColor: '#d9e1e8',
+                    monthTextColor: colors.text,
+                    indicatorColor: colors.text,
+                    // primary: colors.primary
+                }}
+                markingType="period"
+                minDate={dayjs().toISOString()}
+                // Max amount of months allowed to scroll to the past. Default = 50
+                pastScrollRange={1}
+                // Max amount of months allowed to scroll to the future. Default = 50
+                futureScrollRange={6}
+                // Enable or disable scrolling of calendar list
+                scrollEnabled={true}
+                // Enable or disable vertical scroll indicator. Default = false
+                showScrollIndicator={true}
+                markedDates={markedDays}
+                onDayPress={({ dateString }) => {
+                    if (disabled)
+                        return;
+                    if (!activeDate)
+                        setActiveDate(dateString);
+                    else {
+
+                        const startDate = dayjs(activeDate).startOf("day");
+                        const endDate = dayjs(dateString).endOf("day");
+
+                        const index = votes?.findIndex(v => dayjs(startDate).isSame(v?.startDate) && endDate.isSame(v.endDate));
+                        if (index !== -1) {
+                            const newArray = votes[index]?.users;
+                            newArray.push(user);
+                            update(index, {
+                                startDate,
+                                endDate,
+                                users: newArray
+                            });
+                        } else {
+                            append({
+                                startDate: startDate,
+                                endDate: endDate,
+                                users: [user]
+                            });
+                        }
+                        setActiveDate("");
+
+                    }
+                }}
+                dayComponent={({ date, marking, onPress, theme }) =>
+                    <CustomDay
+                        date={date}
+                        marking={marking}
+                        onPress={onPress}
+                        theme={theme}
+                        percent={formatPercent(getPercent(marking?.users?.length, nbOfVoters), 0)}
+                        active={activeDate === date?.dateString}
+                    />
+                }
+
+
+            />
+        </View>
+    )
+}
+</file>
+
+<file path="components/votes/VoteListItem.tsx">
+import useI18nTime from "@/hooks/i18n/useI18nTime"
+import { getPercent, getVoteLabel } from "@/lib/voteUtils"
+import { Text, View } from "react-native"
+import { Avatar } from "../ui/Avatar"
+import { Button } from "../ui/Button"
+import { Checkbox } from "../ui/Checkbox"
+import { IconSymbol } from "../ui/IconSymbol"
+import { LinearProgress } from "../ui/LinearProgress"
+
+interface IUser {
+    _id: string,
+    name: string,
+    avatar: string
+}
+
+
+interface IVote {
+    createdBy: IUser,
+    voters: [IUser],
+    status: string,
+    type: string
+}
+
+export const VoteListItem = ({ vote, trip, user, onClick }: { vote: IVote, trip: any, user?: any, onClick?: () => void }) => {
+
+    const { formatDuration } = useI18nTime();
+
+    return (
+        <View>
+            <View className="flex-row pl-2 items-end justify-between">
+                <Text className="text-md dark:text-white">
+                    {getVoteLabel(vote)}
+                </Text>
+
+
+                <Text className="italic text-xs dark:text-white">
+                    {vote?.status === "OPEN" ? `Ouvert depuis ${formatDuration(vote?.createdAt, new Date())}`
+                        : "Clôturé"}
+                </Text>
+            </View>
+            <Button className="flex-row rounded-lg bg-orange-200 dark:bg-gray-200 p-2 gap-1" onPress={onClick}>
+
+                <View className="w-10 h-10">
+                    <Checkbox checked={vote?.voters.map(v => v._id).includes(user?._id)} />
+                </View>
+                <View className="flex-1 gap-1">
+                    <View className="flex-row items-center justify-between">
+                        <View className="flex-row items-center ">
+                            {vote?.voters.map((v, index) =>
+                                <View key={v._id}
+                                    className={`flex ${index > 0 && "-ml-3"}`}>
+                                    <Avatar src={v.avatar}
+                                        size2="sm"
+                                        alt={v.name?.charAt(0)}
+                                    />
+                                </View>
+                            )}
+                        </View>
+                        <View className="flex-row gap-1 items-center ">
+                            <IconSymbol name="person" size={20} color="black" />
+                            <Text className="font-bold">{vote?.voters.length}</Text>
+                        </View>
+                    </View>
+                
+                    <LinearProgress progress={vote ? getPercent(vote?.voters.length, trip?.users.length) : 0} />
+                </View>
+
+            </Button>
+        </View>
+    )
+}
+</file>
+
+<file path="components/polls/DatesPollOptionsForm.tsx">
+import styles from "@/constants/Styles";
+import useI18nTime from "@/hooks/i18n/useI18nTime";
+import useColors from "@/hooks/styles/useColors";
+import { getDatesBetween } from "@/lib/utils";
+import dayjs from "dayjs";
+import { useEffect, useState } from "react";
+import { useFieldArray, useFormState, useWatch } from "react-hook-form";
+import { Modal, Pressable, Text, View } from "react-native";
+import Animated, { SlideInUp, SlideOutDown } from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Button } from "../ui/Button";
+import { DateRangeCalendar } from "../ui/DateRangeCalendar";
+import { IconSymbol } from "../ui/IconSymbol";
+
+export const DateOptionItem = ({
+    control,
+    index,
+    onDateSelect,
+    onRemove
+}: {
+    control: any;
+    index: number;
+    onDateSelect: (index: number) => void;
+    onRemove: () => void;
+}) => {
+    const option = useWatch({ control, name: `options[${index}]` });
+    const { formatRange } = useI18nTime();
+
+    const hasDates = option.startDate && option.endDate;
+
+    return (
+        <Animated.View
+            entering={SlideInUp}
+            exiting={SlideOutDown}
+            key={option.id}
+            className="flex-row items-center bg-gray-50 dark:bg-gray-700 rounded-lg p-3 gap-2"
+        >
+            <Pressable
+                onPress={() => onDateSelect(index)}
+                className="flex-1"
+            >
+                {hasDates ? (
+                    <View className="flex-row items-center gap-2">
+                        <IconSymbol name="calendar" color="#3b82f6" size={18} />
+                        <Text className="text-sm dark:text-white capitalize">
+                            {formatRange(dayjs(option.startDate), dayjs(option.endDate))}
+                        </Text>
+                    </View>
+                ) : (
+                    <View className="flex-row items-center gap-2">
+                        <IconSymbol name="calendar" color="gray" size={18} />
+                        <Text className="text-sm text-gray-500 dark:text-gray-400">
+                            Sélectionner des dates
+                        </Text>
+                    </View>
+                )}
+            </Pressable>
+            {hasDates && (
+                <Pressable
+                    onPress={onRemove}
+                    className="p-2 rounded-full hover:bg-red-50"
+                >
+                    <IconSymbol name="trash" color="#ef4444" size={20} />
+                </Pressable>
+            )}
+        </Animated.View>
+    );
+};
+
+export const DatesPollOptionsForm = ({ control }: { control: any }) => {
+    const [calendarIndex, setCalendarIndex] = useState<number | null>(null);
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
+
+    const colors = useColors();
+    const { formatRange } = useI18nTime();
+
+    const { fields: options, append, remove, update } = useFieldArray<{ startDate?: string; endDate?: string }>({
+        control,
+        name: "options",
+        rules: {
+            validate: (value) =>  value.every(opt => opt.startDate && opt.endDate) || "options.error"
+        }
+    });
+    const formState = useFormState({
+        control,
+        name: "options"
+    });
+
+    // Add default option on mount
+    useEffect(() => {
+        if (options.length === 0) {
+            append({ startDate: "", endDate: "" });
+        }
+    }, [options.length, append]);
+
+    const handleDateSelect = (index: number) => {
+        setCalendarIndex(index);
+        // Pre-fill with existing dates if editing
+        if (options[index]?.startDate) {
+            setStartDate(dayjs(options[index].startDate).format("YYYY-MM-DD"));
+            setEndDate(dayjs(options[index].endDate).format("YYYY-MM-DD"));
+        } else {
+            setStartDate("");
+            setEndDate("");
+        }
+    };
+
+    const handleSaveDates = () => {
+        if (calendarIndex !== null && startDate && endDate) {
+            update(calendarIndex, {
+                startDate: dayjs(startDate).toISOString(),
+                endDate: dayjs(endDate).toISOString()
+            });
+        }
+        setCalendarIndex(null);
+    };
+
+    const markedDates = {
+        ...(startDate && {
+            [startDate]: {
+                startingDay: true,
+                color: colors.calendarPrimary,
+                textColor: colors.neutral,
+                selected: true,
+                disableTouchEvent: true
+            }
+        }),
+        ...(endDate && {
+            [endDate]: {
+                endingDay: true,
+                color: colors.calendarPrimary,
+                textColor: colors.neutral,
+                selected: true,
+                disableTouchEvent: true
+            }
+        }),
+        ...(getDatesBetween(dayjs(startDate), dayjs(endDate))
+            .reduce((acc: Record<string, any>, date) => {
+                acc[date] = {
+                    color: colors.neutral,
+                    textColor: colors.text,
+                    selected: true,
+                    disableTouchEvent: true
+                };
+                return acc;
+            }, {} as Record<string, any>))
+    };
+
+    return (
+        <View className="gap-3">
+            {options.map((option, index) => (
+                <DateOptionItem
+                    key={option.id}
+                    control={control}
+                    index={index}
+                    onDateSelect={handleDateSelect}
+                    onRemove={() => remove(index)}
+                />
+            ))}
+            {formState.errors.options?.root && (
+                <Text className="text-red-500 text-sm ml-2 mt-1">
+                    Toutes les options doivent avoir une date de début et une date de fin
+                </Text>
+            )}
+            <Button
+                onPress={() => append({ startDate: "", endDate: "" })}
+                className="mt-3 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg justify-start"
+            >
+                <IconSymbol name="plus.circle.fill" color="#3b82f6" size={20} />
+                <Text className="text-blue-600 dark:text-blue-400 font-medium ml-2">
+                    Ajouter une option
+                </Text>
+            </Button>
+
+            {/* Calendar Modal */}
+            <Modal
+                visible={calendarIndex !== null}
+                animationType="slide"
+                transparent={false}
+                onRequestClose={() => setCalendarIndex(null)}
+            >
+                <SafeAreaView style={{
+                    ...styles.container,
+                    padding: 10,
+                    backgroundColor: colors.background
+                }}>
+                    <View className="flex-row justify-between items-center mb-5">
+                        <Pressable onPress={() => setCalendarIndex(null)}>
+                            <Text className="dark:text-white text-xl">Annuler</Text>
+                        </Pressable>
+                    </View>
+
+                    <Text className="mb-4 dark:text-white">
+                        Sélectionne une date de début et de fin
+                    </Text>
+
+                    <DateRangeCalendar
+                        startDate={startDate}
+                        endDate={endDate}
+                        onChange={({ startDate: newStart, endDate: newEnd }) => {
+                            setStartDate(newStart);
+                            setEndDate(newEnd);
+                        }}
+                    />
+                    {(startDate && endDate) && (
+                        <View className="my-4">
+
+                            <Button
+                                title="Enregistrer"
+                                onPress={handleSaveDates}
+                                variant="contained"
+                            />
+                        </View>
+                    )}
+                </SafeAreaView>
+            </Modal>
+        </View>
+    );
+};
+</file>
+
+<file path="components/polls/HousingOptions.tsx">
+import { containsUser } from "@/lib/utils"
+import { HousingPoll, TripUser } from "@/types/models"
+import { Image, ImageBackground } from "expo-image"
+import * as Linking from 'expo-linking'
+import { Pressable, Text, View } from "react-native"
+import { IconSymbol } from "../ui/IconSymbol"
+import { PollOption } from "./PollOption"
+
+export const HousingOptions = ({ poll, user, onVote, onUnVote, onSelected }: { poll: HousingPoll, user?: TripUser, onVote: (option: any) => Promise<void>, onUnVote: (option: any) => Promise<void>, onSelected: (option: any) => void }) => {
+
+    const handleLinkClick = async (url) => {
+        try {
+            await Linking.openURL(url);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+
+    return (
+        <View className="gap-5">
+            {poll.options.map((option) => {
+                const includeUser = containsUser(user, option.selectedBy);
+                return <View key={option._id}
+                    className="rounded-b-lg rounded-t-xl overflow-hidden border-b border-gray-200 pb-5 bg-white dark:bg-gray-900">
+                    <ImageBackground source={option.image}
+                        style={{
+                            width: "100%",
+                            height: 150
+                        }}
+                    >
+                        <View className="flex-1 items-end justify-between p-2">
+                            <Pressable className="bg-blue-50 p-2 rounded-xl"
+                                onPress={async () => await handleLinkClick(option.url)}>
+                                <IconSymbol name="arrow.up.right" color="gray" size={20} />
+                            </Pressable>
+
+                            <Image
+                                source={option.icon}
+                                style={{
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: 10
+                                }} />
+                        </View>
+                    </ImageBackground>
+                    <View className="mx-1 gap-2">
+
+                        <Text className="text-lg font-bold dark:text-white"
+                            numberOfLines={3}>
+                            {option.title}
+                        </Text>
+                        <Pressable className="flex-row justify-between items-center"
+                            onPress={async () => includeUser ? await onUnVote(option) : await onVote(option)}
+                            onLongPress={async() => await onSelected(option)}
+                            >
+                            <PollOption
+                                // label={option.title}²
+                                selectedBy={option.selectedBy}
+                                percent={option.percent}
+                                isAnonymous={poll.isAnonymous}
+                                includeUser={includeUser}
+                            />
+                        </Pressable>
+                    </View>
+
+
+                </View>
+
+            }
+            )}
+        </View>
+    )
+}
+</file>
+
+<file path="components/polls/HousingOptionsForm.tsx">
+import { Button } from "@/components/ui/Button";
+import { usePostLinkPreview } from "@/hooks/api/useLinkPreview";
+import { Pressable, Text, View } from "react-native";
+import { IconSymbol } from "../ui/IconSymbol";
+
+import { Image, ImageBackground } from "expo-image";
+import * as Linking from 'expo-linking';
+import { useCallback, useEffect, useState } from "react";
+import { useFieldArray, useWatch } from "react-hook-form";
+import Animated, { BounceIn, BounceOut, FadeIn, SlideOutDown } from "react-native-reanimated";
+import { FormLink } from "../form/FormLink";
+import { Skeleton } from "../ui/Skeleton";
+
+export const HousingOptionItem = ({
+    control,
+    index,
+    onPreview,
+    onRemove,
+    isPending,
+    onClick
+}: {
+    control: any;
+    index: number;
+    onPreview: (url: string, index: number) => void;
+    onRemove: () => void;
+    isPending: boolean;
+    onClick: (url: string) => void
+}) => {
+    const option = useWatch({ control, name: `options[${index}]` });
+
+    if (isPending)
+        return (
+            <Animated.View entering={BounceIn} exiting={BounceOut}>
+                <Skeleton height={40} />
+            </Animated.View>
+        )
+
+    return (
+        <Animated.View
+            entering={FadeIn}
+            exiting={SlideOutDown}
+            className="bg-gray-50 dark:bg-gray-700 rounded-b-lg rounded-t-xl gap-1 pb-2 overflow-hidden"
+        >
+
+            {option?.image && (
+                <Button onPress={() => onClick(option.url)}>
+                    <ImageBackground
+                        source={option.image}
+                        style={{
+                            height: 200,
+                            width: "100%",
+                            flex: 1,
+                            alignItems: "flex-end",
+                            borderRadius: "inherit"
+                        }}
+                        className="rounded-t-full"
+                        contentFit="cover"
+                    >
+                        <View className="flex-1 items-end p-2">
+                            <View className="flex-1 justify-between">
+                                <Pressable
+                                    onPress={onRemove}
+                                    className="p-2 bg-white/80  w-11 rounded-full items-center shadow-md border border-gray-300"
+                                >
+                                    <IconSymbol name="trash" color="red" size={20} />
+                                </Pressable>
+                                {option.icon && (
+                                    <View>
+                                        <Image
+                                            source={option.icon}
+                                            style={{
+                                                width: 40,
+                                                height: 40,
+                                                borderRadius: 10
+                                            }}
+                                        />
+                                    </View>
+                                )}
+                            </View>
+                        </View>
+                    </ImageBackground>
+                </Button>
+            )}
+
+            {option?.title ? (
+                <View className="mx-1 px-3 pb-2">
+                    <Text className="font-bold text-lg dark:text-white">
+                        {option.title}
+                    </Text>
+                </View>
+            ) :
+                <View className="p-3">
+                    <FormLink
+                        control={control}
+                        name={`options[${index}].url`}
+                        placeholder="Colle un lien Airbnb, Abritel, Booking..."
+                        pattern={/^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?$/i}
+                        onPaste={(text) => onPreview(text, index)}
+                    />
+                </View>
+            }
+        </Animated.View>
+    );
+};
+
+export const HousingOptionsForm = ({ control }: { control: any }) => {
+    const [loadingIndex, setLoadingIndex] = useState<number | null>(null);
+    const postLinkPreview = usePostLinkPreview();
+
+    const { fields: options, append, remove, update } = useFieldArray({
+        control,
+        name: "options",
+    })
+
+  const handleLinkClick = async (url) => {
+        try {
+            await Linking.openURL(url);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+
+    const handlePreview = useCallback(async (url: string, index: number) => {
+        setLoadingIndex(index);
+        try {
+            const response = await postLinkPreview.mutateAsync(url);
+            if (response.success) {
+                update(index, {
+                    title: response.data.title,
+                    image: response.data.image,
+                    icon: response.data.icon,
+                    url: response.data.url
+                });
+            }
+        } finally {
+            setLoadingIndex(null);
+        }
+    }, [postLinkPreview, update]);
+    // Add default option on mount
+    useEffect(() => {
+        if (options.length === 0) {
+            append({ url: "", title: "", image: "", icon: "" });
+        }
+    }, [options.length, append]);
+
+    return (
+        <View className="gap-2 my-2">
+            {options.map((option, index) => (
+                <HousingOptionItem
+                    key={option.id}
+                    control={control}
+                    index={index}
+                    onPreview={handlePreview}
+                    onRemove={() => remove(index)}
+                    isPending={loadingIndex === index}
+                    onClick={handleLinkClick}
+                />
+            ))}
+
+            <Button
+                onPress={() => append({ url: "", title: "", image: "", icon: "" })}
+                className="mt-3 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg justify-start"
+            >
+                <IconSymbol name="plus.circle.fill" color="#3b82f6" size={20} />
+                <Text className="text-blue-600 dark:text-blue-400 font-medium ml-2">
+                    Ajouter une option
+                </Text>
+            </Button>
+        </View>
+    );
+};
+</file>
+
+<file path="components/polls/OtherPollOptionsForm.tsx">
+import { FormText } from "@/components/form/FormText";
+import { Button } from "@/components/ui/Button";
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import { useEffect } from "react";
+import { useFieldArray } from "react-hook-form";
+import { Pressable, Text, View } from "react-native";
+import Animated, { SlideInUp, SlideOutDown } from "react-native-reanimated";
+
+
+export const OtherPollOptionsForm = ({ control }: { control: any }) => {
+    const { fields: options, append, remove } = useFieldArray({
+        control,
+        name: "options",
+        rules: {
+            minLength: 1
+        },
+        keyName: "key",
+    });
+
+    useEffect(() => {
+        if (options.length === 0) {
+            append({ value: "" });
+        }
+    }, [options.length, append]);
+
+    return (
+        <View className="gap-3">
+            {options?.map((option, index) => (
+                <Animated.View
+                    entering={SlideInUp}
+                    exiting={SlideOutDown}
+                    key={option.key}
+                    className="flex-row items-center bg-gray-50 dark:bg-gray-700 rounded-lg p-3"
+                >
+                    <View className="flex-1">
+                        <FormText
+                            control={control}
+                            name={`options[${index}].value`}
+                            placeholder={`Option ${index + 1}`}
+                            rules={{ required: true }}
+                        />
+                    </View>
+                    <Pressable
+                        onPress={() => remove(index)}
+                        className="p-2 rounded-full hover:bg-red-50"
+                    >
+                        <IconSymbol name="trash" color="#ef4444" size={20} />
+                    </Pressable>
+                </Animated.View>
+            ))}
+
+            <Button
+                onPress={() => append({ value: "" })}
+                className="mt-3 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg justify-start"
+            >
+                <IconSymbol name="plus.circle.fill" color="#3b82f6" size={20} />
+                <Text className="text-blue-600 dark:text-blue-400 font-medium ml-2">
+                    Ajouter une option
+                </Text>
+            </Button>
+        </View>
+    );
+};
+</file>
+
+<file path="components/polls/PollOption.tsx">
+import { TripUser } from "@/types/models"
+import { ActivityIndicator, Text, View } from "react-native"
+import { AvatarsGroup } from "../ui/Avatar"
+import { IconSymbol } from "../ui/IconSymbol"
+
+const getColorForPercent = (percent: number) => {
+    // Enhanced orange gradient: light → vibrant
+    const startColor = { r: 255, g: 200, b: 150 }; // #ffc896
+    const endColor = { r: 245, g: 120, b: 50 };   // #f57832
+
+    const r = Math.round(startColor.r + (endColor.r - startColor.r) * (percent / 100));
+    const g = Math.round(startColor.g + (endColor.g - startColor.g) * (percent / 100));
+    const b = Math.round(startColor.b + (endColor.b - startColor.b) * (percent / 100));
+
+    return `rgb(${r}, ${g}, ${b})`;
+}
+
+export const PollOption = ({
+    label,
+    selectedBy,
+    percent,
+    isAnonymous,
+    includeUser,
+    isLoading
+}: {
+    label?: string,
+    selectedBy?: TripUser[],
+    percent: string | number,
+    isAnonymous?: boolean,
+    includeUser?: boolean,
+    isLoading?: boolean
+}) => {
+    const voteCount = selectedBy?.length || 0;
+    const normalizedPercent = typeof percent === 'string' ? parseFloat(percent) : percent;
+
+    return (
+        <View className="flex-1 rounded-xl py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden">
+            {/* Progress bar - enhanced */}
+            <View
+                className="absolute left-0 top-0 bottom-0 rounded-xl"
+                style={{
+                    width: `${normalizedPercent}%`,
+                    backgroundColor: getColorForPercent(normalizedPercent),
+                    opacity: 0.2,
+                }}
+            />
+
+            <View className="relative flex-1 flex-row justify-between items-center px-3">
+                <View className="flex-row items-center gap-3 flex-1">
+                    {/* Checkmark circle - improved with loading state */}
+                    <View className={`rounded-full w-10 h-10 items-center justify-center border-2 ${
+                        includeUser
+                            ? 'border-blue-500 bg-blue-100 dark:bg-blue-900/30'
+                            : 'border-gray-300 bg-gray-50 dark:bg-gray-700/30'
+                    }`}>
+                        {isLoading ? (
+                            <ActivityIndicator size="small" color="#3b82f6" />
+                        ) : includeUser ? (
+                            <IconSymbol
+                                name="checkmark.circle.fill"
+                                color="#3b82f6"
+                                size={22}
+                            />
+                        ) : null}
+                    </View>
+
+                    {/* Label - improved typography */}
+                    <Text
+                        className="text-sm capitalize flex-1 dark:text-white"
+                        numberOfLines={2}
+                        ellipsizeMode="tail"
+                    >
+                        {label}
+                    </Text>
+                </View>
+
+                {/* Right side - vote info */}
+                <View className="flex-row items-center gap-2">
+                    {/* Avatars - only show if not anonymous and has voters */}
+                    {!isAnonymous && voteCount > 0 && (
+                        <AvatarsGroup
+                            avatars={selectedBy?.map(u => ({
+                                avatar: u.avatar,
+                                alt: u?.name.charAt(0)
+                            }))}
+                            size2="xs"
+                            maxLength={3}
+                        />
+                    )}
+
+                    {/* Percentage - enhanced display */}
+                    <View className={`px-3 py-1 rounded-lg ${
+                        normalizedPercent > 50 ? 'bg-green-100 dark:bg-green-900/30' :
+                        normalizedPercent > 25 ? 'bg-amber-100 dark:bg-amber-900/30' :
+                        'bg-red-100 dark:bg-red-900/30'
+                    }`}>
+                        <Text className={`font-bold text-sm ${
+                            normalizedPercent > 50 ? 'text-green-700 dark:text-green-300' :
+                            normalizedPercent > 25 ? 'text-amber-700 dark:text-amber-300' :
+                            'text-red-700 dark:text-red-300'
+                        }`}>
+                            {Math.round(normalizedPercent)}%
+                        </Text>
+                    </View>
+                </View>
+            </View>
+        </View>
+    );
+}
+</file>
+
+<file path="components/polls/PollSettingsForm.tsx">
+import { useWatch } from "react-hook-form";
+import { Text, View } from "react-native";
+import { FormSwitch } from "../form/FormSwitch";
+
+
+
+
+
+
+export const PollSettingsForm = ({ control }: { control: any }) => {
+
+    const isSingleAnswer = useWatch({
+        control,
+        name: "isSingleAnswer"
+    })
+
+    const isAnonymous = useWatch({
+        control,
+        name: "isAnonymous"
+    })
+
+    return (
+        <View>
+            <View className="flex-1 gap-4 my-2">
+                <View
+                    className={`flex-row items-center rounded-lg justify-between border border-2 p-5 ${isSingleAnswer ? "border-blue-400 dark:border-blue-600" : "border-gray-200 dark:border-gray-600"}`}>
+                    <View>
+                        <Text className="font-bold dark:text-white">
+                            Réponse unique
+                        </Text>
+                        <Text className="text-gray-600 dark:text-gray-200 text-xs italic">
+                            Seule réponse à la fois sera possible
+                        </Text>
+                    </View>
+                    <FormSwitch control={control}
+                        name="isSingleAnswer"
+                        />
+                </View>
+
+                <View
+                    className={`flex-row items-center rounded-lg justify-between border border-2 p-5 ${isAnonymous ? "border-blue-400 dark:border-blue-600" : "border-gray-200 dark:border-gray-600"}`}>
+                    <View>
+                        <Text className="font-bold dark:text-white">
+                            Votes anonyme
+                        </Text>
+                        <Text className="text-gray-600 dark:text-gray-200 text-xs italic">
+                            Seul les résultats du vote seront visible
+                        </Text>
+                    </View>
+                    <FormSwitch
+                        control={control}
+                        name="isAnonymous"
+                        />
+                </View>
+            </View>
+
+        </View>
+    )
+}
+</file>
+
+<file path="app/[id]/polls/[pollId]/new-option.tsx">
+import { FormLink } from "@/components/form/FormLink";
+import { FormText } from "@/components/form/FormText";
+import { Button } from "@/components/ui/Button";
+import { DateRangeCalendar } from "@/components/ui/DateRangeCalendar";
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import { Skeleton } from "@/components/ui/Skeleton";
+import styles from "@/constants/Styles";
+import { TripContext } from "@/context/TripContext";
+import { usePostLinkPreview } from "@/hooks/api/useLinkPreview";
+import { useGetPoll, usePutPoll } from "@/hooks/api/usePolls";
+import { DatePollOption, HousingPollOption, OtherPollOption, PollOption } from "@/types/models";
+import { Image, ImageBackground } from "expo-image";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useContext, useEffect } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { Pressable, Text, View } from "react-native";
+import Animated, { BounceIn, BounceOut } from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Toast } from "toastify-react-native";
+
+export default function NewPollOptionPage() {
+    const { id, pollId } = useLocalSearchParams<{ id: string, pollId: string }>();
+    const router = useRouter();
+    const { me } = useContext(TripContext);
+
+    const { data: poll } = useGetPoll(id, pollId);
+    const updatePoll = usePutPoll(id, pollId, me?._id);
+    const postLinkPreview = usePostLinkPreview();
+
+    const { control, register, handleSubmit, reset, setValue, formState: { isSubmitSuccessful } } = useForm();
+    const option = useWatch({ control });
+
+    useEffect(() => {
+        if (poll?.type === "DatesPoll") {
+            register("startDate", { required: true });
+            register("endDate", { required: true });
+        }
+    }, [poll?.type, register]);
+
+    useEffect(() => {
+        if (isSubmitSuccessful)
+            reset();
+    }, [isSubmitSuccessful, reset]);
+
+    const handlePasteLink = async (url: string) => {
+        const response = await postLinkPreview.mutateAsync(url);
+        if (response.success && response.data) {
+            reset(response.data);
+        }
+    };
+
+    const onSubmit = async (data: any) => {
+        let typedOption: PollOption;
+
+        if (poll?.type === "DatesPoll") {
+            typedOption = {
+                startDate: new Date(data.startDate as string),
+                endDate: new Date(data.endDate as string),
+            } as DatePollOption;
+        }
+        else if (poll?.type === "HousingPoll") {
+            typedOption = data as HousingPollOption;
+        }
+        else {
+            typedOption = data as OtherPollOption;
+        }
+
+        try {
+            await updatePoll.mutateAsync({ newOptions: [typedOption] });
+            Toast.success("Option ajoutée");
+            router.back();
+        } catch {
+            // Toast already handled by axios interceptor
+        }
+    };
+
+    if (!poll)
+        return (
+            <View style={styles.container}>
+                <View className="gap-4 my-4 px-4">
+                    <Skeleton height={50} />
+                    <Skeleton height={50} />
+                </View>
+            </View>
+        );
+
+    return (
+        <SafeAreaView style={styles.container}>
+            <Animated.ScrollView
+                className="flex-1 mx-4"
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: 24 }}
+            >
+                <View className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-4 shadow-sm border border-gray-100 dark:border-gray-700">
+                    <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+                        {poll.type === "DatesPoll" && "Proposer des dates"}
+                        {poll.type === "HousingPoll" && "Proposer un hébergement"}
+                        {poll.type === "OtherPoll" && "Ajouter une option"}
+                    </Text>
+
+                    {poll.type === "DatesPoll" && (
+                        <View className="gap-2">
+                            <Text className="text-sm font-medium mb-1 dark:text-gray-300">
+                                Sélectionne une date de début et de fin
+                            </Text>
+                            <DateRangeCalendar
+                                startDate={option?.startDate || ""}
+                                endDate={option?.endDate || ""}
+                                onChange={({ startDate, endDate }) => {
+                                    setValue("startDate", startDate, { shouldValidate: true });
+                                    setValue("endDate", endDate, { shouldValidate: true });
+                                }}
+                            />
+                        </View>
+                    )}
+
+                    {poll.type === "HousingPoll" && (
+                        <View className="gap-3">
+                            {postLinkPreview.isPending ? (
+                                <Animated.View entering={BounceIn} exiting={BounceOut}>
+                                    <Skeleton height={40} />
+                                </Animated.View>
+                            ) : (
+                                <Animated.View entering={BounceIn} exiting={BounceOut}>
+                                    {option?.image && (
+                                        <ImageBackground
+                                            source={option.image}
+                                            style={{
+                                                height: 200,
+                                                width: "100%",
+                                                alignItems: "flex-end",
+                                            }}
+                                            className="rounded-t-xl"
+                                            contentFit="cover"
+                                        >
+                                            <View className="flex-1 items-end p-2">
+                                                <View className="flex-1 justify-between w-full">
+                                                    <Pressable
+                                                        onPress={() => reset({ url: "" })}
+                                                        className="p-2 bg-white/80 w-11 rounded-full items-center shadow-md border border-gray-300"
+                                                    >
+                                                        <IconSymbol name="trash" color="red" size={20} />
+                                                    </Pressable>
+                                                    {option.icon && (
+                                                        <View>
+                                                            <Image
+                                                                source={option.icon}
+                                                                style={{
+                                                                    width: 40,
+                                                                    height: 40,
+                                                                    borderRadius: 10
+                                                                }}
+                                                            />
+                                                        </View>
+                                                    )}
+                                                </View>
+                                            </View>
+                                        </ImageBackground>
+                                    )}
+                                </Animated.View>
+                            )}
+
+                            {option?.title ? (
+                                <View className="mx-1 px-3 pb-2">
+                                    <Text className="font-bold text-lg dark:text-white">
+                                        {option.title}
+                                    </Text>
+                                </View>
+                            ) : (
+                                <View>
+                                    <FormLink
+                                        control={control}
+                                        name="url"
+                                        placeholder="Colle un lien Airbnb, Abritel, Booking..."
+                                        pattern={/^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?$/i}
+                                        onPaste={handlePasteLink}
+                                    />
+                                </View>
+                            )}
+                        </View>
+                    )}
+
+                    {poll.type === "OtherPoll" && (
+                        <FormText
+                            control={control}
+                            placeholder="Nouvelle option"
+                            name="value"
+                            rules={{
+                                required: true,
+                                maxLength: 255
+                            }}
+                        />
+                    )}
+                </View>
+
+                <Button
+                    variant="contained"
+                    icon="plus"
+                    title="Ajouter"
+                    onPress={handleSubmit(onSubmit)}
+                    isLoading={updatePoll.isPending}
+                />
+            </Animated.ScrollView>
+        </SafeAreaView>
+    );
+}
+</file>
+
+<file path="components/polls/PollStatus.tsx">
+import { Button } from "@/components/ui/Button";
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import { Poll, TripUser } from "@/types/models";
+import { Text } from "react-native";
+
+interface PollStatusProps {
+    poll?: Poll;
+    selectedUser?: TripUser;
+    onNewClick: () => void;
+    onPollClick: (pollId: string) => void;
+}
+
+export const PollStatus = ({ poll, selectedUser, onNewClick, onPollClick }: PollStatusProps) => {
+    const hasVoted = poll?.hasSelected?.some(v => v._id === selectedUser?._id);
+
+    if (!poll) return (
+        <Button className="flex-row items-center gap-1 bg-blue-100 dark:bg-blue-900/40 p-2 rounded-xl"
+            onPress={onNewClick}>
+            <IconSymbol name="plus" size={16} color="#2563EB" />
+            <Text className="text-blue-700 dark:text-blue-400 font-medium text-sm">
+                Créer un sondage
+            </Text>
+        </Button>
+    );
+
+    if (poll.isClosed) return (
+        <Button className="flex-row items-center gap-2 bg-gray-200 dark:bg-gray-700 p-2 rounded-xl"
+            onPress={() => onPollClick(poll._id)}>
+            <IconSymbol name="lock.fill" size={16} color="#6B7280" />
+            <Text className="text-gray-500 dark:text-gray-400 font-medium text-sm">Sondage terminé</Text>
+        </Button>
+    );
+
+    if (hasVoted) return (
+        <Button className="flex-row items-center gap-2 bg-green-100 dark:bg-green-900/40 p-2 rounded-xl"
+            onPress={() => onPollClick(poll._id)}>
+            <IconSymbol name="checkmark.circle.fill" size={16} color="#16A34A" />
+            <Text className="text-green-700 dark:text-green-400 font-medium text-sm">Vous avez voté</Text>
+        </Button>
+    );
+
+    return (
+        <Button className="flex-row items-center gap-1 bg-orange-100 dark:bg-orange-900/40 p-2 rounded-xl"
+            onPress={() => onPollClick(poll._id)}>
+            <IconSymbol name="exclamationmark" size={16} color="#EA580C" />
+            <Text className="text-orange-700 dark:text-orange-400 font-medium text-sm">Voter maintenant</Text>
+        </Button>
+    );
+};
+</file>
+
+<file path="app/[id]/polls/new.tsx">
+import { FormText } from "@/components/form/FormText";
+import { DatesPollOptionsForm } from "@/components/polls/DatesPollOptionsForm";
+import { HousingOptionsForm } from "@/components/polls/HousingOptionsForm";
+import { OtherPollOptionsForm } from "@/components/polls/OtherPollOptionsForm";
+import { PollSettingsForm } from "@/components/polls/PollSettingsForm";
+import { Button } from "@/components/ui/Button";
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import styles from "@/constants/Styles";
+import { TripContext } from "@/context/TripContext";
+import { usePostPoll } from "@/hooks/api/usePolls";
+import { Poll } from "@/types/models";
+import { useLocalSearchParams, useRouter } from "expo-router/build/hooks";
+import { useContext, useEffect } from "react";
+
+import { useController, useForm } from "react-hook-form";
+import { Text, View } from "react-native";
+import Animated from "react-native-reanimated";
+
+
+const placeholder = (type: string): string => {
+    if (type === "DatesPoll")
+        return "On part quand?";
+    else if (type === "HousingPoll")
+        return "On loge ou?";
+    else
+        return "On part ou?"
+}
+
+
+export default function NewPoll() {
+
+    const { control, handleSubmit, setValue } = useForm({
+        defaultValues: {
+            question: "",
+            type: "",
+            isSingleAnswer: false,
+            isAnonymous: false,
+            options: []
+        }
+    });
+
+    const { field: { value: type, onChange: setType } } = useController({
+        control,
+        name: "type",
+        rules: {
+            required: true
+        }
+    });
+
+
+    const { type: typeParam, stop } = useLocalSearchParams<{ type: string, stop?: string }>();
+    const { trip, me } = useContext(TripContext);
+    const postPoll = usePostPoll(trip?._id, me?._id);
+    const router = useRouter();
+
+    const onSubmit = async (data: Omit<Poll, '_id'>) => {
+        const result = await postPoll.mutateAsync({
+            ...data,
+            ...(stop && { stop })
+        });
+        router.dismissTo({
+            pathname: "/[id]/polls/[pollId]",
+            params: {
+                id: trip?._id,
+                pollId: result._id
+
+            }
+        });
+    }
+
+    useEffect(() => {
+        if (typeParam)
+            setValue("type", String(typeParam));
+    }, [typeParam, setValue]);
+
+    if (!type)
+        return (
+            <View style={styles.container}>
+                <Text>Quel type de sondage veux tu organiser ? </Text>
+                <View className="flex-row flex-wrap gap-5 m-5">
+                    <Button className="flex bg-orange-200 rounded-xl w-[40%] gap-2 border-blue-50 shadow p-2"
+                        onPress={() => setType("DatesPoll")}>
+                        <IconSymbol name="calendar" color="black" size={34} />
+                        <Text className="capitalize text-lg font-bold"> des Dates</Text>
+                    </Button>
+                    <Button className="flex bg-orange-200 rounded-xl w-[40%] gap-2 border-blue-50 shadow p-2"
+                        onPress={() => setType("HousingPoll")}>
+                        <IconSymbol name="house.fill" color="black" size={34} />
+                        <Text className="capitalize text-lg font-bold"> des hébergements</Text>
+                    </Button>
+                    <Button className="flex bg-orange-200 rounded-xl w-[40%] gap-2 border-blue-50 shadow p-2"
+                        onPress={() => setType("OtherPoll")}>
+                        <IconSymbol name="chart.bar.fill" color="black" size={34} />
+                        <Text className="capitalize text-lg font-bold"> autre chose</Text>
+                    </Button>
+
+                </View>
+
+            </View>
+
+
+        )
+
+    return (
+        <Animated.ScrollView className="flex-1 mt-4 mx-4" contentInsetAdjustmentBehavior="automatic" showsVerticalScrollIndicator={false}>
+            <View className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-4 shadow-sm border border-gray-100 dark:border-gray-700">
+                <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+                    Question *
+                </Text>
+                <FormText
+                    control={control}
+                    name="question"
+                    rules={{
+                        required: true,
+                        maxLength: 255
+                    }}
+                    placeholder={placeholder(type)}
+                />
+            </View>
+
+
+            <View className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-4 shadow-sm border border-gray-100 dark:border-gray-700">
+                <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+                    Options
+                </Text>
+                {type === "DatesPoll" &&
+                    <DatesPollOptionsForm control={control} />
+                }
+                {type === "OtherPoll" &&
+                    <OtherPollOptionsForm
+                        control={control}
+                    />
+                }
+                {type === "HousingPoll" &&
+                    <View className="flex-1 my-2">
+                        <HousingOptionsForm control={control} />
+                    </View>
+                }
+            </View>
+
+            <View className="flex-1 bg-white dark:bg-gray-800 rounded-xl p-4 mb-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+                    Paramètres
+                </Text>
+                <PollSettingsForm control={control} />
+            </View>
+
+            <View className="my-4">
+                <Button
+                    variant="contained"
+                    icon="tray"
+                    title="Démarrer le sondage"
+                    onPress={handleSubmit(onSubmit)}
+                    isLoading={postPoll?.isPending} />
+            </View>
+
+        </Animated.ScrollView>
+    )
+}
+</file>
+
+<file path="app/[id]/polls/[pollId]/index.tsx">
+import { PickUsersModal } from "@/components/modals/PickUsersModal";
+import { HousingOptions } from "@/components/polls/HousingOptions";
+import { PollOption } from "@/components/polls/PollOption";
+import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import { Skeleton } from "@/components/ui/Skeleton";
+import styles from "@/constants/Styles";
+import { TripContext } from "@/context/TripContext";
+import { useGetPoll, useUnvotePoll, useVotePoll } from "@/hooks/api/usePolls";
+import useI18nTime from "@/hooks/i18n/useI18nTime";
+import dayjs from "@/lib/dayjs-config";
+
+import { PollOption as Option } from "@/types/models";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useContext, useState } from "react";
+import { Text, View } from "react-native";
+import Animated from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+export default function PollDetailsPage() {
+    const { id, pollId } = useLocalSearchParams<{ id: string, pollId: string }>();
+
+    const { me } = useContext(TripContext);
+    const { data: poll } = useGetPoll(id, pollId);
+    const votePoll = useVotePoll(id, pollId, me?._id);
+    const unvotePoll = useUnvotePoll(id, pollId, me?._id);
+    const router = useRouter();
+
+    const { formatDuration, formatRange } = useI18nTime();
+
+
+    const [selectedOption, setSelectedOption] = useState<Option | null>(null);
+    const [loadingOptionId, setLoadingOptionId] = useState<string | null>(null);
+
+    const insets = useSafeAreaInsets();
+
+    const handleClick = async (option: Option, includeMe: boolean) => {
+        setLoadingOptionId(option._id);
+        try {
+            if (includeMe)
+                await unvotePoll.mutateAsync({
+                    option: option._id,
+                })
+            else
+                await votePoll.mutateAsync({
+                    options: [option._id],
+                });
+        } finally {
+            setLoadingOptionId(null);
+        }
+    }
+
+    if (!poll)
+        return (
+            <View style={styles.container}>
+                <View className="flex-row gap-3 items-center p-4">
+                    <Skeleton variant="circular" size="md" />
+                    <View className="flex-1 gap-2">
+                        <Skeleton height={8} width="60%" />
+                        <Skeleton height={6} width="40%" />
+                    </View>
+                </View>
+                <View className="gap-4 my-4 px-4">
+                    <Skeleton height={50} />
+                    <Skeleton height={50} />
+                    <Skeleton height={50} />
+                </View>
+            </View>
+        );
+
+
+
+    return (
+        <Animated.ScrollView
+            style={styles.container}
+            contentContainerStyle={{ paddingBottom: insets.bottom }}
+            showsVerticalScrollIndicator={false}
+        >
+            {/* Poll Card */}
+            <View className="m-2 mb-4 rounded-2xl p-4 border border-gray-200 dark:border-gray-600 shadow-sm bg-white dark:bg-gray-800"
+            >
+                {/* Meta block */}
+                <View className="flex-row items-center gap-2 mb-4">
+                    <Avatar
+                        src={poll?.createdBy?.avatar}
+                        alt={poll?.createdBy?.name?.charAt(0)}
+                        size2="sm"
+                    />
+                    <View className="flex-1">
+                        <Text className="text-sm font-medium text-gray-600 dark:text-gray-300"
+                            numberOfLines={1}
+                            ellipsizeMode="tail">
+                            {poll?.createdBy?.name}
+                        </Text>
+                        <View className="flex-row items-center gap-1">
+                            <IconSymbol name="clock" color="gray" size={12} />
+                            <Text className="text-xs text-gray-500 dark:text-gray-400">
+                                {formatDuration(poll?.createdAt)}
+                            </Text>
+                        </View>
+                    </View>
+                </View>
+
+                {/* Question hero */}
+                <View className="mb-6">
+                    <Text className="text-2xl font-bold dark:text-white mb-2">
+                        {poll?.question}
+                    </Text>
+                    <View className="flex-row items-center gap-2">
+                        <View className="flex-row items-center">
+                            <IconSymbol name="person.2" color="orange" size={16} />
+                            <Text className="text-orange-600 dark:text-orange-400 font-medium ml-1">
+                                {poll?.hasSelected.length}
+                            </Text>
+                        </View>
+                        <Text className="text-gray-500 dark:text-gray-400">
+                            {poll?.hasSelected.length === 1 ? 'vote' : 'votes'}
+                        </Text>
+                    </View>
+                </View>
+
+                {/* Options Section */}
+                {poll?.type === "HousingPoll" ? (
+                    <View className="mb-4">
+                        <HousingOptions
+                            poll={poll}
+                            user={me}
+                            onVote={(option) => handleClick(option, false)}
+                            onUnVote={(option) => handleClick(option, true)}
+                            onSelected={(option) => setSelectedOption(option)}
+                        />
+                    </View>
+                ) : (
+                    <View className="gap-4 mb-4">
+                        {poll?.options?.map((option) => {
+                            const includeMe = option?.selectedBy?.map(u => u._id).includes(me?._id);
+                            const isLoading = loadingOptionId === option._id;
+                            return (
+                                <Button
+                                    key={option?._id}
+                                    disabled={poll?.isClosed || votePoll?.isPending || unvotePoll?.isPending || isLoading}
+                                    onPress={() => handleClick(option, includeMe)}
+                                    onLongPress={() => setSelectedOption(option)}
+                                    className={`rounded-xl border-2 ${includeMe
+                                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-800/30'
+                                        : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800'
+                                        }`}
+                                >
+                                    <PollOption
+                                        label={poll?.type === "DatesPoll"
+                                            ? formatRange(dayjs(option.startDate), dayjs(option.endDate))
+                                            : option.value}
+                                        selectedBy={option.selectedBy}
+                                        percent={option.percent}
+                                        isAnonymous={poll.isAnonymous}
+                                        includeUser={includeMe}
+                                        isLoading={isLoading}
+                                    />
+                                </Button>
+                            );
+                        })}
+                    </View>
+                )}
+
+                {/* Poll Settings Footer */}
+                <View className="flex-row justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-600">
+                    <View className="flex-row items-center gap-2">
+                        <IconSymbol
+                            name={poll?.isSingleAnswer ? "checkmark.circle.fill" : "list.bullet"}
+                            color="gray"
+                            size={18}
+                        />
+                        <Text className="text-sm text-gray-500 dark:text-gray-400">
+                            {poll?.isSingleAnswer ? "Une option" : "Options multiples"}
+                        </Text>
+                    </View>
+
+                    <View className="flex-row gap-1 items-center">
+                        <IconSymbol
+                            name={poll?.isAnonymous ? "eye.slash.fill" : "eye.fill"}
+                            color={poll?.isAnonymous ? "purple" : "green"}
+                            size={18}
+                        />
+                        <Text className="text-sm text-gray-500 dark:text-gray-400">
+                            Vote {poll?.isAnonymous ? "anonyme" : "public"}
+                        </Text>
+                    </View>
+                </View>
+
+                {/* Closed Poll Indicator */}
+                {poll?.isClosed ? (
+                    <View className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-700">
+                        <View className="flex-row items-center gap-2">
+                            <IconSymbol name="lock.fill" color="amber" size={18} />
+                            <Text className="text-amber-700 dark:text-amber-300 font-medium">
+                                Sondage terminé
+                            </Text>
+                        </View>
+                    </View>)
+                    :
+                    <View className="mt-3">
+
+                        <Button variant="contained"
+                            size="small"
+                            icon="plus"
+                            title="Ajouter une option"
+                            onPress={() => router.push({
+                                pathname: "/[id]/polls/[pollId]/new-option",
+                                params: { id, pollId }
+                            })}
+                        />
+                    </View>
+                }
+            </View>
+
+            <PickUsersModal
+                open={!!selectedOption && !poll.isAnonymous}
+                onClose={() => setSelectedOption(null)}
+                users={selectedOption?.selectedBy || []}
+                disabled
+                title="Votants"
+            />
+        </Animated.ScrollView>
+    );
+
+
+}
+</file>
+
+<file path="app/[id]/polls/_layout.tsx">
+import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import { TripContext } from "@/context/TripContext";
+import { Stack, useRouter } from "expo-router";
+import { useContext } from "react";
+import { View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+export default function PollsLayout() {
+
+    const insets = useSafeAreaInsets();
+    const { trip, me } = useContext(TripContext);
+
+    const router = useRouter();
+
+    return (
+        <View style={{
+            flex: 1,
+            paddingBottom: insets.bottom
+        }}>
+
+            <Stack screenOptions={{
+                headerShown: true,
+                headerLargeTitle: true,
+                headerLargeTitleShadowVisible: false,
+            }}>
+                <Stack.Screen name="index"
+                    options={{
+                        headerShown: true,
+                        title: "Sondages",
+                        headerLeft: () =>
+                            <Button onPress={() => router.back()}
+                                className="mr-4">
+                                <IconSymbol name="arrow.left" />
+                            </Button>,
+                        headerRight: () =>
+                            me && <Button
+                                onPress={() => router.push({
+                                    pathname: "/[id]/settings",
+                                    params: {
+                                        id: trip?._id
+                                    }
+                                })}
+                                className="ml-4"
+                            >
+                                <Avatar
+                                    src={me?.avatar}
+                                    alt={me?.name?.charAt(0)}
+                                />
+                            </Button>
+                    }}
+                />
+                <Stack.Screen name="new"
+                    options={{
+                        title: "Nouveau sondage",
+                        headerBackTitle: "Annuler",
+                        headerLargeTitle: false,
+                    }} />
+                <Stack.Screen name="[pollId]/index"
+                    options={{
+                        headerShown: true,
+                        headerLargeTitle: false,
+                        title: "",
+                        headerRight: () =>
+                            me && <Button
+                                onPress={() => router.push({
+                                    pathname: "/[id]/settings",
+                                    params: {
+                                        id: trip?._id
+                                    }
+                                })}
+                                className="ml-4"
+                            >
+                                <Avatar
+                                    src={me?.avatar}
+                                    alt={me?.name?.charAt(0)}
+                                />
+                            </Button>
+                    }} />
+                <Stack.Screen name="[pollId]/new-option"
+                    options={{
+                        presentation: "modal",
+                        headerShown: true,
+                        title: "Ajouter une option",
+                        headerBackTitle: "Annuler",
+                    }} />
+            </Stack>
+        </View>
+    )
+}
+</file>
+
+<file path="app/[id]/polls/index.tsx">
+import { PollStatus } from "@/components/polls/PollStatus";
+import { Avatar, AvatarsGroup } from "@/components/ui/Avatar";
+import { FloatingAddButton } from "@/components/ui/FloatingAddButton";
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { ToggleButton } from "@/components/ui/ToggleButton";
+import styles from "@/constants/Styles";
+import { TripContext } from "@/context/TripContext";
+import { useGetPolls } from "@/hooks/api/usePolls";
+import { useGetDashboard } from "@/hooks/api/useTrips";
+import useI18nTime from "@/hooks/i18n/useI18nTime";
+import { translateType } from "@/lib/pollUtils";
+import { useRouter } from "expo-router";
+import { useContext, useState } from "react";
+import { Pressable, Text, View } from "react-native";
+import Animated from "react-native-reanimated";
+
+
+export default function PollsPage() {
+
+    const { trip, me } = useContext(TripContext);
+
+    const [excludeSelectedBy, setExcludeSelectedBy] = useState(false);
+    const { data: page, isLoading, refetch, isRefetching } = useGetPolls(trip?._id, {
+        ...(excludeSelectedBy && me?._id && { excludeSelectedBy: me?._id })
+    });
+    const { data: dashboard } = useGetDashboard(trip?._id, me?._id, !!trip?._id);
+    const hasPolls = (dashboard?.polls?.openPollsCount ?? 0) > 0;
+    const allAnswered = excludeSelectedBy && hasPolls;
+
+    const router = useRouter();
+
+    const { formatDuration } = useI18nTime();
+
+
+    return (
+        <View style={styles.container}>
+            <Animated.FlatList
+                data={page?.polls || []}
+                className="my-2"
+                contentContainerClassName="m-2"
+                contentInsetAdjustmentBehavior="automatic"
+                showsVerticalScrollIndicator={false}
+                keyExtractor={(item) => item._id}
+                ListHeaderComponent={() => (
+                    <View className="flex-row mb-2">
+                        <ToggleButton
+                            active={!!excludeSelectedBy}
+                            onPress={() => setExcludeSelectedBy(!excludeSelectedBy)}
+                            label="Sondages en attente"
+                            icon="exclamationmark"
+                            disabled={!hasPolls}
+                        />
+                    </View>
+                )}
+                renderItem={({ item }) => (
+                    <Pressable
+                        onPress={() => router.push({
+                            pathname: "/[id]/polls/[pollId]",
+                            params: {
+                                id: trip._id,
+                                pollId: item._id
+                            }
+                        })}
+                        className="rounded-2xl bg-white dark:bg-gray-800 shadow-md p-4 gap-4 border border-gray-100 dark:border-gray-700 active:opacity-55">
+                        <View className="">
+                            <View className="flex-row items-center justify-between gap-1">
+                                <View className="flex-row items-center gap-2">
+                                    <Avatar
+                                        size2="sm"
+                                        src={item?.createdBy.avatar}
+                                        alt={item.createdBy.name.charAt(0)}
+                                    />
+                                    <Text className="text-base dark:text-white font-bold">
+                                        {item.createdBy.name}
+                                    </Text>
+                                </View>
+                                <View>
+                                    <PollStatus poll={item}
+                                        selectedUser={me}
+                                        onNewClick={() => router.push({
+                                            pathname: "/[id]/polls/new",
+                                            params: {
+                                                id: trip._id,
+                                                type: "OtherPoll"
+                                            }
+                                        })}
+                                        onPollClick={() => router.push({
+                                            pathname: "/[id]/polls/[pollId]",
+                                            params: {
+                                                id: trip._id,
+                                                pollId: item._id
+                                            }
+                                        })}
+                                    />
+                                </View>
+                            </View>
+                            <Text className="text-2xl font-bold dark:text-white">{item?.question}</Text>
+
+                        </View>
+
+
+                        <View className="flex-row flex-1 justify-between items-end">
+                            <View className="flex-row flex-1 items-center gap-1">
+                                {!item.isAnonymous &&
+                                    <AvatarsGroup
+                                        avatars={item.hasSelected.map(u => ({
+                                            avatar: u.avatar,
+                                            alt: u.name.charAt(0)
+                                        }))}
+                                        maxLength={3}
+                                        size2="xs"
+                                    />
+                                }
+
+                                {!item.isAnonymous && item.hasSelected.length > 0 &&
+                                    <Text className="font-bold text-gray-400">
+                                        •
+                                    </Text>
+                                }
+                                <Text className="text-gray-400">
+                                    {item?.hasSelected?.length ?? 0} votes
+                                </Text>
+
+                            </View>
+                            <View className="flex-row gap-1 items-center">
+                                <Text className="font-bold text-gray-600 dark:text-gray-400 capitalize text-sm">
+                                    {translateType(item.type)}
+                                </Text>
+                                <Text className="text-gray-400">
+                                    •
+                                </Text>
+                                <Text className="font-bold text-gray-600 dark:text-gray-400 text-xs">
+                                    {formatDuration(item?.createdAt)}
+                                </Text>
+
+                            </View>
+
+                        </View>
+                    </Pressable>
+                )
+                }
+                refreshing={isRefetching}
+                onRefresh={refetch}
+                ItemSeparatorComponent={() => <View className="my-2" />}
+                ListEmptyComponent={() =>
+                    isLoading ? (
+                        // Skeleton loaders matching poll card structure
+                        <View className="gap-3 px-1">
+                            <View className="rounded-2xl bg-white dark:bg-gray-800 shadow-md p-4 gap-4 border border-gray-100 dark:border-gray-700">
+                                <View className="flex-row items-center justify-between gap-1">
+                                    <View className="flex-row items-center gap-2">
+                                        <Skeleton variant="circular" height={32} />
+                                        <Skeleton height={4} />
+                                    </View>
+                                    <Skeleton height={8} />
+                                </View>
+                                <Skeleton height={6} />
+                                <View className="flex-row flex-1 justify-between items-end">
+                                    <View className="flex-row items-center gap-1">
+                                        <View className="flex-row -space-x-1">
+                                            <Skeleton variant="circular" height={20} />
+                                            <Skeleton variant="circular" height={20} />
+                                        </View>
+                                        <Skeleton height={3} />
+                                    </View>
+                                    <View className="flex-row gap-1 items-center">
+                                        <Skeleton height={3} />
+                                    </View>
+                                </View>
+                            </View>
+                        </View>
+                    ) : allAnswered ? (
+                        // All polls answered state
+                        <View className="flex-1 items-center justify-center gap-6 py-20 px-4">
+                            <View className="p-7 rounded-3xl bg-green-50 dark:bg-green-900 shadow-lg">
+                                <IconSymbol name="checkmark.circle.fill" size={64} color="#22C55E" />
+                            </View>
+                            <Text className="text-3xl font-bold dark:text-white">
+                                Tout est à jour
+                            </Text>
+                            <Text className="text-gray-400 dark:text-gray-500 text-center max-w-sm">
+                                Vous avez répondu à tous les sondages de ce voyage
+                            </Text>
+                        </View>
+                    ) : (
+                        // Empty state for polls
+                        <View className="flex-1 items-center justify-center gap-6 py-20 px-4">
+                            <View className="p-7 rounded-3xl bg-gray-50 dark:bg-gray-800 shadow-lg">
+                                <IconSymbol name="chart.bar.fill" size={64} color="gray" />
+                            </View>
+                            <Text className="text-3xl font-bold dark:text-white">
+                                Aucun sondage
+                            </Text>
+                            <Text className="text-gray-400 dark:text-gray-500 text-center max-w-sm">
+                                Créez votre premier sondage pour ce voyage
+                            </Text>
+                        </View>
+                    )
+                }
+            />
+            {trip?._id &&
+                <FloatingAddButton
+                    onPress={() => router.push({
+                        pathname: "/[id]/polls/new",
+                        params: {
+                            id: trip._id,
+                            type: "OtherPoll"
+                        }
+                    })} />
+            }
+        </View>
+    )
+}
+</file>
+
+</files>

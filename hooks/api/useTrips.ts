@@ -107,16 +107,28 @@ export const useUpdateTripUser = (tripId: string, userId: string) => {
   })
 }
 
+// v3 : le partage est un POST (génère le token d'invitation). Le v1 GET /trips/:id/share
+// n'accepte que les raw ObjectIds → 500 avec un encodedId. Le x-user-token est injecté
+// par l'interceptor axios (déduit du trip dans l'URL).
 const shareTrip = async (id: any) => {
-  const response = await axios.get(`/trips/${id}/share`);
-  return response.data;
+  const response = await axios.post(v3Path(`/trips/${id}/share`), {});
+  const data = response.data;
+  // Contrat v1 : { value: <token> }. On tolère d'autres noms de champ côté v3.
+  const value = data?.value ?? data?.token ?? data?.joinToken ?? data?.shareToken;
+  if (!value)
+    console.warn("Partage v3 : réponse sans token reconnu", data);
+  return { ...data, value };
 }
 
 export const useShareTrip = (id: string) => {
   return useQuery({
     queryKey: ["trips", id, "share"],
     queryFn: () => shareTrip(id),
-    enabled: !!id
+    enabled: !!id,
+    // POST qui génère un token : ne pas le rejouer à chaque rendu/focus
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    retry: false
   });
 }
 

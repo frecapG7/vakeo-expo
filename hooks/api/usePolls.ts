@@ -1,3 +1,4 @@
+import { v3Path } from "@/lib/api-v3";
 import axios from "@/lib/axios";
 import { Poll, PollOption, PollType } from "@/types/models";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -22,7 +23,7 @@ interface IPage {
 
 const postPoll = async (tripId: any, data: Omit<Poll, '_id'>, userId?: string): Promise<Poll> => {
 
-    const response = await axios.post(`/trips/${tripId}/polls`, data, {
+    const response = await axios.post(v3Path(`/trips/${tripId}/polls`), data, {
         headers: {
             ...(userId && { 'x-user-id': userId })
         }
@@ -44,7 +45,7 @@ interface UpdatePollPayload {
 }
 
 const updatePoll = async (tripId: string, pollId: string, data: UpdatePollPayload, userId?: string): Promise<Poll> => {
-    const response = await axios.put(`/trips/${tripId}/polls/${pollId}`, data, {
+    const response = await axios.put(v3Path(`/trips/${tripId}/polls/${pollId}`), data, {
         headers: {
             ...(userId && { 'x-user-id': userId })
         }
@@ -73,7 +74,7 @@ export const usePutPoll = (tripId: string, pollId: string, userId?: string) => {
 
 
 const getPolls = async (tripId: any, params?: IParams) => {
-    const response = await axios.get(`/trips/${tripId}/polls`, {
+    const response = await axios.get(v3Path(`/trips/${tripId}/polls`), {
         params: {
             ...params,
             limit: params?.limit || 25
@@ -93,7 +94,7 @@ export const useGetPolls = (tripId: any, params?: IParams) => {
 
 
 const getPoll = async (tripId: any, pollId: any): Promise<Poll> => {
-    const response = await axios.get(`/trips/${tripId}/polls/${pollId}`);
+    const response = await axios.get(v3Path(`/trips/${tripId}/polls/${pollId}`));
     return response.data;
 }
 
@@ -109,7 +110,7 @@ export const useGetPoll = (tripId: any, pollId: any) => {
 
 
 const votePoll = async (tripId: any, pollId: any, data: any, userId?: string): Promise<Poll> => {
-    const response = await axios.patch(`/trips/${tripId}/polls/${pollId}/vote`, data, {
+    const response = await axios.patch(v3Path(`/trips/${tripId}/polls/${pollId}/vote`), data, {
         headers: {
             "x-user-id": userId
         }
@@ -134,7 +135,7 @@ export const useVotePoll = (tripId: string, pollId: string, userId?: string) => 
 }
 
 const unvotePoll = async (tripId: string, pollId: string, optionId: string, userId?: string): Promise<Poll> => {
-    const response = await axios.delete(`/trips/${tripId}/polls/${pollId}/vote/${optionId}`, {
+    const response = await axios.delete(v3Path(`/trips/${tripId}/polls/${pollId}/vote/${optionId}`), {
         headers: {
             "x-user-id": userId
         }

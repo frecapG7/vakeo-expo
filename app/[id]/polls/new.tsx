@@ -1,16 +1,18 @@
 import { FormText } from "@/components/form/FormText";
+import CalendarPollCreation, { DatesFormatPicker } from "@/components/polls/CalendarPollCreation";
 import { DatesPollOptionsForm } from "@/components/polls/DatesPollOptionsForm";
 import { HousingOptionsForm } from "@/components/polls/HousingOptionsForm";
 import { OtherPollOptionsForm } from "@/components/polls/OtherPollOptionsForm";
 import { PollSettingsForm } from "@/components/polls/PollSettingsForm";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { SHARED_CALENDAR_ENABLED } from "@/constants/Features";
 import styles from "@/constants/Styles";
 import { useTrip } from "@/context/TripContext";
 import { usePostPoll } from "@/hooks/api/usePolls";
 import { Poll } from "@/types/models";
 import { useLocalSearchParams, useRouter } from "expo-router/build/hooks";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { useController, useForm } from "react-hook-form";
 import { Text, View } from "react-native";
@@ -52,6 +54,9 @@ export default function NewPoll() {
     const { trip, me } = useTrip();
     const postPoll = usePostPoll(trip?._id, me?._id);
     const router = useRouter();
+
+    // Feature calendrier : choix du format (calendrier / liste) pour les sondages de dates
+    const [datesFormat, setDatesFormat] = useState<"calendar" | "list" | null>(null);
 
     const onSubmit = async (data: Omit<Poll, '_id'>) => {
         const result = await postPoll.mutateAsync({
@@ -100,6 +105,13 @@ export default function NewPoll() {
 
 
         )
+
+    // Feature calendrier (EXPO_PUBLIC_SHARED_CALENDAR_ENABLED, cf. constants/Features.ts)
+    if (SHARED_CALENDAR_ENABLED && type === "DatesPoll" && datesFormat !== "list") {
+        if (!datesFormat)
+            return <DatesFormatPicker onSelect={setDatesFormat} />;
+        return <CalendarPollCreation />;
+    }
 
     return (
         <Animated.ScrollView className="flex-1 mt-4 mx-4" contentInsetAdjustmentBehavior="automatic" showsVerticalScrollIndicator={false}>
