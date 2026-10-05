@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/Button";
 import { FloatingAddButton } from "@/components/ui/FloatingAddButton";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Spinner } from "@/components/ui/Spinner";
-import styles, { popupMenuStyles } from "@/constants/Styles";
+import { Screen } from "@/components/ui/Screen";
+import { popupMenuStyles } from "@/constants/Styles";
 import { useTrip } from "@/context/TripContext";
 import { useCheckAllGoods, useCheckGood, useDeleteGood, useGetGoods } from "@/hooks/api/useGoods";
 import useColors from "@/hooks/styles/useColors";
@@ -12,7 +13,6 @@ import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { Menu, MenuOption, MenuOptions, MenuTrigger } from "react-native-popup-menu";
 import Animated from "react-native-reanimated";
@@ -30,9 +30,9 @@ export default function TripGoods() {
         ...eventId && { event: eventId }
     });
 
-    const checkGood = useCheckGood(trip._id, me?._id);
-    const checkAllGoods = useCheckAllGoods(trip._id, me?._id || '');
-    const deleteGood = useDeleteGood(trip._id, me?._id);
+    const checkGood = useCheckGood(trip._id);
+    const checkAllGoods = useCheckAllGoods(trip._id);
+    const deleteGood = useDeleteGood(trip._id);
 
     const onCheck = async (data: Good) => await checkGood.mutateAsync(data);
     const handleCheckAll = async () => {
@@ -79,15 +79,15 @@ export default function TripGoods() {
                     <MenuOptions customStyles={popupMenuStyles(colors)}>
                         <MenuOption onSelect={() => setUnchecked(!unchecked)}
                             customStyles={{ optionWrapper: popupMenuStyles(colors).optionWrapper }}>
-                            <View className={`flex-row items-center gap-2 ${unchecked ? 'bg-orange-100 dark:bg-orange-900/30' : ''}`}>
+                            <View className={`flex-row items-center gap-2 ${unchecked ? 'bg-amber/20' : ''}`}>
                                 <View className={`p-1 rounded-full`}>
                                     <IconSymbol
                                         name="line.horizontal.3"
                                         size={18}
-                                        color={unchecked ? "orange" : colors.text}
+                                        color={unchecked ? "#EE8B33" : colors.text}
                                     />
                                 </View>
-                                <Text className="dark:text-white">Afficher uniquement les articles manquants</Text>
+                                <Text className="text-night dark:text-white">Afficher uniquement les articles manquants</Text>
                             </View>
                         </MenuOption>
                         {!!me?._id &&
@@ -95,7 +95,7 @@ export default function TripGoods() {
                                 customStyles={{ optionWrapper: popupMenuStyles(colors).optionWrapper }}>
                                 <View className="flex-row items-center gap-2">
                                     <IconSymbol name="checkmark.circle" size={18} color={colors.text} />
-                                    <Text className="dark:text-white">Cocher tous les éléments</Text>
+                                    <Text className="text-night dark:text-white">Cocher tous les éléments</Text>
                                 </View>
                             </MenuOption>
                         }
@@ -106,7 +106,7 @@ export default function TripGoods() {
     })
 
     return (
-        <GestureHandlerRootView style={styles.container}>
+        <Screen className="bg-mist dark:bg-ink" edges={[]}>
             <Animated.FlatList
                 data={goods}
                 refreshing={isFetching}
@@ -116,7 +116,7 @@ export default function TripGoods() {
                 renderItem={({ item }) =>
                     <Swipeable
                         renderRightActions={() => (
-                            <View className="bg-red-500 justify-center rounded-2xl mx-4 my-1">
+                            <View className="bg-danger justify-center rounded-2xl mx-4 my-1">
                                 <Button
                                     onPress={() => handleDelete(item)}
                                     className="h-full px-4"
@@ -132,12 +132,12 @@ export default function TripGoods() {
                     >
 
                         <View
-                            className={`flex-row items-center rounded-2xl bg-white dark:bg-gray-800 shadow-md mx-4 p-4 gap-4 border border-gray-100 dark:border-gray-700 ${item.checked ? "opacity-60" : ""}`}>
+                            className={`flex-row items-center rounded-2xl bg-white dark:bg-night shadow-md mx-4 p-4 gap-4 border border-mist dark:border-white/10 ${item.checked ? "opacity-60" : ""}`}>
                             <Button className=""
                                 onPress={() => onCheck(item)}
                                 disabled={false}>
                                 <IconSymbol name={item.checked ? "checkmark.circle.fill" : "circle"}
-                                    color={item.checked ? colors.success : colors.gray}
+                                    color={item.checked ? "#EE8B33" : "#9AA3B8"}
                                     size={30} />
                             </Button>
                             <Pressable
@@ -151,7 +151,7 @@ export default function TripGoods() {
 
                                 disabled={item?.checked}
                                 className="flex-1 justify-center active:opacity-75">
-                                <Text className={`dark:text-white capitalize  ${item.checked && "line-through"}`}>
+                                <Text className={`text-night dark:text-white capitalize  ${item.checked && "line-through"}`}>
                                     <Text className="text-lg">
                                         {item.name}
                                         {item.quantityNumber != null && (
@@ -162,11 +162,11 @@ export default function TripGoods() {
                                 <View className="flex-row items-center justify-between mt-1">
                                     <View className="max-w-[50%]">
                                         {item?.event && (
-                                            <Text className="text-gray-400 text-xs" numberOfLines={2}>{item.event?.name}</Text>
+                                            <Text className="text-night/60 dark:text-white/70 text-xs" numberOfLines={2}>{item.event?.name}</Text>
                                         )}
                                     </View>
                                     <View className="flex-row items-center gap-2">
-                                        <Text className="text-xs text-gray-500 dark:text-gray-400">
+                                        <Text className="text-xs text-night/60 dark:text-white/70">
                                             Ajouté par {item.createdBy?.name}
                                         </Text>
                                     </View>
@@ -192,13 +192,13 @@ export default function TripGoods() {
                         </View>
                         :
                         <View className="flex-1 items-center justify-center gap-6 py-20 px-4">
-                            <View className="p-7 rounded-3xl bg-gray-50 dark:bg-gray-800 shadow-lg">
-                                <IconSymbol name="cart" size={64} color={colors.gray} />
+                            <View className="p-7 rounded-3xl bg-amber/15 shadow-lg">
+                                <IconSymbol name="cart" size={64} color="#EE8B33" />
                             </View>
-                            <Text className="text-3xl font-bold dark:text-white">
+                            <Text className="text-3xl font-bold text-night dark:text-white">
                                 Aucun article
                             </Text>
-                            <Text className="text-gray-400 dark:text-gray-500 text-center max-w-sm">
+                            <Text className="text-night/60 dark:text-white/70 text-center max-w-sm">
                                 Votre liste est vide pour l&apos;instant
                             </Text>
                         </View>
@@ -218,6 +218,6 @@ export default function TripGoods() {
                 }
             })}
             />
-        </GestureHandlerRootView>
+        </Screen>
     )
 }

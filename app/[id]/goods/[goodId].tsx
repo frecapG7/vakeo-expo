@@ -12,11 +12,11 @@ import { Toast } from "toastify-react-native";
 
 export default function EditGood() {
     const { goodId } = useLocalSearchParams<{ id: string, goodId: string }>();
-    const { trip, me } = useTrip();
+    const { trip } = useTrip();
     const router = useRouter();
 
     const { data: good, isLoading } = useGetGood(trip?._id, goodId);
-    const { mutateAsync: putGood, isPending, isSuccess } = usePutGood(trip?._id, me?._id);
+    const { mutateAsync: putGood, isPending, isSuccess } = usePutGood(trip?._id);
     const [showSimilar, setShowSimilar] = useState(false);
 
     const { data: similarGoods } = useGetGoods(trip?._id, { search: good?.name }, {
@@ -48,14 +48,14 @@ export default function EditGood() {
     };
 
     return (
-        <View className="flex-1 p-4">
+        <View className="flex-1 bg-mist dark:bg-ink p-5">
             <View className="flex-1 mt-6">
                 <GoodForm control={control} />
                 <Pressable
                     className="mt-4 flex-row items-center gap-2"
                     onPress={() => setShowSimilar(!showSimilar)}>
-                    <IconSymbol name={showSimilar ? "chevron.down" : "chevron.right"} size={20} color="gray" />
-                    <Text className="text-gray-600 dark:text-gray-400">Afficher similaire</Text>
+                    <IconSymbol name={showSimilar ? "chevron.down" : "chevron.right"} size={20} color="#9AA3B8" />
+                    <Text className="text-night/60 dark:text-white/60">Afficher similaire</Text>
                 </Pressable>
 
                 {showSimilar && similarGoods?.pages && (
@@ -63,19 +63,19 @@ export default function EditGood() {
                         {similarGoods.pages.flatMap(page => page.goods)
                             .filter(g => g._id !== goodId)
                             .map(item => (
-                                <View key={item._id} className="flex-row items-center gap-3 p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                                    <IconSymbol name={item.checked ? "circle.fill" : "circle"} size={12} color="gray" />
+                                <View key={item._id} className="flex-row items-center gap-3 p-2 bg-white dark:bg-night rounded-xl border border-mist dark:border-white/10">
+                                    <IconSymbol name={item.checked ? "circle.fill" : "circle"} size={12} color="#9AA3B8" />
                                     <View className="flex-1">
                                         <View className="flex-row flex-wrap items-baseline gap-2">
-                                            <Text className={`dark:text-white capitalize ${item.checked ? "line-through" : ""}`}>
+                                            <Text className={`text-night dark:text-white capitalize ${item.checked ? "line-through" : ""}`}>
                                                 {item.name}
                                                 {item.quantityNumber != null && (
-                                                    <Text className="text-sm text-gray-500 dark:text-gray-400"> ({item.quantityNumber} {item.unit})</Text>
+                                                    <Text className="text-sm text-night/60 dark:text-white/70"> ({item.quantityNumber} {item.unit})</Text>
                                                 )}
                                             </Text>
                                         </View>
                                         {(item.event?.name || item.createdBy?.name) && (
-                                            <Text className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                            <Text className="text-xs text-night/60 dark:text-white/70 mt-0.5">
                                                 {item.event?.name}
                                                 {item.event?.name && item.createdBy?.name ? " • " : ""}
                                                 {item.createdBy?.name && `ajouté par ${item.createdBy.name}`}
