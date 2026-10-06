@@ -20,13 +20,12 @@ type GoodFormInputs = Omit<Good, '_id' | 'createdBy' | 'checked'>;
 export default function NewGood() {
     const { eventId } = useLocalSearchParams<{ id: string, eventId?: string }>();
 
-
-    const {me, trip} = useTrip();
+    const { trip } = useTrip();
     const { control, handleSubmit, reset } = useForm<GoodFormInputs>({
         defaultValues
     });
 
-    const { mutateAsync: postGood, isPending, isSuccess } = usePostGood(trip._id, me?._id);
+    const { mutateAsync: postGood, isPending, isSuccess } = usePostGood(trip._id);
 
     useEffect(() => {
         if (isSuccess) {
@@ -44,7 +43,7 @@ export default function NewGood() {
     };
 
     return (
-        <View className="flex-1 p-4">
+        <View className="flex-1 bg-mist dark:bg-ink p-5">
             <View className="flex-1 mt-6">
                 <GoodForm control={control} />
                 <View className="mt-6">

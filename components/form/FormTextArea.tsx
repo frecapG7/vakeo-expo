@@ -50,7 +50,7 @@ export const FormTextArea = ({ control, name, label, placeholder, rules }: {
         <View>
 
             <Animated.View style={animatedStyle}
-                className="flex-row bg-mist dark:bg-ink border border-night/10 dark:border-white/10 focus:border-amber-deep rounded-xl h-40">
+                className="flex-row bg-white dark:bg-night border border-mist dark:border-white/10 focus:border-amber-deep rounded-2xl h-40">
                 <TextInput
                     onChangeText={onChange}
                     value={value}
@@ -67,7 +67,7 @@ export const FormTextArea = ({ control, name, label, placeholder, rules }: {
             </Animated.View>
             {rules?.maxLength &&
                 <View className="flex-row justify-end">
-                    <Text className={`${value?.length < rules?.maxLength ? "text-night/40 dark:text-white/40" : "text-red-500"}`}>
+                    <Text className={`${value?.length < rules?.maxLength ? "text-night/40 dark:text-white/40" : "text-danger"}`}>
                         {rules?.maxLength - value?.length}
                     </Text>
                 </View>

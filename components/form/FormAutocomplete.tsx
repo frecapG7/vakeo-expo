@@ -95,11 +95,11 @@ export const FormAutocomplete = ({
     return (
         <View className="flex-1">
             <Animated.View style={animatedStyle}
-                className={`flex-row items-center ${disabled ? 'bg-gray-200 dark:bg-gray-700 opacity-60' : 'bg-white dark:bg-gray-600'} border focus:border focus:border-blue-500 rounded-xl h-12`}>
+                className={`flex-row items-center ${disabled ? 'bg-white/60 dark:bg-night/60 opacity-60' : 'bg-white dark:bg-night'} border border-mist dark:border-white/10 focus:border-amber-deep rounded-2xl h-12`}>
                 <TextInput
                     onChangeText={handleChangeText}
                     value={inputValue}
-                    className="flex-1 text-dark dark:text-white h-full items-start normal-case p-3"
+                    className="flex-1 text-night dark:text-white h-full items-start normal-case p-3"
                     placeholderTextColor={inputPlaceHolder}
                     ref={textInputRef}
                     placeholder={placeholder}
@@ -112,7 +112,7 @@ export const FormAutocomplete = ({
                 />
             </Animated.View>
             {!disabled && showDropdown && filteredSuggestions.length > 0 && (
-                <View className="absolute top-full left-0 right-0 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl mt-1 max-h-40 z-10">
+                <View className="absolute top-full left-0 right-0 bg-white dark:bg-night border border-mist dark:border-white/15 rounded-xl mt-1 max-h-40 z-10">
                     <FlatList
                         data={filteredSuggestions}
                         keyExtractor={(item) => item}
@@ -121,7 +121,7 @@ export const FormAutocomplete = ({
                                 onPress={() => handleSelectSuggestion(item)}
                                 className="p-3"
                             >
-                                <Text className="text-dark dark:text-white">{item}</Text>
+                                <Text className="text-night dark:text-white">{item}</Text>
                             </Pressable>
                         )}
                         keyboardShouldPersistTaps="always"

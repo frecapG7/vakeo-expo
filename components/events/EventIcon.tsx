@@ -4,7 +4,6 @@ import PartyEventIcon from "@/assets/icons/party_event_icon.png";
 import RestaurantEventIcon from "@/assets/icons/restaurant_event_icon.png";
 import SportEventIcon from "@/assets/icons/sport_event_icon.png";
 
-// ✨ 1. On importe tes 3 nouvelles images ici ✨
 import TransportEventIcon from "@/assets/icons/transport_event_icon.png";
 import ExcursionEventIcon from "@/assets/icons/excursion_event_icon.png";
 import OtherEventIcon from "@/assets/icons/other_event_icon.png";
@@ -29,8 +28,7 @@ const nameToSource = {
     "PARTY": PartyEventIcon,
     "SPORT": SportEventIcon,
     "RESTAURANT": RestaurantEventIcon,
-    // ✨ 2. On fait correspondre tes catégories avec les images importées ✨
-    "TRANSPORT": TransportEventIcon,
+        "TRANSPORT": TransportEventIcon,
     "EXCURSION": ExcursionEventIcon,
     "OTHER": OtherEventIcon
 }

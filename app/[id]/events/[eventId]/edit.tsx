@@ -1,14 +1,13 @@
 import { EventInfoForm } from "@/components/events/EventInfoForm";
 import { Button } from "@/components/ui/Button";
-import styles from "@/constants/Styles";
-import { useGetEvent, useUpdateEvent } from "@/hooks/api/useEvents";
-import { useGetTrip } from "@/hooks/api/useTrips";
+import { Screen } from "@/components/ui/Screen";
+import { useDeleteEvent, useGetEvent, useUpdateEvent } from "@/hooks/api/useEvents";
 import { Event } from "@/types/models";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useEffect } from "react";
+import { Alert, Text } from "react-native";
 import { useForm } from "react-hook-form";
 import Animated, { ZoomIn } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Toast } from "toastify-react-native";
 
 
@@ -18,9 +17,42 @@ export default function EditTripEvent() {
     const { id, eventId } = useLocalSearchParams();
 
 
-    const { data: trip } = useGetTrip(String(id));
     const { data: event } = useGetEvent(id, eventId);
     const updateEvent = useUpdateEvent(id, eventId);
+    const deleteEvent = useDeleteEvent(id, eventId);
+
+    const onDelete = () => {
+        Alert.alert("Supprimer cette activité ?", "Cette action est définitive.", [
+            {
+                text: "Annuler",
+            },
+            {
+                text: "Supprimer",
+                style: "destructive",
+                onPress: async () => {
+                    if (deleteEvent.isPending) return;
+                    await deleteEvent.mutateAsync();
+                    Toast.success("Activité supprimée");
+                    router.dismissTo({
+                        pathname: "/[id]/(tabs)/planning",
+                        params: { id: String(id) }
+                    });
+                }
+            }
+        ]);
+    }
+
+    const navigation = useNavigation();
+
+    useEffect(() => {
+        navigation.setOptions({
+            headerRight: () => (
+                <Button onPress={onDelete} disabled={deleteEvent.isPending} className="ml-4">
+                    <Text className="text-danger font-semibold">Supprimer</Text>
+                </Button>
+            )
+        })
+    })
 
     const router = useRouter();
 
@@ -46,7 +78,7 @@ export default function EditTripEvent() {
     }, [event]);
 
     return (
-        <SafeAreaView style={styles.container}>
+        <Screen className="bg-mist dark:bg-ink">
             <Animated.ScrollView style={{ flex: 1 }} className="flex flex-grow">
                 <EventInfoForm control={control} />
 
@@ -59,6 +91,6 @@ export default function EditTripEvent() {
                             isLoading={updateEvent.isPending} />
                     </Animated.View>
             </Animated.ScrollView>
-        </SafeAreaView>
+        </Screen>
     )
 }

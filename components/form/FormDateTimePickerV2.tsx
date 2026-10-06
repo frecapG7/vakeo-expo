@@ -1,10 +1,9 @@
 import useI18nTime from "@/hooks/i18n/useI18nTime";
-import useColors from "@/hooks/styles/useColors";
 import dayjs from "@/lib/dayjs-config";
 import WheelPicker from '@quidone/react-native-wheel-picker';
 import { useState } from "react";
 import { useController } from "react-hook-form";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, useColorScheme } from "react-native";
 import { Calendar, CalendarUtils } from "react-native-calendars";
 import Animated, { FadeIn, FadeOut, StretchInY, StretchOutY } from "react-native-reanimated";
 
@@ -18,9 +17,9 @@ const minuteItems = Array.from({ length: 12 }).map((_, index) => index * 5).map(
 }));
 
 const WheelTimePicker = ({ value, onChangeHour, onChangeMinute }: { value?: Date | string, onChangeHour: (value: any) => void, onChangeMinute: (value: any) => void }) => {
-    const colors = useColors();
+    const isDark = useColorScheme() === "dark";
     return (
-        <View className="flex-row flex-1 gap-5 items-center justify-center bg-white dark:bg-gray-900">
+        <View className="flex-row flex-1 gap-5 items-center justify-center bg-white dark:bg-night">
             <WheelPicker
                 data={hoursItems}
                 value={value && dayjs(value).hour()}
@@ -32,10 +31,10 @@ const WheelTimePicker = ({ value, onChangeHour, onChangeMinute }: { value?: Date
                     width: 40,
                 }}
                 itemTextStyle={{
-                    color: colors.text,
+                    color: isDark ? "#F6F8FD" : "#16265C",
                 }}
                 overlayItemStyle={{
-                    backgroundColor: colors.neutral
+                    backgroundColor: isDark ? "#16265C" : "#F6F8FD"
                 }}
             />
             <WheelPicker
@@ -48,16 +47,15 @@ const WheelTimePicker = ({ value, onChangeHour, onChangeMinute }: { value?: Date
                     width: 40,
                 }}
                 itemTextStyle={{
-                    color: colors.text,
+                    color: isDark ? "#F6F8FD" : "#16265C",
                 }}
                 overlayItemStyle={{
-                    backgroundColor: colors.neutral
+                    backgroundColor: isDark ? "#16265C" : "#F6F8FD"
                 }}
             />
         </View>)
 }
 
-// 🚨 Ajout de initialDate dans les props du composant
 export const FormDateTimePickerV2 = ({ control, rules, initialDate }:
     {
         control: any;
@@ -86,7 +84,9 @@ export const FormDateTimePickerV2 = ({ control, rules, initialDate }:
         }
     });
 
-    const colors = useColors();
+    const isDark = useColorScheme() === "dark";
+    const themeText = isDark ? "#F6F8FD" : "#16265C";
+    const themeBackground = isDark ? "#101736" : "#FFFFFF";
 
     const [showStartDateCalendar, setShowStartDateCalendar] = useState(false);
     const [showStartDateTimePicker, setShowStartDateTimePicker] = useState(false);
@@ -96,17 +96,17 @@ export const FormDateTimePickerV2 = ({ control, rules, initialDate }:
     return (
         <View className="gap-2">
             <View>
-                <View className="flex-row justify-between items-center p-1 pb-2 border-b border-gray-200">
-                    <Text className="font-bold dark:text-gray-200">
+                <View className="flex-row justify-between items-center p-1 pb-2 border-b border-night/10 dark:border-white/10">
+                    <Text className="font-bold text-night dark:text-white">
                         Quel jour
                     </Text>
-                    <Pressable className="bg-gray-200 rounded-full py-1 px-2"
+                    <Pressable className="bg-mist dark:bg-white/10 rounded-full py-1 px-2"
                         onPress={() => {
                             setShowStartDateTimePicker(false);
                             setShowEndDateTimePicker(false);
                             setShowStartDateCalendar(!showStartDateCalendar)
                         }}>
-                        <Text className={`${showStartDateCalendar && "font-bold text-orange-400"}`}>
+                        <Text className={`text-night dark:text-white ${showStartDateCalendar && "font-bold text-amber-deep dark:text-amber"}`}>
                             {startDate ? formatDate(startDate) : "Choisis un jour"}
                         </Text>
                     </Pressable>
@@ -117,27 +117,27 @@ export const FormDateTimePickerV2 = ({ control, rules, initialDate }:
                         exiting={StretchOutY}
                     >
                         <Calendar
-                            // ✨ LA MAGIE OPÈRE ICI : Si on a déjà choisi une date, on ouvre le calendrier dessus. 
+                            // Si on a déjà choisi une date, on ouvre le calendrier dessus.
                             // Sinon, on s'ouvre sur la date de début du séjour (initialDate).
                             initialDate={startDate ? String(startDate) : (initialDate ? String(initialDate) : undefined)}
                             enableSwipeMonths
                             theme={{
-                                backgroundColor: colors.calendarBackground,
-                                calendarBackground: colors.calendarBackground,
-                                textSectionTitleColor: colors.text,
-                                dayTextColor: colors.text,
+                                backgroundColor: themeBackground,
+                                calendarBackground: themeBackground,
+                                textSectionTitleColor: themeText,
+                                dayTextColor: themeText,
                                 textSectionTitleDisabledColor: '#d9e1e8',
-                                selectedDayBackgroundColor: '#fdb140',
-                                selectedDayTextColor: colors.primary,
-                                todayTextColor: '#00adf5',
-                                todayBackgroundColor: '#a2daf1ff',
+                                selectedDayBackgroundColor: '#EE8B33',
+                                selectedDayTextColor: '#FFFFFF',
+                                todayTextColor: '#EE8B33',
+                                todayBackgroundColor: '#F7B74A33',
                                 textDisabledColor: '#828485ff',
-                                dotColor: '#00adf5',
+                                dotColor: '#EE8B33',
                                 selectedDotColor: '#ffffff',
-                                arrowColor: 'orange',
+                                arrowColor: '#EE8B33',
                                 disabledArrowColor: '#d9e1e8',
-                                monthTextColor: colors.text,
-                                indicatorColor: colors.text,
+                                monthTextColor: themeText,
+                                indicatorColor: themeText,
                             }}
                             onDayPress={({ dateString }) => {
                                 let newStartDate = dayjs(dateString).hour(12);
@@ -152,8 +152,8 @@ export const FormDateTimePickerV2 = ({ control, rules, initialDate }:
                             markedDates={{
                                 ...(startDate && {
                                     [CalendarUtils.getCalendarDateString(startDate)]: {
-                                        color: colors.calendarPrimary,
-                                        textColor: colors.neutral,
+                                        color: '#EE8B33',
+                                        textColor: '#FFFFFF',
                                         selected: true,
                                         disableTouchEvent: true
                                     }
@@ -165,18 +165,18 @@ export const FormDateTimePickerV2 = ({ control, rules, initialDate }:
 
             </View>
             <View>
-                <View className="flex-row justify-between items-center p-1 pb-2 border-b border-gray-200">
-                    <Text className="font-bold dark:text-gray-200">
+                <View className="flex-row justify-between items-center p-1 pb-2 border-b border-night/10 dark:border-white/10">
+                    <Text className="font-bold text-night dark:text-white">
                         Heure de début
                     </Text>
                     <View className="flex-row gap-1 items-end">
-                        <Pressable className="bg-gray-200 rounded-full py-1 px-2"
+                        <Pressable className="bg-mist dark:bg-white/10 rounded-full py-1 px-2"
                             onPress={() => {
                                 setShowStartDateCalendar(false);
                                 setShowEndDateTimePicker(false);
                                 setShowStartDateTimePicker(!showStartDateTimePicker)
                             }}>
-                            <Text className={`${showStartDateTimePicker && "font-bold text-orange-400"}`}>
+                            <Text className={`text-night dark:text-white ${showStartDateTimePicker && "font-bold text-amber-deep dark:text-amber"}`}>
                                 {startDate ? formatHour(startDate) : "Choisis une heure"}
                             </Text>
                         </Pressable>
@@ -207,7 +207,7 @@ export const FormDateTimePickerV2 = ({ control, rules, initialDate }:
             </View>
             <View>
                 <View className="flex-row justify-between items-center p-1">
-                    <Text className="font-bold dark:text-gray-200">
+                    <Text className="font-bold text-night dark:text-white">
                         Heure de fin
                     </Text>
                     <View className="flex-row gap-1 items-end">
@@ -219,8 +219,8 @@ export const FormDateTimePickerV2 = ({ control, rules, initialDate }:
                                 setShowEndDateTimePicker(!showEndDateTimePicker)
                             }
                             }
-                            className={`bg-gray-200 rounded-full py-1 px-2  ${!startDate && 'opacity-40 bg-gray-100'}`}>
-                            <Text className={`${showEndDateTimePicker && "font-bold text-orange-400"} ${error && "text-red-400 line-through"}`}>
+                            className={`bg-mist dark:bg-white/10 rounded-full py-1 px-2 ${!startDate && 'opacity-40'}`}>
+                            <Text className={`text-night dark:text-white ${showEndDateTimePicker && "font-bold text-amber-deep dark:text-amber"} ${error && "text-danger line-through"}`}>
                                 {endDate ? formatHour(endDate) : "Choisis une heure"}
                             </Text>
                         </Pressable>
@@ -231,7 +231,7 @@ export const FormDateTimePickerV2 = ({ control, rules, initialDate }:
                         entering={FadeIn}
                         exiting={FadeOut}
                         className="flex-row justify-end">
-                        <Text className="text-red-400">
+                        <Text className="text-danger">
                             {error?.message}
                         </Text>
 
@@ -243,7 +243,7 @@ export const FormDateTimePickerV2 = ({ control, rules, initialDate }:
                     <Animated.View entering={StretchInY}
                         exiting={StretchOutY}
                     >
-                        <View className="flex-row flex-1 gap-5 items-center justify-center bg-white dark:bg-gray-900">
+                        <View className="flex-row flex-1 gap-5 items-center justify-center bg-white dark:bg-night">
                             <WheelPicker
                                 data={hoursItems}
                                 value={endDate && dayjs(endDate).hour()}
@@ -255,10 +255,10 @@ export const FormDateTimePickerV2 = ({ control, rules, initialDate }:
                                     width: 40,
                                 }}
                                 itemTextStyle={{
-                                    color: colors.text,
+                                    color: themeText,
                                 }}
                                 overlayItemStyle={{
-                                    backgroundColor: colors.neutral
+                                    backgroundColor: isDark ? "#16265C" : "#F6F8FD"
                                 }}
                             />
                             <WheelPicker
@@ -272,10 +272,10 @@ export const FormDateTimePickerV2 = ({ control, rules, initialDate }:
                                     width: 40,
                                 }}
                                 itemTextStyle={{
-                                    color: colors.text,
+                                    color: themeText,
                                 }}
                                 overlayItemStyle={{
-                                    backgroundColor: colors.neutral
+                                    backgroundColor: isDark ? "#16265C" : "#F6F8FD"
                                 }}
                             />
                         </View>
