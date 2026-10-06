@@ -36,6 +36,10 @@ export default function TripLocation() {
     const putTripStop = usePutTripStop(id);
     const deleteTripStop = useDeleteTripStop(id);
 
+    // Gamification : etape complete = adresse ET hebergement, ratio partage avec le ring du dashboard.
+    const totalStops = tripStops?.length ?? 0;
+    const completedStops = tripStops?.filter(stop => !!stop?.location && !!stop?.accommodation).length ?? 0;
+
 
     const onDelete = (tripStop: TripStop) => {
         Alert.alert(`Supprimer l'étape ${tripStop.name} ?`,
@@ -70,6 +74,9 @@ export default function TripLocation() {
                     keyExtractor={(i) => i?._id}
                     renderItem={({ item, index }) => {
                         const isLast = index === (tripStops?.length ?? 0) - 1;
+                        const stopComplete = !!item?.location && !!item?.accommodation;
+                        const nextStop = tripStops?.[index + 1];
+                        const segmentPaved = stopComplete && !!nextStop?.location && !!nextStop?.accommodation;
                         // Sondages ouverts que je n'ai pas encore votes : seule info actionnable sur la carte.
                         const pendingPolls = item.polls?.filter(p => !p.isClosed
                             && !p.hasSelected?.some(user => user._id === me?._id)) ?? [];
@@ -78,13 +85,21 @@ export default function TripLocation() {
                                 {/* Timeline rail : pointilles reliant les etapes */}
                                 <View className="w-9">
                                     {!isLast && (
-                                        <View className="absolute left-[15px] top-9 bottom-0 border-l-2 border-dashed border-amber-deep/40" />
+                                        <View className={`absolute left-[15px] top-9 bottom-0 ${segmentPaved
+                                            ? "border-l-2 border-amber-deep"
+                                            : "border-l-2 border-dashed border-amber-deep/40"}`} />
                                     )}
-                                    <View className={`w-8 h-8 rounded-full items-center justify-center ${isLast ? "bg-night dark:bg-amber-deep" : "bg-amber-deep"}`}>
+                                    <View className={`w-8 h-8 rounded-full items-center justify-center ${isLast
+                                        ? "bg-night dark:bg-amber-deep"
+                                        : stopComplete
+                                            ? "bg-amber-deep"
+                                            : "bg-white dark:bg-night border-2 border-amber-deep"}`}>
                                         {isLast ? (
                                             <IconSymbol name="flag.fill" size={14} color="#F6F8FD" />
+                                        ) : stopComplete ? (
+                                            <IconSymbol name="checkmark" size={16} color="#F6F8FD" />
                                         ) : (
-                                            <Text className="text-white text-sm font-bold">{index + 1}</Text>
+                                            <Text className="text-amber-deep text-sm font-bold">{index + 1}</Text>
                                         )}
                                     </View>
                                 </View>
@@ -216,6 +231,14 @@ export default function TripLocation() {
                                             </View>
                                         </Animated.View>
                                     </Pressable>
+                                {stopComplete && (
+                                    <View className="flex-row px-3 pb-3 pt-1">
+                                        <View className="flex-row items-center gap-1 bg-amber/15 dark:bg-amber/20 rounded-full px-2.5 py-1">
+                                            <IconSymbol name="checkmark" size={11} color="#EE8B33" />
+                                            <Text className="text-amber-deep dark:text-amber text-xs font-bold">Étape complète</Text>
+                                        </View>
+                                    </View>
+                                )}
                                 </View>
                             </View>
                         )
@@ -225,6 +248,17 @@ export default function TripLocation() {
                                 <Text className="text-sm text-night/70 dark:text-white/70" numberOfLines={4}>
                                     Ajoute pour chaque étape une adresse et un hébergement.
                                 </Text>
+                            {totalStops > 0 && (
+                                <View className="mt-4">
+                                    <View className="flex-row justify-between items-baseline mb-1.5">
+                                        <Text className="text-sm font-bold text-night dark:text-white">Préparation du trajet</Text>
+                                        <Text className="text-xs text-night/50 dark:text-white/50">{completedStops}/{totalStops} complètes</Text>
+                                    </View>
+                                    <View className="h-2.5 rounded-full bg-white dark:bg-white/10 overflow-hidden border border-mist dark:border-white/10">
+                                        <View className="h-2.5 rounded-full bg-amber-deep" style={{ width: `${(completedStops / totalStops) * 100}%` }} />
+                                    </View>
+                                </View>
+                            )}
                         </View>
                     }
                     ListEmptyComponent={isLoading ?
@@ -246,6 +280,12 @@ export default function TripLocation() {
                                     onPress={() => openStopEditor()} />
                             </View>
                         </View>}
+                    ListFooterComponent={totalStops > 0 && completedStops === totalStops ? (
+                        <View className="mt-1 mx-1 rounded-2xl bg-amber items-center p-4">
+                            <Text className="text-night font-bold text-base">Trajet au complet</Text>
+                            <Text className="text-night/70 text-xs font-medium">Toutes les étapes sont prêtes</Text>
+                        </View>
+                    ) : null}
                     onRefresh={refetch}
                     refreshing={isRefetching}
                 />

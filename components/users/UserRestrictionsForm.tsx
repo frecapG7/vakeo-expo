@@ -1,6 +1,9 @@
-import { FormSwitch } from "@/components/form/FormSwitch";
-import { useWatch } from "react-hook-form";
-import { Text, View } from "react-native";
+import * as Haptics from "expo-haptics";
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import { translateRestriction } from "@/lib/userUtils";
+import { useController } from "react-hook-form";
+import { Pressable, Text, View } from "react-native";
+import Animated, { ZoomIn } from "react-native-reanimated";
 import { RestrictionIcon } from "./RestrictionIcon";
 
 
@@ -8,80 +11,63 @@ type UserRestrictionsFormProps = {
     control: any;
 };
 
-export const UserRestrictionsForm = ({ control }: UserRestrictionsFormProps) => {
+// Grille de tuiles sélectionnables (même langage que le picker d'avatar) —
+// tap pour activer/désactiver, pas d'interrupteur.
+// Libellés : translateRestriction = source unique, partagée avec la page des restrictions du trip.
+const RESTRICTIONS = ["hasHalal", "hasKasher", "hasNoPork", "hasNoAlcohol", "hasVegan"];
 
-    const hasHalal = useWatch({ control, name: "hasHalal", defaultValue: false });
-    const hasKasher = useWatch({ control, name: "hasKasher", defaultValue: false });
-    const hasNoPork = useWatch({ control, name: "hasNoPork", defaultValue: false });
-    const hasNoAlcohol = useWatch({ control, name: "hasNoAlcohol", defaultValue: false });
-    const hasVegan = useWatch({ control, name: "hasVegan", defaultValue: false });
+const RestrictionTile = ({ control, name }: { control: any, name: string }) => {
+    const { field: { value, onChange } } = useController({ control, name, defaultValue: false });
+    const active = !!value;
+
+    const handleToggle = () => {
+        Haptics.selectionAsync();
+        onChange(!active);
+    };
 
     return (
-        <View className="gap-4">
-            <View className={`flex-row justify-between items-center border-b ${hasHalal ? "border-blue-400" : "border-gray-800 dark:border-gray-400"} pr-10 pb-1`}>
-                <View className="flex-row gap-2 items-center">
-                    <View className="rounded-full bg-white">
-                        <RestrictionIcon value="hasHalal" size="sm" />
-                    </View>
-                    <Text className="dark:text-white text-lg font-bold">Halal</Text>
+        <Pressable
+            onPress={handleToggle}
+            className="w-[31%] active:opacity-80"
+        >
+            <View
+                className={`relative rounded-2xl p-3 items-center gap-2 border ${active
+                    ? "border-amber-deep bg-amber/10 dark:bg-amber/15"
+                    : "border-mist dark:border-white/10 bg-white dark:bg-night"
+                    }`}
+            >
+                <View className="w-12 h-12 rounded-full items-center justify-center bg-mist dark:bg-white/10">
+                    <RestrictionIcon value={name} size="xs" />
                 </View>
-                <FormSwitch
-                    control={control}
-                    name="hasHalal"
-                />
+                <Text
+                    className="text-xs font-bold text-night dark:text-white text-center capitalize"
+                    numberOfLines={2}
+                >
+                    {translateRestriction(name)}
+                </Text>
+                {active && (
+                    <Animated.View
+                        entering={ZoomIn}
+                        className="absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full bg-amber-deep items-center justify-center border-2 border-white dark:border-night"
+                    >
+                        <IconSymbol name="checkmark" color="#F6F8FD" size={12} />
+                    </Animated.View>
+                )}
             </View>
+        </Pressable>
+    );
+};
 
-            <View className={`flex-row justify-between items-center border-b ${hasKasher ? "border-blue-400" : "border-gray-800 dark:border-gray-400"} pb-1 pr-10`}>
-                <View className="flex-row gap-2 items-center">
-                    <View className="rounded-full bg-white">
-                        <RestrictionIcon value="hasKasher" size="sm" />
-                    </View>
-                    <Text className="dark:text-white text-lg font-bold">Kasher</Text>
-                </View>
-                <FormSwitch
+export const UserRestrictionsForm = ({ control }: UserRestrictionsFormProps) => {
+    return (
+        <View className="flex-row flex-wrap gap-3">
+            {RESTRICTIONS.map(name => (
+                <RestrictionTile
+                    key={name}
                     control={control}
-                    name="hasKasher"
+                    name={name}
                 />
-            </View>
-
-            <View className={`flex-row justify-between items-center border-b ${hasNoPork ? "border-blue-400" : "border-gray-800 dark:border-gray-400"} pb-1 pr-10`}>
-                <View className="flex-row gap-2 items-center">
-                    <View className="rounded-full bg-white">
-                        <RestrictionIcon value="hasNoPork" size="sm" />
-                    </View>
-                    <Text className="dark:text-white text-lg font-bold">Pas de porc</Text>
-                </View>
-                <FormSwitch
-                    control={control}
-                    name="hasNoPork"
-                />
-            </View>
-
-            <View className={`flex-row justify-between items-center border-b ${hasNoAlcohol ? "border-blue-400" : "border-gray-800 dark:border-gray-400"} pb-1 pr-10`}>
-                <View className="flex-row gap-2 items-center">
-                    <View className="rounded-full bg-white">
-                        <RestrictionIcon value="hasNoAlcohol" size="sm" />
-                    </View>
-                    <Text className="dark:text-white text-lg font-bold">Pas d&apos;alcool</Text>
-                </View>
-                <FormSwitch
-                    control={control}
-                    name="hasNoAlcohol"
-                />
-            </View>
-
-            <View className={`flex-row justify-between items-center border-b ${hasVegan ? "border-blue-400" : "border-gray-800 dark:border-gray-400"} pb-1 pr-10`}>
-                <View className="flex-row gap-2 items-center">
-                    <View className="rounded-full bg-white">
-                        <RestrictionIcon value="hasVegan" size="sm" />
-                    </View>
-                    <Text className="dark:text-white text-lg font-bold">Végétarien</Text>
-                </View>
-                <FormSwitch
-                    control={control}
-                    name="hasVegan"
-                />
-            </View>
+            ))}
         </View>
     );
 };

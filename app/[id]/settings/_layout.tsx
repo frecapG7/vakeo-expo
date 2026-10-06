@@ -1,18 +1,15 @@
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { useTrip } from "@/context/TripContext";
-import useColors from "@/hooks/styles/useColors";
 import { useGlassHeaderOptions } from "@/hooks/styles/useGlassHeaderOptions";
 import { Stack, useRouter } from "expo-router";
-import { View } from "react-native";
+import { View, useColorScheme } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
 export default function SettingsLayout() {
 
-    const { trip } = useTrip();
     const router = useRouter();
-    const { text } = useColors();
+    const isDark = useColorScheme() === "dark";
 
 
     const insets = useSafeAreaInsets();
@@ -35,7 +32,7 @@ export default function SettingsLayout() {
                             className="mr-4"
                             onPress={() => router.back()}
                         >
-                            <IconSymbol name="chevron.left" color={text} />
+                            <IconSymbol name="chevron.left" color={isDark ? "#F6F8FD" : "#16265C"} />
                         </Button>,
                 }}
                 />

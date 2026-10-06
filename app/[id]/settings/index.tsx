@@ -2,20 +2,18 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { UserRestrictionsForm } from "@/components/users/UserRestrictionsForm";
-import styles from "@/constants/Styles";
 import { useTrip } from "@/context/TripContext";
 import { useGetTripUser, useUpdateTripUser } from "@/hooks/api/useTrips";
 import { router } from "expo-router";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
 
 
 
 export default function TripSettings() {
-
 
     const { me, trip } = useTrip();
 
@@ -27,7 +25,8 @@ export default function TripSettings() {
             hasHalal: false,
             hasKasher: false,
             hasNoPork: false,
-            hasNoAlcohol: false
+            hasNoAlcohol: false,
+            hasVegan: false
         }
     });
 
@@ -36,18 +35,17 @@ export default function TripSettings() {
         if (!user)
             return;
 
-        const formValues = {
+        reset({
             hasHalal: user.restrictions?.includes("hasHalal"),
             hasKasher: user.restrictions?.includes("hasKasher"),
             hasNoPork: user.restrictions?.includes("hasNoPork"),
             hasNoAlcohol: user.restrictions?.includes("hasNoAlcohol"),
             hasVegan: user.restrictions?.includes("hasVegan"),
-        };
-        reset(formValues);
+        });
     }, [user, reset])
 
 
-    const onSubmit = async (formData) => {
+    const onSubmit = async (formData: Record<string, boolean>) => {
         const restrictions = Object.keys(formData).filter(key => formData[key]);
         await updateTripUser.mutateAsync({
             ...user,
@@ -57,143 +55,79 @@ export default function TripSettings() {
     };
 
 
-
     if (!user)
         return (
-            <Animated.View style={styles.container}>
-                <View className="flex gap-2 items-start border-b border-blue-700  pb-2 mx-5">
+            <View className="flex-1 bg-mist dark:bg-ink px-4 py-4 gap-4">
+                <View className="rounded-2xl bg-white dark:bg-night border border-mist dark:border-white/10 p-4 gap-4 items-start">
                     <Skeleton variant="circular" height={40} />
                     <View className="flex-row gap-5 items-center">
+                        <View className="w-32">
+                            <Skeleton height={5} />
+                        </View>
                         <View className="w-20">
                             <Skeleton height={5} />
                         </View>
-                        <View className="w-10">
-                            <Skeleton height={5} />
-                        </View>
                     </View>
                 </View>
-
-                <View className="my-5 gap-4 ml-5 ">
+                <View className="rounded-2xl bg-white dark:bg-night border border-mist dark:border-white/10 p-4">
                     <Skeleton height={40} />
                 </View>
-            </Animated.View>)
+            </View>)
 
     return (
-        <Animated.View style={styles.container}>
-            <View className="flex gap-2 items-start border-b border-blue-700  pb-2 m-5">
-                <Avatar src={user?.avatar} size2="xl" alt={user?.name.charAt(0)} />
-                <View className="flex-row gap-5 items-end">
-                    <Text className="dark:text-white text-3xl font-bold">{user?.name}</Text>
-                    <View className="flex-1 flex-row items-center gap-2 ">
-                        <Pressable
-                            onPress={() => router.push({ pathname: "/[id]/settings/avatar", params: { id: trip._id } })}
-                        >
-                            <Text className="text-neutral-900 dark:text-neutral-100">
-                                Modifier avatar
-                            </Text>
-                        </Pressable>
-                        <Text className="text-neutral-900 dark:text-neutral-100">|</Text>
-                        <Pressable
-                            onPress={() => router.push({ pathname: "/[id]/settings/username", params: { id: trip._id } })}
-                        >
-                            <Text className="text-neutral-900 dark:text-neutral-100">
-                                Modifier nom
-                            </Text>
-                        </Pressable>
+        <View className="flex-1 bg-mist dark:bg-ink">
+            <Animated.ScrollView contentContainerClassName="px-4 py-4 gap-4">
+
+                {/* Carte profil */}
+                <View className="rounded-2xl bg-white dark:bg-night border border-mist dark:border-white/10 p-4 gap-4">
+                    <View className="flex-row gap-4 items-center">
+                        <Avatar src={user?.avatar} size2="xl" alt={user?.name.charAt(0)} />
+                        <Text className="text-3xl font-bold text-night dark:text-white flex-1" numberOfLines={2}>
+                            {user?.name}
+                        </Text>
                     </View>
-                </View>
-            </View>
-
-            <View className="my-5 gap-4 ml-5">
-                <View>
-                    <Text className="text-xl dark:text-white ml-5">
-                        Restrictions
-                    </Text>
-                    <Text className="text-xs dark:text-white">
-                        Renseigne tes restrictions alimentaires afin de faciliter l'organisation des repas</Text>
-                </View>
-
-                <UserRestrictionsForm control={control} />
-
-                {/* <View className={`flex-row justify-between items-center border-b ${restrictions.includes("hasHalal") ? "border-blue-400" : "border-gray-800 dark:border-gray-400"} pr-10 pb-1`}>
-                    <View className="flex-row gap-2 items-center">
-                        <View className="rounded-full bg-white">
-                            <RestrictionIcon value="hasHalal" size="sm" />
-                        </View>
-                        <Text className="dark:text-white text-lg font-bold">Halal</Text>
-                    </View>
-                    <Switch value={restrictions.includes("hasHalal")}
-                        onSwitch={(v) => onSwitch(v, "hasHalal")}
-                        disabled={updateTripUser?.isPending} />
-                </View>
-
-
-                <View className={`flex-row justify-between items-center border-b ${restrictions.includes("hasKasher") ? "border-blue-400" : "border-gray-800 dark:border-gray-400"} pb-1 pr-10`}>
-                    <View className="flex-row gap-2 items-center">
-                        <View className="rounded-full bg-white">
-                            <RestrictionIcon value="hasKasher" size="sm" />
-                        </View>
-                        <Text className="dark:text-white text-lg font-bold">Kasher</Text>
-                    </View>
-                    <Switch value={restrictions.includes("hasKasher")}
-                        onSwitch={(v) => onSwitch(v, "hasKasher")}
-                        disabled={updateTripUser?.isPending}
-                    />
-                </View>
-
-                <View className={`flex-row justify-between items-center border-b ${restrictions.includes("hasNoPork") ? "border-blue-400" : "border-gray-800 dark:border-gray-400"} pb-1 pr-10`}>
-                    <View className="flex-row gap-2 items-center">
-                        <View className="rounded-full bg-white">
-                            <RestrictionIcon value="hasNoPork" size="sm" />
-                        </View>
-                        <Text className="dark:text-white text-lg font-bold">Pas de porc</Text>
-                    </View>
-                    <Switch value={restrictions.includes("hasNoPork")}
-                        onSwitch={(v) => onSwitch(v, "hasNoPork")}
-                        disabled={updateTripUser?.isPending}
-                    />
-                </View>
-
-                <View className={`flex-row justify-between items-center border-b ${restrictions.includes("hasNoAlcohol") ? "border-blue-400" : "border-gray-800 dark:border-gray-400"} pb-1 pr-10`}>
-                    <View className="flex-row gap-2 items-center">
-                        <View className="rounded-full bg-white">
-                            <RestrictionIcon value="hasNoAlcohol" size="sm" />
-                        </View>
-                        <Text className="dark:text-white text-lg font-bold">Pas d'alcool</Text>
-                    </View>
-                    <Switch value={restrictions.includes("hasNoAlcohol")}
-                        onSwitch={(v) => onSwitch(v, "hasNoAlcohol")}
-                        disabled={updateTripUser?.isPending} />
-                </View>
-
-                <View className={`flex-row justify-between items-center border-b ${restrictions.includes("hasVegan") ? "border-blue-400" : "border-gray-800 dark:border-gray-400"} pb-1 pr-10`}>
-                    <View className="flex-row gap-2 items-center">
-                        <View className="rounded-full bg-white">
-                            <RestrictionIcon value="hasVegan" size="sm" />
-                        </View>
-                        <Text className="dark:text-white text-lg font-bold">Végétarien</Text>
-                    </View>
-                    <Switch value={restrictions.includes("hasVegan")}
-                        onSwitch={(v) => onSwitch(v, "hasVegan")}
-                        disabled={updateTripUser?.isPending} />
-                </View> */}
-
-                {isDirty && 
-                
-                    <Animated.View entering={FadeIn}>
+                    <View className="flex-row gap-3">
                         <Button
-                            variant="contained"
-                            title="Modifier"
-                            isLoading={updateTripUser.isPending}
-                            onPress={handleSubmit(onSubmit)}
+                            size="small"
+                            variant="outlined"
+                            title="Modifier nom"
+                            onPress={() => router.push({ pathname: "/[id]/settings/username", params: { id: trip._id } })}
+                        />
+                        <Button
+                            size="small"
+                            variant="outlined"
+                            title="Modifier avatar"
+                            onPress={() => router.push({ pathname: "/[id]/settings/avatar", params: { id: trip._id } })}
+                        />
+                    </View>
+                </View>
+
+                {/* Restrictions */}
+                <View className="rounded-2xl bg-white dark:bg-night border border-mist dark:border-white/10 p-4 gap-4">
+                    <View className="gap-1">
+                        <Text className="text-xl font-bold text-night dark:text-white">
+                            Restrictions
+                        </Text>
+                        <Text className="text-xs text-night/60 dark:text-white/60">
+                            Renseigne tes restrictions alimentaires afin de faciliter l&apos;organisation des repas
+                        </Text>
+                    </View>
+
+                    <UserRestrictionsForm control={control} />
+
+                    {isDirty && (
+                        <Animated.View entering={FadeIn}>
+                            <Button
+                                variant="contained"
+                                title="Modifier"
+                                isLoading={updateTripUser.isPending}
+                                onPress={handleSubmit(onSubmit)}
                             />
-                    </Animated.View>
-                }
-            </View>
+                        </Animated.View>
+                    )}
+                </View>
 
-
-
-
-        </Animated.View>
+            </Animated.ScrollView>
+        </View>
     )
 }
