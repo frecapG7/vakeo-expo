@@ -96,6 +96,7 @@ export default function TripMessages() {
                     left: { color: isDark ? "rgba(246,248,253,0.5)" : "rgba(22,38,92,0.5)" }
                 }}
                 // Jour integre : pill et header flottant styles via le theme du fork.
+                locale="fr"
                 dateFormat="ddd D MMM"
                 theme={{
                     colors: {

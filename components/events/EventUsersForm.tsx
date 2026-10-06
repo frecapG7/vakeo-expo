@@ -4,12 +4,11 @@ import { Control, useFieldArray, useFormState } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import { Avatar } from "../ui/Avatar";
 import { IconSymbol } from "../ui/IconSymbol";
-import { Toast } from "toastify-react-native";
 
 /**
  * Sélection des participants (checkbox) et des responsables (étoile).
  * Règles : l'étoile n'existe que sur les participants ; décocher un owner
- * retire son étoile ; la dernière étoile ne se retire pas (toast d'erreur).
+ * retire son étoile. Un event peut rester sans responsable (le back accepte owners vide).
  */
 export const EventsUsersForm = ({ trip, control, me }: { trip: Trip, control: Control<Event>, me?: TripUser }) => {
 
@@ -43,10 +42,6 @@ export const EventsUsersForm = ({ trip, control, me }: { trip: Trip, control: Co
     const toggleOwner = (user: TripUser) => {
         const index = owners?.map(o => o._id)?.indexOf(user._id);
         if (index >= 0) {
-            if (owners.length <= 1) {
-                Toast.error("Au moins un responsable est requis");
-                return;
-            }
             removeOwner(index);
         } else {
             appendOwner(user);
@@ -118,7 +113,7 @@ export const EventsUsersForm = ({ trip, control, me }: { trip: Trip, control: Co
             </View>
 
             <Text className="text-[11px] text-gray-400 leading-4">
-                L&apos;étoile désigne les responsables de l&apos;organisation. Au moins un responsable est requis.
+                L&apos;étoile désigne les responsables de l&apos;organisation.
             </Text>
         </View>
     )

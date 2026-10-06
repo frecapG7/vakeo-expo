@@ -30,6 +30,7 @@ export default function EditTripEvent() {
                 text: "Supprimer",
                 style: "destructive",
                 onPress: async () => {
+                    if (deleteEvent.isPending) return;
                     await deleteEvent.mutateAsync();
                     Toast.success("Activité supprimée");
                     router.dismissTo({
@@ -46,7 +47,7 @@ export default function EditTripEvent() {
     useEffect(() => {
         navigation.setOptions({
             headerRight: () => (
-                <Button onPress={onDelete} className="ml-4">
+                <Button onPress={onDelete} disabled={deleteEvent.isPending} className="ml-4">
                     <Text className="text-danger font-semibold">Supprimer</Text>
                 </Button>
             )
