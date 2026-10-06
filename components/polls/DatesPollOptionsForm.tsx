@@ -74,7 +74,7 @@ export const DatesPollOptionsForm = ({ control }: { control: any }) => {
 
     const isDark = useColorScheme() === "dark";
 
-    const { fields: options, append, remove, update } = useFieldArray<{ startDate?: string; endDate?: string }>({
+    const { fields: options, append, remove, update } = useFieldArray<{ options: { startDate?: string; endDate?: string }[] }>({
         control,
         name: "options",
         rules: {

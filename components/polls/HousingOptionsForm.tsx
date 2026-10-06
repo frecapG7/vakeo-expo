@@ -112,7 +112,7 @@ export const HousingOptionsForm = ({ control }: { control: any }) => {
         name: "options",
     })
 
-  const handleLinkClick = async (url) => {
+  const handleLinkClick = async (url: string) => {
         try {
             await Linking.openURL(url);
         } catch (err) {

@@ -22,7 +22,7 @@ export default function LinkForm({
     const url = useWatch({ control, name: "url" });
 
 
-    const { field: { value: title, onChange: setTitle } } = useController({
+    const { field: { onChange: setTitle } } = useController({
         control,
         name: "title"
     });
@@ -32,7 +32,7 @@ export default function LinkForm({
         name: "icon"
     });
 
-    const { field: { value: image, onChange: setImage } } = useController({
+    const { field: { onChange: setImage } } = useController({
         control,
         name: "image"
     });
@@ -56,7 +56,7 @@ export default function LinkForm({
             const debounceTimer = setTimeout(fetchPreview, 500);
             return () => clearTimeout(debounceTimer);
         }
-    }, [url, setIcon, setTitle, postLinkPreview]);
+    }, [url, setIcon, setTitle, setImage, postLinkPreview]);
 
 
 
@@ -66,7 +66,7 @@ export default function LinkForm({
             setTitle("");
             setImage("")
         }
-    }, [url, setIcon, setTitle]);
+    }, [url, setIcon, setTitle, setImage]);
 
 
 
@@ -75,12 +75,12 @@ export default function LinkForm({
 
             <View className="gap-4">
                 <View className="gap-1">
-                    <Text className='font-bold ml-2 dark:text-white text-sm'>
+                    <Text className='font-bold ml-2 text-night dark:text-white text-sm'>
                         URL*
                     </Text>
                     <View className="flex-row items-center gap-2 ">
                         {icon && (
-                            <Animated.View entering={BounceInRight} className="bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                            <Animated.View entering={BounceInRight} className="bg-mist dark:bg-white/10 rounded-lg p-1">
                                 <Image source={{ uri: icon }} style={{ width: 28, height: 28 }} contentFit="cover" />
                             </Animated.View>
                         )}
@@ -96,7 +96,7 @@ export default function LinkForm({
                 </View>
 
                 <View className="gap-1">
-                    <Text className='font-bold ml-2 dark:text-white text-sm'>
+                    <Text className='font-bold ml-2 text-night dark:text-white text-sm'>
                         Titre*
                     </Text>
                     <FormText
@@ -110,7 +110,7 @@ export default function LinkForm({
                 </View>
 
                 <View className="gap-1">
-                    <Text className='font-bold ml-2 dark:text-white text-sm'>
+                    <Text className='font-bold ml-2 text-night dark:text-white text-sm'>
                         Description
                     </Text>
                     <FormTextArea

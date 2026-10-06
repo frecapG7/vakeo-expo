@@ -8,7 +8,7 @@ import { PollOption } from "./PollOption"
 
 export const HousingOptions = ({ poll, user, onVote, onUnVote, onSelected }: { poll: HousingPoll, user?: TripUser, onVote: (option: any) => Promise<void>, onUnVote: (option: any) => Promise<void>, onSelected: (option: any) => void }) => {
 
-    const handleLinkClick = async (url) => {
+    const handleLinkClick = async (url: string) => {
         try {
             await Linking.openURL(url);
         } catch (err) {

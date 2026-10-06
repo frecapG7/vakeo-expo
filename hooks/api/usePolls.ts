@@ -21,7 +21,17 @@ interface IPage {
 
 
 
-const postPoll = async (tripId: any, data: Omit<Poll, '_id'>): Promise<Poll> => {
+// Brouillon de creation : question + reglages + options sans champs serveur (_id, selectedBy, percent).
+export interface PollInput {
+    question: string;
+    type: string;
+    isSingleAnswer: boolean;
+    isAnonymous: boolean;
+    options: Record<string, unknown>[];
+    stop?: string;
+}
+
+const postPoll = async (tripId: any, data: PollInput): Promise<Poll> => {
 
     const response = await axios.post(v3Path(`/trips/${tripId}/polls`), data);
     return response.data;
@@ -29,7 +39,7 @@ const postPoll = async (tripId: any, data: Omit<Poll, '_id'>): Promise<Poll> => 
 
 export const usePostPoll = (tripId: any) => {
     const queryClient = useQueryClient();
-    return useMutation<Poll, Error, Omit<Poll, '_id'>>({
+    return useMutation<Poll, Error, PollInput>({
         mutationFn: (data) => postPoll(tripId, data),
         onSuccess: (data: Poll) => queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
             .then(() => queryClient.setQueryData(["trips", tripId, "polls", data._id], data))

@@ -1,10 +1,10 @@
 import { Image } from "expo-image";
 import { Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-import { IconSymbol } from "./IconSymbol";
+import { IconSymbol, type IconSymbolName } from "./IconSymbol";
 
 const blurhash =
-    '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
+    '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[ayj[j[ayfQfQfQMW|aWBj@ay';
 
 type ImageSize = 'xs' | 'sm' | 'sm2' | 'md' | 'lg' | 'xl';
 
@@ -22,6 +22,7 @@ const sizeToClassMap = {
 const sizeToMarginMap = {
     xs: "-ml-2",
     sm: "-ml-3",
+    sm2: "-ml-4",
     md: "-ml-6",
     lg: "-ml-7",
     xl: "-ml-10"
@@ -45,7 +46,7 @@ export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src, badgeCo
     alt?: string,
     src?: string,
     badgeContent?: string | number,
-    badgeIcon?: string
+    badgeIcon?: IconSymbolName
 }) => {
 
 
@@ -55,7 +56,7 @@ export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src, badgeCo
 
     if (!src)
         return (
-            <View className={`relative justify-center items-center rounded-full ${sizeClass} border dark:border-white bg-amber dark:bg-gray-400`}>
+            <View className={`relative justify-center items-center rounded-full ${sizeClass} border dark:border-white bg-amber dark:bg-night`}>
                 <Text className={`font-bold uppercase ${textClass}`}>
                     {alt}
                 </Text>
@@ -73,13 +74,12 @@ export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src, badgeCo
                     <Animated.View
                         entering={FadeIn}
                         exiting={FadeOut}
-                        className="absolute -bottom-1 -right-2 bg-blue-400 rounded-full w-6 h-6 justify-center items-center">
-                        <IconSymbol name={badgeIcon} size={15} color="white" />
+                        className="absolute -bottom-1 -right-2 bg-night rounded-full w-6 h-6 justify-center items-center">
+                        <IconSymbol name={badgeIcon} size={15} color="#F6F8FD" />
                     </Animated.View>
                 )}
             </View>
         )
-
 
     return (
         <View className={`relative justify-center items-center rounded-full ${sizeClass}`} {...props}>
@@ -106,8 +106,8 @@ export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src, badgeCo
                 <Animated.View
                     entering={FadeIn}
                     exiting={FadeOut}
-                    className="absolute -bottom-1 -right-2 bg-blue-400 rounded-full w-6 h-6 justify-center items-center">
-                    <IconSymbol name={badgeIcon} size={15} color="white" />
+                    className="absolute -bottom-1 -right-2 bg-night rounded-full w-6 h-6 justify-center items-center">
+                    <IconSymbol name={badgeIcon} size={15} color="#F6F8FD" />
                 </Animated.View>
             )}
         </View>
@@ -115,7 +115,11 @@ export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src, badgeCo
 }
 
 
-export const AvatarsGroup = ({ avatars = [], size2 = "sm", maxLength = 3 }: { avatars: any, size2: ImageSize, maxLength: number }) => {
+export const AvatarsGroup = ({ avatars = [], size2 = "sm", maxLength = 3 }: {
+    avatars?: { avatar?: string, alt: string }[],
+    size2: ImageSize,
+    maxLength: number
+}) => {
 
     const marginClass = sizeToMarginMap[size2];
 

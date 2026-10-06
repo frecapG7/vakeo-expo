@@ -7,8 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
 import { useTrip } from "@/context/TripContext";
-import { usePostPoll } from "@/hooks/api/usePolls";
-import { Poll } from "@/types/models";
+import { usePostPoll, type PollInput } from "@/hooks/api/usePolls";
 import { useLocalSearchParams, useRouter } from "expo-router/build/hooks";
 import { useEffect } from "react";
 
@@ -29,7 +28,7 @@ const placeholder = (type: string): string => {
 
 export default function NewPoll() {
 
-    const { control, handleSubmit, setValue } = useForm({
+    const { control, handleSubmit, setValue } = useForm<PollInput>({
         defaultValues: {
             question: "",
             type: "",
@@ -53,7 +52,7 @@ export default function NewPoll() {
     const postPoll = usePostPoll(trip?._id);
     const router = useRouter();
 
-    const onSubmit = async (data: Omit<Poll, '_id'>) => {
+    const onSubmit = async (data: PollInput) => {
         const result = await postPoll.mutateAsync({
             ...data,
             ...(stop && { stop })

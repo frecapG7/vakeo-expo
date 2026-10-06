@@ -56,7 +56,7 @@ export default function PollDetailsPage() {
         return (
             <View style={styles.container} className="flex-1 bg-mist dark:bg-ink">
                 <View className="flex-row gap-3 items-center p-4">
-                    <Skeleton variant="circular" size="md" />
+                    <Skeleton variant="circular" height={40} />
                     <View className="flex-1 gap-2">
                         <Skeleton height={8} width="60%" />
                         <Skeleton height={6} width="40%" />
@@ -136,7 +136,7 @@ export default function PollDetailsPage() {
                 ) : (
                     <View className="gap-4 mb-4">
                         {poll?.options?.map((option) => {
-                            const includeMe = option?.selectedBy?.map(u => u._id).includes(me?._id);
+                            const includeMe = option?.selectedBy?.map(u => u._id).includes(me?._id ?? "");
                             const isLoading = loadingOptionId === option._id;
                             return (
                                 <Button
@@ -150,7 +150,8 @@ export default function PollDetailsPage() {
                                         }`}
                                 >
                                     <PollOption
-                                        label={poll?.type === "DatesPoll"
+                                        // Narrowing par le champ : une option DatesPoll porte startDate, une OtherPoll non.
+                                        label={"startDate" in option
                                             ? formatRange(dayjs(option.startDate), dayjs(option.endDate))
                                             : option.value}
                                         selectedBy={option.selectedBy}

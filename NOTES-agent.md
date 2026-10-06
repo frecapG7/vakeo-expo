@@ -16,7 +16,7 @@ Détails : voir `docs/architecture-agent.md` (architecture) et `docs/plan-migrat
 ## Commandes
 
 - `npm start` / `npm run android` / `npm run ios` — expo (APP_ENVIRONMENT=development). Rebuild du dev client obligatoire après chaque upgrade SDK (nouveaux modules natifs en 57 : keyboard-controller, glass-effect).
-- `npm run lint` — expo lint (eslint-config-expo 57 : **8 erreurs / 28 warnings**, 2026-10-06 — voir Dette)
+- `npm run lint` — expo lint (eslint-config-expo 57 : **7 erreurs / 17 warnings**, 2026-10-06 — voir Dette)
 - `npm test` — jest (preset jest-expo 57, mode watch ; CI : `npx jest --ci`)
 - `npx expo-doctor` — 16/21 (les échecs restants sont connus/acceptés, voir architecture doc)
 - `npm run brand:assets` — régénère icon/splash depuis la charte (`scripts/generate-brand-assets.mjs`)
@@ -90,15 +90,15 @@ Détails : voir `docs/architecture-agent.md` (architecture) et `docs/plan-migrat
 
 1. **Migration API v1 → v3** (chantier principal, plan détaillé dans `docs/plan-migration-v3.md`) :
    - `x-user-id` → `x-user-token`, trip IDs encodés en URL, base URL `/api/v3/`.
-   - **Fait au 2026-10-06** : `useTrips`, `useEvents`, `useMessages`, `useGoods` (05/10), **`usePolls` + `useTripStop` (06/10)** — tous sous `v3Path`, interceptor pour le token, plus aucun `x-user-id` manuel. **Restent en v1/v2 : `useLinks` seul** (+ `useTokens`/`useVerifyToken`, Phase 5) ; **share migré v3 (06/10, POST) — idempotence backend Q4 à confirmer** ; puis les 403 lectures privées.
+   - **Phase 3 COMPLETE (06/10)** : `useTrips`, `useEvents`, `useMessages`, `useGoods`, `usePolls`, `useTripStop`, **`useLinks` (06/10, dernier)** — tous sous `v3Path`, interceptor pour le token, plus aucun `x-user-id` manuel. Restent en v1 **par design** : `useTokens`/`useVerifyToken` (Phase 5), `useSearchTrips` (mort, Phase 7) ; `useMigrate` envoie `x-user-id` volontairement. **Share migré v3 (06/10, POST) — idempotence backend Q4 à confirmer** ; puis les 403 lectures privées.
    - Flow join repensé (resolve token → seat picker → join), leave/rotate-token à créer.
 2. **Gamification** (2026-10-06) : maquette `docs/maquette-gamification.html`. **Page étapes implémentée** (barre/nœuds/segments/chip/bannière — validation device en cours). **Dashboard en attente de validation** : ring « Préparation du voyage » (pondérations à trancher : ex. dates 25% / étapes 30% / sondages 25% / liste 20%), J-x, badges, carte « Prochaine action ». Tout front, aucune donnée API en plus.
 3. **Améliorations visuelles opportunistes** : avatars des cartes, propagation `useColors` (voir Palette), `Screen edges={[]}` sur les écrans poussés restants, FAB inset sur `links`.
 
 ## Dette connue
 
-- **TS : 80 erreurs** (`npx tsc --noEmit`, 2026-10-06 — baseline historique 117, réduite au fil des nettoyages par fichier touché). Baseline à ne pas dégrader.
-- **Lint : 8 erreurs / 28 warnings** (2026-10-06 ; était 27 erreurs le 02/10). Améliorations du 06/10 : faux positif immutability de `FormLink` aligné sur `FormText` (disable), code mort `markedDates`/`formatRange` supprimés de `DatesPollOptionsForm`, `editMode` de `BottomLocationForm` dérivé (fin d'un setState-in-effect). **2 setState-in-effect restants assumés** (`setEnableQuery` du geocode dans `BottomLocationForm`, `editMode` de `BottomAccommodationForm` — setters manuels, refonte UX risquée, à traiter séparément). À nettoyer par fichier touché.
+- **TS : 26 erreurs** (`npx tsc --noEmit`, 2026-10-06 — baseline historique 117, réduite au fil des nettoyages par fichier touché). Baseline à ne pas dégrader.
+- **Lint : 7 erreurs / 17 warnings** (2026-10-06 ; était 27 erreurs le 02/10). NB : `components/votes/` (ancêtre des polls, orphelin à zéro import) supprimé le 06/10 — il portait 28 erreurs TS à lui seul.. Améliorations du 06/10 : faux positif immutability de `FormLink` aligné sur `FormText` (disable), code mort `markedDates`/`formatRange` supprimés de `DatesPollOptionsForm`, `editMode` de `BottomLocationForm` dérivé (fin d'un setState-in-effect). **2 setState-in-effect restants assumés** (`setEnableQuery` du geocode dans `BottomLocationForm`, `editMode` de `BottomAccommodationForm` — setters manuels, refonte UX risquée, à traiter séparément). À nettoyer par fichier touché.
 - **`text-md` : classe fantôme Tailwind v4** — migration `text-sm`/`text-base` au fil de l'eau.
 - **`Skeleton` réparé (2026-09-30)** : tailles via `style` numérique (les classes dynamiques ne compilent pas en NativeWind). Les écrans touchés l'utilisent normalement.
 - `app/_layout.tsx` : splash masqué dès que les polices sont chargées ; `useShareTrip` en `useQuery` (deviendra POST en v3) ; `useVerifyToken` réponse non consommée ; `storage/index.tsx` `encryptionKey` en dur.

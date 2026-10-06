@@ -68,11 +68,11 @@ export default function PollsPage() {
                                 <View className="flex-row items-center gap-2">
                                     <Avatar
                                         size2="sm"
-                                        src={item?.createdBy.avatar}
-                                        alt={item.createdBy.name.charAt(0)}
+                                        src={item?.createdBy?.avatar}
+                                        alt={item?.createdBy?.name?.charAt(0)}
                                     />
                                     <Text className="text-base text-night dark:text-white font-bold">
-                                        {item.createdBy.name}
+                                        {item?.createdBy?.name}
                                     </Text>
                                 </View>
                                 <View>
