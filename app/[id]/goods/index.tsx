@@ -15,6 +15,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { Menu, MenuOption, MenuOptions, MenuTrigger } from "react-native-popup-menu";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
 
@@ -43,6 +44,7 @@ export default function TripGoods() {
 
     const colors = useColors();
     const navigation = useNavigation();
+    const insets = useSafeAreaInsets();
 
     const handleDelete = async (good: Good) => {
         if (!good)
@@ -210,7 +212,9 @@ export default function TripGoods() {
                 }}
                 ListFooterComponent={<View className="my-5" />}
             />
-            <FloatingAddButton onPress={() => router.push({
+            <FloatingAddButton
+                style={{ bottom: insets.bottom + 40 }}
+                onPress={() => router.push({
                 pathname: "/[id]/goods/new",
                 params: {
                     id: trip._id,

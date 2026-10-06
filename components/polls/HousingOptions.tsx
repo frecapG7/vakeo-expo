@@ -22,7 +22,7 @@ export const HousingOptions = ({ poll, user, onVote, onUnVote, onSelected }: { p
             {poll.options.map((option) => {
                 const includeUser = containsUser(user, option.selectedBy);
                 return <View key={option._id}
-                    className="rounded-b-lg rounded-t-xl overflow-hidden border-b border-gray-200 pb-5 bg-white dark:bg-gray-900">
+                    className="rounded-b-lg rounded-t-xl overflow-hidden border-b border-mist dark:border-white/10 pb-5 bg-white dark:bg-night">
                     <ImageBackground source={option.image}
                         style={{
                             width: "100%",
@@ -30,9 +30,9 @@ export const HousingOptions = ({ poll, user, onVote, onUnVote, onSelected }: { p
                         }}
                     >
                         <View className="flex-1 items-end justify-between p-2">
-                            <Pressable className="bg-blue-50 p-2 rounded-xl"
+                            <Pressable className="bg-mist/80 dark:bg-white/10 p-2 rounded-xl"
                                 onPress={async () => await handleLinkClick(option.url)}>
-                                <IconSymbol name="arrow.up.right" color="gray" size={20} />
+                                <IconSymbol name="arrow.up.right" color="#EE8B33" size={20} />
                             </Pressable>
 
                             <Image
@@ -46,7 +46,7 @@ export const HousingOptions = ({ poll, user, onVote, onUnVote, onSelected }: { p
                     </ImageBackground>
                     <View className="mx-1 gap-2">
 
-                        <Text className="text-lg font-bold dark:text-white"
+                        <Text className="text-lg font-bold text-night dark:text-white"
                             numberOfLines={3}>
                             {option.title}
                         </Text>
@@ -55,7 +55,6 @@ export const HousingOptions = ({ poll, user, onVote, onUnVote, onSelected }: { p
                             onLongPress={async() => await onSelected(option)}
                             >
                             <PollOption
-                                // label={option.title}²
                                 selectedBy={option.selectedBy}
                                 percent={option.percent}
                                 isAnonymous={poll.isAnonymous}
