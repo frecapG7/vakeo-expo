@@ -7,8 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
 import { useTrip } from "@/context/TripContext";
-import { usePostPoll } from "@/hooks/api/usePolls";
-import { Poll } from "@/types/models";
+import { usePostPoll, type PollInput } from "@/hooks/api/usePolls";
 import { useLocalSearchParams, useRouter } from "expo-router/build/hooks";
 import { useEffect } from "react";
 
@@ -29,7 +28,7 @@ const placeholder = (type: string): string => {
 
 export default function NewPoll() {
 
-    const { control, handleSubmit, setValue } = useForm({
+    const { control, handleSubmit, setValue } = useForm<PollInput>({
         defaultValues: {
             question: "",
             type: "",
@@ -49,11 +48,11 @@ export default function NewPoll() {
 
 
     const { type: typeParam, stop } = useLocalSearchParams<{ type: string, stop?: string }>();
-    const { trip, me } = useTrip();
-    const postPoll = usePostPoll(trip?._id, me?._id);
+    const { trip } = useTrip();
+    const postPoll = usePostPoll(trip?._id);
     const router = useRouter();
 
-    const onSubmit = async (data: Omit<Poll, '_id'>) => {
+    const onSubmit = async (data: PollInput) => {
         const result = await postPoll.mutateAsync({
             ...data,
             ...(stop && { stop })
@@ -75,23 +74,23 @@ export default function NewPoll() {
 
     if (!type)
         return (
-            <View style={styles.container}>
-                <Text>Quel type de sondage veux tu organiser ? </Text>
+            <View style={styles.container} className="flex-1 bg-mist dark:bg-ink">
+                <Text className="text-night dark:text-white">Quel type de sondage veux tu organiser ? </Text>
                 <View className="flex-row flex-wrap gap-5 m-5">
-                    <Button className="flex bg-orange-200 rounded-xl w-[40%] gap-2 border-blue-50 shadow p-2"
+                    <Button className="flex bg-white dark:bg-night rounded-2xl w-[40%] gap-2 border border-mist dark:border-white/10 shadow p-2"
                         onPress={() => setType("DatesPoll")}>
-                        <IconSymbol name="calendar" color="black" size={34} />
-                        <Text className="capitalize text-lg font-bold"> des Dates</Text>
+                        <IconSymbol name="calendar" color="#EE8B33" size={34} />
+                        <Text className="capitalize text-lg font-bold text-night dark:text-white"> des Dates</Text>
                     </Button>
-                    <Button className="flex bg-orange-200 rounded-xl w-[40%] gap-2 border-blue-50 shadow p-2"
+                    <Button className="flex bg-white dark:bg-night rounded-2xl w-[40%] gap-2 border border-mist dark:border-white/10 shadow p-2"
                         onPress={() => setType("HousingPoll")}>
-                        <IconSymbol name="house.fill" color="black" size={34} />
-                        <Text className="capitalize text-lg font-bold"> des hébergements</Text>
+                        <IconSymbol name="house.fill" color="#EE8B33" size={34} />
+                        <Text className="capitalize text-lg font-bold text-night dark:text-white"> des hébergements</Text>
                     </Button>
-                    <Button className="flex bg-orange-200 rounded-xl w-[40%] gap-2 border-blue-50 shadow p-2"
+                    <Button className="flex bg-white dark:bg-night rounded-2xl w-[40%] gap-2 border border-mist dark:border-white/10 shadow p-2"
                         onPress={() => setType("OtherPoll")}>
-                        <IconSymbol name="chart.bar.fill" color="black" size={34} />
-                        <Text className="capitalize text-lg font-bold"> autre chose</Text>
+                        <IconSymbol name="chart.bar.fill" color="#EE8B33" size={34} />
+                        <Text className="capitalize text-lg font-bold text-night dark:text-white"> autre chose</Text>
                     </Button>
 
                 </View>
@@ -102,9 +101,9 @@ export default function NewPoll() {
         )
 
     return (
-        <Animated.ScrollView className="flex-1 mt-4 mx-4" contentInsetAdjustmentBehavior="automatic" showsVerticalScrollIndicator={false}>
-            <View className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-4 shadow-sm border border-gray-100 dark:border-gray-700">
-                <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+        <Animated.ScrollView className="flex-1 bg-mist dark:bg-ink" contentContainerClassName="mt-4 mx-4" contentInsetAdjustmentBehavior="automatic" showsVerticalScrollIndicator={false}>
+            <View className="bg-white dark:bg-night rounded-2xl p-4 mb-4 shadow-sm border border-mist dark:border-white/10">
+                <Text className="text-lg font-semibold text-night dark:text-white mb-3">
                     Question *
                 </Text>
                 <FormText
@@ -119,8 +118,8 @@ export default function NewPoll() {
             </View>
 
 
-            <View className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-4 shadow-sm border border-gray-100 dark:border-gray-700">
-                <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+            <View className="bg-white dark:bg-night rounded-2xl p-4 mb-4 shadow-sm border border-mist dark:border-white/10">
+                <Text className="text-lg font-semibold text-night dark:text-white mb-3">
                     Options
                 </Text>
                 {type === "DatesPoll" &&
@@ -138,8 +137,8 @@ export default function NewPoll() {
                 }
             </View>
 
-            <View className="flex-1 bg-white dark:bg-gray-800 rounded-xl p-4 mb-6 shadow-sm border border-gray-100 dark:border-gray-700">
-                <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+            <View className="flex-1 bg-white dark:bg-night rounded-2xl p-4 mb-6 shadow-sm border border-mist dark:border-white/10">
+                <Text className="text-lg font-semibold text-night dark:text-white mb-3">
                     Paramètres
                 </Text>
                 <PollSettingsForm control={control} />

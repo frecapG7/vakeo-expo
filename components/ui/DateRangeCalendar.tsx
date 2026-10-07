@@ -1,9 +1,9 @@
 // components/ui/DateRangeCalendar.tsx
+import { useColorScheme } from "react-native";
 import { Calendar } from "react-native-calendars";
-import { IconSymbol } from "./IconSymbol";
-import useColors from "@/hooks/styles/useColors";
 import dayjs from "dayjs";
 import { getDatesBetween } from "@/lib/utils";
+import { IconSymbol } from "./IconSymbol";
 
 interface DateRangeCalendarProps {
     startDate?: string;
@@ -18,7 +18,11 @@ export const DateRangeCalendar = ({
     onChange,
     disabled = false,
 }: DateRangeCalendarProps) => {
-    const colors = useColors();
+    const isDark = useColorScheme() === "dark";
+    const text = isDark ? "#F6F8FD" : "#16265C";
+    const surface = isDark ? "#101736" : "#F6F8FD";
+    const muted = isDark ? "rgba(246,248,253,0.35)" : "rgba(22,38,92,0.35)";
+    const ink = "#101736";
 
     const handleDateSelection = (dateString: string) => {
         if (disabled) return;
@@ -43,8 +47,8 @@ export const DateRangeCalendar = ({
         ...(start && start !== end && {
             [start]: {
                 startingDay: true,
-                color: colors.calendarPrimary,
-                textColor: colors.neutral,
+                color: "#EE8B33",
+                textColor: ink,
                 selected: true,
                 disableTouchEvent: true
             }
@@ -52,8 +56,8 @@ export const DateRangeCalendar = ({
         ...(end && start !== end && {
             [end]: {
                 endingDay: true,
-                color: colors.calendarPrimary,
-                textColor: colors.neutral,
+                color: "#EE8B33",
+                textColor: ink,
                 selected: true,
                 disableTouchEvent: true
             }
@@ -62,8 +66,8 @@ export const DateRangeCalendar = ({
             [start]: {
                 startingDay: true,
                 endingDay: true,
-                color: colors.calendarPrimary,
-                textColor: colors.neutral,
+                color: "#EE8B33",
+                textColor: ink,
                 selected: true,
                 disableTouchEvent: true
             }
@@ -71,7 +75,7 @@ export const DateRangeCalendar = ({
         ...(start && end && getDatesBetween(dayjs(start), dayjs(end))
             .reduce((acc: Record<string, any>, date) => ({
                 ...acc,
-                [date]: { color: colors.neutral, textColor: colors.text, selected: true, disableTouchEvent: true }
+                [date]: { color: "rgba(247,183,74,0.35)", textColor: text, selected: true, disableTouchEvent: true }
             }), {})
         )
     };
@@ -80,23 +84,21 @@ export const DateRangeCalendar = ({
         <Calendar
             enableSwipeMonths
             theme={{
-                backgroundColor: colors.calendarBackground,
-                calendarBackground: colors.calendarBackground,
-                textSectionTitleColor: colors.text,
-                dayTextColor: colors.text,
-                textSectionTitleDisabledColor: '#d9e1e8',
-                selectedDayBackgroundColor: '#fdb140',
-                selectedDayTextColor: colors.primary,
-                todayTextColor: '#00adf5',
-                todayBackgroundColor: '#a2daf1ff',
-                textDisabledColor: '#828485ff',
-                dotColor: '#00adf5',
-                selectedDotColor: '#ffffff',
-                arrowColor: 'orange',
-                disabledArrowColor: '#d9e1e8',
-                monthTextColor: colors.text,
-                indicatorColor: colors.text,
-                textInactiveColor: colors.textInactiveColor,
+                calendarBackground: surface,
+                textSectionTitleColor: text,
+                dayTextColor: text,
+                textSectionTitleDisabledColor: muted,
+                selectedDayBackgroundColor: "#EE8B33",
+                selectedDayTextColor: ink,
+                todayTextColor: "#EE8B33",
+                textDisabledColor: muted,
+                dotColor: "#EE8B33",
+                selectedDotColor: "#F6F8FD",
+                arrowColor: "#EE8B33",
+                disabledArrowColor: muted,
+                monthTextColor: text,
+                indicatorColor: "#EE8B33",
+                textInactiveColor: muted,
             }}
             markingType="period"
             onDayPress={({ dateString }) => handleDateSelection(dateString)}
@@ -105,7 +107,7 @@ export const DateRangeCalendar = ({
                 <IconSymbol
                     name={direction === 'left' ? 'chevron.left' : 'chevron.right'}
                     size={24}
-                    color={colors.primary}
+                    color="#EE8B33"
                 />
             )}
         />

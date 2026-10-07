@@ -5,16 +5,15 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
 import { useTrip } from "@/context/TripContext";
 import { useGetPolls } from "@/hooks/api/usePolls";
-import { useGetTrip, useUpdateTrip } from "@/hooks/api/useTrips";
+import { useUpdateTrip } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
-import useColors from "@/hooks/styles/useColors";
 import dayjs from "@/lib/dayjs-config";
 import { countDaysBetween } from "@/lib/utils";
 import { Trip } from "@/types/models";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo } from "react";
 import { useController, useForm } from "react-hook-form";
-import { Text, View } from "react-native";
+import { Text, View, useColorScheme } from "react-native";
 import { Calendar, CalendarUtils } from "react-native-calendars";
 import Animated, { SlideInDown, SlideOutUp } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -22,12 +21,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function DatesPage() {
 
-    const colors = useColors();
+    const isDark = useColorScheme() === "dark";
+    const textColor = isDark ? "#F6F8FD" : "#16265C";
+    const muted = isDark ? "rgba(246,248,253,0.35)" : "rgba(22,38,92,0.35)";
+    const ink = "#101736";
 
     const { id } = useLocalSearchParams();
-    const { data: trip } = useGetTrip(id);
     const updateTrip = useUpdateTrip(id);
-    const { me } = useTrip();
+    const { trip, me } = useTrip();
     const { data: pagePoll } = useGetPolls(id, { type: "DatesPoll" });
     const poll = pagePoll?.polls[0];
     const router = useRouter();
@@ -97,23 +98,23 @@ export default function DatesPage() {
 
 
     return (
-        <SafeAreaView edges={["bottom"]} style={styles.container} >
+        <SafeAreaView edges={["bottom"]} style={styles.container} className="flex-1 bg-mist dark:bg-ink">
             <Animated.ScrollView contentInsetAdjustmentBehavior="automatic">
                 {/* // Above calendar */}
-                <View className="m-2 mb-4 p-4 gap-4 bg-white dark:bg-gray-900 rounded-xl shadow-sm">
+                <View className="m-2 mb-4 p-4 gap-4 bg-white dark:bg-night rounded-2xl shadow-sm border border-mist dark:border-white/10">
                     <View className="flex-row items-center gap-2">
                         <Text className="text-xl">📅</Text>
                         {startDate && endDate ? (
                             <View>
-                                <Text className="text-lg font-bold capitalize dark:text-white">
+                                <Text className="text-lg font-bold capitalize text-night dark:text-white">
                                     {formatRange(dayjs(startDate), dayjs(endDate))}
                                 </Text>
-                                <Text className="text-base font-normal text-gray-500">
+                                <Text className="text-base font-normal text-night/60 dark:text-white/60">
                                     {countDaysBetween(dayjs(startDate), dayjs(endDate))} jours
                                 </Text>
                             </View>
                         ) : (
-                            <Text className="text-lg font-bold dark:text-white">Aucune date sélectionnée</Text>
+                            <Text className="text-lg font-bold text-night dark:text-white">Aucune date sélectionnée</Text>
                         )}
                     </View>
                     <View className="flex-row justify-start">
@@ -144,28 +145,26 @@ export default function DatesPage() {
                     </View>
                 </View>
 
-                <View className="flex-1 m-2 py-5 rounded-xl bg-white dark:bg-gray-900">
+                <View className="flex-1 m-2 py-5 rounded-2xl bg-white dark:bg-night border border-mist dark:border-white/10">
                     <Calendar
                         enableSwipeMonths
                         theme={{
-                            backgroundColor: colors.calendarBackground,
-                            calendarBackground: colors.calendarBackground,
-                            textSectionTitleColor: colors.text,
-                            dayTextColor: colors.text,
-                            textSectionTitleDisabledColor: '#d9e1e8',
-                            selectedDayBackgroundColor: '#fdb140',
-                            selectedDayTextColor: colors.primary,
-                            todayTextColor: '#00adf5',
-                            todayBackgroundColor: '#a2daf1ff',
-                            textDisabledColor: '#828485ff',
-                            dotColor: '#00adf5',
-                            selectedDotColor: '#ffffff',
-                            arrowColor: 'orange',
-                            disabledArrowColor: '#d9e1e8',
-                            textInactiveColor: colors.textInactiveColor,
-                            monthTextColor: colors.text,
-                            indicatorColor: colors.text,
-
+                            backgroundColor: isDark ? "#101736" : "#F6F8FD",
+                            calendarBackground: isDark ? "#101736" : "#F6F8FD",
+                            textSectionTitleColor: textColor,
+                            dayTextColor: textColor,
+                            textSectionTitleDisabledColor: muted,
+                            selectedDayBackgroundColor: "#EE8B33",
+                            selectedDayTextColor: ink,
+                            todayTextColor: "#EE8B33",
+                            textDisabledColor: muted,
+                            dotColor: "#EE8B33",
+                            selectedDotColor: "#F6F8FD",
+                            arrowColor: "#EE8B33",
+                            disabledArrowColor: muted,
+                            textInactiveColor: muted,
+                            monthTextColor: textColor,
+                            indicatorColor: "#EE8B33",
                         }}
                         initialDate={startDate ? CalendarUtils.getCalendarDateString(startDate) : undefined}
                         markingType="period"
@@ -179,8 +178,8 @@ export default function DatesPage() {
                                         [date]: {
                                             startingDay: date === startDate,
                                             endingDay: date === endDate,
-                                            color: date === startDate || date === endDate ? colors.calendarPrimary : colors.neutral,
-                                            textColor: date === startDate || date === endDate ? colors.neutral : colors.text,
+                                            color: date === startDate || date === endDate ? "#EE8B33" : "rgba(247,183,74,0.35)",
+                                            textColor: date === startDate || date === endDate ? ink : textColor,
                                             selected: true,
                                             disableTouchEvent: true
                                         }
@@ -191,13 +190,13 @@ export default function DatesPage() {
                             <IconSymbol
                                 name={direction === 'left' ? 'chevron.left' : 'chevron.right'}
                                 size={24}
-                                color={colors.primary}
+                                color="#EE8B33"
                             />
                         )}
                     />
                     {hasError &&
                         <Animated.View entering={SlideInDown} exiting={SlideOutUp}>
-                            <Text className="text-red-400 mt-4">
+                            <Text className="text-danger mt-4">
                                 Une date de début et de fin est requise
                             </Text>
                         </Animated.View>

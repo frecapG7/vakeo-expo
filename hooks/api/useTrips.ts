@@ -107,13 +107,21 @@ export const useUpdateTripUser = (tripId: string, userId: string) => {
   })
 }
 
-const shareTrip = async (id: any) => {
-  const response = await axios.get(`/trips/${id}/share`);
+// --- Share v3 ---
+// POST /v3/trips/:id/share -> { value, type: "joinToken" } (403 si non-membre).
+// NB : un POST part a chaque montage de l'ecran de partage - idempotence cote backend a confirmer (Q4).
+export interface ShareTripResponse {
+  value: string,
+  type: "joinToken"
+}
+
+const shareTrip = async (id: any): Promise<ShareTripResponse> => {
+  const response = await axios.post(v3Path(`/trips/${id}/share`));
   return response.data;
 }
 
 export const useShareTrip = (id: string) => {
-  return useQuery({
+  return useQuery<ShareTripResponse>({ 
     queryKey: ["trips", id, "share"],
     queryFn: () => shareTrip(id),
     enabled: !!id

@@ -2,21 +2,18 @@ import { FormText } from "@/components/form/FormText";
 import { Button } from "@/components/ui/Button";
 import { useTrip } from "@/context/TripContext";
 import { useGetTripUser, useUpdateTripUser } from "@/hooks/api/useTrips";
-import useColors from "@/hooks/styles/useColors";
 import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
-import { Text } from "react-native";
+import { View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 
 export default function UsernameSetting() {
 
     const router = useRouter();
-    const { me , trip} = useTrip();
+    const { me, trip } = useTrip();
     const { data: user } = useGetTripUser(trip._id, me?._id);
     const updateUser = useUpdateTripUser(trip._id, user?._id);
-    const colors = useColors();
 
     const { control, handleSubmit } = useForm({
         values: {
@@ -33,14 +30,9 @@ export default function UsernameSetting() {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
-            <Animated.ScrollView contentContainerStyle={{ padding: 16 }}>
-                <Animated.View entering={FadeIn} className="mb-6">
-                    <Text className="text-3xl font-bold dark:text-white" style={{ color: colors.text }}>
-                        Modifier votre nom
-                    </Text>
-                </Animated.View>
-                <Animated.View entering={FadeIn.delay(100)} className="mb-8">
+        <View className="flex-1 bg-mist dark:bg-ink">
+            <Animated.ScrollView contentContainerClassName="px-4 py-5 gap-8">
+                <Animated.View entering={FadeIn}>
                     <FormText
                         control={control}
                         name="name"
@@ -49,7 +41,7 @@ export default function UsernameSetting() {
                     />
                 </Animated.View>
 
-                <Animated.View entering={FadeIn.delay(200)}>
+                <Animated.View entering={FadeIn.delay(100)}>
                     <Button
                         isLoading={updateUser.isPending}
                         onPress={handleSubmit(onSubmit)}
@@ -58,6 +50,6 @@ export default function UsernameSetting() {
                     />
                 </Animated.View>
             </Animated.ScrollView>
-        </SafeAreaView>
+        </View>
     );
 }

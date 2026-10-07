@@ -30,7 +30,7 @@ export const OtherPollOptionsForm = ({ control }: { control: any }) => {
                     entering={SlideInUp}
                     exiting={SlideOutDown}
                     key={option.key}
-                    className="flex-row items-center bg-gray-50 dark:bg-gray-700 rounded-lg p-3"
+                    className="flex-row items-center bg-mist dark:bg-ink rounded-lg p-3"
                 >
                     <View className="flex-1">
                         <FormText
@@ -42,19 +42,19 @@ export const OtherPollOptionsForm = ({ control }: { control: any }) => {
                     </View>
                     <Pressable
                         onPress={() => remove(index)}
-                        className="p-2 rounded-full hover:bg-red-50"
+                        className="p-2 rounded-full active:bg-danger/10"
                     >
-                        <IconSymbol name="trash" color="#ef4444" size={20} />
+                        <IconSymbol name="trash" color="#E5484D" size={20} />
                     </Pressable>
                 </Animated.View>
             ))}
 
             <Button
                 onPress={() => append({ value: "" })}
-                className="mt-3 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg justify-start"
+                className="mt-3 p-3 bg-white dark:bg-night border border-mist dark:border-white/10 rounded-lg justify-start"
             >
-                <IconSymbol name="plus.circle.fill" color="#3b82f6" size={20} />
-                <Text className="text-blue-600 dark:text-blue-400 font-medium ml-2">
+                <IconSymbol name="plus.circle.fill" color="#EE8B33" size={20} />
+                <Text className="text-amber-deep dark:text-amber font-medium ml-2">
                     Ajouter une option
                 </Text>
             </Button>

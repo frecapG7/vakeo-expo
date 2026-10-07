@@ -36,8 +36,8 @@ export const isValidUrl = (url: string): boolean => {
 //     return dates;
 // }
 
-export const containsUser = (user: TripUser, array?: TripUser[]): boolean => {
-    return array?.map(u => u._id).includes(String(user._id)) || false;
+export const containsUser = (user?: TripUser, array?: TripUser[]): boolean => {
+    return !!user && (array?.map(u => u._id).includes(String(user._id)) || false);
 }
 
 export const countDaysBetween = (startDate: dayjs.Dayjs, endDate: dayjs.Dayjs, inclusive: boolean = true) => {

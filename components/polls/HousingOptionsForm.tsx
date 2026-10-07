@@ -39,7 +39,7 @@ export const HousingOptionItem = ({
         <Animated.View
             entering={FadeIn}
             exiting={SlideOutDown}
-            className="bg-gray-50 dark:bg-gray-700 rounded-b-lg rounded-t-xl gap-1 pb-2 overflow-hidden"
+            className="bg-mist dark:bg-ink rounded-b-lg rounded-t-xl gap-1 pb-2 overflow-hidden"
         >
 
             {option?.image && (
@@ -60,9 +60,9 @@ export const HousingOptionItem = ({
                             <View className="flex-1 justify-between">
                                 <Pressable
                                     onPress={onRemove}
-                                    className="p-2 bg-white/80  w-11 rounded-full items-center shadow-md border border-gray-300"
+                                    className="p-2 bg-white/80 w-11 rounded-full items-center shadow-md border border-mist"
                                 >
-                                    <IconSymbol name="trash" color="red" size={20} />
+                                    <IconSymbol name="trash" color="#E5484D" size={20} />
                                 </Pressable>
                                 {option.icon && (
                                     <View>
@@ -84,7 +84,7 @@ export const HousingOptionItem = ({
 
             {option?.title ? (
                 <View className="mx-1 px-3 pb-2">
-                    <Text className="font-bold text-lg dark:text-white">
+                    <Text className="font-bold text-lg text-night dark:text-white">
                         {option.title}
                     </Text>
                 </View>
@@ -112,7 +112,7 @@ export const HousingOptionsForm = ({ control }: { control: any }) => {
         name: "options",
     })
 
-  const handleLinkClick = async (url) => {
+  const handleLinkClick = async (url: string) => {
         try {
             await Linking.openURL(url);
         } catch (err) {
@@ -160,10 +160,10 @@ export const HousingOptionsForm = ({ control }: { control: any }) => {
 
             <Button
                 onPress={() => append({ url: "", title: "", image: "", icon: "" })}
-                className="mt-3 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg justify-start"
+                className="mt-3 p-3 bg-white dark:bg-night border border-mist dark:border-white/10 rounded-lg justify-start"
             >
-                <IconSymbol name="plus.circle.fill" color="#3b82f6" size={20} />
-                <Text className="text-blue-600 dark:text-blue-400 font-medium ml-2">
+                <IconSymbol name="plus.circle.fill" color="#EE8B33" size={20} />
+                <Text className="text-amber-deep dark:text-amber font-medium ml-2">
                     Ajouter une option
                 </Text>
             </Button>

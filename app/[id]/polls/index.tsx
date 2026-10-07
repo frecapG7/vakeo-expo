@@ -34,7 +34,7 @@ export default function PollsPage() {
 
 
     return (
-        <View style={styles.container}>
+        <View style={styles.container} className="flex-1 bg-mist dark:bg-ink">
             <Animated.FlatList
                 data={page?.polls || []}
                 className="my-2"
@@ -62,17 +62,17 @@ export default function PollsPage() {
                                 pollId: item._id
                             }
                         })}
-                        className="rounded-2xl bg-white dark:bg-gray-800 shadow-md p-4 gap-4 border border-gray-100 dark:border-gray-700 active:opacity-55">
+                        className="rounded-2xl bg-white dark:bg-night shadow-md p-4 gap-4 border border-mist dark:border-white/10 active:opacity-55">
                         <View className="">
                             <View className="flex-row items-center justify-between gap-1">
                                 <View className="flex-row items-center gap-2">
                                     <Avatar
                                         size2="sm"
-                                        src={item?.createdBy.avatar}
-                                        alt={item.createdBy.name.charAt(0)}
+                                        src={item?.createdBy?.avatar}
+                                        alt={item?.createdBy?.name?.charAt(0)}
                                     />
-                                    <Text className="text-base dark:text-white font-bold">
-                                        {item.createdBy.name}
+                                    <Text className="text-base text-night dark:text-white font-bold">
+                                        {item?.createdBy?.name}
                                     </Text>
                                 </View>
                                 <View>
@@ -95,7 +95,7 @@ export default function PollsPage() {
                                     />
                                 </View>
                             </View>
-                            <Text className="text-2xl font-bold dark:text-white">{item?.question}</Text>
+                            <Text className="text-2xl font-bold text-night dark:text-white">{item?.question}</Text>
 
                         </View>
 
@@ -114,23 +114,23 @@ export default function PollsPage() {
                                 }
 
                                 {!item.isAnonymous && item.hasSelected.length > 0 &&
-                                    <Text className="font-bold text-gray-400">
+                                    <Text className="font-bold text-night/50 dark:text-white/50">
                                         •
                                     </Text>
                                 }
-                                <Text className="text-gray-400">
+                                <Text className="text-night/50 dark:text-white/50">
                                     {item?.hasSelected?.length ?? 0} votes
                                 </Text>
 
                             </View>
                             <View className="flex-row gap-1 items-center">
-                                <Text className="font-bold text-gray-600 dark:text-gray-400 capitalize text-sm">
+                                <Text className="font-bold text-night/70 dark:text-white/70 capitalize text-sm">
                                     {translateType(item.type)}
                                 </Text>
-                                <Text className="text-gray-400">
+                                <Text className="text-night/50 dark:text-white/50">
                                     •
                                 </Text>
-                                <Text className="font-bold text-gray-600 dark:text-gray-400 text-xs">
+                                <Text className="font-bold text-night/70 dark:text-white/70 text-xs">
                                     {formatDuration(item?.createdAt)}
                                 </Text>
 
@@ -147,7 +147,7 @@ export default function PollsPage() {
                     isLoading ? (
                         // Skeleton loaders matching poll card structure
                         <View className="gap-3 px-1">
-                            <View className="rounded-2xl bg-white dark:bg-gray-800 shadow-md p-4 gap-4 border border-gray-100 dark:border-gray-700">
+                            <View className="rounded-2xl bg-white dark:bg-night shadow-md p-4 gap-4 border border-mist dark:border-white/10">
                                 <View className="flex-row items-center justify-between gap-1">
                                     <View className="flex-row items-center gap-2">
                                         <Skeleton variant="circular" height={32} />
@@ -173,26 +173,26 @@ export default function PollsPage() {
                     ) : allAnswered ? (
                         // All polls answered state
                         <View className="flex-1 items-center justify-center gap-6 py-20 px-4">
-                            <View className="p-7 rounded-3xl bg-green-50 dark:bg-green-900 shadow-lg">
-                                <IconSymbol name="checkmark.circle.fill" size={64} color="#22C55E" />
+                            <View className="p-7 rounded-3xl bg-amber/15 dark:bg-amber/20 shadow-lg">
+                                <IconSymbol name="checkmark.circle.fill" size={64} color="#EE8B33" />
                             </View>
-                            <Text className="text-3xl font-bold dark:text-white">
+                            <Text className="text-3xl font-bold text-night dark:text-white">
                                 Tout est à jour
                             </Text>
-                            <Text className="text-gray-400 dark:text-gray-500 text-center max-w-sm">
+                            <Text className="text-night/50 dark:text-white/50 text-center max-w-sm">
                                 Vous avez répondu à tous les sondages de ce voyage
                             </Text>
                         </View>
                     ) : (
                         // Empty state for polls
                         <View className="flex-1 items-center justify-center gap-6 py-20 px-4">
-                            <View className="p-7 rounded-3xl bg-gray-50 dark:bg-gray-800 shadow-lg">
-                                <IconSymbol name="chart.bar.fill" size={64} color="gray" />
+                            <View className="p-7 rounded-3xl bg-amber/15 dark:bg-amber/20 shadow-lg">
+                                <IconSymbol name="chart.bar.fill" size={64} color="#EE8B33" />
                             </View>
-                            <Text className="text-3xl font-bold dark:text-white">
+                            <Text className="text-3xl font-bold text-night dark:text-white">
                                 Aucun sondage
                             </Text>
-                            <Text className="text-gray-400 dark:text-gray-500 text-center max-w-sm">
+                            <Text className="text-night/50 dark:text-white/50 text-center max-w-sm">
                                 Créez votre premier sondage pour ce voyage
                             </Text>
                         </View>

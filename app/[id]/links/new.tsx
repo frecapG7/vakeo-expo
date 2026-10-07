@@ -1,6 +1,5 @@
 import LinkForm from "@/components/links/LinkForm";
 import { Button } from "@/components/ui/Button";
-import styles from "@/constants/Styles";
 import { useTrip } from "@/context/TripContext";
 import { usePostLink } from "@/hooks/api/useLinks";
 import { Link } from "@/types/models";
@@ -13,14 +12,12 @@ import { View } from "react-native";
 
 export default function NewLink() {
 
-
-    const {trip, me} = useTrip();
+    const { trip } = useTrip();
     const { control, handleSubmit } = useForm<Omit<Link, '_id'>>();
-
 
     const router = useRouter();
 
-    const postLink = usePostLink(trip?._id, me?._id);
+    const postLink = usePostLink(trip?._id);
 
     const onSubmit = async (data: Omit<Link, '_id'>) => {
         await postLink.mutateAsync(data);
@@ -33,7 +30,7 @@ export default function NewLink() {
     };
 
     return (
-        <View style={styles.container}>
+        <View className="flex-1 bg-mist dark:bg-ink">
             <View className="m-4">
                 <LinkForm control={control} />
                 <View className="mt-6">

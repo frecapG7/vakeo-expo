@@ -1,11 +1,10 @@
 import styles from "@/constants/Styles";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
-import useColors from "@/hooks/styles/useColors";
-import { getDatesBetween } from "@/lib/utils";
+
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { useFieldArray, useFormState, useWatch } from "react-hook-form";
-import { Modal, Pressable, Text, View } from "react-native";
+import { Modal, Pressable, Text, useColorScheme, View } from "react-native";
 import Animated, { SlideInUp, SlideOutDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "../ui/Button";
@@ -25,6 +24,7 @@ export const DateOptionItem = ({
 }) => {
     const option = useWatch({ control, name: `options[${index}]` });
     const { formatRange } = useI18nTime();
+    const isDark = useColorScheme() === "dark";
 
     const hasDates = option.startDate && option.endDate;
 
@@ -33,7 +33,7 @@ export const DateOptionItem = ({
             entering={SlideInUp}
             exiting={SlideOutDown}
             key={option.id}
-            className="flex-row items-center bg-gray-50 dark:bg-gray-700 rounded-lg p-3 gap-2"
+            className="flex-row items-center bg-mist dark:bg-ink rounded-lg p-3 gap-2"
         >
             <Pressable
                 onPress={() => onDateSelect(index)}
@@ -41,15 +41,15 @@ export const DateOptionItem = ({
             >
                 {hasDates ? (
                     <View className="flex-row items-center gap-2">
-                        <IconSymbol name="calendar" color="#3b82f6" size={18} />
-                        <Text className="text-sm dark:text-white capitalize">
+                        <IconSymbol name="calendar" color="#EE8B33" size={18} />
+                        <Text className="text-sm text-night dark:text-white capitalize">
                             {formatRange(dayjs(option.startDate), dayjs(option.endDate))}
                         </Text>
                     </View>
                 ) : (
                     <View className="flex-row items-center gap-2">
-                        <IconSymbol name="calendar" color="gray" size={18} />
-                        <Text className="text-sm text-gray-500 dark:text-gray-400">
+                        <IconSymbol name="calendar" color={isDark ? "#F6F8FD" : "#16265C"} size={18} />
+                        <Text className="text-sm text-night/50 dark:text-white/50">
                             Sélectionner des dates
                         </Text>
                     </View>
@@ -58,9 +58,9 @@ export const DateOptionItem = ({
             {hasDates && (
                 <Pressable
                     onPress={onRemove}
-                    className="p-2 rounded-full hover:bg-red-50"
+                    className="p-2 rounded-full active:bg-danger/10"
                 >
-                    <IconSymbol name="trash" color="#ef4444" size={20} />
+                    <IconSymbol name="trash" color="#E5484D" size={20} />
                 </Pressable>
             )}
         </Animated.View>
@@ -72,10 +72,9 @@ export const DatesPollOptionsForm = ({ control }: { control: any }) => {
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
 
-    const colors = useColors();
-    const { formatRange } = useI18nTime();
+    const isDark = useColorScheme() === "dark";
 
-    const { fields: options, append, remove, update } = useFieldArray<{ startDate?: string; endDate?: string }>({
+    const { fields: options, append, remove, update } = useFieldArray<{ options: { startDate?: string; endDate?: string }[] }>({
         control,
         name: "options",
         rules: {
@@ -116,37 +115,6 @@ export const DatesPollOptionsForm = ({ control }: { control: any }) => {
         setCalendarIndex(null);
     };
 
-    const markedDates = {
-        ...(startDate && {
-            [startDate]: {
-                startingDay: true,
-                color: colors.calendarPrimary,
-                textColor: colors.neutral,
-                selected: true,
-                disableTouchEvent: true
-            }
-        }),
-        ...(endDate && {
-            [endDate]: {
-                endingDay: true,
-                color: colors.calendarPrimary,
-                textColor: colors.neutral,
-                selected: true,
-                disableTouchEvent: true
-            }
-        }),
-        ...(getDatesBetween(dayjs(startDate), dayjs(endDate))
-            .reduce((acc: Record<string, any>, date) => {
-                acc[date] = {
-                    color: colors.neutral,
-                    textColor: colors.text,
-                    selected: true,
-                    disableTouchEvent: true
-                };
-                return acc;
-            }, {} as Record<string, any>))
-    };
-
     return (
         <View className="gap-3">
             {options.map((option, index) => (
@@ -159,16 +127,16 @@ export const DatesPollOptionsForm = ({ control }: { control: any }) => {
                 />
             ))}
             {formState.errors.options?.root && (
-                <Text className="text-red-500 text-sm ml-2 mt-1">
+                <Text className="text-danger text-sm ml-2 mt-1">
                     Toutes les options doivent avoir une date de début et une date de fin
                 </Text>
             )}
             <Button
                 onPress={() => append({ startDate: "", endDate: "" })}
-                className="mt-3 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg justify-start"
+                className="mt-3 p-3 bg-white dark:bg-night border border-mist dark:border-white/10 rounded-lg justify-start"
             >
-                <IconSymbol name="plus.circle.fill" color="#3b82f6" size={20} />
-                <Text className="text-blue-600 dark:text-blue-400 font-medium ml-2">
+                <IconSymbol name="plus.circle.fill" color="#EE8B33" size={20} />
+                <Text className="text-amber-deep dark:text-amber font-medium ml-2">
                     Ajouter une option
                 </Text>
             </Button>
@@ -183,15 +151,15 @@ export const DatesPollOptionsForm = ({ control }: { control: any }) => {
                 <SafeAreaView style={{
                     ...styles.container,
                     padding: 10,
-                    backgroundColor: colors.background
+                    backgroundColor: isDark ? "#101736" : "#F6F8FD"
                 }}>
                     <View className="flex-row justify-between items-center mb-5">
                         <Pressable onPress={() => setCalendarIndex(null)}>
-                            <Text className="dark:text-white text-xl">Annuler</Text>
+                            <Text className="text-night dark:text-white text-xl">Annuler</Text>
                         </Pressable>
                     </View>
 
-                    <Text className="mb-4 dark:text-white">
+                    <Text className="mb-4 text-night dark:text-white">
                         Sélectionne une date de début et de fin
                     </Text>
 
