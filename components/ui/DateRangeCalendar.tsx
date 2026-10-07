@@ -22,6 +22,7 @@ export const DateRangeCalendar = ({
     const text = isDark ? "#F6F8FD" : "#16265C";
     const surface = isDark ? "#101736" : "#F6F8FD";
     const muted = isDark ? "rgba(246,248,253,0.35)" : "rgba(22,38,92,0.35)";
+    const ink = "#101736";
 
     const handleDateSelection = (dateString: string) => {
         if (disabled) return;
@@ -47,7 +48,7 @@ export const DateRangeCalendar = ({
             [start]: {
                 startingDay: true,
                 color: "#EE8B33",
-                textColor: "#F6F8FD",
+                textColor: ink,
                 selected: true,
                 disableTouchEvent: true
             }
@@ -56,7 +57,7 @@ export const DateRangeCalendar = ({
             [end]: {
                 endingDay: true,
                 color: "#EE8B33",
-                textColor: "#F6F8FD",
+                textColor: ink,
                 selected: true,
                 disableTouchEvent: true
             }
@@ -66,7 +67,7 @@ export const DateRangeCalendar = ({
                 startingDay: true,
                 endingDay: true,
                 color: "#EE8B33",
-                textColor: "#F6F8FD",
+                textColor: ink,
                 selected: true,
                 disableTouchEvent: true
             }
@@ -88,7 +89,7 @@ export const DateRangeCalendar = ({
                 dayTextColor: text,
                 textSectionTitleDisabledColor: muted,
                 selectedDayBackgroundColor: "#EE8B33",
-                selectedDayTextColor: "#F6F8FD",
+                selectedDayTextColor: ink,
                 todayTextColor: "#EE8B33",
                 textDisabledColor: muted,
                 dotColor: "#EE8B33",

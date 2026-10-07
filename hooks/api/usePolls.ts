@@ -41,8 +41,12 @@ export const usePostPoll = (tripId: any) => {
     const queryClient = useQueryClient();
     return useMutation<Poll, Error, PollInput>({
         mutationFn: (data) => postPoll(tripId, data),
-        onSuccess: (data: Poll) => queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
-            .then(() => queryClient.setQueryData(["trips", tripId, "polls", data._id], data))
+        onSuccess: async (data: Poll) => {
+            queryClient.setQueryData(["trips", tripId, "polls", data._id], data);
+            await queryClient.invalidateQueries({
+                queryKey: ["trips", tripId]
+            });
+        }
     })
 }
 
@@ -123,10 +127,14 @@ export const useVotePoll = (tripId: string, pollId: string) => {
     return useMutation<any, Error, any>({
         mutationFn: (data) => votePoll(tripId, pollId, data),
         onSuccess: async (data) => {
+            queryClient.setQueryData(["trips", tripId, "polls", pollId], data)
             await queryClient.invalidateQueries({
                 queryKey: ["trips", tripId, "polls"]
             });
-            queryClient.setQueryData(["trips", tripId, "polls", pollId], data)
+            // Stops : la liste embarque des polls (hasSelected) — rafraîchir le badge de la page étapes.
+            await queryClient.invalidateQueries({
+                queryKey: ["trips", tripId, "stops"]
+            });
         }
     });
 }
@@ -142,10 +150,14 @@ export const useUnvotePoll = (tripId: string, pollId: string) => {
     return useMutation<Poll, Error, any>({
         mutationFn: ({ option }) => unvotePoll(tripId, pollId, option),
         onSuccess: async (data) => {
+            queryClient.setQueryData(["trips", tripId, "polls", pollId], data)
             await queryClient.invalidateQueries({
                 queryKey: ["trips", tripId, "polls"]
             });
-            queryClient.setQueryData(["trips", tripId, "polls", pollId], data)
+            // Stops : la liste embarque des polls (hasSelected) — rafraîchir le badge de la page étapes.
+            await queryClient.invalidateQueries({
+                queryKey: ["trips", tripId, "stops"]
+            });
         }
     });
 }

@@ -3,7 +3,7 @@ import { useTrip } from "@/context/TripContext";
 import { Trip, TripStop } from "@/types/models";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
+import { useCallback, useRef, useState, type RefObject } from "react";
 import { useForm } from "react-hook-form";
 import { Pressable, Text, useColorScheme, View, type ViewProps } from "react-native";
 import Animated, { SlideInRight, SlideOutLeft } from "react-native-reanimated";
@@ -20,7 +20,6 @@ import { BottomLocationForm } from "./BottomLocationForm";
 
 
 interface AccommodationWizardProps {
-    visible: boolean;
     onClose: () => void;
     trip: Trip;
     tripStop?: TripStop;
@@ -35,7 +34,6 @@ interface AccommodationWizardProps {
 
 
 export const TripStopDetailsEditor = ({
-    visible,
     onClose,
     trip,
     tripStop,
@@ -57,22 +55,16 @@ export const TripStopDetailsEditor = ({
         [blurTarget]
     );
 
-    useEffect(() => {
-        if (visible)
-            bottomSheetRef?.current?.snapToIndex(0);
-        else
-            bottomSheetRef.current?.close();
-    }, [visible]);
 
 
 
-    const { control, handleSubmit, reset, formState: { isDirty } } = useForm<TripStop>();
+    const { control, handleSubmit, formState: { isDirty } } = useForm<TripStop>({ defaultValues: tripStop || { name: "" } });
+    // Soumission puis fermeture animée : le onClose du sheet (post-animation) remonte au parent.
+    const submitAndClose = async (data: TripStop) => {
+        await onSubmit(data);
+        bottomSheetRef.current?.close();
+    };
 
-    useEffect(() => {
-        if (visible) {
-            reset(tripStop || { name: "" });
-        }
-    }, [tripStop, reset, visible]);
 
 
     return (
@@ -81,7 +73,7 @@ export const TripStopDetailsEditor = ({
             ref={bottomSheetRef}
             backgroundComponent={SheetBackground}
             backgroundStyle={styles.bottomSheet}
-            index={-1}
+            index={0}
             enablePanDownToClose={true}
             enableOverDrag={false}
             keyboardBehavior="interactive"
@@ -96,7 +88,7 @@ export const TripStopDetailsEditor = ({
                         {isEdit ? `Étape ${tripStop?.name}` : "Nouvelle étape"}
                     </Text>
                     <Button
-                        onPress={onClose}
+                        onPress={() => bottomSheetRef.current?.close()}
                         className="flex-row items-center">
                         <IconSymbol name="xmark.circle" color={isDark ? "#F6F8FD" : "#16265C"} size={24} />
                     </Button>
@@ -149,7 +141,7 @@ export const TripStopDetailsEditor = ({
                                     <PollStatus poll={tripStop?.polls?.filter(p => !p.isClosed && p.type === "OtherPoll")?.[0]}
                                         selectedUser={me}
                                         onNewClick={() => {
-                                            onClose();
+                                            bottomSheetRef.current?.close();
                                             router.push({
                                                 pathname: "/[id]/polls/new",
                                                 params: {
@@ -161,7 +153,7 @@ export const TripStopDetailsEditor = ({
                                             )
                                         }}
                                         onPollClick={(pollId) => {
-                                            onClose();
+                                            bottomSheetRef.current?.close();
                                             router.push({
                                                 pathname: "/[id]/polls/[pollId]",
                                                 params: {
@@ -187,7 +179,7 @@ export const TripStopDetailsEditor = ({
                                     <PollStatus poll={tripStop?.polls?.filter(p => !p.isClosed && p.type === "HousingPoll")?.[0]}
                                         selectedUser={me}
                                         onNewClick={() => {
-                                            onClose();
+                                            bottomSheetRef.current?.close();
                                             router.push({
                                                 pathname: "/[id]/polls/new",
                                                 params: {
@@ -198,7 +190,7 @@ export const TripStopDetailsEditor = ({
                                             })
                                         }}
                                         onPollClick={(pollId) => {
-                                            onClose();
+                                            bottomSheetRef.current?.close();
                                             router.push({
                                                 pathname: "/[id]/polls/[pollId]",
                                                 params: {
@@ -220,7 +212,7 @@ export const TripStopDetailsEditor = ({
                 <View className="mx-10">
                     <Button variant="contained"
                         title={isEdit ? "Modifier" : "Ajouter l'étape"}
-                        onPress={handleSubmit(onSubmit)}
+                        onPress={() => handleSubmit(submitAndClose)()}
                         isLoading={isSubmitting}
                         disabled={!isDirty}
                     />

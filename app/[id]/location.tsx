@@ -297,9 +297,8 @@ export default function TripLocation() {
                     accessibilityLabel="Ajouter une étape" />
             }
 
-            {trip &&
+            {stopEditorOpen && trip &&
                 <TripStopDetailsEditor
-                    visible={stopEditorOpen}
                     onClose={() => {
                         setSelectedTripStop(undefined);
                         setStopEditorOpen(false)
@@ -312,8 +311,6 @@ export default function TripLocation() {
                             await putTripStop.mutateAsync(data);
                         else
                             await postTripStop.mutateAsync(data);
-                        setSelectedTripStop(undefined);
-                        setStopEditorOpen(false);
                     }}
                     isSubmitting={putTripStop.isPending || postTripStop.isPending}
                 />

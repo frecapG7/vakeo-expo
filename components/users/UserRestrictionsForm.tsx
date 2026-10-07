@@ -27,6 +27,8 @@ const RestrictionTile = ({ control, name }: { control: any, name: string }) => {
 
     return (
         <Pressable
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: active }}
             onPress={handleToggle}
             className="w-[31%] active:opacity-80"
         >

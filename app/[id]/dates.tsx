@@ -24,6 +24,7 @@ export default function DatesPage() {
     const isDark = useColorScheme() === "dark";
     const textColor = isDark ? "#F6F8FD" : "#16265C";
     const muted = isDark ? "rgba(246,248,253,0.35)" : "rgba(22,38,92,0.35)";
+    const ink = "#101736";
 
     const { id } = useLocalSearchParams();
     const updateTrip = useUpdateTrip(id);
@@ -154,7 +155,7 @@ export default function DatesPage() {
                             dayTextColor: textColor,
                             textSectionTitleDisabledColor: muted,
                             selectedDayBackgroundColor: "#EE8B33",
-                            selectedDayTextColor: "#F6F8FD",
+                            selectedDayTextColor: ink,
                             todayTextColor: "#EE8B33",
                             textDisabledColor: muted,
                             dotColor: "#EE8B33",
@@ -178,7 +179,7 @@ export default function DatesPage() {
                                             startingDay: date === startDate,
                                             endingDay: date === endDate,
                                             color: date === startDate || date === endDate ? "#EE8B33" : "rgba(247,183,74,0.35)",
-                                            textColor: date === startDate || date === endDate ? "#F6F8FD" : textColor,
+                                            textColor: date === startDate || date === endDate ? ink : textColor,
                                             selected: true,
                                             disableTouchEvent: true
                                         }

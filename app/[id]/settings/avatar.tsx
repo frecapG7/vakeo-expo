@@ -112,6 +112,8 @@ export default function AvatarSetting() {
                                     const isSelected = selectedAvatar === item.uri;
                                     const isDisabled = disabledAvatars?.includes(item.uri);
                                     const userName = getUserNameForAvatar(item.uri);
+                                    const ownerSuffix = userName === "Moi" ? ", mon avatar actuel" : userName ? `, déjà pris par ${userName}` : "";
+                                    const tileLabel = `Avatar ${category === "perso" ? "personnage" : "animal"} ${index + 1}${ownerSuffix}`;
 
                                     return (
                                         <Animated.View
@@ -121,6 +123,10 @@ export default function AvatarSetting() {
                                             className="w-[31%]"
                                         >
                                             <Pressable
+                                                accessibilityRole="button"
+                                                accessibilityLabel={tileLabel}
+                                                accessibilityHint="Sélectionne cet avatar"
+                                                accessibilityState={{ selected: isSelected, disabled: isDisabled }}
                                                 disabled={isDisabled}
                                                 onPress={() => handleSelect(item.uri)}
                                                 className={isDisabled ? "opacity-40" : "active:opacity-80"}
