@@ -74,10 +74,11 @@ export const FormLink = ({
     }, [error]);
 
     const handlePaste = async () => {
-        const text = await Clipboard.getStringAsync();
+        const text = (await Clipboard.getStringAsync()).trim();
 
-        // Try direct match first
-        if (isValidHttpUrl(text)) {
+        // Lien exact : http(s), ou scheme custom validé par le pattern du caller
+        // (ex. deep-link vakeoexpo://token/... du join, jamais matché par isValidHttpUrl).
+        if (isValidHttpUrl(text) || pattern.test(text)) {
             onChange(text);
             await onPaste?.(text);
             Toast.info("Lien collé !");
@@ -93,7 +94,7 @@ export const FormLink = ({
             // Clean trailing punctuation: "https://toto.com." -> "https://toto.com"
             const cleanUrl = extractedUrl.replace(/[.,!?;:)]+$/, '');
 
-            if (isValidHttpUrl(cleanUrl)) {
+            if (isValidHttpUrl(cleanUrl) || pattern.test(cleanUrl)) {
                 onChange(cleanUrl);
                 await onPaste?.(cleanUrl);
                 Toast.info("Lien extrait et collé !");

@@ -174,10 +174,10 @@ export default function HomePage() {
               <IconSymbol name="link" size={44} color="#EE8B33" />
               <View className="flex-1">
                 <Text className="text-h1 text-night dark:text-white">
-                  Rejoins un voyage existant
+                  Rejois un voyage existant
                 </Text>
                 <Text className="text-sm text-night/70 dark:text-white/60">
-                  Utilise un lien d’invitation pour rejoindre tes amis
+                  Utilise un lien d&apos;invitation pour rejoindre tes amis
                 </Text>
               </View>
             </Button>

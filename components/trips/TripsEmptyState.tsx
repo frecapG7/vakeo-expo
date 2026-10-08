@@ -1,8 +1,10 @@
+import { Wordmark } from "@/components/brand/Wordmark";
 import { Button } from "@/components/ui/Button";
 import { GlassSurface } from "@/components/ui/GlassSurface";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Text, View } from "react-native";
+import Animated, { FadeIn, ZoomIn } from "react-native-reanimated";
 
 type TripsEmptyStateProps = {
     isLoading: boolean;
@@ -16,6 +18,9 @@ type TripsEmptyStateProps = {
  * État vide de l’accueil « Mes projets » : skeletons en chargement,
  * carte de verre avec CTA (créer / rejoindre) si aucun voyage, retry si erreur.
  * Le fond brume / encre nuit est porté par ce composant (la page reste sur le fond système).
+ *
+ * Empty : le wordmark All In est le héros de la carte (le logo EST le wordmark —
+ * pas d'icône v5b en doublon). C'est la première impression d'un nouvel utilisateur.
  */
 export const TripsEmptyState = ({ isLoading, isError, onRetry, onCreate, onJoin }: TripsEmptyStateProps) => {
 
@@ -34,7 +39,7 @@ export const TripsEmptyState = ({ isLoading, isError, onRetry, onCreate, onJoin 
             <View className="items-center gap-2">
                 <IconSymbol name="exclamationmark.triangle" size={40} color="#EE8B33" />
                 <Text className="text-h1 text-center text-night dark:text-white">Impossible de charger tes voyages</Text>
-                <Text className="text-sm text-center text-gray-500 dark:text-gray-400">
+                <Text className="text-sm text-center text-night/50 dark:text-white/50">
                     Vérifie ta connexion, puis réessaie.
                 </Text>
                 <Button
@@ -47,11 +52,12 @@ export const TripsEmptyState = ({ isLoading, isError, onRetry, onCreate, onJoin 
     else
         content = (
             <GlassSurface style={{ borderRadius: 24 }}>
-                <View className="items-center gap-3 p-6">
-                    <IconSymbol name="map" size={40} color="#EE8B33" />
-                    <Text className="text-h1 text-center text-night dark:text-white">Aucun voyage pour l’instant</Text>
-                    <Text className="text-sm text-center text-gray-500 dark:text-gray-400">
-                        Crée ton premier projet de voyage ou rejoins tes amis via un lien d’invitation.
+                <Animated.View entering={FadeIn} className="items-center gap-3 p-6">
+                    <Animated.View entering={ZoomIn.duration(250)}>
+                        <Wordmark size={40} />
+                    </Animated.View>
+                    <Text className="text-sm text-center text-night/50 dark:text-white/50">
+                        Prépare ton premier voyage entre amis.
                     </Text>
                     <View className="gap-3 w-full pt-2">
                         <Button
@@ -67,7 +73,7 @@ export const TripsEmptyState = ({ isLoading, isError, onRetry, onCreate, onJoin 
                             <Text className="text-base font-bold text-night dark:text-white">Rejoindre un voyage</Text>
                         </Button>
                     </View>
-                </View>
+                </Animated.View>
             </GlassSurface>
         );
 

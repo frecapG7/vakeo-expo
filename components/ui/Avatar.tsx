@@ -57,7 +57,7 @@ export const Avatar = ({ name, size = 24, size2 = "sm", color, alt, src, badgeCo
     if (!src)
         return (
             <View className={`relative justify-center items-center rounded-full ${sizeClass} border dark:border-white bg-amber dark:bg-night`}>
-                <Text className={`font-bold uppercase ${textClass}`}>
+                <Text className={`font-bold uppercase text-night dark:text-white ${textClass}`}>
                     {alt}
                 </Text>
                 {!!badgeContent && (

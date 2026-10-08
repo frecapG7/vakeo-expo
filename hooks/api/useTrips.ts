@@ -124,11 +124,34 @@ export const useShareTrip = (id: string) => {
   return useQuery<ShareTripResponse>({ 
     queryKey: ["trips", id, "share"],
     queryFn: () => shareTrip(id),
-    enabled: !!id
+    enabled: !!id,
+    // Q4 (idempotence backend non confirmée) : un seul POST par session et par trip.
+    // Chaque montage mintait un token neuf (le lien déjà partagé changeait sous les
+    // pieds de l'utilisateur) ; l'invalidation globale des mutations storage ne
+    // re-déclenche plus le POST non plus. NB : un restart remint quand même —
+    // la vraie fix (cacher le token) est côté serveur.
+    staleTime: Infinity,
+    gcTime: Infinity,
+    refetchOnMount: false
   });
 }
 
 
+
+// --- Leave v3 (anticipé depuis le flow join « changement de siège » ; UI dédiée en Phase 6) ---
+// POST /v3/trips/:tripId/leave : libère le siège et invalide le token (204).
+// Le token part via l'interceptor (lu dans MMKV au moment de la requête). Le
+// caller gère le stockage : le join qui suit un changement de siège doit repartir
+// anonyme (purger trips.<id> entre les deux appels).
+const leaveTrip = async (tripId: string): Promise<void> => {
+    await axios.post(v3Path(`/trips/${tripId}/leave`));
+}
+
+export const useLeaveTrip = (tripId: string) => {
+    return useMutation<void, Error, void>({
+        mutationFn: () => leaveTrip(tripId)
+    });
+}
 
 const getDashboard = async (tripId: string): Promise<Dashboard> => {
   const response = await axios.get(v3Path(`/trips/${tripId}/dashboard`));
