@@ -8,14 +8,18 @@ const { withGradleProperties } = require('@expo/config-plugins');
 // Le template Expo pose jvmargs 2g - remplace, pas duplique.
 const withGradleBuildTuning = (config) =>
   withGradleProperties(config, (props) => {
-    const jvmArgs = props.find((item) => item.key === 'org.gradle.jvmargs');
+    // L'action d'un mod recoit le config : le tableau des proprietes est
+    // modResults, items discrimines par type ("property").
+    const jvmArgs = props.modResults.find(
+      (item) => item.type === 'property' && item.key === 'org.gradle.jvmargs'
+    );
     if (jvmArgs) {
       jvmArgs.value = '-Xmx3g -XX:MaxMetaspaceSize=512m';
     } else {
-      props.push({ key: 'org.gradle.jvmargs', value: '-Xmx3g -XX:MaxMetaspaceSize=512m' });
+      props.modResults.push({ type: 'property', key: 'org.gradle.jvmargs', value: '-Xmx3g -XX:MaxMetaspaceSize=512m' });
     }
-    if (!props.some((item) => item.key === 'org.gradle.caching')) {
-      props.push({ key: 'org.gradle.caching', value: 'true' });
+    if (!props.modResults.some((item) => item.type === 'property' && item.key === 'org.gradle.caching')) {
+      props.modResults.push({ type: 'property', key: 'org.gradle.caching', value: 'true' });
     }
     return props;
   });
