@@ -1,8 +1,5 @@
 import { Avatar } from "@/components/ui/Avatar";
-import { Button } from "@/components/ui/Button";
-import { GlassSurface } from "@/components/ui/GlassSurface";
-import { IconSymbol } from "@/components/ui/IconSymbol";
-import { Skeleton } from "@/components/ui/Skeleton";
+import { ConversationsEmptyState } from "@/components/conversations/ConversationsEmptyState";
 import { useTrip } from "@/context/TripContext";
 import { useGetConversations, useMarkAllAsRead } from "@/hooks/api/useMessages";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
@@ -108,46 +105,15 @@ export default function TripConversations() {
             </View>}
             refreshing={isRefetching}
             onRefresh={refetch}
-            ListEmptyComponent={() => isFetching ?
-                <View className="gap-4">
-                    <View className="flex-row gap-2">
-                        <Skeleton variant="circular" height={40} />
-                        <View className="flex-1 px-5 gap-2">
-                            <Skeleton height={12} />
-                            <Skeleton height={12} width="66%" />
-                        </View>
-                    </View>
-                    <View className="flex-row gap-2">
-                        <Skeleton variant="circular" height={40} />
-                        <View className="flex-1 px-5 gap-2">
-                            <Skeleton height={12} />
-                            <Skeleton height={12} width="66%" />
-                        </View>
-                    </View>
-
-                </View>
-                :
-                <View className="flex-1 justify-center items-center p-8">
-                    <GlassSurface style={{ borderRadius: 24 }}>
-                        <View className="items-center gap-3 p-6">
-                            <IconSymbol name="bubble.left.fill" size={40} color="#EE8B33" />
-                            <Text className="text-h1 text-center text-night dark:text-white">Aucune conversation pour le moment</Text>
-                            <Text className="text-sm text-center text-gray-500 dark:text-gray-400">
-                                Lance la discussion avec ton groupe de voyage.
-                            </Text>
-                            <Button
-                                className="bg-amber p-4 rounded-2xl flex-row items-center justify-center gap-3 w-full"
-                                onPress={() => router.push({
-                                    pathname: "/[id]/chat",
-                                    params: { id: trip?._id, title: "General" }
-                                })}>
-                                <IconSymbol name="plus.circle" size={28} color="#16265C" />
-                                <Text className="text-base font-bold text-night">Nouvelle discussion</Text>
-                            </Button>
-                        </View>
-                    </GlassSurface>
-                </View>
-            }
+            ListEmptyComponent={() => (
+                <ConversationsEmptyState
+                    isLoading={isFetching}
+                    onNewConversation={() => router.push({
+                        pathname: "/[id]/chat",
+                        params: { id: trip?._id, title: "General" }
+                    })}
+                />
+            )}
         />
     );
 }

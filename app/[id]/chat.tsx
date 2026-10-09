@@ -1,6 +1,6 @@
 import { Avatar } from "@/components/ui/Avatar";
 import { useTrip } from "@/context/TripContext";
-import { useGetMessages, useMarkAllAsRead, usePostMessage } from "@/hooks/api/useMessages";
+import { ALLOWED_REACTIONS, useGetMessages, useMarkAllAsRead, usePostMessage, useToggleReaction } from "@/hooks/api/useMessages";
 import { useFocusEffect, useLocalSearchParams, useNavigation } from "expo-router";
 import { useCallback, useEffect, useMemo } from "react";
 import { Text, useColorScheme } from "react-native";
@@ -16,12 +16,23 @@ export default function TripMessages() {
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetMessages(trip?._id, eventId);
     const postMessage = usePostMessage(trip?._id, me?._id, eventId);
     const { mutate: markAllAsRead } = useMarkAllAsRead(trip?._id, me?._id, eventId, true);
+    const toggleReaction = useToggleReaction(trip?._id, me?._id, eventId);
 
-    const messages = useMemo(() => data?.pages.flatMap((page) => page.messages) ?? [], [data]);
+    // L'API renvoie { emoji, users } ; la lib de chat attend { emoji, userIds }.
+    const messages = useMemo(() => (data?.pages.flatMap((page) => page.messages) ?? []).map(({ reactions, ...message }) => ({
+        ...message,
+        reactions: reactions?.map(({ emoji, users }) => ({ emoji, userIds: users }))
+    })), [data]);
 
     const onSend = useCallback(async (values: IMessage[]) => {
         await postMessage.mutateAsync(values[0]);
     }, [postMessage]);
+
+    const onReactionPress = useCallback((message: IMessage, emoji: string) => {
+        if (!me?._id) return;
+        const currentReaction = message.reactions?.find((reaction) => reaction.userIds.includes(me._id))?.emoji;
+        toggleReaction.mutate({ messageId: String(message._id), emoji, currentReaction });
+    }, [toggleReaction, me?._id]);
 
 
     const navigation = useNavigation();
@@ -45,6 +56,11 @@ export default function TripMessages() {
                 messages={messages}
                 onSend={onSend}
                 user={me}
+                reactions={{
+                    isEnabled: !!me?._id,
+                    emojis: ALLOWED_REACTIONS,
+                    onReactionPress: onReactionPress
+                }}
                 // La racine de l'app monte deja son GestureHandlerRootView.
                 enableGestureHandlerRootView={false}
                 renderBubble={(props) => (
@@ -101,13 +117,15 @@ export default function TripMessages() {
                 theme={{
                     colors: {
                         dayPillBackground: "#FFFFFF",
-                        dayPillText: "#101736"
+                        dayPillText: "#101736",
+                        reactionActiveBackground: "rgba(238,139,51,0.18)"
                     }
                 }}
                 darkTheme={{
                     colors: {
                         dayPillBackground: "rgba(255,255,255,0.10)",
-                        dayPillText: "#F6F8FD"
+                        dayPillText: "#F6F8FD",
+                        reactionActiveBackground: "rgba(247,183,74,0.25)"
                     }
                 }}
                 loadEarlierMessagesProps={{

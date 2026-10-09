@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vakeo — Maquette gamification (dashboard + étapes)</title>
+<style>
+  :root {
+    --amber: #F7B74A;
+    --amber-deep: #EE8B33;
+    --night: #16265C;
+    --ink: #101736;
+    --mist: #F6F8FD;
+    --danger: #E5484D;
+    --border: #E3E8F4;
+    --muted: rgba(22, 38, 92, 0.55);
+    --muted-2: rgba(22, 38, 92, 0.4);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #DCE3F2;
+    color: var(--night);
+    padding: 32px 24px 64px;
+  }
+  h1 { font-size: 22px; margin-bottom: 6px; }
+  .intro { color: var(--muted); font-size: 14px; max-width: 720px; margin-bottom: 8px; }
+  .palette { display: flex; gap: 8px; margin: 14px 0 30px; flex-wrap: wrap; }
+  .palette span { font-size: 11px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border); background: #fff; }
+
+  .boards { display: flex; gap: 40px; flex-wrap: wrap; align-items: flex-start; }
+  .board h2 { font-size: 15px; margin-bottom: 12px; color: var(--ink); }
+  .board .note { font-size: 12px; color: var(--muted); margin-top: 10px; max-width: 380px; line-height: 1.5; }
+
+  /* --- phone frame --- */
+  .phone {
+    width: 390px; border-radius: 44px; background: #fff;
+    box-shadow: 0 24px 60px rgba(22,38,92,0.25);
+    overflow: hidden; border: 10px solid var(--ink);
+  }
+  .screen { background: var(--mist); overflow: hidden; }
+  .statusbar {
+    height: 44px; background: linear-gradient(160deg, var(--night), var(--ink));
+    display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 0 24px 6px; color: rgba(246,248,253,0.9); font-size: 12px; font-weight: 600;
+  }
+  .scroll { padding-bottom: 28px; }
+
+  /* --- dashboard --- */
+  .hero {
+    height: 200px; background: linear-gradient(160deg, var(--night), var(--ink));
+    position: relative;
+  }
+  .hero .name { position: absolute; left: 20px; bottom: 64px; color: #fff; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+  .countdown {
+    position: absolute; top: 54px; right: 20px;
+    background: rgba(246,248,253,0.16); border: 1px solid rgba(246,248,253,0.25);
+    color: #F6F8FD; border-radius: 14px; padding: 7px 12px; text-align: center; line-height: 1.1;
+  }
+  .countdown b { font-size: 20px; display: block; }
+  .countdown small { font-size: 10px; opacity: 0.8; }
+
+  .card {
+    background: #fff; border: 1px solid var(--border); border-radius: 20px;
+    margin: -46px 16px 14px; padding: 16px; position: relative;
+    box-shadow: 0 8px 24px rgba(22,38,92,0.08);
+  }
+  .card-title { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+  .card-sub { font-size: 12px; color: var(--muted); }
+
+  .prep { display: flex; gap: 16px; align-items: center; }
+  .ring-wrap { position: relative; width: 96px; height: 96px; flex-shrink: 0; }
+  .ring-wrap .pct {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; font-weight: 800; font-size: 20px;
+  }
+  .ring-wrap .pct small { font-size: 9px; font-weight: 600; color: var(--muted); letter-spacing: 0.4px; }
+  .bars { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+  .bar-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .bar-row .label { width: 72px; color: var(--muted); font-weight: 600; }
+  .bar-row .track { flex: 1; height: 8px; border-radius: 99px; background: var(--mist); overflow: hidden; }
+  .bar-row .fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--amber), var(--amber-deep)); }
+  .bar-row .fill.full { background: var(--amber-deep); }
+  .bar-row .val { width: 34px; text-align: right; font-weight: 700; font-size: 11px; }
+  .bar-row .check { width: 14px; height: 14px; border-radius: 99px; background: var(--amber-deep); display: inline-flex; align-items: center; justify-content: center; }
+  .bar-row .check svg { width: 8px; height: 8px; }
+
+  /* badge */
+  .badges { display: flex; gap: 8px; margin: 0 16px 14px; flex-wrap: wrap; }
+  .badge {
+    display: flex; align-items: center; gap: 6px;
+    border: 1px solid var(--border); background: #fff; border-radius: 999px;
+    padding: 6px 12px 6px 8px; font-size: 12px; font-weight: 700;
+  }
+  .badge .ico { width: 22px; height: 22px; border-radius: 99px; display: flex; align-items: center; justify-content: center; }
+  .badge.unlocked .ico { background: var(--amber); }
+  .badge.locked { opacity: 0.55; }
+  .badge.locked .ico { background: var(--mist); }
+  .badge .ico svg { width: 12px; height: 12px; }
+  .badge small { font-weight: 600; color: var(--muted-2); }
+
+  /* next action */
+  .next-action {
+    margin: 0 16px 14px; border-radius: 20px; padding: 14px 16px;
+    background: linear-gradient(100deg, var(--amber), var(--amber-deep));
+    display: flex; align-items: center; gap: 12px; color: var(--night);
+    box-shadow: 0 10px 24px rgba(238,139,51,0.35);
+  }
+  .next-action .bubble {
+    width: 38px; height: 38px; border-radius: 99px; background: rgba(22,38,92,0.14);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .next-action b { font-size: 14px; display: block; }
+  .next-action small { font-size: 11px; opacity: 0.75; font-weight: 600; }
+  .next-action .go { margin-left: auto; background: var(--night); color: #F6F8FD; border-radius: 99px; padding: 7px 14px; font-size: 12px; font-weight: 700; }
+
+  .section-label { font-size: 14px; font-weight: 700; margin: 6px 20px 8px; }
+
+  /* stats (existant, pour situer) */
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 16px; }
+  .stat { background: #fff; border: 1px solid var(--border); border-radius: 18px; padding: 12px; }
+  .stat .top { display: flex; justify-content: space-between; align-items: center; }
+  .stat b { font-size: 20px; }
+  .stat small { font-size: 11px; color: var(--muted); display: block; margin-top: 2px; }
+  .dot { width: 26px; height: 26px; border-radius: 99px; display: flex; align-items: center; justify-content: center; }
+  .dot svg { width: 13px; height: 13px; }
+
+  /* --- stops --- */
+  .stops-header { padding: 18px 20px 0; }
+  .stops-header h3 { font-size: 26px; font-weight: 800; }
+  .stops-header p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .steps-progress { margin: 12px 20px 18px; }
+  .steps-progress .legend { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+  .steps-progress .legend small { color: var(--muted); font-weight: 600; }
+  .steps-progress .track { height: 10px; border-radius: 99px; background: #E9EEF8; overflow: hidden; }
+  .steps-progress .fill { height: 100%; width: 60%; border-radius: 99px; background: linear-gradient(90deg, var(--amber), var(--amber-deep)); }
+
+  .stop-row { display: flex; padding: 0 20px; }
+  .rail { width: 36px; display: flex; justify-content: center; position: relative; flex-shrink: 0; }
+  .rail .line { position: absolute; top: 36px; bottom: -6px; width: 0; border-left: 2px dashed rgba(238,139,51,0.4); }
+  .node { width: 32px; height: 32px; border-radius: 99px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; z-index: 1; }
+  .node.done { background: var(--amber-deep); color: #fff; }
+  .node.partial { background: #fff; border: 2px solid var(--amber-deep); color: var(--amber-deep); }
+  .node.final { background: var(--night); }
+  .stop-card {
+    flex: 1; margin: 0 0 22px 12px; background: #fff; border: 1px solid var(--border);
+    border-radius: 18px; overflow: hidden;
+  }
+  .stop-card .head { display: flex; align-items: center; justify-content: space-between; padding: 12px 12px 8px; }
+  .stop-card .head b { font-size: 16px; }
+  .pill-actions { display: flex; gap: 6px; }
+  .mini-pill { width: 28px; height: 28px; border-radius: 99px; display: flex; align-items: center; justify-content: center; }
+  .mini-pill.edit { background: rgba(247,183,74,0.18); }
+  .mini-pill.del { background: rgba(229,72,77,0.1); }
+  .mini-pill svg { width: 13px; height: 13px; }
+  .stop-card .row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-top: 1px solid var(--border); font-size: 12.5px; }
+  .stop-card .row .ic { width: 30px; height: 30px; border-radius: 99px; background: rgba(247,183,74,0.18); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .stop-card .row .ic svg { width: 15px; height: 15px; }
+  .stop-card .row .txt { flex: 1; color: var(--muted); }
+  .stop-card .row .txt.ok { color: var(--night); font-weight: 600; }
+  .stop-card .row .plus { width: 16px; height: 16px; }
+  .poll-chip {
+    display: inline-flex; align-items: center; gap: 5px; margin: 0 12px 10px;
+    background: rgba(229,72,77,0.1); border: 1px solid rgba(229,72,77,0.3); color: var(--danger);
+    border-radius: 999px; padding: 4px 10px; font-size: 11px; font-weight: 700;
+  }
+  .poll-chip svg { width: 11px; height: 11px; }
+  .done-chip {
+    display: inline-flex; align-items: center; gap: 5px; margin: 0 12px 10px;
+    background: rgba(247,183,74,0.15); color: var(--amber-deep);
+    border-radius: 999px; padding: 4px 10px; font-size: 11px; font-weight: 700;
+  }
+
+  .flag-banner {
+    margin: 4px 20px 0; border-radius: 18px; padding: 14px;
+    background: linear-gradient(100deg, var(--amber), var(--amber-deep));
+    color: var(--night); text-align: center;
+  }
+  .flag-banner b { font-size: 14px; display: block; }
+  .flag-banner small { font-size: 11px; opacity: 0.75; font-weight: 600; }
+
+  .legend-block { margin-top: 26px; font-size: 12.5px; line-height: 1.7; color: var(--ink); max-width: 760px; }
+  .legend-block h3 { font-size: 14px; margin: 18px 0 6px; }
+  .legend-block code { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 1px 6px; font-size: 11px; }
+</style>
+</head>
+<body>
+
+<h1>Vakeo — Gamification de la préparation</h1>
+<p class="intro">
+  Proposition : transformer la préparation du voyage en progression visible et gratifiante.
+  Deux écrans, une seule mécanique : <b>le score de préparation</b> (données déjà disponibles côté API — rien à ajouter backend).
+</p>
+<div class="palette">
+  <span>#F7B74A ambre</span><span>#EE8B33 ambre-deep</span><span>#16265C bleu nuit</span>
+  <span>#101736 encre nuit</span><span>#F6F8FD brume</span><span>#E5484D danger</span>
+</div>
+
+<div class="boards">
+
+  <!-- ============ BOARD 1 : DASHBOARD ============ -->
+  <div class="board">
+    <h2>1. Dashboard — le score de préparation</h2>
+    <div class="phone"><div class="screen">
+      <div class="statusbar"><span>9:41</span><span>▪▪▪</span></div>
+      <div class="scroll">
+
+        <div class="hero">
+          <div class="name">Week-end à Amsterdam</div>
+          <div class="countdown"><b>J-23</b><small>avant le départ</small></div>
+        </div>
+
+        <!-- NOUVEAU : score de preparation -->
+        <div class="card">
+          <div class="card-title">Préparation du voyage</div>
+          <div class="card-sub">4 étapes restantes pour être au top</div>
+          <div style="height:12px"></div>
+          <div class="prep">
+            <div class="ring-wrap">
+              <svg width="96" height="96" viewBox="0 0 96 96">
+                <circle cx="48" cy="48" r="40" fill="none" stroke="#EEF2FA" stroke-width="9"/>
+                <circle cx="48" cy="48" r="40" fill="none" stroke="#EE8B33" stroke-width="9"
+                        stroke-linecap="round" stroke-dasharray="251.3" stroke-dashoffset="70.4"
+                        transform="rotate(-90 48 48)"/>
+              </svg>
+              <div class="pct">72%<small>PRÊT</small></div>
+            </div>
+            <div class="bars">
+              <div class="bar-row">
+                <span class="label">Dates</span>
+                <div class="track"><div class="fill" style="width:100%"></div></div>
+                <span class="val check"><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4"><path d="M4 12l6 6L20 6"/></svg></span></span>
+              </div>
+              <div class="bar-row">
+                <span class="label">Étapes</span>
+                <div class="track"><div class="fill" style="width:60%"></div></div>
+                <span class="val">3/5</span>
+              </div>
+              <div class="bar-row">
+                <span class="label">Sondages</span>
+                <div class="track"><div class="fill" style="width:50%"></div></div>
+                <span class="val">2/4</span>
+              </div>
+              <div class="bar-row">
+                <span class="label">Liste</span>
+                <div class="track"><div class="fill" style="width:60%"></div></div>
+                <span class="val">12/20</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NOUVEAU : badges -->
+        <div class="badges">
+          <div class="badge unlocked">
+            <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#16265C" stroke-width="3"><path d="M4 12l6 6L20 6"/></svg></span>
+            Dates posées
+          </div>
+          <div class="badge locked">
+            <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#16265C" stroke-width="3"><path d="M4 12l6 6L20 6"/></svg></span>
+            Étapes complètes
+          </div>
+          <div class="badge unlocked">
+            <span class="ico"><svg viewBox="0 0 24 24" fill="#16265C"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg></span>
+            100% voté
+          </div>
+        </div>
+
+        <!-- NOUVEAU : prochaine action -->
+        <div class="next-action">
+          <div class="bubble">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16265C" stroke-width="2.5">
+              <path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>
+            </svg>
+          </div>
+          <div>
+            <b>2 sondages t'attendent</b>
+            <small>C'est l'action la plus rapide pour monter le score</small>
+          </div>
+          <span class="go">Voter</span>
+        </div>
+
+        <p class="section-label">Aperçu du voyage</p>
+        <div class="stats">
+          <div class="stat">
+            <div class="top"><b>20</b><span class="dot" style="background:rgba(247,183,74,0.2)"><svg viewBox="0 0 24 24" fill="#EE8B33"><path d="M7 18c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM1 2h2v3h16V2h2v18H1V2zm5 8h12V7H6v3z"/></svg></span></div>
+            <small>Liste de course · 8 manquants</small>
+          </div>
+          <div class="stat">
+            <div class="top"><b>4</b><span class="dot" style="background:rgba(229,72,77,0.12)"><svg viewBox="0 0 24 24" fill="#E5484D"><circle cx="12" cy="12" r="6"/><path d="M2 12h20" stroke="#E5484D" stroke-width="2"/></svg></span></div>
+            <small>Restrictions</small>
+          </div>
+          <div class="stat">
+            <div class="top"><b>4</b><span class="dot" style="background:rgba(22,38,92,0.1)"><svg viewBox="0 0 24 24" fill="#16265C"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span></div>
+            <small>Sondages · 2 en attente</small>
+          </div>
+          <div class="stat">
+            <div class="top"><b>6</b><span class="dot" style="background:rgba(238,139,51,0.18)"><svg viewBox="0 0 24 24" fill="none" stroke="#EE8B33" stroke-width="2.5"><path d="M10 14L21 3M21 3v6M21 3h-6M3 14l3 3 2-2M3 21l3-3"/></svg></span></div>
+            <small>Liens utiles</small>
+          </div>
+        </div>
+
+      </div>
+    </div></div>
+    <p class="note">
+      Le score agrège 4 domaines calculables aujourd'hui : dates posées, étapes complètes
+      (adresse + hébergement), sondages votés (<code>pendingPollsCount</code>), liste cochée
+      (<code>goods.total - missing</code>). Chaque barre est tappable et mène à son écran.
+    </p>
+  </div>
+
+  <!-- ============ BOARD 2 : ETAPES ============ -->
+  <div class="board">
+    <h2>2. Étapes — la timeline qui se remplit</h2>
+    <div class="phone"><div class="screen">
+      <div class="statusbar" style="background:#fff;color:var(--night);border-bottom:1px solid var(--border)"><span>9:41</span><span>Les étapes</span><span>▪▪▪</span></div>
+      <div class="scroll">
+
+        <div class="stops-header">
+          <h3>Les étapes</h3>
+          <p>Ajoute pour chaque étape une adresse et un hébergement.</p>
+        </div>
+
+        <!-- NOUVEAU : progression des etapes -->
+        <div class="steps-progress">
+          <div class="legend"><span>Préparation du trajet</span><small>3/5 complètes</small></div>
+          <div class="track"><div class="fill"></div></div>
+        </div>
+
+        <!-- etape complete : noeud plein, coche -->
+        <div class="stop-row">
+          <div class="rail">
+            <div class="line"></div>
+            <div class="node done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4"><path d="M4 12l6 6L20 6"/></svg></div>
+          </div>
+          <div class="stop-card">
+            <div class="head">
+              <b>1 · Paris</b>
+              <div class="pill-actions">
+                <span class="mini-pill edit"><svg viewBox="0 0 24 24" fill="none" stroke="#EE8B33" stroke-width="2.5"><path d="M4 20l4-1L20 7l-3-3L5 16l-1 4z"/></svg></span>
+                <span class="mini-pill del"><svg viewBox="0 0 24 24" fill="none" stroke="#E5484D" stroke-width="2.5"><path d="M5 7h14M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></span>
+              </div>
+            </div>
+            <div class="row"><span class="ic"><svg viewBox="0 0 24 24" fill="#EE8B33"><path d="M12 2a7 7 0 007 7v1a7 7 0 01-7 7 7 7 0 01-7-7V9a7 7 0 017-7zm0 16c-2 0-4 1-5 3h10c-1-2-3-3-5-3z"/></svg></span><span class="txt ok">24 rue du Louvre, Paris</span></div>
+            <div class="row"><span class="ic"><svg viewBox="0 0 24 24" fill="#EE8B33"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg></span><span class="txt ok">Louvre Appartement</span></div>
+            <span class="done-chip"><svg viewBox="0 0 24 24" fill="none" stroke="#EE8B33" stroke-width="4"><path d="M4 12l6 6L20 6"/></svg></span>Étape complète</span>
+          </div>
+        </div>
+
+        <!-- etape partielle : noeud creux, numero, invites -->
+        <div class="stop-row">
+          <div class="rail">
+            <div class="line"></div>
+            <div class="node partial">2</div>
+          </div>
+          <div class="stop-card">
+            <div class="head">
+              <b>2 · Amsterdam</b>
+              <div class="pill-actions">
+                <span class="mini-pill edit"><svg viewBox="0 0 24 24" fill="none" stroke="#EE8B33" stroke-width="2.5"><path d="M4 20l4-1L20 7l-3-3L5 16l-1 4z"/></svg></span>
+                <span class="mini-pill del"><svg viewBox="0 0 24 24" fill="none" stroke="#E5484D" stroke-width="2.5"><path d="M5 7h14M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></span>
+              </div>
+            </div>
+            <div class="row"><span class="ic"><svg viewBox="0 0 24 24" fill="#EE8B33"><path d="M12 2a7 7 0 007 7v1a7 7 0 01-7 7 7 7 0 01-7-7V9a7 7 0 017-7zm0 16c-2 0-4 1-5 3h10c-1-2-3-3-5-3z"/></svg></span><span class="txt ok">Keizersgracht 124, Amsterdam</span></div>
+            <div class="row"><span class="ic"><svg viewBox="0 0 24 24" fill="#EE8B33"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg></span><span class="txt">Ajouter un hébergement</span><svg class="plus" viewBox="0 0 24 24" fill="none" stroke="#EE8B33" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></div>
+            <span class="poll-chip"><svg viewBox="0 0 24 24" fill="none" stroke="#E5484D" stroke-width="3"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>1 sondage t'attend</span>
+          </div>
+        </div>
+
+        <!-- etape brouillon -->
+        <div class="stop-row">
+          <div class="rail">
+            <div class="line"></div>
+            <div class="node partial">3</div>
+          </div>
+          <div class="stop-card">
+            <div class="head">
+              <b>3 · Bruges</b>
+              <div class="pill-actions">
+                <span class="mini-pill edit"><svg viewBox="0 0 24 24" fill="none" stroke="#EE8B33" stroke-width="2.5"><path d="M4 20l4-1L20 7l-3-3L5 16l-1 4z"/></svg></span>
+                <span class="mini-pill del"><svg viewBox="0 0 24 24" fill="none" stroke="#E5484D" stroke-width="2.5"><path d="M5 7h14M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></span>
+              </div>
+            </div>
+            <div class="row"><span class="ic"><svg viewBox="0 0 24 24" fill="#EE8B33"><path d="M12 2a7 7 0 007 7v1a7 7 0 01-7 7 7 7 0 01-7-7V9a7 7 0 017-7zm0 16c-2 0-4 1-5 3h10c-1-2-3-3-5-3z"/></svg></span><span class="txt">Ajouter une adresse</span><svg class="plus" viewBox="0 0 24 24" fill="none" stroke="#EE8B33" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></div>
+            <div class="row"><span class="ic"><svg viewBox="0 0 24 24" fill="#EE8B33"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg></span><span class="txt">Ajouter un hébergement</span><svg class="plus" viewBox="0 0 24 24" fill="none" stroke="#EE8B33" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></div>
+          </div>
+        </div>
+
+        <!-- dernier noeud : drapeau, ligne s'arrete -->
+        <div class="stop-row">
+          <div class="rail">
+            <div class="node final"><svg width="13" height="13" viewBox="0 0 24 24" fill="#F6F8FD"><path d="M5 3v18M5 4h13l-3 4 3 4H5"/></svg></div>
+          </div>
+          <div class="stop-card">
+            <div class="head"><b>4 · Gand</b>
+              <div class="pill-actions">
+                <span class="mini-pill edit"><svg viewBox="0 0 24 24" fill="none" stroke="#EE8B33" stroke-width="2.5"><path d="M4 20l4-1L20 7l-3-3L5 16l-1 4z"/></svg></span>
+                <span class="mini-pill del"><svg viewBox="0 0 24 24" fill="none" stroke="#E5484D" stroke-width="2.5"><path d="M5 7h14M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></span>
+              </div>
+            </div>
+            <div class="row"><span class="ic"><svg viewBox="0 0 24 24" fill="#EE8B33"><path d="M12 2a7 7 0 007 7v1a7 7 0 01-7 7 7 7 0 01-7-7V9a7 7 0 017-7zm0 16c-2 0-4 1-5 3h10c-1-2-3-3-5-3z"/></svg></span><span class="txt ok">Graslei, Gand</span></div>
+            <div class="row"><span class="ic"><svg viewBox="0 0 24 24" fill="#EE8B33"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg></span><span class="txt ok">Gand River Hotel</span></div>
+          </div>
+        </div>
+
+        <!-- NOUVEAU : quand tout est complet -->
+        <div class="flag-banner">
+          <b>Trajet au complet</b>
+          <small>Badge « Étapes complètes » débloqué — il s'affiche sur le dashboard</small>
+        </div>
+
+      </div>
+    </div></div>
+    <p class="note">
+      La timeline existante devient jauge : nœud plein + coche quand l'étape a adresse
+      <i>et</i> hébergement, nœud creux tant qu'il manque quelque chose. La bannière
+      finale n'apparaît qu'une fois, à la complétion du dernier segment.
+    </p>
+  </div>
+</div>
+
+<div class="legend-block">
+  <h3>Mapping données (tout existe déjà)</h3>
+  <div>
+    <b>Ring dashboard</b> : <code>trip.startDate</code> (dates), <code>stops[].location/accommodation</code> (étapes),
+    <code>polls.pendingPollsCount / openPollsCount</code> (sondages), <code>goods.total / missing</code> (liste).
+    Score = moyenne pondérée, calculée côté front. Pondérations à régler ensemble (ex. dates 25%, étapes 30%, sondages 25%, liste 20%).<br>
+    <b>J-x</b> : <code>dayjs().diff(trip.startDate)</code> — masqué si pas de dates.<br>
+    <b>Badges</b> : purs, recalculés front à chaque dashboard (dates posées / étapes complètes / 100% voté / liste finie / départ passé…).<br>
+    <b>Prochaine action</b> : priorité simple — sondages en attente &gt; étape incomplète &gt; items manquants &gt; dates absentes ; CTA direct vers l'écran.<br>
+    <b>Étapes</b> : complétion = <code>location &amp;&amp; accommodation</code>, déjà sur la carte actuelle (les <code>plus.circle</code>).
+  </div>
+  <h3>Garde-fous</h3>
+  <div>
+    Pas de dark pattern : le score informe (chaque barre est tappable vers l'écran réel), aucun streak ni notification.
+    Les états « complets » restent discrets (chip ambre, pas de confetti permanent). Le badge verrouillé s'affiche en opacité réduite,
+    il indique quoi faire sans frustrer.
+  </div>
+</div>
+
+</body>
+</html>
