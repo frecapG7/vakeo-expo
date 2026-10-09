@@ -1,8 +1,7 @@
-import LinkForm from "@/components/links/LinkForm";
+import LinkForm, { type LinkFormValues } from "@/components/links/LinkForm";
 import { Button } from "@/components/ui/Button";
 import { useTrip } from "@/context/TripContext";
 import { usePostLink } from "@/hooks/api/useLinks";
-import { Link } from "@/types/models";
 import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import { View } from "react-native";
@@ -13,13 +12,13 @@ import { View } from "react-native";
 export default function NewLink() {
 
     const { trip } = useTrip();
-    const { control, handleSubmit } = useForm<Omit<Link, '_id'>>();
+    const { control, handleSubmit } = useForm<LinkFormValues>();
 
     const router = useRouter();
 
     const postLink = usePostLink(trip?._id);
 
-    const onSubmit = async (data: Omit<Link, '_id'>) => {
+    const onSubmit = async (data: LinkFormValues) => {
         await postLink.mutateAsync(data);
         router.dismissTo({
             pathname: "/[id]/links",

@@ -3,8 +3,8 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Screen } from "@/components/ui/Screen";
+import { useTrip } from "@/context/TripContext";
 import { JoinTripInput, useJoinTrip } from "@/hooks/api/useTokens";
-import { useGetTrip } from "@/hooks/api/useTrips";
 import { useGetStorageTrip, useUpdateStorageTrip } from "@/hooks/storage/useStorageTrips";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
@@ -30,11 +30,11 @@ export default function PickTripUserPage() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
 
-    // Même queryKey que le layout [id] (includeStops) → dédup React Query, pas de
-    // double fetch. Le contexte TripContext ne porte pas encore loading/error
-    // (tri-state prévu avec les 403 v3) : il en faut ici — un trip privé non-membre
-    // 403 (trip indéfini), il faut distinguer chargement et refus d'accès.
-    const { data: trip, isLoading } = useGetTrip(String(id), true);
+    // Tri-state 403 v3 porté par le contexte (même query que le layout, dédup) :
+    // "loading" | "ready" — le refus d'accès (403) rend l'écran d'état du layout,
+    // cet écran ne le voit jamais. NB : un `!trip` avec status "ready" reste
+    // possible (erreur réseau) — couvert par l'état « Voyage privé » ci-dessous.
+    const { trip, status } = useTrip();
 
     // Seat déjà réclamé ? Le storage le sait ; le trip chargé fournit nom + avatar
     // (pas de fetch supplémentaire).
@@ -89,7 +89,7 @@ export default function PickTripUserPage() {
         claimNewSeat({ name: data.name.trim() })
     );
 
-    if (isLoading)
+    if (status === "loading")
         return (
             <Screen className="flex-1 bg-mist dark:bg-ink">
                 <View className="flex-1 items-center justify-center">

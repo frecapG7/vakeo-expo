@@ -1,11 +1,11 @@
 import { Pressable, Text } from "react-native";
-import { IconSymbol } from "./IconSymbol";
+import { IconSymbol, IconSymbolName } from "./IconSymbol";
 
 interface ToggleButtonProps {
   active: boolean;
   onPress: () => void;
   label: string;
-  icon?: string;
+  icon?: IconSymbolName;
   className?: string;
   disabled?: boolean;
 }

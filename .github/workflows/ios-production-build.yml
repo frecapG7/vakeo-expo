@@ -2,9 +2,16 @@ name: iOS App Release Build
 
 on: workflow_dispatch
 
+concurrency:
+  group: ios-production-build
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: macos-latest
+    timeout-minutes: 180
+    permissions:
+      contents: read
     steps:
       - name: Setup xcode
         uses: maxim-lobanov/setup-xcode@v1
@@ -13,7 +20,7 @@ jobs:
 
       - name: Setup repo
         uses: actions/checkout@v4
-      
+
       - name: Setup node
         uses: actions/setup-node@v4.0.2
         with:
@@ -23,18 +30,18 @@ jobs:
       - name: Setup Expo
         uses: expo/expo-github-action@v8
         with:
-          expo-version: latest
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Install dependencies
         run: npm ci
 
-      - name: 🚀 Build iOS app
-        run: eas build --platform ios --profile preview --local --non-interactive --output ${{ github.workspace }}/vakeo-app-release.ipa
+      - name: Build iOS app
+        run: eas build --platform ios --profile preview --local --non-interactive --output vakeo-app-release.ipa
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: ${{ github.workspace }}/vakeo-app-release.ipa
+          path: vakeo-app-release.ipa
+          retention-days: 14

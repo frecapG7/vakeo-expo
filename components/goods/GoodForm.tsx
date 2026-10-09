@@ -35,7 +35,7 @@ export const GoodForm = ({ control }: {
                         name="quantityNumber"
                         placeholder="0"
                         rules={{
-                            validate: (value) => {
+                            validate: (value: string | number | undefined) => {
                                 if (unitValue && (value === undefined || value === null || value === '')) {
                                     return 'Requis si une unité est saisie';
                                 }
@@ -53,7 +53,7 @@ export const GoodForm = ({ control }: {
                         suggestions={GROCERY_UNITS}
                         disabled={isSubmitting}
                         rules={{
-                            validate: (value) => {
+                            validate: (value: string | number | undefined) => {
                                 if (quantityValue && (value === undefined || value === null || value === '')) {
                                     return 'Requis si une quantité est saisie';
                                 }

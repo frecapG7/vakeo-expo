@@ -21,7 +21,7 @@ export const PickUsersModal = ({
     {
         open: boolean,
         onClose: () => void,
-        users: TripUser[],
+        users: (TripUser & { checked?: boolean })[],
         onClick?: (user: any, index: number) => void,
         disabled?: boolean,
         title?: string,
@@ -66,7 +66,7 @@ export const PickUsersModal = ({
                                             //     {item.restrictions.map(translateRestriction).join(", ")}
                                             // </Text>
                                             <Animated.View className="flex-row gap-2">
-                                                {item.restrictions.map(restriction => (
+                                                {item.restrictions?.map(restriction => (
                                                     <RestrictionIcon key={restriction} value={restriction} size="xs"/>
                                                 ))}
                                             </Animated.View>

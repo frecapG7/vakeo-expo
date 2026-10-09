@@ -66,14 +66,14 @@ export const usePostGood = (tripId: string) => {
     });
 }
 
-const putGood = async (tripId: string, data: Good) => {
+const putGood = async (tripId: string, data: Partial<Good>) => {
     const response = await axios.put(v3Path(`/trips/${tripId}/goods/${data._id}`), data);
     return response.data;
 }
 export const usePutGood = (tripId: string) => {
 
     const queryClient = useQueryClient();
-    return useMutation<Good, Error, Good>({
+    return useMutation<Good, Error, Partial<Good>>({
         mutationFn: (data) => putGood(tripId, data),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["trips", tripId, "goods"] })
     });
