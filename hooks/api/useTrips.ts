@@ -35,33 +35,16 @@ const getTrip = async (tripId: string, params?: any): Promise<Trip> => {
   };
 };
 
-export const useGetTrip = (tripId: any, includeStops?: boolean) => {
+export const useGetTrip = (tripId: any, includeStops?: boolean, options?: any) => {
   return useQuery<Trip>({
     queryKey: ["trips", tripId, { includeStops: !!includeStops }],
     queryFn: () => getTrip(tripId, {
       ...(!!includeStops && { includeStops: "true" })
     }),
     enabled: !!tripId,
+    ...options
   });
 };
-
-
-const searchTrips = async (ids: string[], search?: string) => {
-  const response = await axios.get("/trips", {
-    params: {
-      ids: ids?.join(","),
-      search
-    }
-  });
-  return response.data;
-}
-
-export const useSearchTrips = (ids: string[]) => {
-  return useQuery({
-    queryKey: ["trips", ids],
-    queryFn: () => searchTrips(ids)
-  });
-}
 
 const updateTrip = async (tripId: any, data: Trip): Promise<Trip> => {
   const response = await axios.put(v3Path(`/trips/${tripId}`), data);

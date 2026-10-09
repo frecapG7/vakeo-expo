@@ -2,6 +2,25 @@ const IS_PRODUCTION = process.env.APP_ENVIRONMENT === 'production';
 const packageJson = require('./package.json');
 
 
+const { withGradleProperties } = require('@expo/config-plugins');
+
+// Tuning Gradle pour le build (CI comme local) : cache de build + JVM 3g.
+// Le template Expo pose jvmargs 2g - remplace, pas duplique.
+const withGradleBuildTuning = (config) =>
+  withGradleProperties(config, (props) => {
+    const jvmArgs = props.find((item) => item.key === 'org.gradle.jvmargs');
+    if (jvmArgs) {
+      jvmArgs.value = '-Xmx3g -XX:MaxMetaspaceSize=512m';
+    } else {
+      props.push({ key: 'org.gradle.jvmargs', value: '-Xmx3g -XX:MaxMetaspaceSize=512m' });
+    }
+    if (!props.some((item) => item.key === 'org.gradle.caching')) {
+      props.push({ key: 'org.gradle.caching', value: 'true' });
+    }
+    return props;
+  });
+
+
 const computeVersionCode = (version) => {
   const [major, minor, patch] = version.split('.').map(Number);
   return major * 10000 + minor * 100 + patch;
@@ -70,6 +89,31 @@ export default {
       'expo-image',
       '@react-native-vector-icons/fontawesome5',
       '@react-native-vector-icons/material-icons',
+      withGradleBuildTuning,
+      [
+        'expo-build-properties',
+        {
+          android: {
+            // R8 + shrink resources : coeur du score d'optimisation Play Console
+            // (AAB non minifie = score nul) et de la taille telechargee.
+            // Le preview APK est un build release minifie : c'est le vehicule de
+            // validation R8 avant toute soumission prod.
+            enableMinifyInReleaseBuilds: true,
+            enableShrinkResourcesInReleaseBuilds: true,
+            // ABI unique : x86/x86_64 ne servent qu'aux emulateurs (les tests
+            // sont sur tel physique arm64). Temps de compile natif et taille
+            // d'APK divises. Remettre x86_64 si l'emulateur devient necessaire.
+            buildArchs: ['arm64-v8a'],
+            // Reprise des keeps du proguard-rules.pro local : le dossier android/
+            // est regenere par prebuild en CI, seul ce canal survit.
+            extraProguardRules: [
+              '# react-native-reanimated',
+              '-keep class com.swmansion.reanimated.** { *; }',
+              '-keep class com.facebook.react.turbomodule.** { *; }',
+            ].join('\n'),
+          },
+        },
+      ],
     ],
     experiments: {
       typedRoutes: true,

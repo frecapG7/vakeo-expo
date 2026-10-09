@@ -1,11 +1,14 @@
 import { Avatar } from "@/components/ui/Avatar";
-import { TripContext } from "@/context/TripContext";
+import { Button } from "@/components/ui/Button";
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import { Screen } from "@/components/ui/Screen";
+import { TripContext, TripStatus } from "@/context/TripContext";
 import { useGetTrip, useGetTripUser } from "@/hooks/api/useTrips";
 import { useGetStorageTrip } from "@/hooks/storage/useStorageTrips";
 import { useGlassHeaderOptions } from "@/hooks/styles/useGlassHeaderOptions";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo } from "react";
-import { Platform, Pressable } from "react-native";
+import { Platform, Pressable, Text, View } from "react-native";
 
 export default function TripDetailsLayout() {
 
@@ -13,7 +16,10 @@ export default function TripDetailsLayout() {
     const { id } = useLocalSearchParams<{ id: string }>();
 
     const { data: storageTrip } = useGetStorageTrip(id);
-    const { data: trip } = useGetTrip(id, true);
+    // retry: false — un refus d'accès (403 lecture privée) ne se répare pas en
+    // relançant la requête. L'interceptor ne toast pas les 403 GET (état d'accès).
+    const { data: trip, error, isLoading } = useGetTrip(id, true, { retry: false });
+    const forbidden = (error as any)?.response?.status === 403;
 
     const { data: me } = useGetTripUser(id, storageTrip?.user, {
         enabled: !!storageTrip?.user
@@ -21,16 +27,42 @@ export default function TripDetailsLayout() {
 
     const glass = useGlassHeaderOptions();
 
-    // `trip` est undefined pendant le chargement — les écrans [id]/* assument un trip
-    // résolu (typage historique ITripContext.trip non-optionnel). À retyper en
-    // tri-state chargement/anonyme/membre avec les 403 v3 (Phase 5).
-    const contextValue = useMemo(() => ({ me, trip: trip! }), [me, trip]);
+    // Tri-state 403 v3 : le contexte porte le statut de résolution (cf. TripContext).
+    const status: TripStatus = forbidden ? "forbidden" : isLoading ? "loading" : "ready";
+    const contextValue = useMemo(() => ({ me, trip: trip!, status }), [me, trip, status]);
 
     useEffect(() => {
-        if (!!storageTrip && !storageTrip.user)
+        if (!forbidden && !!storageTrip && !storageTrip.user)
             router.navigate('./pick-user');
-    }, [router, storageTrip]);
+    }, [router, storageTrip, forbidden]);
 
+
+    // Lecture privée refusée (403) : écran d'état à la place de la Stack — les
+    // écrans [id]/* assument un trip résolu, ils ne doivent pas monter. Pattern
+    // des états pick-user (carte lock ambre, charte All In).
+    if (forbidden) {
+        return (
+            <Screen className="flex-1 bg-mist dark:bg-ink">
+                <View className="flex-1 items-center justify-center gap-3 px-6">
+                    <View className="w-20 h-20 rounded-full bg-amber/15 justify-center items-center mb-2">
+                        <IconSymbol name="lock" size={36} color="#EE8B33" />
+                    </View>
+                    <Text className="text-xl font-bold text-night dark:text-white text-center">
+                        Voyage privé
+                    </Text>
+                    <Text className="text-sm text-night/50 dark:text-white/50 text-center mb-4">
+                        Tu n&apos;as pas accès à ce voyage. Demande un lien de partage à l&apos;organisateur pour le rejoindre.
+                    </Text>
+                    <Button
+                        title="Retour à l'accueil"
+                        variant="contained"
+                        className="w-full"
+                        onPress={() => router.dismissAll()}
+                    />
+                </View>
+            </Screen>
+        );
+    }
 
     return (
         <TripContext.Provider value={contextValue}>
