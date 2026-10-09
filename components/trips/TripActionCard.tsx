@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/Button";
-import { IconSymbol } from "@/components/ui/IconSymbol";
+import { IconSymbol, IconSymbolName } from "@/components/ui/IconSymbol";
 import { Text, View } from "react-native";
 
 type TripActionCardProps = {
   icon: {
-    name: string;
+    name: IconSymbolName;
     color?: string; // Optional custom color
   };
   title: string;
@@ -16,7 +16,7 @@ type TripActionCardProps = {
   badge?: {
     color: string;
     text?: string;
-    icon?: string;
+    icon?: IconSymbolName;
   };
 };
 

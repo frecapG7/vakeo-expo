@@ -1,5 +1,5 @@
 import { Pressable, Text } from "react-native";
-import { IconSymbol } from "./IconSymbol";
+import { IconSymbol, IconSymbolName } from "./IconSymbol";
 
 
 
@@ -11,7 +11,7 @@ const sizeToMap = {
 }
 
 
-export const Chip = ({ text, variant = "outlined", size = "medium", icon , onPress }: { text: string, variant?: string, size?: ChipSize, icon ?: string, onPress?: () => void }) => {
+export const Chip = ({ text, variant = "outlined", size = "medium", icon , onPress }: { text: string, variant?: string, size?: ChipSize, icon?: IconSymbolName, onPress?: () => void }) => {
 
 
     const sizeClass = sizeToMap[size];
