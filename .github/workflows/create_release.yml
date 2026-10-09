@@ -84,8 +84,12 @@ jobs:
       - name: Setup Gradle cache
         uses: gradle/actions/setup-gradle@v4
 
+      # v4: ne demande plus le paquet legacy 'tools', retire du depot SDK
+      # Google en sept 2026 (setup-android#537, fix depuis v4.0.2).
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools'
 
       - name: Setup Expo
         uses: expo/expo-github-action@v8
