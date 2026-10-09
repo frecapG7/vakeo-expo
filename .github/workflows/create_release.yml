@@ -150,8 +150,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # En non-interactif, EAS doit pouvoir s'authentifier aupres de l'ASC
+      # pour valider ou renouveler les credentials distants (le profil store
+      # expire tous les 12 mois). Voir https://docs.expo.dev/build/building-on-ci/
+      - name: Write ASC API key
+        run: echo '${{ secrets.APP_STORE_CONNECT_API_KEY }}' > asc-api-key.p8
+
       - name: Build iOS
         run: eas build --platform ios --non-interactive --profile production --local --output app-release.ipa
+        env:
+          EXPO_ASC_API_KEY_PATH: ${{ github.workspace }}/asc-api-key.p8
+          EXPO_ASC_KEY_ID: H4WX38MS9P
+          EXPO_ASC_ISSUER_ID: c44dbaa3-0315-47ef-bf05-0d90cc340ba2
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
