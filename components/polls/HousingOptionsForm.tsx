@@ -8,6 +8,7 @@ import * as Linking from 'expo-linking';
 import { useCallback, useEffect, useState } from "react";
 import { useFieldArray, useWatch } from "react-hook-form";
 import Animated, { BounceIn, BounceOut, FadeIn, SlideOutDown } from "react-native-reanimated";
+import { Toast } from "toastify-react-native";
 import { FormLink } from "../form/FormLink";
 import { Skeleton } from "../ui/Skeleton";
 
@@ -50,10 +51,9 @@ export const HousingOptionItem = ({
                             height: 200,
                             width: "100%",
                             flex: 1,
-                            alignItems: "flex-end",
-                            borderRadius: "inherit"
+                            alignItems: "flex-end"
                         }}
-                        className="rounded-t-full"
+                        className="rounded-t-xl"
                         contentFit="cover"
                     >
                         <View className="flex-1 items-end p-2">
@@ -94,7 +94,7 @@ export const HousingOptionItem = ({
                         control={control}
                         name={`options[${index}].url`}
                         placeholder="Colle un lien Airbnb, Abritel, Booking..."
-                        pattern={/^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?$/i}
+                        pattern={/^https?:\/\/([\w-]+\.)+[\w-]+([\/?][\w\-./?%&=]*)?$/i}
                         onPaste={(text) => onPreview(text, index)}
                     />
                 </View>
@@ -132,7 +132,15 @@ export const HousingOptionsForm = ({ control }: { control: any }) => {
                     icon: response.data.icon,
                     url: response.data.url
                 });
+            } else {
+                // Échec explicite de la preview (lien illisible côté serveur) :
+                // le champ reste utilisable, mais sans silence pour l'utilisateur.
+                Toast.info("Impossible de prévisualiser ce lien");
             }
+        } catch {
+            // Toast déjà porté par l'interceptor axios — ici, ne pas laisser la
+            // promesse rejeter sans gestion ni perdre l'état de chargement.
+            console.warn("Preview : échec");
         } finally {
             setLoadingIndex(null);
         }

@@ -41,7 +41,9 @@ export interface TripUser {
     _id: string,
     name: string,
     avatar?: string,
-    restrictions?: string[]
+    restrictions?: string[],
+    /** Siège déjà réclamé (marqueur v3 du GET /trips) — grisé dans le sélecteur de siège. */
+    claimed?: boolean
 }
 
 

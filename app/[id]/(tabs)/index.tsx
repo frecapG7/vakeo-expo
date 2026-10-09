@@ -7,7 +7,7 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { StatCard } from "@/components/ui/StatCard";
 import { useTrip } from "@/context/TripContext";
-import { useGetDashboard } from "@/hooks/api/useTrips";
+import { useGetDashboard, useLeaveTrip } from "@/hooks/api/useTrips";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import { useDeleteStorageTrip } from "@/hooks/storage/useStorageTrips";
 import dayjs from "@/lib/dayjs-config";
@@ -26,6 +26,7 @@ export default function ItemDetails() {
     const { me, trip } = useTrip();
     const { data: dashboard, refetch, isRefetching } = useGetDashboard(trip?._id, me?._id, !!trip?._id)
     const deleteTrip = useDeleteStorageTrip();
+    const leaveTrip = useLeaveTrip();
 
     const router = useRouter();
 
@@ -36,6 +37,11 @@ export default function ItemDetails() {
     }
 
     const onDelete = async () => {
+        // Libérer le siège côté serveur d'abord — le token doit encore vivre dans
+        // le storage pour l'interceptor (leave 204 = siège libéré, token mort).
+        // En cas d'échec du leave : toast interceptor, storage intact, l'utilisateur
+        // reste membre et peut réessayer.
+        await leaveTrip.mutateAsync(trip._id);
         await deleteTrip.mutateAsync(trip._id);
         router.dismissAll();
     };
@@ -295,7 +301,7 @@ export default function ItemDetails() {
                             params: { id: trip._id }
                         })}
                         onDelete={onDelete}
-                        isDeleting={deleteTrip.isPending}
+                        isDeleting={deleteTrip.isPending || leaveTrip.isPending}
                     />
                 </>
             } />

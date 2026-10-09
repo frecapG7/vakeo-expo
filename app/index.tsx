@@ -177,7 +177,7 @@ export default function HomePage() {
                   Rejoins un voyage existant
                 </Text>
                 <Text className="text-sm text-night/70 dark:text-white/60">
-                  Utilise un lien d’invitation pour rejoindre tes amis
+                  Utilise un lien d&apos;invitation pour rejoindre tes amis
                 </Text>
               </View>
             </Button>
