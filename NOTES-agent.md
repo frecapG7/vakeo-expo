@@ -134,7 +134,7 @@ Diagnostic posé pendant la validation device du join (trip public) : join OK pu
 - **ABI unique rm64-v8a** (uildArchs) : x86/x86_64 ne servent qu'aux émulateurs — compile native et APK preview divisés ~2. Remettre x86_64 si l'émulateur Android devient nécessaire ; NB devices 32-bit (armv7) exclus.
 - **Tuning Gradle** : plugin maison withGradleBuildTuning dans pp.config.js (withGradleProperties de @expo/config-plugins) — jvmargs 3g (template 2g) + org.gradle.caching=true.
 - **Workflows** : cache Gradle (gradle/actions/setup-gradle@v4) sur les jobs Android (levier n°1 du temps de build), 	imeout-minutes partout (le défaut GH est 360 min), concurrency sur les dispatch, permissions minimales, rétention artifacts 14 j, expo-version retiré (le CLI vient de 
-pm ci). Nouvelle **CI advisory** (ci.yml, PR + push main/master/develop) : lint/tsc/jest en continue-on-error — baselines non nulles (7 erreurs lint / 26 TS / échecs jest préexistants), à passer bloquantes quand les baselines seront nettoyées.
+pm ci). Nouvelle **CI advisory** (ci.yml, PR + push main/master/develop) : lint/tsc/jest en continue-on-error — baselines non nulles (7 erreurs lint / 10 TS ; jest au vert 13/13 depuis le fix isValidUrl + la mise à jour des tests useI18nTime), à passer bloquantes quand les baselines seront nettoyées.
 - versionCode : pas de dérive possible — la CI prébuilde depuis pp.config.js (computeVersionCode(packageJson.version)), le 
 pm version du workflow release alimente le tag checkout ; le ersionCode 20600 de ndroid/app/build.gradle local est inert en CI.
 
