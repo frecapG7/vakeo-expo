@@ -37,11 +37,11 @@ Sentry.init({
 
 const queryClient = new QueryClient({});
 
-// Gate du bootstrap v3 (Phase 2) : désactivé, l'app est 100 % v1 et ne fait
-// AUCUN appel réseau au lancement. Activé, la boucle /migrate tourne avant le
-// montage de la navigation (voir MigrationGate) — Phase 2 + Phase 3 seront
-// livrées dans la même version (cf. plan-migration-v3.md, journal 2026-09-29).
-const V3_ENABLED = process.env.EXPO_PUBLIC_V3_ENABLED === "true";
+// Bootstrap v3 inconditionnel : la boucle /migrate tourne avant le montage
+// de la navigation (voir MigrationGate). No-op sans trips v1 en storage
+// (preflight hasPendingMigrations, zéro réseau). L'ancienne gate
+// EXPO_PUBLIC_V3_ENABLED est retirée : le front est 100 % v3, un build
+// sans migration cassait les voyages existants au lieu de les protéger.
 
 // La boucle ne doit tourner qu'une fois par lancement de l'app, même si le
 // layout est remonté (fast refresh) : le promise vit au niveau module.
@@ -99,7 +99,7 @@ export default Sentry.wrap(function RootLayout() {
 
   // Migration v3 : démarrée au premier rendu (MigrationGate), "done" quand elle
   // est terminée (réussie ou non — jamais de blocage sur le splash).
-  const [migrationDone, setMigrationDone] = useState(!V3_ENABLED);
+  const [migrationDone, setMigrationDone] = useState(false);
 
   // Splash masquée quand les polices sont prêtes ET la migration terminée.
   useEffect(() => {

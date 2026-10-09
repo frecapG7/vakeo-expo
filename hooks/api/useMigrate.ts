@@ -19,9 +19,7 @@ import { storage } from "@/storage";
  * - un échec réseau n'interrompt pas la boucle : le trip restera à migrer au
  *   prochain lancement ;
  * - la clé méta disparaîtra en Phase 7 avec le reste du code de migration.
- *
- * Gate : branché au démarrage derrière `EXPO_PUBLIC_V3_ENABLED` — désactivé,
- * l'app reste 100 % v1 (aucun appel réseau).
+
  */
 
 interface MigrateResponse {
