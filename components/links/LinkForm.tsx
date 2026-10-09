@@ -1,4 +1,5 @@
 import { usePostLinkPreview } from '@/hooks/api/useLinkPreview';
+import { Link } from '@/types/models';
 import { isValidUrl } from '@/lib/utils';
 import { Image } from 'expo-image';
 import React, { useEffect } from 'react';
@@ -10,8 +11,10 @@ import { FormText } from '../form/FormText';
 import { FormTextArea } from '../form/FormTextArea';
 
 
+export type LinkFormValues = Omit<Link, "_id">;
+
 interface LinkFormProps {
-    control: Control
+    control: Control<LinkFormValues>
 }
 
 export default function LinkForm({

@@ -14,14 +14,14 @@ const defaultValues = {
     name: "",
     checked: false
 };
-type GoodFormInputs = Omit<Good, '_id' | 'createdBy' | 'checked'>;
+
 
 
 export default function NewGood() {
     const { eventId } = useLocalSearchParams<{ id: string, eventId?: string }>();
 
     const { trip } = useTrip();
-    const { control, handleSubmit, reset } = useForm<GoodFormInputs>({
+    const { control, handleSubmit, reset } = useForm<Partial<Good>>({
         defaultValues
     });
 
