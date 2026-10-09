@@ -1,3 +1,4 @@
+import { v3Path } from "@/lib/api-v3";
 import axios from "@/lib/axios";
 import { Poll, PollOption, PollType } from "@/types/models";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -20,22 +21,32 @@ interface IPage {
 
 
 
-const postPoll = async (tripId: any, data: Omit<Poll, '_id'>, userId?: string): Promise<Poll> => {
+// Brouillon de creation : question + reglages + options sans champs serveur (_id, selectedBy, percent).
+export interface PollInput {
+    question: string;
+    type: string;
+    isSingleAnswer: boolean;
+    isAnonymous: boolean;
+    options: Record<string, unknown>[];
+    stop?: string;
+}
 
-    const response = await axios.post(`/trips/${tripId}/polls`, data, {
-        headers: {
-            ...(userId && { 'x-user-id': userId })
-        }
-    });
+const postPoll = async (tripId: any, data: PollInput): Promise<Poll> => {
+
+    const response = await axios.post(v3Path(`/trips/${tripId}/polls`), data);
     return response.data;
 }
 
-export const usePostPoll = (tripId: any, userId?: string) => {
+export const usePostPoll = (tripId: any) => {
     const queryClient = useQueryClient();
-    return useMutation<Poll, Error, Omit<Poll, '_id'>>({
-        mutationFn: (data) => postPoll(tripId, data, userId),
-        onSuccess: (data: Poll) => queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
-            .then(() => queryClient.setQueryData(["trips", tripId, "polls", data._id], data))
+    return useMutation<Poll, Error, PollInput>({
+        mutationFn: (data) => postPoll(tripId, data),
+        onSuccess: async (data: Poll) => {
+            queryClient.setQueryData(["trips", tripId, "polls", data._id], data);
+            await queryClient.invalidateQueries({
+                queryKey: ["trips", tripId]
+            });
+        }
     })
 }
 
@@ -43,28 +54,24 @@ interface UpdatePollPayload {
     newOptions: PollOption[];
 }
 
-const updatePoll = async (tripId: string, pollId: string, data: UpdatePollPayload, userId?: string): Promise<Poll> => {
-    const response = await axios.put(`/trips/${tripId}/polls/${pollId}`, data, {
-        headers: {
-            ...(userId && { 'x-user-id': userId })
-        }
-    });
+const updatePoll = async (tripId: string, pollId: string, data: UpdatePollPayload): Promise<Poll> => {
+    const response = await axios.put(v3Path(`/trips/${tripId}/polls/${pollId}`), data);
     return response.data;
 }
 
-export const usePutPoll = (tripId: string, pollId: string, userId?: string) => {
+export const usePutPoll = (tripId: string, pollId: string) => {
     const queryClient = useQueryClient();
     return useMutation<Poll, Error, UpdatePollPayload>({
-        mutationFn: (data) => updatePoll(tripId, pollId, data, userId),
+        mutationFn: (data) => updatePoll(tripId, pollId, data),
         onSuccess: async (data: Poll) => {
             // 1. Set the updated poll data (immediate update, no flicker)
             queryClient.setQueryData(
                 ["trips", tripId, "polls", pollId],
                 data
             );
-            // 2. Invalidate tripStops (triggers refetch for related data)
+            // 2. Invalidate polls (list + related data)
             await queryClient.invalidateQueries({
-                queryKey: ["trips", tripId, "stops"]
+                queryKey: ["trips", tripId, "polls"]
             });
         }
     })
@@ -73,7 +80,7 @@ export const usePutPoll = (tripId: string, pollId: string, userId?: string) => {
 
 
 const getPolls = async (tripId: any, params?: IParams) => {
-    const response = await axios.get(`/trips/${tripId}/polls`, {
+    const response = await axios.get(v3Path(`/trips/${tripId}/polls`), {
         params: {
             ...params,
             limit: params?.limit || 25
@@ -93,7 +100,7 @@ export const useGetPolls = (tripId: any, params?: IParams) => {
 
 
 const getPoll = async (tripId: any, pollId: any): Promise<Poll> => {
-    const response = await axios.get(`/trips/${tripId}/polls/${pollId}`);
+    const response = await axios.get(v3Path(`/trips/${tripId}/polls/${pollId}`));
     return response.data;
 }
 
@@ -108,50 +115,49 @@ export const useGetPoll = (tripId: any, pollId: any) => {
 
 
 
-const votePoll = async (tripId: any, pollId: any, data: any, userId?: string): Promise<Poll> => {
-    const response = await axios.patch(`/trips/${tripId}/polls/${pollId}/vote`, data, {
-        headers: {
-            "x-user-id": userId
-        }
-    }
-    );
+const votePoll = async (tripId: any, pollId: any, data: any): Promise<Poll> => {
+    const response = await axios.patch(v3Path(`/trips/${tripId}/polls/${pollId}/vote`), data);
     return response.data;
 
 }
 
 
-export const useVotePoll = (tripId: string, pollId: string, userId?: string) => {
+export const useVotePoll = (tripId: string, pollId: string) => {
     const queryClient = useQueryClient();
     return useMutation<any, Error, any>({
-        mutationFn: (data) => votePoll(tripId, pollId, data, userId),
+        mutationFn: (data) => votePoll(tripId, pollId, data),
         onSuccess: async (data) => {
+            queryClient.setQueryData(["trips", tripId, "polls", pollId], data)
+            await queryClient.invalidateQueries({
+                queryKey: ["trips", tripId, "polls"]
+            });
+            // Stops : la liste embarque des polls (hasSelected) — rafraîchir le badge de la page étapes.
             await queryClient.invalidateQueries({
                 queryKey: ["trips", tripId, "stops"]
             });
-            queryClient.setQueryData(["trips", tripId, "polls", pollId], data)
         }
     });
 }
 
-const unvotePoll = async (tripId: string, pollId: string, optionId: string, userId?: string): Promise<Poll> => {
-    const response = await axios.delete(`/trips/${tripId}/polls/${pollId}/vote/${optionId}`, {
-        headers: {
-            "x-user-id": userId
-        }
-    });
+const unvotePoll = async (tripId: string, pollId: string, optionId: string): Promise<Poll> => {
+    const response = await axios.delete(v3Path(`/trips/${tripId}/polls/${pollId}/vote/${optionId}`));
     return response.data;
 }
 
 
-export const useUnvotePoll = (tripId: string, pollId: string, userId?: string) => {
+export const useUnvotePoll = (tripId: string, pollId: string) => {
     const queryClient = useQueryClient();
     return useMutation<Poll, Error, any>({
-        mutationFn: ({ option }) => unvotePoll(tripId, pollId, option, userId),
+        mutationFn: ({ option }) => unvotePoll(tripId, pollId, option),
         onSuccess: async (data) => {
+            queryClient.setQueryData(["trips", tripId, "polls", pollId], data)
+            await queryClient.invalidateQueries({
+                queryKey: ["trips", tripId, "polls"]
+            });
+            // Stops : la liste embarque des polls (hasSelected) — rafraîchir le badge de la page étapes.
             await queryClient.invalidateQueries({
                 queryKey: ["trips", tripId, "stops"]
             });
-            queryClient.setQueryData(["trips", tripId, "polls", pollId], data)
         }
     });
 }

@@ -7,7 +7,7 @@ import * as Clipboard from 'expo-clipboard';
 import { Image, ImageBackground } from "expo-image";
 import React, { useEffect, useState } from "react";
 import { Control, useController, useFormState } from "react-hook-form";
-import { Linking, Pressable, Text, View } from "react-native";
+import { Linking, Pressable, Text, useColorScheme, View } from "react-native";
 import Animated, { BounceIn, BounceOut, SlideInLeft, SlideOutRight } from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
 import { Button } from "../ui/Button";
@@ -21,15 +21,14 @@ interface AccommodationFormProps {
 export const BottomAccommodationForm = ({ control }: AccommodationFormProps) => {
     const [input, setInput] = useState<string>("");
 
+    const isDark = useColorScheme() === "dark";
+
     const { isSubmitting } = useFormState({
         control
     });
     const { field: { value: accommodation, onChange: setAccommodation } } = useController({
         control,
-        name: "accommodation",
-        rules: {
-            required: true
-        }
+        name: "accommodation"
     });
     const [editMode, setEditMode] = useState(!accommodation);
 
@@ -100,7 +99,7 @@ export const BottomAccommodationForm = ({ control }: AccommodationFormProps) => 
                 className="">
                 <Pressable
                     onPress={onLinkClick}
-                    className="rounded-xl bg-white dark:bg-gray-800 shadow-sm dark:shadow-gray-900/20  gap-1 pb-2 overflow-hidden active:opacity-70"
+                    className="rounded-xl bg-white dark:bg-night shadow-sm border border-mist dark:border-white/10 gap-1 pb-2 overflow-hidden active:opacity-70"
                 >
                     <ImageBackground
                         source={accommodation?.image}
@@ -118,8 +117,8 @@ export const BottomAccommodationForm = ({ control }: AccommodationFormProps) => 
                             <View className="flex-1 justify-between">
                                 <Button
                                     onPress={() => setAccommodation(null)}
-                                    className="p-1 bg-red-300 dark:bg-red-900/50 w-10 rounded-full items-center">
-                                    <IconSymbol name="trash" />
+                                    className="p-1 bg-danger/10 dark:bg-danger/20 w-10 rounded-full items-center">
+                                    <IconSymbol name="trash" color="#E5484D" />
                                 </Button>
                                 <View>
                                     <Image source={accommodation?.icon}
@@ -134,10 +133,10 @@ export const BottomAccommodationForm = ({ control }: AccommodationFormProps) => 
                         </View>
                     </ImageBackground>
                     <View className="mx-1 p-2">
-                        <Text className="font-bold text-lg dark:text-white">
+                        <Text className="font-bold text-lg text-night dark:text-white">
                             {accommodation?.title}
                         </Text>
-                        <Text className="text-red-400 italic underline text-sm py-2">
+                        <Text className="text-amber-deep dark:text-amber italic underline text-sm py-2">
                             Voir le détail
                         </Text>
                     </View>
@@ -148,12 +147,12 @@ export const BottomAccommodationForm = ({ control }: AccommodationFormProps) => 
 
     return (
         <View className="gap-1">
-            <View className="flex-row bg-gray-100 dark:bg-gray-600 border focus:border-blue-400 items-center px-2 rounded-xl h-12">
-                <IconSymbol name="house.fill" color="gray" size={16} />
+            <View className="flex-row bg-white dark:bg-night border border-mist dark:border-white/10 focus:border-amber-deep items-center px-2 rounded-2xl h-12">
+                <IconSymbol name="house.fill" color={isDark ? "#F6F8FD" : "#16265C"} size={16} />
                 <BottomSheetTextInput
                     value={input}
                     onChangeText={setInput}
-                    className="flex-1 text-dark dark:text-white h-full normal-case"
+                    className="flex-1 text-night dark:text-white h-full normal-case"
                     placeholderTextColor={inputPlaceHolder}
                     placeholder="Coller le lien de l'hébergement"
                     keyboardType="url"
@@ -167,11 +166,11 @@ export const BottomAccommodationForm = ({ control }: AccommodationFormProps) => 
                         entering={BounceIn}
                         exiting={BounceOut}>
                         <Button
-                            className="bg-gray-200 rounded-lg p-1 shadow"
+                            className="bg-mist dark:bg-white/10 rounded-lg p-1 shadow"
                             disabled={postLinkPreview.isPending}
                             onPress={onPaste}
                         >
-                            <IconSymbol name="doc.on.doc" size={16} color="blue" />
+                            <IconSymbol name="doc.on.doc" size={16} color="#EE8B33" />
                         </Button>
                     </Animated.View>
                 </View>

@@ -2,7 +2,6 @@ import { FormLink } from "@/components/form/FormLink";
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
-import { useVerifyToken } from "@/hooks/api/useTokens";
 import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import { Text, View } from "react-native";
@@ -18,12 +17,14 @@ export default function JoinTrip() {
 
     const router = useRouter();
 
-
-    const verifyToken = useVerifyToken()
-    const onSubmit = async (data: any) => {
-        const parts = data?.value?.split("/");
-        const token = parts[parts.length - 1];
-
+    // Le POST /token/verify v1 est mort (Q3) : la vérification vit dans l'écran de
+    // résolution (GET /v3/token/:value), poussé avec la valeur extraite du lien.
+    const onSubmit = (data: { value?: string }) => {
+        // Le pattern accepte un slash final : filter(Boolean) évite le segment vide,
+        // qui laissait le bouton en no-op silencieux (retour sans navigation).
+        const token = data?.value?.split("/").filter(Boolean).pop();
+        if (!token)
+            return;
         router.push({
             pathname: '/token/[token]',
             params: {
@@ -32,32 +33,31 @@ export default function JoinTrip() {
         });
     }
 
-
     return (
         <SafeAreaView style={styles.container}>
             <View className="flex items-center mt-10 gap-5">
-                <View className="w-20 h-20 rounded-full bg-blue-100 dark:bg-blue-900/30 justify-center items-center mb-2">
-                    <IconSymbol name="link" size={40} color="blue" />
+                <View className="w-20 h-20 rounded-full bg-amber/15 justify-center items-center mb-2">
+                    <IconSymbol name="link" size={40} color="#EE8B33" />
                 </View>
-                <Text className="text-2xl font-bold dark:text-white text-center mb-2">
+                <Text className="text-2xl font-bold text-night dark:text-white text-center mb-2">
                     Rejoindre un voyage
                 </Text>
-                <Text className="text-md text-gray-50 dark:text-gray-400 text-center mb-8">
+                <Text className="text-sm text-night/50 dark:text-white/50 text-center mb-8">
                     Collez le lien pour rejoindre l&apos;aventure
                 </Text>
 
+                {/* Le joinToken v3 est un JWT : la valeur contient des points (header.payload.signature). */}
                 <FormLink
                     control={control}
                     name="value"
                     required
                     placeholder="vakeoexpo://token/..."
-                    pattern={/^(?:https?:\/\/[^/\s]+\/token|vakeoexpo:\/\/token)\/[A-Za-z0-9_-]+\/?$/}
+                    pattern={/^(?:https?:\/\/[^/\s]+\/token|vakeoexpo:\/\/token)\/[A-Za-z0-9_.-]+\/?$/}
                 />
                 <View className="m-5">
                     <Button title="Rejoindre le voyage"
                         variant="contained"
                         onPress={handleSubmit(onSubmit)}
-                        isLoading={verifyToken.isPending}
                     />
                 </View>
             </View>

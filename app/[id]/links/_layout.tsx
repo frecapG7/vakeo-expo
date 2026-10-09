@@ -3,17 +3,13 @@
 
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { TripContext } from "@/context/TripContext";
 import { useGlassHeaderOptions } from "@/hooks/styles/useGlassHeaderOptions";
 import { Stack, useRouter } from "expo-router";
-import { useContext } from "react";
 import { Platform, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
-export default function GoodsLayout() {
-
-    const { trip } = useContext(TripContext);
+export default function LinksLayout() {
 
     const insets = useSafeAreaInsets();
     const bottomPadding = insets.bottom;

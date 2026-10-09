@@ -1,3 +1,4 @@
+import { v3Path } from "@/lib/api-v3";
 import axios from "@/lib/axios";
 import type { Link } from "@/types/models";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -15,7 +16,7 @@ interface IPage {
 }
 
 const getLinks = async (id: string, params?: IParams): Promise<IPage> => {
-  const response = await axios.get(`/v2/trips/${id}/links`, {
+  const response = await axios.get(v3Path(`/trips/${id}/links`), {
     params,
   });
   return response.data;
@@ -36,20 +37,16 @@ export const useGetLinks = (tripId: string) => {
 };
 
 
-const postLink = async (tripId: string, data: Omit<Link, '_id'>, userId?: string): Promise<Link> => {
-  const response = await axios.post(`/v2/trips/${tripId}/links`, data, {
-    headers: {
-      ...(userId && { "x-user-id": userId })
-    }
-  });
+const postLink = async (tripId: string, data: Omit<Link, '_id'>): Promise<Link> => {
+  const response = await axios.post(v3Path(`/trips/${tripId}/links`), data);
   return response.data;
 }
 
 
-export const usePostLink = (tripId: string, userId?: string) => {
+export const usePostLink = (tripId: string) => {
   const queryClient = useQueryClient();
   return useMutation<Link, Error, Omit<Link, "_id">>({
-    mutationFn: (data) => postLink(tripId, data, userId),
+    mutationFn: (data) => postLink(tripId, data),
     onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ["trips", tripId, "links"] });
       queryClient.invalidateQueries({ queryKey: ["trips", tripId, "dashboard"]});
@@ -59,19 +56,15 @@ export const usePostLink = (tripId: string, userId?: string) => {
 
 
 
-const deleteLink = async (tripId: string, linkId: string, userId?: string): Promise<void> => {
-  const response = await axios.delete(`/v2/trips/${tripId}/links/${linkId}`, {
-    headers: {
-      ...(userId && { "x-user-id": userId })
-    }
-  });
+const deleteLink = async (tripId: string, linkId: string): Promise<void> => {
+  const response = await axios.delete(v3Path(`/trips/${tripId}/links/${linkId}`));
   return response.data;
 }
 
-export const useDeleteLink = (tripId: string, userId?: string) => {
+export const useDeleteLink = (tripId: string) => {
   const queryClient = useQueryClient();
   return useMutation<void, Error, Link>({
-    mutationFn: (data) => deleteLink(tripId, data._id, userId),
+    mutationFn: (data) => deleteLink(tripId, data._id),
     onSuccess: () => queryClient.invalidateQueries({
       queryKey: ["trips", tripId, "links"]
     })

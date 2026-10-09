@@ -2,13 +2,20 @@ name: Vakeo App APK Build
 
 on: workflow_dispatch
 
+concurrency:
+  group: android-apk-build
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
     steps:
       - name: Setup repo
         uses: actions/checkout@v4
-      
+
       - name: Setup node
         uses: actions/setup-node@v4.0.2
         with:
@@ -21,24 +28,31 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      # Cache Gradle (~/.gradle) entre les runs - le build RN est tres lourd,
+      # c'est le levier no 1 sur le temps de build.
+      - name: Setup Gradle cache
+        uses: gradle/actions/setup-gradle@v4
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
       - name: Setup Expo
         uses: expo/expo-github-action@v8
         with:
-          expo-version: latest
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Install dependencies
         run: npm ci
 
-      - name: 🚀 Build Android app
-        run: eas build --platform android --non-interactive --profile preview --local --output ${{ github.workspace }}/app-release.apk
+      # Build release minifie (R8 + shrink via app.config.js) : c'est le
+      # vehicule de validation R8 avant toute soumission prod.
+      - name: Build Android app (preview APK)
+        run: eas build --platform android --non-interactive --profile preview --local --output app-release.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: ${{ github.workspace }}/app-release.apk
+          path: app-release.apk
+          retention-days: 14

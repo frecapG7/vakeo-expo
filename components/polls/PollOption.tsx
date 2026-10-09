@@ -4,9 +4,9 @@ import { AvatarsGroup } from "../ui/Avatar"
 import { IconSymbol } from "../ui/IconSymbol"
 
 const getColorForPercent = (percent: number) => {
-    // Enhanced orange gradient: light → vibrant
-    const startColor = { r: 255, g: 200, b: 150 }; // #ffc896
-    const endColor = { r: 245, g: 120, b: 50 };   // #f57832
+    // Dégradé palette All In : ambre (#F7B74A) → ambre orangé (#EE8B33)
+    const startColor = { r: 247, g: 183, b: 74 };
+    const endColor = { r: 238, g: 139, b: 51 };
 
     const r = Math.round(startColor.r + (endColor.r - startColor.r) * (percent / 100));
     const g = Math.round(startColor.g + (endColor.g - startColor.g) * (percent / 100));
@@ -34,8 +34,8 @@ export const PollOption = ({
     const normalizedPercent = typeof percent === 'string' ? parseFloat(percent) : percent;
 
     return (
-        <View className="flex-1 rounded-xl py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden">
-            {/* Progress bar - enhanced */}
+        <View className="flex-1 rounded-xl py-3 bg-white dark:bg-night border border-mist dark:border-white/10 overflow-hidden">
+            {/* Progress bar */}
             <View
                 className="absolute left-0 top-0 bottom-0 rounded-xl"
                 style={{
@@ -47,26 +47,26 @@ export const PollOption = ({
 
             <View className="relative flex-1 flex-row justify-between items-center px-3">
                 <View className="flex-row items-center gap-3 flex-1">
-                    {/* Checkmark circle - improved with loading state */}
+                    {/* Checkmark circle */}
                     <View className={`rounded-full w-10 h-10 items-center justify-center border-2 ${
                         includeUser
-                            ? 'border-blue-500 bg-blue-100 dark:bg-blue-900/30'
-                            : 'border-gray-300 bg-gray-50 dark:bg-gray-700/30'
+                            ? 'border-amber-deep bg-amber/15 dark:bg-amber/20'
+                            : 'border-mist dark:border-white/10 bg-mist dark:bg-white/5'
                     }`}>
                         {isLoading ? (
-                            <ActivityIndicator size="small" color="#3b82f6" />
+                            <ActivityIndicator size="small" color="#EE8B33" />
                         ) : includeUser ? (
                             <IconSymbol
                                 name="checkmark.circle.fill"
-                                color="#3b82f6"
+                                color="#EE8B33"
                                 size={22}
                             />
                         ) : null}
                     </View>
 
-                    {/* Label - improved typography */}
+                    {/* Label */}
                     <Text
-                        className="text-sm capitalize flex-1 dark:text-white"
+                        className="text-sm capitalize flex-1 text-night dark:text-white"
                         numberOfLines={2}
                         ellipsizeMode="tail"
                     >
@@ -88,17 +88,9 @@ export const PollOption = ({
                         />
                     )}
 
-                    {/* Percentage - enhanced display */}
-                    <View className={`px-3 py-1 rounded-lg ${
-                        normalizedPercent > 50 ? 'bg-green-100 dark:bg-green-900/30' :
-                        normalizedPercent > 25 ? 'bg-amber-100 dark:bg-amber-900/30' :
-                        'bg-red-100 dark:bg-red-900/30'
-                    }`}>
-                        <Text className={`font-bold text-sm ${
-                            normalizedPercent > 50 ? 'text-green-700 dark:text-green-300' :
-                            normalizedPercent > 25 ? 'text-amber-700 dark:text-amber-300' :
-                            'text-red-700 dark:text-red-300'
-                        }`}>
+                    {/* Percentage */}
+                    <View className="px-3 py-1 rounded-lg bg-amber/15 dark:bg-amber/20">
+                        <Text className="font-bold text-sm text-amber-deep dark:text-amber">
                             {Math.round(normalizedPercent)}%
                         </Text>
                     </View>

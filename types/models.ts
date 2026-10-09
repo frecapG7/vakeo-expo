@@ -41,11 +41,13 @@ export interface TripUser {
     _id: string,
     name: string,
     avatar?: string,
-    restrictions?: string[]
+    restrictions?: string[],
+    /** Siège déjà réclamé (marqueur v3 du GET /trips) — grisé dans le sélecteur de siège. */
+    claimed?: boolean
 }
 
 
-export type EventType = "MEAL" | "RESTAURANT" | "SPORT" | "PARTY" | "VISITATION" | "ACTIVITY" | "OTHER";
+export type EventType = "MEAL" | "RESTAURANT" | "SPORT" | "PARTY" | "TRANSPORT" | "EXCURSION" | "ACTIVITY" | "OTHER";
 
 
 export interface Event {

@@ -16,10 +16,10 @@ export const FormText = ({ control, name, placeholder, rules, endAdornment, auto
 
     const { field: { value, onChange },
         fieldState: { error, } } = useController({
-            name,
-            control,
-            rules
-        });
+        name,
+        control,
+        rules
+    });
 
     const shakeAnimation = useSharedValue(0);
     const animatedStyle = useAnimatedStyle(() => {
@@ -34,6 +34,8 @@ export const FormText = ({ control, name, placeholder, rules, endAdornment, auto
 
     useEffect(() => {
         if (error) {
+            // Faux positif React Compiler : mutation volontaire d'un shared value Reanimated.
+            // eslint-disable-next-line react-hooks/immutability
             shakeAnimation.value = withRepeat(withTiming(20, {
                 duration: 100,
                 easing: Easing.linear,
@@ -52,11 +54,11 @@ export const FormText = ({ control, name, placeholder, rules, endAdornment, auto
 
     return (
         <Animated.View style={animatedStyle}
-            className={`flex-row items-center ${disabled ? 'bg-gray-200 dark:bg-gray-700 opacity-60' : 'bg-white dark:bg-gray-600'} border focus:border focus:border-blue-500 rounded-xl h-12`}>
+            className={`flex-row items-center ${disabled ? 'bg-white/60 dark:bg-night/60 opacity-60' : 'bg-white dark:bg-night'} border border-mist dark:border-white/10 focus:border-amber-deep rounded-2xl h-12`}>
             <TextInput
                 onChangeText={onChange}
                 value={value}
-                className="flex-1 text-dark dark:text-white h-full items-start normal-case p-3"
+                className="flex-1 text-night dark:text-white h-full items-start normal-case p-3"
                 placeholderTextColor={inputPlaceHolder}
                 ref={textInputRef}
                 placeholder={placeholder}

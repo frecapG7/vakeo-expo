@@ -1,23 +1,22 @@
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { useGetEvent } from "@/hooks/api/useEvents";
-import { useGetTrip } from "@/hooks/api/useTrips";
-import useColors from "@/hooks/styles/useColors";
+import { useTrip } from "@/context/TripContext";
+import { useGlassHeaderOptions } from "@/hooks/styles/useGlassHeaderOptions";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { Text, View } from "react-native";
+import { Text } from "react-native";
 
 export default function EventDetailsLayout() {
 
     const { id, eventId } = useLocalSearchParams();
 
-    const { data: event } = useGetEvent(id, eventId)
-    const { data: trip } = useGetTrip(id)
-    const { text } = useColors();
+    const { trip } = useTrip();
+    const glass = useGlassHeaderOptions();
     const router = useRouter();
 
     return (
 
         <Stack screenOptions={{
+            ...glass
         }}>
             <Stack.Screen name="index"
                 options={{
@@ -28,12 +27,10 @@ export default function EventDetailsLayout() {
                             id: String(id)
                         }
                     })}>
-                        <IconSymbol name="arrow.left" color={text} />
+                        <IconSymbol name="arrow.left" />
                     </Button>,
-                    headerTitle: () => <View className="items-center justify-center">
-                        <Text className="font-bold text-lg dark:text-white" numberOfLines={1}>{event?.name}</Text>
-                        <Text className="text-sm italic text-gray-400 dark:text-gray-200" numberOfLines={1}>{trip?.name}</Text>
-                    </View>,
+                    // Le header porte le contexte (le trip) ; l'identité de l'event vit dans le héro.
+                    headerTitle: trip?.name ?? "",
                     headerRight: () => <Button onPress={() => router.push({
                         pathname: "/[id]/events/[eventId]/edit",
                         params: {
@@ -41,7 +38,7 @@ export default function EventDetailsLayout() {
                             eventId: String(eventId)
                         }
                     })}>
-                        <Text className="text-blue-400">
+                        <Text className="text-amber-deep dark:text-amber font-semibold">
                             Modifier
                         </Text>
                     </Button>
@@ -51,11 +48,14 @@ export default function EventDetailsLayout() {
                 options={{
                     title: "Modifier l'activité",
                     headerBackTitle: "Annuler"
-                }} />
+                }}
+            />
             <Stack.Screen name="edit-users"
                 options={{
-                    title: "Modifier les participants"
-                }} />
+                    title: "Participants",
+                    headerBackTitle: "Annuler"
+                }}
+            />
         </Stack>
     )
 }

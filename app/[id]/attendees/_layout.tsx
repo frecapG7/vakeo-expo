@@ -1,8 +1,7 @@
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { useGlassHeaderOptions } from "@/hooks/styles/useGlassHeaderOptions";
 import { Stack, useRouter } from "expo-router";
-import { useContext } from "react";
 import { Platform, Pressable, Text } from "react-native";
 
 export default function AttendeesLayout() {
@@ -10,7 +9,7 @@ export default function AttendeesLayout() {
 
     const glass = useGlassHeaderOptions();
     const router = useRouter();
-    const { trip } = useContext(TripContext);
+    const { trip } = useTrip();
 
     return (
         <Stack screenOptions={{

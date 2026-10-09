@@ -10,8 +10,7 @@ import { IconSymbol } from "../ui/IconSymbol";
 
 const MAX_USERS_LENGTH = 20;
 
-export const TripUsersForm = ({ control, selected = -1  }: { control: Control<Trip>, selected?: Number }) => {
-
+export const TripUsersForm = ({ control, selected = -1  }: { control: Control<Trip>, selected?: number }) => {
 
     const { fields: users, append, remove } = useFieldArray({
         control,
@@ -23,7 +22,6 @@ export const TripUsersForm = ({ control, selected = -1  }: { control: Control<Tr
         }
     });
 
-
     const { field: { value: isPrivate, onChange: setIsPrivate } } = useController({
         control,
         name: "isPrivate"
@@ -34,14 +32,14 @@ export const TripUsersForm = ({ control, selected = -1  }: { control: Control<Tr
     return (
         <View className="gap-4">
             <View className="flex gap-5">
-                <Button className={`flex-row items-center justify-evenly rounded-xl py-2 ${!isPrivate && "border border-blue-400"}`}
+                <Button className={`flex-row items-center justify-evenly rounded-xl py-2 ${!isPrivate && "border-2 border-amber-deep bg-amber/10 dark:bg-amber/10"}`}
                     onPress={() => setIsPrivate(false)}>
                     <IconSymbol name={!isPrivate ? "number.circle.fill" : "number.circle"} size={24} color={text} />
                     <View className="max-w-[60%]">
                         <Text className="text-xl font-bold dark:text-white">
                             Ouvert
                         </Text>
-                        <Text numberOfLines={5} className="text-xs dark:text-gray-400">
+                        <Text numberOfLines={5} className="text-xs text-night/70 dark:text-white/60">
                             Tes amis à qui tu partageras le lien pourront créer leur profil au moment de rejointre le projet.
                         </Text>
                     </View>
@@ -51,14 +49,14 @@ export const TripUsersForm = ({ control, selected = -1  }: { control: Control<Tr
                 </Button>
                 <Button
                     onPress={() => setIsPrivate(true)}
-                    className={`flex-row items-center justify-evenly rounded-xl py-2 ${isPrivate && "border border-blue-400"}`}>
+                    className={`flex-row items-center justify-evenly rounded-xl py-2 ${isPrivate && "border-2 border-amber-deep bg-amber/10 dark:bg-amber/10"}`}>
                     <IconSymbol name={isPrivate ? "lock.fill" : "lock"} size={24} color={text} />
                     <View className="max-w-[60%]">
                         <Text className="font-bold text-xl dark:text-white">
                             Fermé
                         </Text>
-                        <Text numberOfLines={5} className="text-xs dark:text-gray-400">
-                            Tu es le seul à pouvoir créer des profil d'utilisateurs. Tes amis à qui tu partageras le lien devront choisir un profil que tu auras créer.
+                        <Text numberOfLines={5} className="text-xs text-night/70 dark:text-white/60">
+                            Tu es le seul à pouvoir créer des profil d&apos;utilisateurs. Tes amis à qui tu partageras le lien devront choisir un profil que tu auras créer.
                         </Text>
                     </View>
                     <View className="w-7 h-7">
@@ -67,7 +65,7 @@ export const TripUsersForm = ({ control, selected = -1  }: { control: Control<Tr
                 </Button>
             </View>
 
-            <View className="border-t mx-5 py-2 dark:border-gray-400">
+            <View className="border-t mx-5 py-2 dark:border-white/10 border-night/10">
                 <Text className="text-sm font-bold dark:text-white">
                     Ajoute tes amis
                 </Text>
@@ -93,12 +91,13 @@ export const TripUsersForm = ({ control, selected = -1  }: { control: Control<Tr
                                             disabled={selected===index}
                                             onPress={() => selected !== index && remove(index)}>
                                             {selected === index ?
-                                                <Text className="font-bold bg-blue-600 p-1 text-white">Moi</Text> :
+                                                <Text className="font-bold bg-amber rounded-md p-1 text-night">Moi</Text> :
                                                 <IconSymbol name="xmark.circle" size={24} />}
                                         </Pressable>
                                     ) : null
                                 }
-                                    
+
+
                             />
                         </Animated.View>
                     ))}
@@ -110,7 +109,7 @@ export const TripUsersForm = ({ control, selected = -1  }: { control: Control<Tr
                                 onPress={() => {
                                     append({ name: "", _id: "" });
                                 }}>
-                                <Text className="text-md font-bold text-blue-500 p-2">
+                                <Text className="text-sm font-bold text-amber-deep p-2">
                                     Ajouter un participant
                                 </Text>
                             </Pressable>

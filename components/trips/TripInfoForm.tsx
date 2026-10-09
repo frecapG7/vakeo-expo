@@ -85,8 +85,7 @@ export const TripInfoForm = ({ control }: { control: Control<Trip> }) => {
             </View>
 
 
-
-            <View className="border-t border-gray-400">
+            <View className="border-t border-night/10 dark:border-white/10">
                 <Text className="font-bold text-sm ml-2 dark:text-white">
                     Thème
                 </Text>
@@ -97,7 +96,9 @@ export const TripInfoForm = ({ control }: { control: Control<Trip> }) => {
                             onPress={() => {
                                 setTheme(item.uri);
                             }}
-                            className={`p-1 rounded-xl ${item.uri === theme ? "bg-blue-400" : ""}`}
+                            // Bordure toujours posée (transparente si non sélectionnée) :
+                            // pas de saut de taille entre les états.
+                            className={`p-1 rounded-xl border-2 ${item.uri === theme ? "border-amber bg-amber/10" : "border-transparent"}`}
                         >
                             <Image
                                 style={{
@@ -113,7 +114,6 @@ export const TripInfoForm = ({ control }: { control: Control<Trip> }) => {
                     ))}
                 </View>
             </View>
-
 
         </View>
     )

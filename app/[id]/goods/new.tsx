@@ -1,10 +1,10 @@
 import { GoodForm } from "@/components/goods/GoodForm";
 import { Button } from "@/components/ui/Button";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { usePostGood } from "@/hooks/api/useGoods";
 import { Good } from "@/types/models";
 import { useLocalSearchParams } from "expo-router";
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { View } from "react-native";
 import { Toast } from "toastify-react-native";
@@ -14,19 +14,18 @@ const defaultValues = {
     name: "",
     checked: false
 };
-type GoodFormInputs = Omit<Good, '_id' | 'createdBy' | 'checked'>;
+
 
 
 export default function NewGood() {
     const { eventId } = useLocalSearchParams<{ id: string, eventId?: string }>();
 
-
-    const {me, trip} = useContext(TripContext);
-    const { control, handleSubmit, reset } = useForm<GoodFormInputs>({
+    const { trip } = useTrip();
+    const { control, handleSubmit, reset } = useForm<Partial<Good>>({
         defaultValues
     });
 
-    const { mutateAsync: postGood, isPending, isSuccess } = usePostGood(trip._id, me?._id);
+    const { mutateAsync: postGood, isPending, isSuccess } = usePostGood(trip._id);
 
     useEffect(() => {
         if (isSuccess) {
@@ -44,7 +43,7 @@ export default function NewGood() {
     };
 
     return (
-        <View className="flex-1 p-4">
+        <View className="flex-1 bg-mist dark:bg-ink p-5">
             <View className="flex-1 mt-6">
                 <GoodForm control={control} />
                 <View className="mt-6">

@@ -1,12 +1,9 @@
-import { BackgroundHeader } from "@/components/header/BackgroundHeader";
+import { WordmarkHomeButton } from "@/components/brand/WordmarkHomeButton";
 import { Avatar } from "@/components/ui/Avatar";
-import { IconSymbol } from "@/components/ui/IconSymbol";
-import styles from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
-import { useGetTrip } from "@/hooks/api/useTrips";
-import useColors from "@/hooks/styles/useColors";
+import { ViewToggle, ViewToggleMode } from "@/components/ui/ViewToggle";
+import { useTrip } from "@/context/TripContext";
+import { useGlassHeaderOptions } from "@/hooks/styles/useGlassHeaderOptions";
 import { Stack, useGlobalSearchParams, usePathname, useRouter } from "expo-router";
-import { useContext } from "react";
 import { Platform, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -14,16 +11,28 @@ export default function PlanningLayout() {
 
     const { id } = useGlobalSearchParams<{id: string}>();
     const router = useRouter();
-    const { data: trip } = useGetTrip(id);
-    const { me } = useContext(TripContext);
+    const { me } = useTrip();
 
-    const colors = useColors();
+    const glass = useGlassHeaderOptions();
 
     const pathname = usePathname();
-    const isCalendar = pathname?.includes("calendar") || pathname?.includes("day");
+    const mode: ViewToggleMode = pathname?.includes("calendar") || pathname?.includes("day")
+        ? "calendar"
+        : "list";
 
     const insets = useSafeAreaInsets();
     const bottomPadding = Platform.OS === 'ios' ? insets.bottom : 0;
+
+    const handleModeChange = (next: ViewToggleMode) => {
+        if (next === mode)
+            return;
+        router.replace({
+            pathname: next === "calendar"
+                ? "/[id]/(tabs)/planning/calendar"
+                : "/[id]/(tabs)/planning",
+            params: { id }
+        });
+    };
 
     return (
         <View className="flex-1"
@@ -32,35 +41,12 @@ export default function PlanningLayout() {
             }}>
             <Stack screenOptions={{
                 headerShown: true,
-                title: "Planning",
-                headerTintColor: "white",
-                headerTitleStyle: styles.headerTitle,
-                headerLargeTitleStyle: {
-                    color: "white",
-                    fontWeight: "bold",
-                },
-                headerBackground: () => trip && <BackgroundHeader trip={trip} />,
+                ...glass,
+                // Le toggle vit au centre (comme le titre du GlassHeaderBar du dashboard).
+                headerTitleAlign: "center",
+                headerTitle: () => <ViewToggle mode={mode} onChange={handleModeChange} />,
                 headerRight: () =>
                     <View className="flex flex-row justify-end items-center my-2 gap-2">
-                        <View>
-                            <Pressable
-                                onPress={() =>
-                                    router.replace({
-                                        pathname: isCalendar
-                                            ? "/[id]/(tabs)/planning"
-                                            : "/[id]/(tabs)/planning/calendar",
-                                        params: { id }
-                                    })
-                                }
-                                className="p-2 rounded-full bg-gray-200 dark:bg-gray-800">
-                                <IconSymbol
-                                    name={isCalendar ? "list.dash" : "calendar"}
-                                    size={20}
-                                    color={colors.text}
-                                />
-                            </Pressable>
-
-                        </View>
                         <Pressable
                             className="items-center"
                             onPress={() => router.push({
@@ -75,11 +61,14 @@ export default function PlanningLayout() {
                     </View>,
             }}>
                 <Stack.Screen name="index" options={{
-                    headerLargeTitleEnabled: true,
-                    headerTransparent: Platform.OS === "ios",
+                    // Le nom de l'onglet vit dans la tab bar : pas de titre.
+                    // headerLeft = wordmark (retour home) — uniquement sur l'onglet
+                    // racine, les écrans poussés gardent leur back natif.
+                    title: "",
+                    headerLeft: () => <WordmarkHomeButton />,
                 }} />
-                <Stack.Screen name="calendar" />
-                <Stack.Screen name="day" />
+                <Stack.Screen name="calendar" options={{ title: "" }} />
+                <Stack.Screen name="day" options={{ title: "" }} />
             </Stack>
         </View>
 

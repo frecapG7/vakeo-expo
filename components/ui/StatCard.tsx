@@ -1,8 +1,7 @@
-import useColors from "@/hooks/styles/useColors";
-import { Pressable, PressableProps, Text, View } from "react-native";
+import { Pressable, PressableProps, Text, View, useColorScheme } from "react-native";
 import { IconSymbol, IconSymbolName } from "./IconSymbol";
 
-type StatCardColor = "orange" | "orange-dark" | "blue" | "blue-dark" | "green" | "green-dark" | "red" | "red-dark";
+type StatCardColor = "amber" | "amber-deep" | "night" | "danger";
 
 interface StatCardProps extends PressableProps {
   icon: IconSymbolName;
@@ -12,38 +11,35 @@ interface StatCardProps extends PressableProps {
   warning?: number | string
 }
 
-export function StatCard({ icon, count, label, color = "orange", warning, ...props }: StatCardProps) {
-  const colors = useColors();
+export function StatCard({ icon, count, label, color = "amber", warning, ...props }: StatCardProps) {
+  const colorScheme = useColorScheme();
+  const iconColor = colorScheme === "dark" ? "#F7B74A" : "#16265C";
 
   const bgColorClasses = {
-    orange: "bg-orange-100 dark:bg-orange-500/50",
-    "orange-dark": "bg-orange-200 dark:bg-orange-800/50",
-    blue: "bg-blue-100 dark:bg-blue-900/50",
-    "blue-dark": "bg-blue-200 dark:bg-blue-800/50",
-    green: "bg-green-100 dark:bg-green-900/50",
-    "green-dark": "bg-green-200 dark:bg-green-800/50",
-    red: "bg-red-100 dark:bg-red-900/50",
-    "red-dark": "bg-red-200 dark:bg-red-800/50",
+    amber: "bg-amber/30 dark:bg-amber/25",
+    "amber-deep": "bg-amber-deep/25 dark:bg-amber-deep/30",
+    night: "bg-night/10 dark:bg-white/15",
+    danger: "bg-danger/15 dark:bg-danger/25",
   };
 
   return (
     <Pressable
-      className="flex-1 bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700"
+      className="flex-1 bg-white dark:bg-night rounded-2xl p-4 shadow-sm border border-mist dark:border-white/10"
       {...props}
     >
       <View className="flex-row items-center justify-between">
         <View className="flex-row items-center gap-3">
           <View className={`rounded-full p-1.5 ${bgColorClasses[color]}`}>
-            <IconSymbol name={icon} size={24} color={colors.primary} />
+            <IconSymbol name={icon} size={24} color={iconColor} />
           </View>
-          <Text className="text-xl font-bold dark:text-white">{count}</Text>
+          <Text className="text-xl font-bold text-night dark:text-white">{count}</Text>
         </View>
         {Number(warning) > 0 && (
-          <View className="flex-row bg-amber-100 dark:bg-amber-500/20 rounded-full px-2 py-0.5 items-center">
-            <Text className="text-amber-700 dark:text-amber-300 text-base font-medium">
+          <View className="flex-row bg-amber/40 dark:bg-amber/25 rounded-full px-2 py-0.5 items-center">
+            <Text className="text-night dark:text-amber text-base font-medium">
               {warning}
             </Text>
-            <IconSymbol name="exclamationmark" color="orange" size={14}/>
+            <IconSymbol name="exclamationmark" color="#EE8B33" size={14}/>
           </View>
         )}
       </View>

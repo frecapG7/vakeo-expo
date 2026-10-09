@@ -6,9 +6,10 @@ export const urlRegex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]
 
 export const isValidUrl = (url: string): boolean => {
     try {
-        // First try the URL constructor (most reliable)
-        new URL(url);
-        return true;
+        // First try the URL constructor (most reliable) — sauf qu'il accepte
+        // des hotes mal formes (ex. "http://.com") : sanity check du hostname.
+        const parsed = new URL(url);
+        return parsed.hostname !== "" && !parsed.hostname.startsWith(".");
     } catch (e) {
         // Fallback to regex for more lenient validation
         return urlRegex.test(url);
@@ -36,8 +37,8 @@ export const isValidUrl = (url: string): boolean => {
 //     return dates;
 // }
 
-export const containsUser = (user: TripUser, array?: TripUser[]): boolean => {
-    return array?.map(u => u._id).includes(String(user._id)) || false;
+export const containsUser = (user?: TripUser, array?: TripUser[]): boolean => {
+    return !!user && (array?.map(u => u._id).includes(String(user._id)) || false);
 }
 
 export const countDaysBetween = (startDate: dayjs.Dayjs, endDate: dayjs.Dayjs, inclusive: boolean = true) => {

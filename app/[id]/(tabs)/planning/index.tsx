@@ -3,24 +3,15 @@ import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { FloatingAddButton } from "@/components/ui/FloatingAddButton";
-import styles from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { useGetEvents } from "@/hooks/api/useEvents";
 import useI18nTime from "@/hooks/i18n/useI18nTime";
 import dayjs from "@/lib/dayjs-config";
 import { Event, TripUser } from "@/types/models";
 import { useGlobalSearchParams, useRouter } from "expo-router";
-import { useContext, useMemo, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { useMemo, useState } from "react";
+import { Pressable, SectionList, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-
-const showDay = (previous?: Event, current?: Event) => {
-    if (!current?.startDate)
-        return false;
-    if (!previous?.startDate)
-        return true;
-    return !dayjs(previous.startDate).isSame(dayjs(current.startDate), 'day');
-}
 
 const typeFilters = [
     {
@@ -54,29 +45,55 @@ const typeFilters = [
     },
     {
         value: "TRANSPORT",
-        icon: "map", 
+        icon: "map",
         label: "Transport"
     },
     {
         value: "EXCURSION",
-        icon: "smiley", 
+        icon: "smiley",
         label: "Excursion"
     },
     {
         value: "OTHER",
-        icon: "star", 
+        icon: "star",
         label: "Autre"
     }
 ]
 
+/** Clé de section pour les events sans date (pas d'en-tête de jour rendu). */
+const SANS_DATE_KEY = "sans-date";
+
+type DaySection = { key: string, data: Event[] };
+
+/**
+ * Regroupe les events par jour, en conservant l'ordre d'apparition.
+ * Les events sans startDate forment une section sans en-tête (comportement
+ * historique : ils s'affichent sans titre de jour). GroupBy front assumé :
+ * l'API pagine en cursor plat, le jour est une notion de vue uniquement.
+ */
+const toDaySections = (events: Event[]): DaySection[] => {
+    const sections: DaySection[] = [];
+    const sectionsByKey = new Map<string, DaySection>();
+    for (const event of events) {
+        const key = event.startDate ? dayjs(event.startDate).format("YYYY-MM-DD") : SANS_DATE_KEY;
+        let section = sectionsByKey.get(key);
+        if (!section) {
+            section = { key, data: [] };
+            sectionsByKey.set(key, section);
+            sections.push(section);
+        }
+        section.data.push(event);
+    }
+    return sections;
+};
+
 const EventItem = ({ event, user, onPress }: { event: Event, user?: TripUser | null, onPress: () => void }) => {
-    const isAttendee = useMemo(() => event.attendees?.map(u => u._id).includes(user?._id), [user, event]);
-    const isOwner = useMemo(() => event.owners?.map(u => u._id).includes(user?._id), [user, event])
+    const isAttendee = useMemo(() => !!user && !!event.attendees?.map(u => u._id).includes(user._id), [user, event]);
 
     return (
         <Button
             onPress={onPress}
-            className="flex-row items-center rounded-2xl bg-white dark:bg-gray-800 shadow-md mx-2 p-4 gap-4 border border-gray-100 dark:border-gray-700">
+            className="flex-row items-center rounded-2xl bg-white dark:bg-night shadow-md mx-2 p-4 gap-4 border border-mist dark:border-white/10">
             <View className="flex-row gap-3 items-center">
                 <View className="mt-1">
                     <EventIcon name={event.type as any} size="md" />
@@ -84,15 +101,15 @@ const EventItem = ({ event, user, onPress }: { event: Event, user?: TripUser | n
                 <View className="flex-1 gap-2 justify-between">
                     <View className="flex-row items-center justify-between">
                         <View className="flex-row items-center gap-2 flex-1">
-                            <Text className="text-lg text-gray-800 dark:text-white font-bold flex-1"
+                            <Text className="text-lg text-night dark:text-white font-bold flex-1"
                                 numberOfLines={2}>
                                 {event.name}
                             </Text>
                         </View>
                         {isAttendee &&
-                            <Animated.View className="flex-row bg-green-200 rounded-lg items-center px-2 py-1">
-                                <IconSymbol name="checkmark" color="green" size={14} />
-                                <Text className="text-xs font-bold text-green-600">Participant</Text>
+                            <Animated.View className="flex-row bg-amber/40 rounded-lg items-center px-2 py-1">
+                                <IconSymbol name="checkmark" color="#EE8B33" size={14} />
+                                <Text className="text-xs font-bold text-night dark:text-amber">Participant</Text>
                             </Animated.View>}
                     </View>
                     {event.details &&
@@ -129,35 +146,33 @@ const EventItem = ({ event, user, onPress }: { event: Event, user?: TripUser | n
 export default function TripPlanning() {
 
     const { id } = useGlobalSearchParams<{id: string}>();
-    const [search, setSearch] = useState("");
     const [typeFilter, setTypeFilter] = useState("");
     const [onlyAttendee, setOnlyAttendee] = useState(false);
     const [onlyOwner, setOnlyOwner] = useState(false);
 
 
     const router = useRouter();
-    // ✅ Restauration de l'extraction de 'trip' (demandé par ton collègue)
-    const { me, trip } = useContext(TripContext);
-    const { formatDate, formatDay, formatHour } = useI18nTime();
+    const { me, trip } = useTrip();
+    const { formatDay } = useI18nTime();
 
-    // ✅ Restauration de trip?._id (demandé par ton collègue)
     const { data, hasNextPage, fetchNextPage, isLoading, refetch, isRefetching } = useGetEvents(trip?._id, {
         type: typeFilter,
-        search,
         ...(onlyAttendee && { attendee: String(me?._id) }),
         ...(onlyOwner && { owner: String(me?._id) }),
     }, {
         enabled: !!trip?._id,
     });
-    
+
     const events = useMemo(() => data?.pages.flatMap((page) => page?.events), [data?.pages]);
+    const sections = useMemo(() => toDaySections(events || []), [events]);
 
     return (
-        <Animated.View style={styles.container}>
-            <Animated.FlatList
-                data={events || []}
+        <Animated.View className="flex-1 bg-mist dark:bg-ink">
+            <SectionList
+                sections={sections}
                 showsVerticalScrollIndicator={false}
                 contentInsetAdjustmentBehavior="automatic"
+                stickySectionHeadersEnabled
                 ListHeaderComponent={
                     <View className="gap-4 my-2">
                         <View className="">
@@ -169,39 +184,49 @@ export default function TripPlanning() {
                                 {typeFilters.map(item => (
                                     <Pressable
                                         key={item.value}
-                                        className={`py-2 px-4 items-center rounded-full ${typeFilter === item.value ? "bg-orange-600 border-orange-400 " : "bg-white dark:bg-gray-900 border border-gray-600"}`}
+                                        className={`py-2 px-4 items-center rounded-full ${typeFilter === item.value ? "bg-amber-deep border border-amber-deep" : "bg-white dark:bg-night border border-mist dark:border-white/15"}`}
                                         onPress={() => setTypeFilter(typeFilter === item?.value ? "" : item.value)}
                                     >
-                                        <Text className={`${typeFilter === item.value ? "font-bold text-white" : "dark:text-white"}`}>
+                                        <Text className={`${typeFilter === item.value ? "font-bold text-night" : "text-night dark:text-white"}`}>
                                             {item.label}
                                         </Text>
                                     </Pressable>
                                 ))}
                             </Animated.ScrollView>
                         </View>
-                        <View className="flex-row justify-start gap-5">
-                            <Pressable className={`w-[48%] shadow flex-row rounded-full justify-center items-center gap-1 p-2 ${onlyAttendee ? "bg-orange-200 dark:bg-orange-600 border border-orange-300" : "bg-white dark:bg-gray-900 dark:border dark:border-gray-600"}`}
+                        <View className="flex-row gap-3">
+                            <Pressable className={`flex-1 shadow flex-row rounded-full justify-center items-center gap-1 p-2 ${onlyAttendee ? "bg-amber/40 dark:bg-amber/25 border border-amber" : "bg-white dark:bg-night border border-mist dark:border-white/15"}`}
                                 onPress={() => setOnlyAttendee(!onlyAttendee)}>
                                 {onlyAttendee &&
-                                    <Animated.View entering={FadeIn} exiting={FadeOut} className="rounded-full bg-orange-400 p-1">
+                                    <Animated.View entering={FadeIn} exiting={FadeOut} className="rounded-full bg-amber-deep p-1">
                                         <IconSymbol name="checkmark" color="white" size={14} />
                                     </Animated.View>
                                 }
-                                <Text className={`${onlyAttendee ? "font-bold" : ""} text-sm dark:text-white`}>Mes participations</Text>
+                                <Text className={`${onlyAttendee ? "font-bold text-night dark:text-white" : ""} text-sm text-night dark:text-white`}>Mes participations</Text>
                             </Pressable>
-                        </View>
+                                                    <Pressable className={`flex-1 shadow flex-row rounded-full justify-center items-center gap-1 p-2 ${onlyOwner ? "bg-amber/40 dark:bg-amber/25 border border-amber" : "bg-white dark:bg-night border border-mist dark:border-white/15"}`}
+                                onPress={() => setOnlyOwner(!onlyOwner)}>
+                                {onlyOwner &&
+                                    <Animated.View entering={FadeIn} exiting={FadeOut} className="rounded-full bg-amber-deep p-1">
+                                        <IconSymbol name="star.fill" color="white" size={14} />
+                                    </Animated.View>
+                                }
+                                <Text className={`${onlyOwner ? "font-bold text-night dark:text-white" : ""} text-sm text-night dark:text-white`}>J&apos;organise</Text>
+                            </Pressable>
+</View>
                     </View>
                 }
-                renderItem={({ item, index, }) =>
-                    <View className="gap-2">
-                        {showDay(events[index - 1], item) &&
-                            <View className="border-b border-orange-400 dark:border-gray-200 p-1 mt-6">
-                                <Text className="text-xl font-bold uppercase text-orange-400 dark:text-white">
-                                    {formatDay(item.startDate)}
-                                </Text>
-                            </View>
-                        }
-                        {/* ✅ Restauration : suppression du "!" sur me et ajout du trip?._id dans le onPress */}
+                renderSectionHeader={({ section }) =>
+                    section.key === SANS_DATE_KEY ? null : (
+                        <View className="bg-mist dark:bg-ink border-b border-amber-deep dark:border-white/20 p-1 mt-6">
+                            <Text className="text-xl font-bold uppercase text-amber-deep dark:text-white">
+                                {formatDay(section.key)}
+                            </Text>
+                        </View>
+                    )
+                }
+                renderItem={({ item }) =>
+                    <View className="pb-2">
                         <EventItem event={item}
                             user={me}
                             onPress={() => trip?._id && router.navigate({
@@ -211,18 +236,16 @@ export default function TripPlanning() {
                     </View>
 
                 }
-                ItemSeparatorComponent={() => <View className="my-1" />}
                 keyExtractor={(item) => item?._id}
-                contentContainerClassName=""
                 ListEmptyComponent={
                     isLoading ?
-                        <View className="gap-5">
-                            <Skeleton height={40} />
-                            <Skeleton height={40} />
+                        <View className="gap-3 mx-2">
+                            <Skeleton height={96} />
+                            <Skeleton height={96} />
                         </View>
                         :
                         <View className="my-5 flex-1 flex-grow justify-center">
-                            <Text className="text-2xl dark:text-white text-center">
+                            <Text className="text-2xl text-night dark:text-white text-center">
                                 Aucune activité
                             </Text>
                         </View>
@@ -235,7 +258,6 @@ export default function TripPlanning() {
                 onRefresh={refetch}
 
             />
-            {/* ✅ Restauration du composant FloatingAddButton d'origine */}
             {trip?._id && (
                 <FloatingAddButton onPress={() => router.push({
                     pathname: "/[id]/events/new",

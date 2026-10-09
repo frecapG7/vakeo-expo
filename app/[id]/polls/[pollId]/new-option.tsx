@@ -5,13 +5,12 @@ import { DateRangeCalendar } from "@/components/ui/DateRangeCalendar";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
 import { usePostLinkPreview } from "@/hooks/api/useLinkPreview";
 import { useGetPoll, usePutPoll } from "@/hooks/api/usePolls";
 import { DatePollOption, HousingPollOption, OtherPollOption, PollOption } from "@/types/models";
 import { Image, ImageBackground } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import Animated, { BounceIn, BounceOut } from "react-native-reanimated";
@@ -21,10 +20,9 @@ import { Toast } from "toastify-react-native";
 export default function NewPollOptionPage() {
     const { id, pollId } = useLocalSearchParams<{ id: string, pollId: string }>();
     const router = useRouter();
-    const { me } = useContext(TripContext);
 
     const { data: poll } = useGetPoll(id, pollId);
-    const updatePoll = usePutPoll(id, pollId, me?._id);
+    const updatePoll = usePutPoll(id, pollId);
     const postLinkPreview = usePostLinkPreview();
 
     const { control, register, handleSubmit, reset, setValue, formState: { isSubmitSuccessful } } = useForm();
@@ -85,14 +83,14 @@ export default function NewPollOptionPage() {
         );
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={styles.container} className="flex-1 bg-mist dark:bg-ink">
             <Animated.ScrollView
                 className="flex-1 mx-4"
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingBottom: 24 }}
             >
-                <View className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-4 shadow-sm border border-gray-100 dark:border-gray-700">
-                    <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+                <View className="bg-white dark:bg-night rounded-2xl p-4 mb-4 shadow-sm border border-mist dark:border-white/10">
+                    <Text className="text-lg font-semibold text-night dark:text-white mb-3">
                         {poll.type === "DatesPoll" && "Proposer des dates"}
                         {poll.type === "HousingPoll" && "Proposer un hébergement"}
                         {poll.type === "OtherPoll" && "Ajouter une option"}
@@ -100,7 +98,7 @@ export default function NewPollOptionPage() {
 
                     {poll.type === "DatesPoll" && (
                         <View className="gap-2">
-                            <Text className="text-sm font-medium mb-1 dark:text-gray-300">
+                            <Text className="text-sm font-medium mb-1 text-night/70 dark:text-white/70">
                                 Sélectionne une date de début et de fin
                             </Text>
                             <DateRangeCalendar
@@ -137,9 +135,9 @@ export default function NewPollOptionPage() {
                                                 <View className="flex-1 justify-between w-full">
                                                     <Pressable
                                                         onPress={() => reset({ url: "" })}
-                                                        className="p-2 bg-white/80 w-11 rounded-full items-center shadow-md border border-gray-300"
+                                                        className="p-2 bg-white/80 w-11 rounded-full items-center shadow-md border border-mist"
                                                     >
-                                                        <IconSymbol name="trash" color="red" size={20} />
+                                                        <IconSymbol name="trash" color="#E5484D" size={20} />
                                                     </Pressable>
                                                     {option.icon && (
                                                         <View>
@@ -162,7 +160,7 @@ export default function NewPollOptionPage() {
 
                             {option?.title ? (
                                 <View className="mx-1 px-3 pb-2">
-                                    <Text className="font-bold text-lg dark:text-white">
+                                    <Text className="font-bold text-lg text-night dark:text-white">
                                         {option.title}
                                     </Text>
                                 </View>

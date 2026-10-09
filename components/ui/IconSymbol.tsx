@@ -2,11 +2,11 @@
 
 import useColors from "@/hooks/styles/useColors";
 import MaterialIcons from "@react-native-vector-icons/material-icons/static";
-import { SymbolViewProps, SymbolWeight } from 'expo-symbols';
+import { SymbolWeight } from 'expo-symbols';
 import { ComponentProps } from 'react';
 import { OpaqueColorValue, type StyleProp, type TextStyle } from 'react-native';
 
-type IconMapping = Record<SymbolViewProps['name'], ComponentProps<typeof MaterialIcons>['name']>;
+type MaterialIconName = ComponentProps<typeof MaterialIcons>['name'];
 type IconSymbolName = keyof typeof MAPPING;
 export type { IconSymbolName };
 
@@ -72,7 +72,9 @@ const MAPPING = {
   "info.circle": "info-outline",
   "line.horizontal.3": "view-headline",
   "eye": "visibility",
+  "eye.fill": "visibility",
   "eye.slash": "visibility-off",
+  "eye.slash.fill": "visibility-off",
   "bag.fill": "shopping-bag",
   "tray": "how-to-vote",
   "exclamationmark.circle.fill": "assignment-late",
@@ -84,8 +86,11 @@ const MAPPING = {
   "number.circle.fill": "add-circle",
   "doc.plaintext": "text-snippet",
   "bubble.left.fill": "chat-bubble",
+  "flag.fill": "flag",
+  "person.2": "people-outline",
+  "plus.circle.fill": "add-circle",
   "nosign": "do-not-disturb"
-} as IconMapping;
+} satisfies Record<string, MaterialIconName>;
 
 /**
  * An icon component that uses native SF Symbols on iOS, and Material Icons on Android and web.

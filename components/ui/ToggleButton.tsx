@@ -1,11 +1,11 @@
 import { Pressable, Text } from "react-native";
-import { IconSymbol } from "./IconSymbol";
+import { IconSymbol, IconSymbolName } from "./IconSymbol";
 
 interface ToggleButtonProps {
   active: boolean;
   onPress: () => void;
   label: string;
-  icon?: string;
+  icon?: IconSymbolName;
   className?: string;
   disabled?: boolean;
 }
@@ -22,16 +22,14 @@ export const ToggleButton = ({
     <Pressable
       className={`flex-row rounded-full justify-center items-center gap-1 p-2 shadow ${className} ${
         active
-          ? "bg-orange-200 dark:bg-orange-600 border border-orange-300"
-          : "bg-white dark:bg-gray-900 dark:border dark:border-gray-600"
+          ? "bg-amber border border-amber-deep"
+          : "bg-white dark:bg-night border border-mist dark:border-white/10"
       } ${disabled ? "opacity-40" : ""}`}
       onPress={onPress}
       disabled={disabled}
     >
-      {/* <Animated.View className="rounded-full bg-orange-400 p-1"> */}
-        <IconSymbol name={icon} color="white" size={14} />
-      {/* </Animated.View> */}
-      <Text className={`${active ? "font-bold" : ""} text-sm dark:text-white`}>
+      <IconSymbol name={icon} color={active ? "#16265C" : "#EE8B33"} size={14} />
+      <Text className={`text-sm ${active ? "font-bold text-night" : "text-night dark:text-white"}`}>
         {label}
       </Text>
     </Pressable>

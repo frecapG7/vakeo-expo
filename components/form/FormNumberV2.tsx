@@ -56,11 +56,11 @@ export const FormNumberV2 = ({ control, name, placeholder, rules, endAdornment, 
 
     return (
         <Animated.View style={animatedStyle}
-            className={`flex-row items-center ${disabled ? 'bg-gray-200 dark:bg-gray-700 opacity-60' : 'bg-white dark:bg-gray-600'} border focus:border focus:border-blue-500 rounded-xl h-12`}>
+            className={`flex-row items-center ${disabled ? 'bg-white/60 dark:bg-night/60 opacity-60' : 'bg-white dark:bg-night'} border border-mist dark:border-white/10 focus:border-amber-deep rounded-2xl h-12`}>
             <TextInput
                 onChangeText={handleChangeText}
                 value={value !== undefined && value !== null ? String(value) : ''}
-                className="flex-1 text-dark dark:text-white h-full items-start normal-case p-3"
+                className="flex-1 text-night dark:text-white h-full items-start normal-case p-3"
                 placeholderTextColor={inputPlaceHolder}
                 ref={textInputRef}
                 placeholder={placeholder}

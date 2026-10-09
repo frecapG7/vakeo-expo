@@ -11,21 +11,21 @@ type ButtonSize = 'medium' | 'small';
 
 const variantToClassMap = {
     'none': 'flex-row justify-center items-center',
-    'contained': 'bg-blue-400 dark:bg-blue-600 rounded-xl shadow-sm shadow-blue-400 flex-row justify-center items-center',
-    'outlined': 'border-2 border-blue-500 dark:border-blue-400 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex-row justify-center items-center active:bg-blue-100 dark:active:bg-blue-900/30',
-    'danger': 'border-2 border-red-500 dark:border-red-400 rounded-xl bg-red-50 dark:bg-red-900/20 flex-row justify-center items-center active:bg-red-100 dark:active:bg-red-900/30'
+    'contained': 'bg-amber rounded-xl shadow-sm shadow-amber/40 flex-row justify-center items-center',
+    'outlined': 'border-2 border-night dark:border-white/25 rounded-xl bg-mist dark:bg-transparent flex-row justify-center items-center active:bg-amber/20 dark:active:bg-white/10',
+    'danger': 'border-2 border-danger rounded-xl bg-danger/10 dark:bg-danger/20 flex-row justify-center items-center active:bg-danger/20 dark:active:bg-danger/25'
 }
 
 const sizeToMap = {
-    'medium': "px-6 py-3 text-md",  // More horizontal padding
+    'medium': "px-6 py-3 text-base",  // More horizontal padding
     'small': 'px-4 py-2 text-sm'
 }
 
 const variantToTitleClassMap = {
-    'none': 'text-neutral-900 dark:text-neutral-100',
-    'contained': 'text-white font-bold',
-    'outlined': 'text-blue-600 font-semibold',
-    'danger': 'text-red-600 font-semibold'
+    'none': 'text-night dark:text-white',
+    'contained': 'text-night font-bold',
+    'outlined': 'text-night dark:text-white font-semibold',
+    'danger': 'text-danger font-semibold'
 }
 
 const ButtonTitle = ({ title, variant, size, isLoading }: { title?: string, variant: ButtonVariant, size: ButtonSize, isLoading: boolean }) => {
@@ -61,6 +61,7 @@ export const Button = ({ title,
     size = "medium",
     icon,
     children,
+    style,
     ...props
 }: {
     title?: string,
@@ -72,26 +73,27 @@ export const Button = ({ title,
     variant?: ButtonVariant,
     size?: ButtonSize,
     icon?: IconSymbolName,
-    children?: React.ReactNode
+    children?: React.ReactNode,
+    style?: React.ComponentProps<typeof Pressable>["style"],
 }) => {
 
     const variantClass = variantToClassMap[variant];
 
-    const disableClass = (disabled || isLoading) ? "opacity-50 bg-gray-600" : ""
+    const disableClass = (disabled || isLoading) ? "opacity-40" : ""
 
-    //${disabled ? 'bg-neutral-200' : 'bg-blue-400'} 
     return (
         <Pressable
             onPress={onPress}
             onLongPress={onLongPress}
             className={`${variantClass} active:opacity-75 ${className} ${disableClass}`}
             disabled={disabled || isLoading}
+            style={style}
             {...props}
         >
             {icon && (
                 <Animated.View entering={FadeIn} exiting={FadeOut} className="">
                     <IconSymbol name={icon}
-                        color={variant === "contained" ? "white" : "blue"}
+                        color={variant === "contained" ? "#16265C" : "#EE8B33"}
                         size={size === "medium" ? 22 : 18} />
                 </Animated.View>
             )}

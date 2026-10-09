@@ -1,16 +1,15 @@
 import { RestrictionIcon } from "@/components/users/RestrictionIcon";
-import { default as styles } from "@/constants/Styles";
-import { TripContext } from "@/context/TripContext";
+import { useTrip } from "@/context/TripContext";
 import { translateRestriction } from "@/lib/userUtils";
 import { router } from "expo-router";
-import { useContext, useMemo } from "react";
+import { useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TripRestrictions() {
 
-    const { trip, me } = useContext(TripContext);
+    const { trip } = useTrip();
 
     // Get all users with their restrictions
     const users = useMemo(() => trip?.users || [], [trip?.users]);
@@ -30,13 +29,13 @@ export default function TripRestrictions() {
 
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
-            <Animated.ScrollView style={styles.container}>
+        <SafeAreaView className="flex-1 bg-mist dark:bg-ink">
+            <Animated.ScrollView>
                 {/* Header */}
-                <View className="flex-row justify-between items-center mx-5 my-4">
+                <View className="flex-row justify-between items-center mx-4 my-4">
                     <View className="flex-1">
-                        <Text className="text-2xl font-bold dark:text-white">Restrictions alimentaires</Text>
-                        <Text className="text-gray-500 dark:text-gray-400 text-sm">
+                        <Text className="text-2xl font-bold text-night dark:text-white">Restrictions alimentaires</Text>
+                        <Text className="text-night/50 dark:text-white/50 text-sm">
                             {totalRestrictions} restriction{totalRestrictions !== 1 ? "s" : ""} au total
                         </Text>
                     </View>
@@ -44,7 +43,7 @@ export default function TripRestrictions() {
                         onPress={() => router.back()}
                         className="p-2 justify-center items-center"
                     >
-                        <Text className="text-blue-500 text-lg font-bold">Terminé</Text>
+                        <Text className="text-amber-deep dark:text-amber text-lg font-bold">Terminé</Text>
                     </Pressable>
                 </View>
 
@@ -54,20 +53,20 @@ export default function TripRestrictions() {
                         return (
                             <View
                                 key={type}
-                                className={`flex-row items-center gap-4 p-4 rounded-xl bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700`}
+                                className="flex-row items-center gap-4 p-4 rounded-2xl bg-white dark:bg-night shadow-sm border border-mist dark:border-white/10"
                             >
                                 <RestrictionIcon value={type} size="sm2" />
                                 <View className="flex-1">
-                                    <Text className="text-lg font-bold dark:text-white capitalize">
+                                    <Text className="text-lg font-bold text-night dark:text-white capitalize">
                                         {translateRestriction(type)}
                                     </Text>
-                                        <Text className="text-gray-600 dark:text-gray-300 text-sm mt-1">
+                                        <Text className="text-night/60 dark:text-white/60 text-sm mt-1">
                                             {usersWithRestriction.map(u => u.name).join(", ")}
                                         </Text>
                                 </View>
                                 <View className="flex-row items-center gap-2">
-                                    <View className={`w-8 h-8 rounded-full items-center justify-center bg-orange-100 dark:bg-orange-900/30`}>
-                                        <Text className={`text-sm font-bold text-orange-600 dark:text-orange-400`}>
+                                    <View className="w-8 h-8 rounded-full items-center justify-center bg-amber/15 dark:bg-amber/20">
+                                        <Text className="text-sm font-bold text-amber-deep dark:text-amber">
                                             {usersWithRestriction.length}
                                         </Text>
                                     </View>
@@ -80,10 +79,10 @@ export default function TripRestrictions() {
                 {/* Empty state */}
                 {totalRestrictions === 0 && (
                     <View className="flex-1 items-center justify-center gap-6 py-20 px-4">
-                        <Text className="text-3xl font-bold dark:text-white">
+                        <Text className="text-3xl font-bold text-night dark:text-white">
                             Aucune restriction
                         </Text>
-                        <Text className="text-gray-400 dark:text-gray-500 text-center max-w-sm">
+                        <Text className="text-night/50 dark:text-white/50 text-center max-w-sm">
                             Aucune restriction alimentaire pour ce voyage
                         </Text>
                     </View>

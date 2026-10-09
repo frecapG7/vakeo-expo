@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, master, develop]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: 22.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Baselines non nulles (lint 7 erreurs / TS 26 / tests preexistants,
+      # voir NOTES-agent.md) : etapes advisory - elles signalent sans bloquer.
+      # Retirer les continue-on-error quand les baselines seront nettoyees.
+      - name: Lint (advisory)
+        run: npm run lint
+        continue-on-error: true
+
+      - name: TypeScript (advisory)
+        run: npx tsc --noEmit
+        continue-on-error: true
+
+      - name: Tests (advisory)
+        run: npx jest --ci
+        continue-on-error: true

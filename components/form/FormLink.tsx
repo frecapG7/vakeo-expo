@@ -3,7 +3,7 @@ import useColors from "@/hooks/styles/useColors";
 import * as Clipboard from 'expo-clipboard';
 import { useEffect, useRef } from "react";
 import { useController } from "react-hook-form";
-import { Pressable, TextInput } from "react-native";
+import { Pressable, TextInput, useColorScheme } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
 
@@ -55,6 +55,8 @@ export const FormLink = ({
 
     useEffect(() => {
         if (error) {
+            // Faux positif React Compiler : mutation volontaire d'un shared value Reanimated.
+            // eslint-disable-next-line react-hooks/immutability
             shakeAnimation.value = withRepeat(
                 withTiming(20, { duration: 100, easing: Easing.linear }),
                 4,
@@ -64,6 +66,7 @@ export const FormLink = ({
     }, [error, shakeAnimation]);
 
     const { inputPlaceHolder } = useColors();
+    const isDark = useColorScheme() === "dark";
     const textInputRef = useRef<TextInput>(null);
 
     useEffect(() => {
@@ -71,10 +74,11 @@ export const FormLink = ({
     }, [error]);
 
     const handlePaste = async () => {
-        const text = await Clipboard.getStringAsync();
+        const text = (await Clipboard.getStringAsync()).trim();
 
-        // Try direct match first
-        if (isValidHttpUrl(text)) {
+        // Lien exact : http(s), ou scheme custom validé par le pattern du caller
+        // (ex. deep-link vakeoexpo://token/... du join, jamais matché par isValidHttpUrl).
+        if (isValidHttpUrl(text) || pattern.test(text)) {
             onChange(text);
             await onPaste?.(text);
             Toast.info("Lien collé !");
@@ -90,7 +94,7 @@ export const FormLink = ({
             // Clean trailing punctuation: "https://toto.com." -> "https://toto.com"
             const cleanUrl = extractedUrl.replace(/[.,!?;:)]+$/, '');
 
-            if (isValidHttpUrl(cleanUrl)) {
+            if (isValidHttpUrl(cleanUrl) || pattern.test(cleanUrl)) {
                 onChange(cleanUrl);
                 await onPaste?.(cleanUrl);
                 Toast.info("Lien extrait et collé !");
@@ -111,11 +115,11 @@ export const FormLink = ({
     };
 
     return (
-        <Animated.View style={animatedStyle} className="flex-row items-center bg-white dark:bg-gray-600 border focus:border focus:border-blue-500 rounded-xl h-12">
+        <Animated.View style={animatedStyle} className="flex-row items-center bg-white dark:bg-night border border-mist dark:border-white/10 focus:border-amber-deep rounded-2xl h-12">
             <TextInput
                 onChangeText={onChange}
                 value={value}
-                className="flex-1 text-dark dark:text-white h-full items-start normal-case p-3"
+                className="flex-1 text-night dark:text-white h-full items-start normal-case p-3"
                 placeholderTextColor={inputPlaceHolder}
                 ref={textInputRef}
                 placeholder={placeholder}
@@ -125,11 +129,11 @@ export const FormLink = ({
             />
             {hasValidLink ? (
                 <Pressable onPress={handleClear} className="p-1 h-full justify-center items-center">
-                    <IconSymbol name="xmark.circle" size={20} color="blue" />
+                    <IconSymbol name="xmark.circle" size={20} color="#EE8B33" />
                 </Pressable>
             ) : (
                 <Pressable onPress={handlePaste} className="p-1 h-full justify-center items-center">
-                    <IconSymbol name="doc.on.doc" size={20} color="gray" />
+                    <IconSymbol name="doc.on.doc" size={20} color={isDark ? "#F6F8FD" : "#16265C"} />
                 </Pressable>
             )}
         </Animated.View>
