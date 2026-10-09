@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Screen } from "@/components/ui/Screen";
 import { JoinTripInput, useJoinTrip } from "@/hooks/api/useTokens";
-import { useGetTrip, useLeaveTrip } from "@/hooks/api/useTrips";
-import { useDeleteStorageTrip, useGetStorageTrip, useUpdateStorageTrip } from "@/hooks/storage/useStorageTrips";
+import { useGetTrip } from "@/hooks/api/useTrips";
+import { useGetStorageTrip, useUpdateStorageTrip } from "@/hooks/storage/useStorageTrips";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import { TripUser } from "@/types/models";
@@ -18,8 +19,8 @@ import { TripUser } from "@/types/models";
  *
  * Si le storage désigne déjà un seat (repasse sur l'écran, entrée future de
  * changement d'identité) : il est marqué « Moi », le tap dessus ne fait rien
- * (retour), et un changement libère l'ancien siège (leave, même séquence que la
- * page token) avant de claim le nouveau.
+ * (retour), et un changement part du header x-user-token : le back libère
+ * l'ancien siège et réclame le nouveau dans la même requête join.
  *
  * Privé : impossible sans joinToken — seul un lien de partage rafraîchi le
  * permet ; état dédié au lieu d'une liste inutilisable.
@@ -41,11 +42,12 @@ export default function PickTripUserPage() {
     const meSeat = trip?.users?.find(user => user._id === storageTrip?.user);
 
     const joinTrip = useJoinTrip(String(id));
-    const leaveTrip = useLeaveTrip(String(id));
     const updateStorageTrip = useUpdateStorageTrip(String(id));
-    const deleteStorageTrip = useDeleteStorageTrip();
 
     const { control, handleSubmit } = useForm({ defaultValues: { name: "" } });
+
+    // Nouveau profil : opt-in — la carte révèle le formulaire au tap.
+    const [showNewProfile, setShowNewProfile] = useState(false);
 
     const finishJoin = async (user: { _id: string }, token: string) => {
         await updateStorageTrip.mutateAsync({ _id: String(id), user: user._id, token });
@@ -57,21 +59,19 @@ export default function PickTripUserPage() {
         });
     };
 
-    // Public : claim sans joinToken (spec v3). Un seat déjà réclamé est refusé
-    // côté serveur (toast interceptor) — la liste des users ne dit pas qui est pris.
+    // Public : claim sans joinToken (spec v3). Un seat déjà réclamé est grisé
+    // (marqueur claimed du GET /trips) — le serveur reste juge au join : le
+    // marqueur est un confort UX, pas une garantie.
     const claimNewSeat = async (input: JoinTripInput) => {
         try {
-            // Changement de siège : libérer l'ancien d'abord (son token meurt côté
-            // serveur) et purger le storage pour que le join reparte anonyme —
-            // même séquence que la page token.
-            if (meSeat) {
-                await leaveTrip.mutateAsync();
-                await deleteStorageTrip.mutateAsync(String(id));
-            }
+            // Changement de siège : le header x-user-token porte l'ancien siège
+            // (storage non purgé) — le back libère l'ancien et réclame le nouveau
+            // dans la même transaction. Si le join échoue, rien n'a été consommé :
+            // l'ancien siège et son token restent intacts.
             const response = await joinTrip.mutateAsync(input);
             await finishJoin(response.user, response.token);
         } catch (err) {
-            // Seat pris, plus de place, leave refusé… : toast déjà porté par l'interceptor.
+            // Seat pris, plus de place… : toast déjà porté par l'interceptor.
             console.warn("Join : échec", err);
         }
     };
@@ -155,15 +155,24 @@ export default function PickTripUserPage() {
 
                 {trip.users?.map(user => {
                     const isMe = meSeat?._id === user._id;
+                    // Réconciliation : le marqueur serveur grise les sièges pris — sauf
+                    // le nôtre, identifié par le storage, pas par le marqueur.
+                    const taken = !!user.claimed && !isMe;
                     return (
                         <Pressable
                             key={user._id}
                             accessibilityRole="button"
                             accessibilityLabel={isMe
                                 ? `${user.name}, ton siège actuel`
-                                : `Rejoindre en tant que ${user.name}`}
+                                : taken
+                                    ? `${user.name}, siège déjà pris`
+                                    : `Rejoindre en tant que ${user.name}`}
+                            accessibilityState={{ disabled: taken }}
+                            disabled={taken}
                             onPress={() => onPickSeat(user)}
-                            className="flex-row items-center gap-3 bg-white dark:bg-night border border-mist dark:border-white/10 rounded-2xl p-4 active:bg-amber/10"
+                            className={`flex-row items-center gap-3 border border-mist dark:border-white/10 rounded-2xl p-4 ${taken
+                                ? "bg-white/60 dark:bg-night/60 opacity-60"
+                                : "bg-white dark:bg-night active:bg-amber/10"}`}
                         >
                             <Avatar name={user.name} size2="sm" alt={user.name.charAt(0)} src={user.avatar} />
                             <Text className="flex-1 text-lg text-night dark:text-white">
@@ -177,28 +186,66 @@ export default function PickTripUserPage() {
                                         </Text>
                                     </View>
                                 )
-                                : <IconSymbol name="chevron.right" size={18} color="#9CA3AF" />}
+                                : taken
+                                    ? (
+                                        <View className="bg-night/5 dark:bg-white/5 rounded-full px-2.5 py-1">
+                                            <Text className="text-xs font-semibold text-night/50 dark:text-white/50">
+                                                Déjà pris
+                                            </Text>
+                                        </View>
+                                    )
+                                    : <IconSymbol name="chevron.right" size={18} color="#9CA3AF" />}
                         </Pressable>
                     );
                 })}
 
-                <Text className="text-base font-semibold text-night dark:text-white px-1 pt-2">
-                    Tu n&apos;es pas dans la liste ?
-                </Text>
-
-                <FormText
-                    control={control}
-                    name="name"
-                    placeholder="Ton prénom"
-                    rules={{ required: true }}
-                />
-                <Button
-                    title="Créer mon profil"
-                    variant="contained"
-                    className="w-full"
-                    onPress={onCreateSeat}
-                    isLoading={joinTrip.isPending || leaveTrip.isPending}
-                />
+                {/* Nouveau profil : une carte de la liste, pas un formulaire toujours exposé. */}
+                {showNewProfile ? (
+                    <View className="gap-3">
+                        <Text className="text-base font-semibold text-night dark:text-white px-1">
+                            Ton nouveau profil
+                        </Text>
+                        <FormText
+                            control={control}
+                            name="name"
+                            placeholder="Ton prénom"
+                            rules={{ required: true }}
+                        />
+                        <Button
+                            title="Créer mon profil"
+                            variant="contained"
+                            className="w-full"
+                            onPress={onCreateSeat}
+                            isLoading={joinTrip.isPending}
+                        />
+                        <Pressable onPress={() => setShowNewProfile(false)} className="py-1">
+                            <Text className="text-sm text-night/50 dark:text-white/50 text-center">
+                                Annuler
+                            </Text>
+                        </Pressable>
+                    </View>
+                ) : (
+                    <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel="Créer un nouveau profil"
+                        accessibilityHint="Rejoindre avec ton propre nom"
+                        onPress={() => setShowNewProfile(true)}
+                        className="flex-row items-center gap-3 bg-white dark:bg-night border border-mist dark:border-white/10 rounded-2xl p-4 active:bg-amber/10"
+                    >
+                        <View className="w-10 h-10 rounded-full bg-amber/15 justify-center items-center">
+                            <IconSymbol name="plus" size={22} color="#EE8B33" />
+                        </View>
+                        <View className="flex-1">
+                            <Text className="text-lg text-night dark:text-white">
+                                Je ne suis pas dans la liste
+                            </Text>
+                            <Text className="text-xs text-night/50 dark:text-white/50">
+                                Créer un nouveau profil pour ce voyage
+                            </Text>
+                        </View>
+                        <IconSymbol name="chevron.right" size={18} color="#9CA3AF" />
+                    </Pressable>
+                )}
             </ScrollView>
         </Screen>
     );

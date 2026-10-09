@@ -94,7 +94,7 @@ export const HousingOptionItem = ({
                         control={control}
                         name={`options[${index}].url`}
                         placeholder="Colle un lien Airbnb, Abritel, Booking..."
-                        pattern={/^https?:\/\/([\w-]+\.)+[\w-]+(\/[\w\-./?%&=]*)?$/i}
+                        pattern={/^https?:\/\/([\w-]+\.)+[\w-]+([\/?][\w\-./?%&=]*)?$/i}
                         onPaste={(text) => onPreview(text, index)}
                     />
                 </View>
@@ -137,10 +137,10 @@ export const HousingOptionsForm = ({ control }: { control: any }) => {
                 // le champ reste utilisable, mais sans silence pour l'utilisateur.
                 Toast.info("Impossible de prévisualiser ce lien");
             }
-        } catch (err) {
+        } catch {
             // Toast déjà porté par l'interceptor axios — ici, ne pas laisser la
             // promesse rejeter sans gestion ni perdre l'état de chargement.
-            console.warn("Preview : échec", err);
+            console.warn("Preview : échec");
         } finally {
             setLoadingIndex(null);
         }

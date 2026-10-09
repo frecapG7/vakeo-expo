@@ -49,8 +49,8 @@ export default function ShareTripPage() {
                             <Animated.View>
                                 <QRCode value={link} size={200} backgroundColor="#FFFFFF" />
                             </Animated.View> :
-                            <Animated.View className="h-64 w-64">
-                                <Skeleton height={200} />
+                            <Animated.View>
+                                <Skeleton height={200} width={200} />
                             </Animated.View>
                         }
                     </View>

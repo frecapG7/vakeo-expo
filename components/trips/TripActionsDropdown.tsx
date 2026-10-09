@@ -22,10 +22,13 @@ export function TripActionsDropdown({
 
   const handleDeletePress = () => {
     if(isDeleting) return;
-    Alert.alert("Supprimer cette escapade ?", "", [
+    Alert.alert(
+      "Quitter cette escapade ?",
+      "Ton siège sera libéré et le voyage disparaîtra de ta liste. Il restera visible pour les autres participants.",
+      [
       { text: "Annuler" },
       {
-        text: "Supprimer",
+        text: "Quitter",
         onPress: async () => {
           try {
             await onDelete();
@@ -108,7 +111,7 @@ export function TripActionsDropdown({
               )}
             </View>
             <Text className="text-base text-red-500 dark:text-red-400">
-              Supprimer le voyage
+              Quitter le voyage
             </Text>
           </View>
         </MenuOption>

@@ -36,7 +36,7 @@ export interface ResolveTokenResponse {
 
 const resolveToken = async (value: string): Promise<ResolveTokenResponse> => {
     // 404 = lien invalide ou expiré : état d'écran dédié, pas de toast interceptor.
-    const response = await axios.get(v3Path(`/token/${value}`), { skipToastStatuses: [404] });
+    const response = await axios.get(v3Path(`/token/${encodeURIComponent(value)}`), { skipToastStatuses: [404] });
     return response.data;
 };
 

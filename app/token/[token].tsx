@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Screen } from "@/components/ui/Screen";
 import { JoinTripResponse, SeatCandidate, useJoinTrip, useResolveToken } from "@/hooks/api/useTokens";
-import { useGetTripUser, useLeaveTrip } from "@/hooks/api/useTrips";
-import { useAddStorageTrip, useDeleteStorageTrip, useGetStorageTrip } from "@/hooks/storage/useStorageTrips";
+import { useGetTripUser } from "@/hooks/api/useTrips";
+import { useAddStorageTrip, useGetStorageTrip } from "@/hooks/storage/useStorageTrips";
 import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
@@ -20,8 +20,9 @@ import Animated, { FadeIn, ZoomIn } from "react-native-reanimated";
  *
  * Sélection en tuiles façon « character select » (pattern settings/avatar) +
  * barre de confirmation fixe. Déjà membre (storage) : son siège actuel est
- * affiché et présélectionné ; un changement de siège libère l'ancien
- * (POST /leave — son token meurt) avant de claim le nouveau. Public : tuile
+ * affiché et présélectionné ; un changement de siège part du header
+ * x-user-token — le back libère l'ancien et réclame le nouveau dans le join.
+ * Public : tuile
  * « nouveau profil » ({ name }) en plus des sièges libres.
  */
 export default function TokenRedirectionPage() {
@@ -39,9 +40,7 @@ export default function TokenRedirectionPage() {
     });
 
     const joinTrip = useJoinTrip(encodedId);
-    const leaveTrip = useLeaveTrip(encodedId);
     const addStorageTrip = useAddStorageTrip();
-    const deleteStorageTrip = useDeleteStorageTrip();
 
     const { control } = useForm({ defaultValues: { name: "" } });
     const nameValue = useWatch({ control, name: "name" });
@@ -91,19 +90,16 @@ export default function TokenRedirectionPage() {
             return;
         }
         try {
-            // Changement de siège : libérer l'ancien d'abord — son token meurt côté
-            // serveur (leave), et le storage est purgé pour que le join reparte
-            // anonyme (l'interceptor ne doit pas envoyer le token mort).
-            if (meSeat) {
-                await leaveTrip.mutateAsync();
-                await deleteStorageTrip.mutateAsync(resolved.encodedId);
-            }
+            // Changement de siège : le header x-user-token porte l'ancien siège
+            // (storage non purgé) — le back libère l'ancien et réclame le nouveau
+            // dans la même transaction. Si le join échoue, rien n'a été consommé :
+            // l'ancien siège et son token restent intacts.
             const response = selected === "new"
                 ? await joinTrip.mutateAsync({ name: String(nameValue ?? "").trim() })
                 : await claimSeat(selected._id);
             await finishJoin(response);
         } catch (err) {
-            // Seat pris, plus de place, leave refusé… : toast déjà porté par l'interceptor.
+            // Seat pris, plus de place… : toast déjà porté par l'interceptor.
             console.warn("Join : échec", err);
         }
     };
@@ -344,7 +340,7 @@ export default function TokenRedirectionPage() {
                     <Button
                         variant="contained"
                         title={confirmTitle}
-                        isLoading={joinTrip.isPending || leaveTrip.isPending}
+                        isLoading={joinTrip.isPending}
                         onPress={onConfirm}
                         disabled={!selected || (selected === "new" && !String(nameValue ?? "").trim())}
                     />
