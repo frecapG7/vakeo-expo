@@ -27,10 +27,11 @@ export default function NewTripLayout() {
     const isDark = useColorScheme() === "dark";
     const text = isDark ? "#F6F8FD" : "#16265C";
 
-    // Sortie du setup : retour à l'écran qui a ouvert /new (l'histoire expo-router
-    // est unifiée, back dépile le push de /new lui-même). Chute dismissAll si aucun
-    // historique (deep link direct) — pattern canGoBack de polls/[pollId].
-    const exitSetup = () => router.canGoBack()
+    // Sortie de la première étape (pas d'étape précédente) : retour à l'écran qui
+    // a ouvert /new — l'histoire expo-router est unifiée, back dépile le push de
+    // /new lui-même. Chute dismissAll si aucun historique (deep link direct),
+    // pattern canGoBack de polls/[pollId].
+    const exitFromFirstStep = () => router.canGoBack()
         ? router.back()
         : router.dismissAll();
 
@@ -40,8 +41,11 @@ export default function NewTripLayout() {
                 headerShown: true,
                 ...glass,
                 headerTitleAlign: "center",
+                // La croix quitte le formulaire depuis n'importe quelle étape :
+                // back() depuis l'étape 2 ne dépilerait que le push interne et
+                // ramènerait à l'étape précédente — c'est le rôle du headerLeft.
                 headerRight: () => (
-                    <Button onPress={exitSetup}>
+                    <Button onPress={() => router.dismissAll()}>
                         <IconSymbol name="xmark" color={text} size={24} />
                     </Button>
                 )
@@ -50,9 +54,9 @@ export default function NewTripLayout() {
                 <Stack.Screen name="setup-general"
                     options={{
                         headerLeft: () => (
-                            <Button onPress={exitSetup}>
+                            <Button onPress={exitFromFirstStep}>
                                 <IconSymbol name="arrow.left" color="gray" />
-                                <Chip text="1 sur 2" size="small" onPress={exitSetup} />
+                                <Chip text="1 sur 2" size="small" onPress={exitFromFirstStep} />
                             </Button>
                         ),
                         headerTitle: () => <HeaderTitle title="Nouvelle escapade" subtitle="Informations générales"/>,
