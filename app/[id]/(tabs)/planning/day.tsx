@@ -18,6 +18,8 @@ export default function DayModal() {
     const background = isDark ? "#101736" : "#F6F8FD";
     const text = isDark ? "#F6F8FD" : "#16265C";
     const accent = "#EE8B33";
+    const ink = "#101736";
+    const muted = isDark ? "rgba(246,248,253,0.35)" : "rgba(22,38,92,0.35)";
 
     const router = useRouter();
 
@@ -98,9 +100,8 @@ export default function DayModal() {
                         monthTextColor: text,
                         arrowColor: accent,
                         selectedDayBackgroundColor: accent,
-                        selectedDayTextColor: background,
+                        selectedDayTextColor: ink,
                         todayTextColor: accent,
-                        todayBackgroundColor: '#F7B74A',
                     }}
                     markedDates={markedDates}
                     markingType="multi-dot"
@@ -132,11 +133,11 @@ export default function DayModal() {
                                 <Text className="text-sm font-semibold text-night dark:text-white">
                                     {event.title}
                                 </Text>
-                                <Text className="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                                <Text className="text-xs text-night/60 dark:text-white/60 mt-1">
                                     {dayjs(event.start).format('HH:mm')} - {dayjs(event.end).format('HH:mm')}
                                 </Text>
                                 {event.summary && (
-                                    <Text className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    <Text className="text-xs text-night/50 dark:text-white/50 mt-1">
                                         {event.summary}
                                     </Text>
                                 )}
@@ -168,16 +169,15 @@ export default function DayModal() {
                             calendarBackground: background,
                             textSectionTitleColor: text,
                             dayTextColor: text,
-                            textSectionTitleDisabledColor: '#d9e1e8',
-                            selectedDayBackgroundColor: '#F7B74A',
-                            selectedDayTextColor: text,
+                            textSectionTitleDisabledColor: muted,
+                            selectedDayBackgroundColor: accent,
+                            selectedDayTextColor: ink,
                             todayTextColor: accent,
-                            todayBackgroundColor: '#F7B74A',
-                            textDisabledColor: '#828485ff',
+                            textDisabledColor: muted,
                             dotColor: accent,
                             selectedDotColor: '#ffffff',
                             arrowColor: accent,
-                            disabledArrowColor: '#d9e1e8',
+                            disabledArrowColor: muted,
                             monthTextColor: text,
                             indicatorColor: text,
                         }

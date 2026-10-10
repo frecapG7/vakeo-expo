@@ -101,11 +101,20 @@ export default Sentry.wrap(function RootLayout() {
   // est terminée (réussie ou non — jamais de blocage sur le splash).
   const [migrationDone, setMigrationDone] = useState(false);
 
-  // Splash masquée quand les polices sont prêtes ET la migration terminée.
+  // Splash masquée quand les polices sont prêtes, la migration terminée ET
+  // le plancher de durée écoulé : sans plancher, un démarrage très rapide
+  // (dev, warm start) fait flasher le splash. Un vrai cold start qui dépasse
+  // déjà ce délai n'est jamais retardé.
+  const [splashMinDurationDone, setSplashMinDurationDone] = useState(false);
   useEffect(() => {
-    if ((fontsLoaded || fontError) && migrationDone)
+    const timer = setTimeout(() => setSplashMinDurationDone(true), 700);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if ((fontsLoaded || fontError) && migrationDone && splashMinDurationDone)
       SplashScreen.hide();
-  }, [fontsLoaded, fontError, migrationDone]);
+  }, [fontsLoaded, fontError, migrationDone, splashMinDurationDone]);
 
 
   return (

@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { useTrip } from "@/context/TripContext";
 import { useGlassHeaderOptions } from "@/hooks/styles/useGlassHeaderOptions";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Platform, View } from "react-native";
@@ -8,8 +7,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
 export default function GoodsLayout() {
-
-    const { trip } = useTrip();
     const { title } = useLocalSearchParams<{ title?: string }>();
 
     const insets = useSafeAreaInsets();
@@ -34,8 +31,7 @@ export default function GoodsLayout() {
                         headerLargeTitleEnabled: true,
                         headerTransparent: Platform.OS === "ios",
                         headerLeft: () =>
-                            <Button onPress={() => router.back()}
-                                className="mr-4">
+                            <Button onPress={() => router.back()}>
                                 <IconSymbol name="arrow.left" />
                             </Button>
                     }} />
@@ -44,8 +40,7 @@ export default function GoodsLayout() {
                         presentation: "modal",
                         title: "Ajouter un article",
                         animation: "slide_from_bottom",
-                        headerLeft: () => <Button onPress={() => router.back()}
-                            className="mr-4">
+                        headerLeft: () => <Button onPress={() => router.back()}>
                             <IconSymbol name="xmark" />
                         </Button>
                     }} />
@@ -54,8 +49,7 @@ export default function GoodsLayout() {
                         presentation: "modal",
                         title: "Modifier un article",
                         animation: "slide_from_bottom",
-                        headerLeft: () => <Button onPress={() => router.back()}
-                            className="mr-4">
+                        headerLeft: () => <Button onPress={() => router.back()}>
                             <IconSymbol name="xmark" />
                         </Button>
                     }} />
