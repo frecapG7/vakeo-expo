@@ -30,9 +30,8 @@ export default function PollsLayout() {
                         headerTransparent: Platform.OS === "ios",
                         title: "Sondages",
                         headerLeft: () =>
-                            <Pressable onPress={() => router.back()}
-                                className="mr-4">
-                                <IconSymbol name="chevron.left" />
+                            <Pressable onPress={() => router.back()}>
+                                <IconSymbol name="arrow.left" />
                             </Pressable>,
                         headerRight: () =>
                             me && <Pressable
@@ -42,7 +41,6 @@ export default function PollsLayout() {
                                         id: trip?._id
                                     }
                                 })}
-                                className="ml-4"
                             >
                                 <Avatar
                                     src={me?.avatar}
@@ -67,8 +65,7 @@ export default function PollsLayout() {
                                     : router.replace({
                                         pathname: "/[id]/polls",
                                         params: { id: trip?._id }
-                                    })}
-                                className="mr-4">
+                                    })}>
                                 <IconSymbol name="arrow.left" />
                             </Pressable>,
                     }} />

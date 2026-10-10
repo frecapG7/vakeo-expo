@@ -29,10 +29,9 @@ export default function SettingsLayout() {
                 <Stack.Screen name="index" options={{
                     headerLeft: () =>
                         <Button
-                            className="mr-4"
                             onPress={() => router.back()}
                         >
-                            <IconSymbol name="chevron.left" color={isDark ? "#F6F8FD" : "#16265C"} />
+                            <IconSymbol name="arrow.left" color={isDark ? "#F6F8FD" : "#16265C"} />
                         </Button>,
                 }}
                 />

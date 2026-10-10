@@ -164,7 +164,7 @@ export default function TripLinks() {
                 ListFooterComponent={<View className="my-5 pb-6" />}
             />
             {trip?._id &&
-                <FloatingAddButton onPress={() => router.push({
+                <FloatingAddButton style={{ bottom: 40 }} onPress={() => router.push({
                     pathname: "/[id]/links/new",
                     params: {
                         id: trip._id,

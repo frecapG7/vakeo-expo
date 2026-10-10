@@ -33,7 +33,11 @@ export default function LinksLayout() {
                     options={{
                         title: "Les liens utiles",
                         headerLargeTitleEnabled: true,
-                        headerTransparent: Platform.OS === "ios"
+                        headerTransparent: Platform.OS === "ios",
+                        headerLeft: () =>
+                            <Button onPress={() => router.back()}>
+                                <IconSymbol name="arrow.left" />
+                            </Button>
                     }} />
                 <Stack.Screen name="new"
                     options={{
@@ -41,7 +45,6 @@ export default function LinksLayout() {
                         title: "Ajouter un lien",
                         animation: "slide_from_bottom",
                         headerLeft: () => <Button
-                            className="mr-4"
                             onPress={() => router.back()}>
                             <IconSymbol name="xmark" />
                         </Button>

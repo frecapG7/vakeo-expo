@@ -145,15 +145,6 @@ export default function TripCalendar() {
                         <Text className="text-xl font-semibold text-night dark:text-white capitalize">
                             {dayjs(selectedDay).locale('fr').format('dddd D MMMM')}
                         </Text>
-                        <Pressable onPress={() => router.push({
-                            pathname: "/[id]/(tabs)/planning/day",
-                            params: {
-                                id,
-                                date: selectedDay
-                            },
-                        })}>
-                            <Text className="text-amber-deep font-medium">Voir tout</Text>
-                        </Pressable>
                     </View>
 
                     <View className="px-4 pb-4">

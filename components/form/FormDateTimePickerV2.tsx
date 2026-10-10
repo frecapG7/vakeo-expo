@@ -86,7 +86,7 @@ export const FormDateTimePickerV2 = ({ control, rules, initialDate }:
 
     const isDark = useColorScheme() === "dark";
     const themeText = isDark ? "#F6F8FD" : "#16265C";
-    const themeBackground = isDark ? "#101736" : "#FFFFFF";
+    const themeBackground = isDark ? "#16265C" : "#FFFFFF";
 
     const [showStartDateCalendar, setShowStartDateCalendar] = useState(false);
     const [showStartDateTimePicker, setShowStartDateTimePicker] = useState(false);

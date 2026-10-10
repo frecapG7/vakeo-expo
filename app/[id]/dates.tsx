@@ -103,7 +103,7 @@ export default function DatesPage() {
                 {/* // Above calendar */}
                 <View className="m-2 mb-4 p-4 gap-4 bg-white dark:bg-night rounded-2xl shadow-sm border border-mist dark:border-white/10">
                     <View className="flex-row items-center gap-2">
-                        <Text className="text-xl">📅</Text>
+                        <IconSymbol name="calendar" size={24} color="#EE8B33" />
                         {startDate && endDate ? (
                             <View>
                                 <Text className="text-lg font-bold capitalize text-night dark:text-white">
@@ -149,8 +149,8 @@ export default function DatesPage() {
                     <Calendar
                         enableSwipeMonths
                         theme={{
-                            backgroundColor: isDark ? "#101736" : "#F6F8FD",
-                            calendarBackground: isDark ? "#101736" : "#F6F8FD",
+                            backgroundColor: isDark ? "#16265C" : "#FFFFFF",
+                            calendarBackground: isDark ? "#16265C" : "#FFFFFF",
                             textSectionTitleColor: textColor,
                             dayTextColor: textColor,
                             textSectionTitleDisabledColor: muted,

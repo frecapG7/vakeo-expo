@@ -13,49 +13,41 @@ import { useMemo, useState } from "react";
 import { Pressable, SectionList, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
-const typeFilters = [
+const typeFilters: { value: string, label: string }[] = [
     {
         value: "",
         label: "Tous"
     },
     {
         value: "ACTIVITY",
-        icon: "flame",
         label: "Activité"
     },
     {
         value: "MEAL",
-        icon: "cart",
         label: "Repas"
     },
     {
         value: "RESTAURANT",
-        icon: "suit.spade",
         label: "Restaurant"
     },
     {
         value: "SPORT",
-        icon: "sportscourt",
         label: "Sport"
     },
     {
         value: "PARTY",
-        icon: "moon.stars.fill",
         label: "Soirée"
     },
     {
         value: "TRANSPORT",
-        icon: "map",
         label: "Transport"
     },
     {
         value: "EXCURSION",
-        icon: "smiley",
         label: "Excursion"
     },
     {
         value: "OTHER",
-        icon: "star",
         label: "Autre"
     }
 ]
@@ -113,26 +105,26 @@ const EventItem = ({ event, user, onPress }: { event: Event, user?: TripUser | n
                             </Animated.View>}
                     </View>
                     {event.details &&
-                        <Text className="text-sm text-gray-500 dark:text-gray-400" numberOfLines={2}>
+                        <Text className="text-sm italic text-night/50 dark:text-white/50" numberOfLines={2}>
                             {event.details}
                         </Text>}
-                    <View className="flex-row items-center justify-around ">
-                        <View className="flex-row items-center gap-1">
-                            <IconSymbol name="clock" color="gray" size={14} />
-                            {event?.startDate &&
-                                <Text className="text-sm text-gray-500 dark:text-gray-400">
+                    <View className="flex-row items-center gap-2 ">
+                        {event?.startDate &&
+                            <View className="flex-row items-center gap-1.5 rounded-full border border-mist dark:border-white/15 px-2.5 py-1">
+                                <IconSymbol name="clock" color="#EE8B33" size={13} />
+                                <Text className="text-xs font-semibold text-night/60 dark:text-white/60">
                                     {dayjs(event?.startDate).format("HH:mm")}-{dayjs(event?.endDate).format("HH:mm")}
-                                </Text>}
-                        </View>
-                        <View className="flex-row items-center gap-1">
-                            <IconSymbol name="person.2.fill" color="gray" size={14} />
-                            <Text className="text-sm text-gray-500 dark:text-gray-400">
+                                </Text>
+                            </View>}
+                        <View className="flex-row items-center gap-1.5 rounded-full border border-mist dark:border-white/15 px-2.5 py-1">
+                            <IconSymbol name="person.2.fill" color="#EE8B33" size={13} />
+                            <Text className="text-xs font-semibold text-night/60 dark:text-white/60">
                                 {event?.attendees?.length}
                             </Text>
                         </View>
-                        <View className="flex-row items-center gap-1">
-                            <IconSymbol name="list.bullet" color="gray" size={14} />
-                            <Text className="text-sm text-gray-500 dark:text-gray-400">
+                        <View className="flex-row items-center gap-1.5 rounded-full border border-mist dark:border-white/15 px-2.5 py-1">
+                            <IconSymbol name="list.bullet" color="#EE8B33" size={13} />
+                            <Text className="text-xs font-semibold text-night/60 dark:text-white/60">
                                 {event?.goodsCount ?? 0}
                             </Text>
                         </View>
@@ -184,9 +176,10 @@ export default function TripPlanning() {
                                 {typeFilters.map(item => (
                                     <Pressable
                                         key={item.value}
-                                        className={`py-2 px-4 items-center rounded-full ${typeFilter === item.value ? "bg-amber-deep border border-amber-deep" : "bg-white dark:bg-night border border-mist dark:border-white/15"}`}
+                                        className={`h-10 px-4 flex-row items-center gap-2 rounded-full ${typeFilter === item.value ? "bg-amber-deep border border-amber-deep" : "bg-white dark:bg-night border border-mist dark:border-white/15"}`}
                                         onPress={() => setTypeFilter(typeFilter === item?.value ? "" : item.value)}
                                     >
+                                        {item.value && <EventIcon name={item.value} size="xs" />}
                                         <Text className={`${typeFilter === item.value ? "font-bold text-night" : "text-night dark:text-white"}`}>
                                             {item.label}
                                         </Text>

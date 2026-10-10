@@ -20,7 +20,7 @@ export const DateRangeCalendar = ({
 }: DateRangeCalendarProps) => {
     const isDark = useColorScheme() === "dark";
     const text = isDark ? "#F6F8FD" : "#16265C";
-    const surface = isDark ? "#101736" : "#F6F8FD";
+    const surface = isDark ? "#16265C" : "#FFFFFF";
     const muted = isDark ? "rgba(246,248,253,0.35)" : "rgba(22,38,92,0.35)";
     const ink = "#101736";
 

@@ -6,7 +6,7 @@ import { useGlassHeaderOptions } from "@/hooks/styles/useGlassHeaderOptions";
 import { Event } from "@/types/models";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { FormProvider, useForm } from "react-hook-form";
-import { View, useColorScheme } from "react-native";
+import { useColorScheme } from "react-native";
 
 const firstParam = (value: string | string[] | undefined): string | undefined =>
     Array.isArray(value) ? value[0] : value;
@@ -50,36 +50,30 @@ export default function NewEventLayout() {
                 <Stack.Screen name="index"
                     options={{
                         headerLeft: () => (
-                            <View className="flex-row items-center">
-                                <Button onPress={() => router.back()}>
-                                    <IconSymbol name="arrow.left" color="gray" />
-                                </Button>
-                                <Chip text="1 sur 3" size="xsmall" />
-                            </View>
+                            <Button onPress={() => router.back()}>
+                                <IconSymbol name="arrow.left" color="gray" />
+                                <Chip text="1 sur 3" size="xsmall" onPress={() => router.back()} />
+                            </Button>
                         ),
                         title: ""
                     }} />
                 <Stack.Screen name="setup-event-info"
                     options={{
                         headerLeft: () => (
-                            <View className="flex-row items-center">
-                                <Button onPress={() => router.back()}>
-                                    <IconSymbol name="arrow.left" color="gray" />
-                                </Button>
-                                <Chip text="2 sur 3" size="xsmall" />
-                            </View>
+                            <Button onPress={() => router.back()}>
+                                <IconSymbol name="arrow.left" color="gray" />
+                                <Chip text="2 sur 3" size="xsmall" onPress={() => router.back()} />
+                            </Button>
                         ),
                         title: ""
                     }} />
                 <Stack.Screen name="setup-event-users"
                     options={{
                         headerLeft: () => (
-                            <View className="flex-row items-center">
-                                <Button onPress={() => router.back()}>
-                                    <IconSymbol name="arrow.left" color="gray" />
-                                </Button>
-                                <Chip text="3 sur 3" size="xsmall" />
-                            </View>
+                            <Button onPress={() => router.back()}>
+                                <IconSymbol name="arrow.left" color="gray" />
+                                <Chip text="3 sur 3" size="xsmall" onPress={() => router.back()} />
+                            </Button>
                         ),
                         title: "",
                     }}

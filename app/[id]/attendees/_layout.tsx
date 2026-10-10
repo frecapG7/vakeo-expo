@@ -22,17 +22,15 @@ export default function AttendeesLayout() {
                     headerLargeTitleEnabled: true,
                     headerTransparent: Platform.OS === "ios",
                     headerLeft: () =>
-                        <Pressable onPress={() => router.back()}
-                            className="mr-4">
-                            <IconSymbol name="chevron.left" />
+                        <Pressable onPress={() => router.back()}>
+                            <IconSymbol name="arrow.left" />
                         </Pressable>,
                     headerRight: () =>
                         trip?._id && <Pressable
                             onPress={() => router.push({
                                 pathname: "/[id]/attendees/edit",
                                 params: { id: trip?._id }
-                            })}
-                            className="ml-4">
+                            })}>
                             <Text className="text-base font-medium dark:text-white">Modifier</Text>
                         </Pressable>,
                 }}

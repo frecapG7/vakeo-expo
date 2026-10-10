@@ -2,9 +2,10 @@ import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
 import { HeaderTitle } from "@/components/ui/HeaderTitle";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { useGlassHeaderOptions } from "@/hooks/styles/useGlassHeaderOptions";
 import { Stack, useRouter } from "expo-router";
 import { FormProvider, useForm } from "react-hook-form";
-import { View } from "react-native";
+import { useColorScheme } from "react-native";
 
 export default function NewTripLayout() {
 
@@ -22,23 +23,41 @@ export default function NewTripLayout() {
     });
 
     const router = useRouter();
+    const glass = useGlassHeaderOptions();
+    const isDark = useColorScheme() === "dark";
+    const text = isDark ? "#F6F8FD" : "#16265C";
+
+    // Sortie de la première étape (pas d'étape précédente) : retour à l'écran qui
+    // a ouvert /new — l'histoire expo-router est unifiée, back dépile le push de
+    // /new lui-même. Chute dismissAll si aucun historique (deep link direct),
+    // pattern canGoBack de polls/[pollId].
+    const exitFromFirstStep = () => router.canGoBack()
+        ? router.back()
+        : router.dismissAll();
 
     return (
         <FormProvider {...methods}>
             <Stack screenOptions={{
                 headerShown: true,
-                headerRight: () => <View className="w-18"/>
+                ...glass,
+                headerTitleAlign: "center",
+                // La croix quitte le formulaire depuis n'importe quelle étape :
+                // back() depuis l'étape 2 ne dépilerait que le push interne et
+                // ramènerait à l'étape précédente — c'est le rôle du headerLeft.
+                headerRight: () => (
+                    <Button onPress={() => router.dismissAll()}>
+                        <IconSymbol name="xmark" color={text} size={24} />
+                    </Button>
+                )
             }}>
                 <Stack.Screen name="index" />
                 <Stack.Screen name="setup-general"
                     options={{
                         headerLeft: () => (
-                            <View className="flex-row items-center">
-                                <Button onPress={() => router.dismissAll()}>
-                                    <IconSymbol name="arrow.left" color="gray" />
-                                </Button>
-                                <Chip text="1 sur 2" size="small" />
-                            </View>
+                            <Button onPress={exitFromFirstStep}>
+                                <IconSymbol name="arrow.left" color="gray" />
+                                <Chip text="1 sur 2" size="small" onPress={exitFromFirstStep} />
+                            </Button>
                         ),
                         headerTitle: () => <HeaderTitle title="Nouvelle escapade" subtitle="Informations générales"/>,
                     }}
@@ -46,14 +65,14 @@ export default function NewTripLayout() {
                 <Stack.Screen name="setup-users"
                     options={{
                         headerLeft: () => (
-                            <View className="flex-row items-center">
-                                <Button onPress={() => router.dismissTo({
+                            <Button onPress={() => router.dismissTo({
+                                pathname: "/new/setup-general"
+                            })}>
+                                <IconSymbol name="arrow.left" color="gray" />
+                                <Chip text="2 sur 2" size="small" onPress={() => router.dismissTo({
                                     pathname: "/new/setup-general"
-                                })}>
-                                    <IconSymbol name="arrow.left" color="gray" />
-                                </Button>
-                                <Chip text="2 sur 2" size="small" />
-                            </View>
+                                })} />
+                            </Button>
                         ),
                         headerTitle: () => <HeaderTitle title="Nouvelle escapade" subtitle="Ajouter des invités"/>,
                     }} />
