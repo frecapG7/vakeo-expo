@@ -27,6 +27,13 @@ export default function NewTripLayout() {
     const isDark = useColorScheme() === "dark";
     const text = isDark ? "#F6F8FD" : "#16265C";
 
+    // Sortie du setup : retour à l'écran qui a ouvert /new (l'histoire expo-router
+    // est unifiée, back dépile le push de /new lui-même). Chute dismissAll si aucun
+    // historique (deep link direct) — pattern canGoBack de polls/[pollId].
+    const exitSetup = () => router.canGoBack()
+        ? router.back()
+        : router.dismissAll();
+
     return (
         <FormProvider {...methods}>
             <Stack screenOptions={{
@@ -34,7 +41,7 @@ export default function NewTripLayout() {
                 ...glass,
                 headerTitleAlign: "center",
                 headerRight: () => (
-                    <Button onPress={() => router.dismissAll()}>
+                    <Button onPress={exitSetup}>
                         <IconSymbol name="xmark" color={text} size={24} />
                     </Button>
                 )
@@ -43,9 +50,9 @@ export default function NewTripLayout() {
                 <Stack.Screen name="setup-general"
                     options={{
                         headerLeft: () => (
-                            <Button onPress={() => router.dismissAll()}>
+                            <Button onPress={exitSetup}>
                                 <IconSymbol name="arrow.left" color="gray" />
-                                <Chip text="1 sur 2" size="small" onPress={() => router.dismissAll()} />
+                                <Chip text="1 sur 2" size="small" onPress={exitSetup} />
                             </Button>
                         ),
                         headerTitle: () => <HeaderTitle title="Nouvelle escapade" subtitle="Informations générales"/>,

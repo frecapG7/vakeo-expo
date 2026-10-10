@@ -13,7 +13,6 @@ import * as Linking from 'expo-linking';
 import { useRouter } from "expo-router";
 import { useMemo } from "react";
 import { Alert, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import Animated from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
@@ -23,7 +22,6 @@ export default function TripLinks() {
 
     const { trip } = useTrip();
     const router = useRouter();
-    const insets = useSafeAreaInsets();
 
     const { data, hasNextPage, fetchNextPage, isLoading, refetch, isRefetching } = useGetLinks(trip?._id);
     const deleteLink = useDeleteLink(trip?._id);
@@ -166,7 +164,7 @@ export default function TripLinks() {
                 ListFooterComponent={<View className="my-5 pb-6" />}
             />
             {trip?._id &&
-                <FloatingAddButton style={{ bottom: insets.bottom + 40 }} onPress={() => router.push({
+                <FloatingAddButton style={{ bottom: 40 }} onPress={() => router.push({
                     pathname: "/[id]/links/new",
                     params: {
                         id: trip._id,
