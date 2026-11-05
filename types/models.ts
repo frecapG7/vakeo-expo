@@ -1,5 +1,5 @@
 export interface Location {
-    coordinates: [Number],
+    coordinates: [number, number],
     displayName: string
 }
 
