@@ -162,7 +162,7 @@ const RootNav = () => {
 
 
   return (
-    <Stack initialRouteName="index">
+    <Stack>
       <Stack.Screen name="index" options={{
         headerShown: true,
         headerTitle: () => <Wordmark size={22} />,

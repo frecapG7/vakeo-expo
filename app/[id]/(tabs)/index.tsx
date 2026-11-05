@@ -25,6 +25,8 @@ export default function ItemDetails() {
 
     const { me, trip } = useTrip();
     const { data: dashboard, refetch, isRefetching } = useGetDashboard(trip?._id, me?._id, !!trip?._id)
+    // Narrowing stable pour les closures (params expo-router 58 stricts).
+    const nextEvent = dashboard?.events?.nextEvent;
     const deleteTrip = useDeleteStorageTrip();
     const leaveTrip = useLeaveTrip();
 
@@ -88,7 +90,7 @@ export default function ItemDetails() {
             scrollEventThrottle={16}
             contentContainerStyle={{ paddingBottom: bottomPadding }}
             refreshControl={
-                <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
+                <RefreshControl refreshing={isRefetching} onRefresh={() => { refetch(); }} />
             }
         >
             <View className="h-64 w-full">
@@ -194,7 +196,7 @@ export default function ItemDetails() {
                     />
                 </View>
             </View>
-            {dashboard?.events?.nextEvent && (
+            {nextEvent && (
                 <View className="mx-4 mb-5">
                     <Text className="text-lg font-bold mb-2 text-night dark:text-white">Prochain événement</Text>
                     <Button
@@ -203,7 +205,7 @@ export default function ItemDetails() {
                             pathname: "/[id]/events/[eventId]",
                             params: {
                                 id: trip._id,
-                                eventId: dashboard.events.nextEvent?._id
+                                eventId: nextEvent._id
                             }
                         })}
                     >
@@ -211,15 +213,15 @@ export default function ItemDetails() {
                             <IconSymbol name="calendar" size={24} color="#EE8B33" />
                             <View className="flex-1">
                                 <Text className="text-lg font-bold text-night dark:text-white" numberOfLines={1}>
-                                    {dashboard.events.nextEvent.name}
+                                    {nextEvent.name}
                                 </Text>
                                 <Text className="text-sm text-gray-500 dark:text-gray-400">
-                                    {dashboard.events.nextEvent.startDate
-                                        ? dayjs(dashboard.events.nextEvent.startDate).format("DD MMM YYYY, HH:mm")
+                                    {nextEvent.startDate
+                                        ? dayjs(nextEvent.startDate).format("DD MMM YYYY, HH:mm")
                                         : "Date à confirmer"
                                     }
-                                    {dashboard.events.nextEvent.endDate
-                                        ? ` - ${dayjs(dashboard.events.nextEvent.endDate).format("HH:mm")}`
+                                    {nextEvent.endDate
+                                        ? ` - ${dayjs(nextEvent.endDate).format("HH:mm")}`
                                         : ""
                                     }
                                 </Text>

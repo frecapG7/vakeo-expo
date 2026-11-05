@@ -1,5 +1,5 @@
 import useColors from "@/hooks/styles/useColors";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ComponentRef } from "react";
 import { useController } from "react-hook-form";
 import { FlatList, Pressable, Text, TextInput, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
@@ -48,7 +48,7 @@ export const FormAutocomplete = ({
     }, [error, shakeAnimation]);
 
     const { inputPlaceHolder } = useColors();
-    const textInputRef = useRef<TextInput>(null);
+    const textInputRef = useRef<ComponentRef<typeof TextInput>>(null);
 
     useEffect(() => {
         if (error)
