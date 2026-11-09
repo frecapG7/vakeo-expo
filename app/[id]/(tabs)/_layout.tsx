@@ -1,6 +1,6 @@
 import { useTrip } from "@/context/TripContext";
 import { useGetUnreadCount } from "@/hooks/api/useMessages";
-import { NativeTabs } from "expo-router/unstable-native-tabs";
+import { NativeTabs } from "expo-router/native-tabs";
 
 export default function ItemDetailsLayout() {
 

@@ -1,0 +1,42 @@
+diff --git a/node_modules/react-native-css/dist/commonjs/components/index.cjs b/node_modules/react-native-css/dist/commonjs/components/index.cjs
+index 23af26c..56bb164 100644
+--- a/node_modules/react-native-css/dist/commonjs/components/index.cjs
++++ b/node_modules/react-native-css/dist/commonjs/components/index.cjs
+@@ -120,6 +120,9 @@ module.exports = {
+   get AppState() {
+     return require("react-native").AppState;
+   },
++  get AssetRegistry() {
++    return require("react-native").AssetRegistry;
++  },
+   get BackHandler() {
+     return require("react-native").BackHandler;
+   },
+diff --git a/node_modules/react-native-css/dist/module/components/index.cjs b/node_modules/react-native-css/dist/module/components/index.cjs
+index 23af26c..56bb164 100644
+--- a/node_modules/react-native-css/dist/module/components/index.cjs
++++ b/node_modules/react-native-css/dist/module/components/index.cjs
+@@ -120,6 +120,9 @@ module.exports = {
+   get AppState() {
+     return require("react-native").AppState;
+   },
++  get AssetRegistry() {
++    return require("react-native").AssetRegistry;
++  },
+   get BackHandler() {
+     return require("react-native").BackHandler;
+   },
+diff --git a/node_modules/react-native-css/src/components/index.cts b/node_modules/react-native-css/src/components/index.cts
+index ead6ff4..3fa4eaf 100644
+--- a/node_modules/react-native-css/src/components/index.cts
++++ b/node_modules/react-native-css/src/components/index.cts
+@@ -119,6 +119,9 @@ module.exports = {
+   get AppState() {
+     return require("react-native").AppState;
+   },
++  get AssetRegistry() {
++    return require("react-native").AssetRegistry;
++  },
+   get BackHandler() {
+     return require("react-native").BackHandler;
+   },

@@ -3,7 +3,7 @@ import { useTrip } from "@/context/TripContext";
 import { Trip, TripStop } from "@/types/models";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
-import { useCallback, useRef, useState, type RefObject } from "react";
+import { useCallback, useRef, useState, type ComponentRef, type RefObject } from "react";
 import { useForm } from "react-hook-form";
 import { Pressable, Text, useColorScheme, View, type ViewProps } from "react-native";
 import Animated, { SlideInRight, SlideOutLeft } from "react-native-reanimated";
@@ -29,7 +29,7 @@ interface AccommodationWizardProps {
      * Cible du blur Android : ref d'un <BlurTargetView> enveloppant le contenu
      * sous le sheet (la liste des étapes), cf. GlassSheetBackground.
      */
-    blurTarget?: RefObject<View | null>;
+    blurTarget?: RefObject<ComponentRef<typeof View> | null>;
 }
 
 

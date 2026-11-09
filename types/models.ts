@@ -1,6 +1,7 @@
 export interface Location {
-    coordinates: [Number],
-    displayName: string
+    coordinates: [number, number],
+    displayName: string,
+    provider?: string
 }
 
 export interface Link {

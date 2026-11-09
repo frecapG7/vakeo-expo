@@ -52,7 +52,7 @@ export default function DayModal() {
 
     const [newEvent, setNewEvent] = useState<Omit<Event, "_id"> | null>();
 
-    const timelineEvents = useMemo(() => {
+    const timelineEvents = useMemo<Record<string, { id: string; start: string; end: string; title: string; summary: string; color: string }[]>>(() => {
         const baseEvents = dayEvents?.map(event => ({
             id: event._id,
             start: dayjs(event.startDate).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
@@ -64,8 +64,8 @@ export default function DayModal() {
 
         const previewEvent = newEvent ? [{
             id: 'new-event-preview',
-            start: newEvent.startDate,
-            end: newEvent.endDate,
+            start: newEvent.startDate ? dayjs(newEvent.startDate).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]') : '',
+            end: newEvent.endDate ? dayjs(newEvent.endDate).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]') : '',
             title: newEvent.name,
             summary: newEvent.type,
             color: accent,
@@ -114,9 +114,9 @@ export default function DayModal() {
                     )}
 
                 />
-                <TimelineList
+                <View className="flex-1">
+                    <TimelineList
                     initialTime={{ hour: 9, minutes: 0 }}
-                    styles={{ flex: 1 }}
                     events={timelineEvents}
                     timelineProps={{
                         // overlapEventsSpacing: 8,
@@ -185,9 +185,8 @@ export default function DayModal() {
                     }}
                     scrollToFirst
                     showNowIndicator
-                    containerStyle={{ flex: 1 }}
-                    timeLabelStyle={{ color: text }}
-                />
+                    />
+                </View>
             </CalendarProvider>
         </View>
     );

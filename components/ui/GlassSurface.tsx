@@ -1,6 +1,6 @@
 import { BlurView } from "expo-blur";
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
-import type { RefObject } from "react";
+import type { ComponentRef, RefObject } from "react";
 import { Platform, StyleSheet, useColorScheme, View, type ViewProps, type ViewStyle } from "react-native";
 
 const supportsLiquidGlass = Platform.OS === "ios" && isLiquidGlassAvailable();
@@ -23,7 +23,7 @@ type GlassSurfaceProps = ViewProps & {
      * Sans cible sur Android : pas de blur (overlay translucide) — l'ancien blur
      * automatique "de tout ce qu'il y a derrière" n'existe plus dans l'API.
      */
-    blurTarget?: RefObject<View | null>;
+    blurTarget?: RefObject<ComponentRef<typeof View> | null>;
 };
 
 /**
@@ -92,7 +92,7 @@ export const GlassSurface = ({ children, style, glassEffectStyle = "regular", ti
  * blurTarget : ref d'un <BlurTargetView> enveloppant le contenu sous le sheet
  * (blur Android explicite, cf. GlassSurface).
  */
-export const GlassSheetBackground = ({ style, blurTarget, ...props }: ViewProps & { blurTarget?: RefObject<View | null> }) => {
+export const GlassSheetBackground = ({ style, blurTarget, ...props }: ViewProps & { blurTarget?: RefObject<ComponentRef<typeof View> | null> }) => {
 
     const colorScheme = useColorScheme();
     const isDark = colorScheme === "dark";

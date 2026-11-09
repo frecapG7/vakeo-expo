@@ -3,6 +3,7 @@ import MaterialIcons from "@react-native-vector-icons/material-icons/static";
 import useColors from "@/hooks/styles/useColors";
 import { useMigrate, hasPendingMigrations } from "@/hooks/api/useMigrate";
 import '@/lib/calendar-config';
+import '@/lib/reanimated-logger';
 import { DefaultTheme, SplashScreen, Stack, ThemeProvider } from "expo-router";
 import * as Sentry from '@sentry/react-native';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -162,7 +163,7 @@ const RootNav = () => {
 
 
   return (
-    <Stack initialRouteName="index">
+    <Stack>
       <Stack.Screen name="index" options={{
         headerShown: true,
         headerTitle: () => <Wordmark size={22} />,

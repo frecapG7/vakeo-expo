@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 
 
-export const popupMenuStyles = (colors) => ({
+export const popupMenuStyles = (colors: { background: string }) => ({
   optionsContainer: {
     borderRadius: 12,
     padding: 8,
