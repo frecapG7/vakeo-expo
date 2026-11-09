@@ -4,9 +4,14 @@ import { Location } from "@/types/models";
 import { useQuery } from "@tanstack/react-query";
 
 
-const postGeocode = async (address: string): Promise<Location> => {
+// Contrat v3 : enveloppe { success, data }. Les interceptors du client partage
+// (lib/axios.js) ne deballent rien, le deballage est par appel.
+// data : tableau de resultats { coordinates, displayName, provider }.
+// No-result du service : 200 + success:true + data [] -> tableau vide cote UI.
+const postGeocode = async (address: string): Promise<Location[]> => {
     const response = await axios.post(v3Path("/geocode"), { address });
-    return response.data;
+    const data = response.data?.data;
+    return Array.isArray(data) ? data : [];
 }
 
 /**
@@ -19,7 +24,7 @@ const postGeocode = async (address: string): Promise<Location> => {
  */
 export const useGeocode = (address: string) => {
     const trimmed = address.trim();
-    return useQuery<Location>({
+    return useQuery<Location[]>({
         queryKey: ["geocode", trimmed],
         queryFn: () => postGeocode(trimmed),
         enabled: false,

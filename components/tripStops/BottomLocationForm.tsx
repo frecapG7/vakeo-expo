@@ -1,6 +1,6 @@
 import { useGeocode } from "@/hooks/api/useGeocode";
 import useColors from "@/hooks/styles/useColors";
-import { TripStop } from "@/types/models";
+import { Location, TripStop } from "@/types/models";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import React, { useState } from "react";
 import { Control, useController, useFormState } from "react-hook-form";
@@ -31,11 +31,11 @@ export const BottomLocationForm = ({ control}: LocationSearchProps) => {
     const { inputPlaceHolder } = useColors();
     // Recherche au clic uniquement (service de geocoding facture) : la query est
     // desactivee et ne part que sur refetch(), depuis la loupe ou la touche chercher du clavier.
-    const { data: geocode, isFetching, isFetched, refetch } = useGeocode(input);
-    const noResult = isFetched && !isFetching && !geocode;
+    const { data: results, isFetching, isSuccess, isError, refetch } = useGeocode(input);
+    const noResult = isSuccess && !isFetching && results?.length === 0;
 
     const onSearch = () => {
-        if (isFetching || geocode || !input.trim())
+        if (isFetching || results?.length || !input.trim())
             return;
         refetch();
     };
@@ -50,7 +50,7 @@ export const BottomLocationForm = ({ control}: LocationSearchProps) => {
                 await Linking.openURL(url);
             } catch {
                 // Fallback for platforms that don't support geo: URI
-                const fallbackUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}&query_place_id=${encodedDisplayName}`;
+                const fallbackUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
                 try {
                     await Linking.openURL(fallbackUrl);
                 } catch (err) {
@@ -60,8 +60,8 @@ export const BottomLocationForm = ({ control}: LocationSearchProps) => {
         }
     };
 
-    const handleSelectResult = () => {
-        setLocation(geocode);
+    const handleSelectResult = (result: Location) => {
+        setLocation(result);
         setInput("");
     };
 
@@ -130,23 +130,31 @@ export const BottomLocationForm = ({ control}: LocationSearchProps) => {
                     Aucun lieu trouvé pour « {input} »
                 </Text>
             )}
-            {geocode && (
-                <Animated.View entering={SlideInLeft} exiting={SlideOutRight}>
-                    <Pressable
-                        onPress={handleSelectResult}
-                        className="flex-row items-center gap-3 p-3 rounded-xl bg-white dark:bg-night border border-mist dark:border-white/10"
-                    >
-                        <View className="p-2 rounded-full bg-amber/15 dark:bg-amber/20">
-                            <IconSymbol name="mappin" color="#EE8B33" size={16} />
-                        </View>
-                        <View className="flex-1">
-                            <Text className="text-xs text-night/50 dark:text-white/50">Suggestion</Text>
-                            <Text className="text-sm font-bold text-night dark:text-white" numberOfLines={3}>
-                                {geocode.displayName}
-                            </Text>
-                        </View>
-                        <IconSymbol name="chevron.right" color={isDark ? "#F6F8FD" : "#16265C"} size={16} />
-                    </Pressable>
+            {isError && !isFetching && (
+                <Text className="text-xs text-danger px-2">
+                    Recherche indisponible — vérifie ta connexion et réessaie
+                </Text>
+            )}
+            {results && results.length > 0 && (
+                <Animated.View entering={SlideInLeft} exiting={SlideOutRight} className="gap-1">
+                    {results.map((result, index) => (
+                        <Pressable
+                            key={index}
+                            onPress={() => handleSelectResult(result)}
+                            className="flex-row items-center gap-3 p-3 rounded-xl bg-white dark:bg-night border border-mist dark:border-white/10"
+                        >
+                            <View className="p-2 rounded-full bg-amber/15 dark:bg-amber/20">
+                                <IconSymbol name="mappin" color="#EE8B33" size={16} />
+                            </View>
+                            <View className="flex-1">
+                                <Text className="text-xs text-night/50 dark:text-white/50">Suggestion</Text>
+                                <Text className="text-sm font-bold text-night dark:text-white" numberOfLines={3}>
+                                    {result.displayName}
+                                </Text>
+                            </View>
+                            <IconSymbol name="chevron.right" color={isDark ? "#F6F8FD" : "#16265C"} size={16} />
+                        </Pressable>
+                    ))}
                 </Animated.View>
             )}
         </View>
