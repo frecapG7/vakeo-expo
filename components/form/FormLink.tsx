@@ -1,7 +1,7 @@
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import useColors from "@/hooks/styles/useColors";
 import * as Clipboard from 'expo-clipboard';
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ComponentRef } from "react";
 import { useController } from "react-hook-form";
 import { Pressable, TextInput, useColorScheme } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
@@ -67,7 +67,7 @@ export const FormLink = ({
 
     const { inputPlaceHolder } = useColors();
     const isDark = useColorScheme() === "dark";
-    const textInputRef = useRef<TextInput>(null);
+    const textInputRef = useRef<ComponentRef<typeof TextInput>>(null);
 
     useEffect(() => {
         if (error) textInputRef.current?.focus();

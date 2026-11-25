@@ -9,11 +9,11 @@ import Animated, { FadeIn, FadeOut, StretchInY, StretchOutY } from "react-native
 
 const hoursItems = Array.from({ length: 24 }).map((_, index) => ({
     value: index,
-    label: index < 10 ? "0" + index : index
+    label: index < 10 ? "0" + index : String(index)
 }));
 const minuteItems = Array.from({ length: 12 }).map((_, index) => index * 5).map((index) => ({
     value: index,
-    label: index < 10 ? "0" + index : index
+    label: index < 10 ? "0" + index : String(index)
 }));
 
 const WheelTimePicker = ({ value, onChangeHour, onChangeMinute }: { value?: Date | string, onChangeHour: (value: any) => void, onChangeMinute: (value: any) => void }) => {
@@ -22,7 +22,7 @@ const WheelTimePicker = ({ value, onChangeHour, onChangeMinute }: { value?: Date
         <View className="flex-row flex-1 gap-5 items-center justify-center bg-white dark:bg-night">
             <WheelPicker
                 data={hoursItems}
-                value={value && dayjs(value).hour()}
+                value={value ? dayjs(value).hour() : 0}
                 onValueChanged={({ item: { value: hour } }) =>
                     onChangeHour(hour)
                 }
@@ -39,7 +39,7 @@ const WheelTimePicker = ({ value, onChangeHour, onChangeMinute }: { value?: Date
             />
             <WheelPicker
                 data={minuteItems}
-                value={value && dayjs(value).minute()}
+                value={value ? dayjs(value).minute() : 0}
                 onValueChanged={({ item: { value: minute } }) => onChangeMinute(minute)
                 }
                 enableScrollByTapOnItem={true}
@@ -246,7 +246,7 @@ export const FormDateTimePickerV2 = ({ control, rules, initialDate }:
                         <View className="flex-row flex-1 gap-5 items-center justify-center bg-white dark:bg-night">
                             <WheelPicker
                                 data={hoursItems}
-                                value={endDate && dayjs(endDate).hour()}
+                                value={endDate ? dayjs(endDate).hour() : 0}
                                 onValueChanged={({ item: { value: hour } }) =>
                                     !!endDate && setEndDate(dayjs(endDate).hour(hour).toISOString())
                                 }
@@ -263,7 +263,7 @@ export const FormDateTimePickerV2 = ({ control, rules, initialDate }:
                             />
                             <WheelPicker
                                 data={minuteItems}
-                                value={endDate && dayjs(endDate).minute()}
+                                value={endDate ? dayjs(endDate).minute() : 0}
                                 onValueChanged={({ item: { value: minute } }) => endDate &&
                                     setEndDate(dayjs(endDate).minute(minute).toISOString())
                                 }

@@ -1,5 +1,5 @@
 import useColors from "@/hooks/styles/useColors";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ComponentRef } from "react";
 import { useController } from "react-hook-form";
 import { TextInput, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
@@ -45,7 +45,7 @@ export const FormText = ({ control, name, placeholder, rules, endAdornment, auto
 
     const { inputPlaceHolder } = useColors();
 
-    const textInputRef = useRef<TextInput>(null);
+    const textInputRef = useRef<ComponentRef<typeof TextInput>>(null);
     useEffect(() => {
         if (error)
             textInputRef.current?.focus();

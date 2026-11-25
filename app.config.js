@@ -21,6 +21,20 @@ const withGradleBuildTuning = (config) =>
     if (!props.modResults.some((item) => item.type === 'property' && item.key === 'org.gradle.caching')) {
       props.modResults.push({ type: 'property', key: 'org.gradle.caching', value: 'true' });
     }
+    // Expo force par defaut CMAKE_OBJECT_PATH_MAX=1024, ce qui desactive le
+    // raccourcissement (hash md5) des chemins d'objets CMake. Sur Windows avec
+    // le cmake 3.22.1 du SDK Android (ninja 1.10.2, sans support long paths),
+    // le build natif SDK 58 echoue sur RNGH 3 shadowNodes :
+    // "ninja: error: ... Filename longer than 260 characters".
+    // 250 = defaut CMake Windows : les longs chemins sont hashes et passent.
+    const objectPathMax = props.modResults.find(
+      (item) => item.type === 'property' && item.key === 'expo.android.cmakeObjectPathMax'
+    );
+    if (objectPathMax) {
+      objectPathMax.value = '250';
+    } else {
+      props.modResults.push({ type: 'property', key: 'expo.android.cmakeObjectPathMax', value: '250' });
+    }
     return props;
   });
 

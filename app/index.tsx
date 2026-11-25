@@ -15,7 +15,7 @@ import { BlurTargetView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import { ImageBackground } from "expo-image";
 import { useNavigation, useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, type ComponentRef } from "react";
 import { Text, View, type ViewProps } from "react-native";
 import Animated, { LinearTransition } from "react-native-reanimated";
 
@@ -24,7 +24,7 @@ import Animated, { LinearTransition } from "react-native-reanimated";
 const TripCard = ({ trip, onPress }: { trip: BatchTrip, onPress: () => void }) => {
 
     const { formatRange } = useI18nTime();
-    const imageRef = useRef<View>(null);
+    const imageRef = useRef<ComponentRef<typeof View>>(null);
 
     return (
         <Button
@@ -90,7 +90,7 @@ export default function HomePage() {
   const navigation = useNavigation();
 
   // Cible du blur Android du sheet : la liste derrière lui.
-  const sheetBlurTarget = useRef<View>(null);
+  const sheetBlurTarget = useRef<ComponentRef<typeof View>>(null);
   // Identité stable pour backgroundComponent (sinon remontage du fond à chaque render).
   const SheetBackground = useCallback(
     (props: ViewProps) => <GlassSheetBackground {...props} blurTarget={sheetBlurTarget} />,

@@ -10,7 +10,7 @@ import { TripStop } from "@/types/models";
 import { BlurTargetView } from "expo-blur";
 import { Image, ImageBackground } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useRef, useState, type ComponentRef } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
 import Animated, { SlideInRight, SlideOutRight } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -29,7 +29,7 @@ export default function TripLocation() {
     const insets = useSafeAreaInsets();
 
     // Cible du blur Android du sheet éditeur (le contenu sous le sheet).
-    const sheetBlurTarget = useRef<View>(null);
+    const sheetBlurTarget = useRef<ComponentRef<typeof View>>(null);
 
     const { data: tripStops, isLoading, isRefetching, refetch } = useGetTripStops(id);
     const postTripStop = usePostTripStop(id);
@@ -285,7 +285,7 @@ export default function TripLocation() {
                             <Text className="text-night font-bold text-base">Trajet au complet</Text>
                             <Text className="text-night/70 text-xs font-medium">Toutes les étapes sont prêtes</Text>
                         </View>
-                    ) : null}
+                    ) : undefined}
                     onRefresh={refetch}
                     refreshing={isRefetching}
                 />

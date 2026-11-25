@@ -8,7 +8,7 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import styles from "@/constants/Styles";
 import { useTrip } from "@/context/TripContext";
 import { usePostPoll, type PollInput } from "@/hooks/api/usePolls";
-import { useLocalSearchParams, useRouter } from "expo-router/build/hooks";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect } from "react";
 
 import { useController, useForm } from "react-hook-form";
