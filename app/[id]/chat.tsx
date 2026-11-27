@@ -1,18 +1,20 @@
 import { Avatar } from "@/components/ui/Avatar";
+import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useTrip } from "@/context/TripContext";
-import { ALLOWED_REACTIONS, useGetMessages, useMarkAllAsRead, usePostMessage, useToggleReaction } from "@/hooks/api/useMessages";
-import { useFocusEffect, useLocalSearchParams, useNavigation } from "expo-router";
+import { ALLOWED_REACTIONS, BackendMessage, useGetMessages, useMarkAllAsRead, usePostMessage, useToggleReaction } from "@/hooks/api/useMessages";
+import { router, useFocusEffect, useLocalSearchParams, useNavigation } from "expo-router";
 import { useCallback, useEffect, useMemo } from "react";
 import { Text, useColorScheme } from "react-native";
-import { Bubble, Chat, IMessage, InputToolbar, Send } from "@kesha-antonov/react-native-chat";
+import { Bubble, Chat, IMessage, InputToolbar, MessageMenuItem, Send } from "@kesha-antonov/react-native-chat";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Toast } from "toastify-react-native";
 
 
 export default function TripMessages() {
 
     const { me, trip } = useTrip();
     const isDark = useColorScheme() === "dark";
-    const { eventId, title } = useLocalSearchParams<{ eventId?: string, title?: string }>();
+    const { id, eventId, title } = useLocalSearchParams<{ id: string, eventId?: string, title?: string }>();
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetMessages(trip?._id, eventId);
     const postMessage = usePostMessage(trip?._id, me?._id, eventId);
     const { mutate: markAllAsRead } = useMarkAllAsRead(trip?._id, me?._id, eventId, true);
@@ -33,6 +35,39 @@ export default function TripMessages() {
         const currentReaction = message.reactions?.find((reaction) => reaction.userIds.includes(me._id))?.emoji;
         toggleReaction.mutate({ messageId: String(message._id), emoji, currentReaction });
     }, [toggleReaction, me?._id]);
+
+    // Menu contextuel au long press : « Signaler » sur les messages des autres
+    // participants. Le menu ne sait pas griser une entree, donc un message deja
+    // signale garde la sienne et se contente d'expliquer l'etat.
+    const messageActions = (message: IMessage, defaults: MessageMenuItem[]): MessageMenuItem[] => {
+        if (!me?._id || String(message.user._id) === String(me._id)) return defaults;
+        if ((message as BackendMessage).reportedByMe) {
+            return [...defaults, {
+                key: "reported",
+                label: "Déjà signalé",
+                icon: ({ color, size }) => <IconSymbol name="checkmark.circle.fill" color={color} size={size} />,
+                onPress: () => Toast.info("Vous avez déjà signalé ce message")
+            }];
+        }
+        return [...defaults, {
+            key: "report",
+            label: "Signaler",
+            destructive: true,
+            icon: ({ color, size }) => <IconSymbol name="flag.fill" color={color} size={size} />,
+            // La page porte le formulaire et la mutation : le chat ne transmet que
+            // la cible et le texte a rappeler.
+            onPress: () => router.push({
+                pathname: "/[id]/report",
+                params: {
+                    id: String(id),
+                    subjectType: "message",
+                    subjectId: String(message._id),
+                    preview: String(message.text ?? ""),
+                    ...(eventId ? { eventId: String(eventId) } : {})
+                }
+            })
+        }];
+    };
 
 
     const navigation = useNavigation();
@@ -61,6 +96,7 @@ export default function TripMessages() {
                     emojis: ALLOWED_REACTIONS,
                     onReactionPress: onReactionPress
                 }}
+                messageActions={messageActions}
                 // La racine de l'app monte deja son GestureHandlerRootView.
                 enableGestureHandlerRootView={false}
                 renderBubble={(props) => (
