@@ -122,6 +122,15 @@ export default function TripDetailsLayout() {
                         ),
                     }}
                 />
+                <Stack.Screen name="report"
+                    options={{
+                        presentation: "modal",
+                        title: "Signaler",
+                        animation: "slide_from_bottom",
+                        headerLeft: () => <Button onPress={() => router.back()}>
+                            <IconSymbol name="xmark" />
+                        </Button>
+                    }} />
                 <Stack.Screen name="restrictions"
                     options={{
                         title: "Restrictions alimentaires",

@@ -1,6 +1,7 @@
 import axios from "@/lib/axios";
 import { v3Path } from "@/lib/api-v3";
-import { ConversationsResponse } from "@/types/responses";
+import { reportContent } from "@/hooks/api/useReports";
+import { ConversationsResponse, ReportReason, ReportResponse } from "@/types/responses";
 import { InfiniteData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { IMessage } from "@kesha-antonov/react-native-chat";
 
@@ -16,8 +17,12 @@ export interface BackendReaction {
     users: string[];
 }
 
-/** Message brut renvoye par l'API (reactions au format backend). */
-export type BackendMessage = Omit<IMessage, "reactions"> & { reactions?: BackendReaction[] };
+/**
+ * Message brut renvoye par l'API (reactions au format backend).
+ * `reportedByMe` n'est present que pour un appelant authentifie, et seulement
+ * sur les listes : le message ne porte jamais de tableau de signaleurs.
+ */
+export type BackendMessage = Omit<IMessage, "reactions"> & { reactions?: BackendReaction[], reportedByMe?: boolean };
 
 interface IPage {
     nextCursor: string,
@@ -163,6 +168,49 @@ export const useToggleReaction = (tripId: any, userId?: string, eventId?: string
                     ...page,
                     messages: page.messages.map((message) => String(message._id) === messageId
                         ? { ...message, reactions }
+                        : message)
+                }))
+            }));
+        }
+    });
+}
+
+
+interface ReportMessageVariables {
+    messageId: string,
+    reason: ReportReason,
+    /** Precision libre optionnelle : trimmee cote serveur, 500 caracteres max. */
+    comment?: string
+}
+
+/**
+ * Signalement d'un message. La route est generique (`POST /trips/:id/reports`,
+ * cf. `useReports`) : ce hook ne porte que le type de sujet et l'etat « deja
+ * signale » dans le cache des messages.
+ */
+export const useReportMessage = (tripId: any, userId?: string, eventId?: string) => {
+    const queryClient = useQueryClient();
+    // Meme cle que les reactions : le chat general et les conversations d'event
+    // partagent l'ecran, seule la cle de cache distingue les deux listes.
+    const queryKey = ["trips", tripId, "messages", eventId ?? null];
+
+    return useMutation<ReportResponse, Error, ReportMessageVariables>({
+        mutationFn: ({ messageId, reason, comment }) => {
+            if (!tripId || !userId) {
+                throw new Error("User ID is required to report a message");
+            }
+            return reportContent(tripId, { subjectType: "message", subjectId: messageId, reason, comment });
+        },
+        // L'endpoint est idempotent (201 sur un nouveau signalement, 200 +
+        // alreadyReported sur un doublon) : dans les deux cas le message est
+        // « signale par moi », on pose le drapeau localement sans re-fetch.
+        onSuccess: (_response, { messageId }) => {
+            queryClient.setQueryData<InfiniteData<IPage>>(queryKey, (old) => old && ({
+                ...old,
+                pages: old.pages.map((page) => ({
+                    ...page,
+                    messages: page.messages.map((message) => String(message._id) === messageId
+                        ? { ...message, reportedByMe: true }
                         : message)
                 }))
             }));
