@@ -9,7 +9,7 @@ import { ReportReason, ReportSubjectType } from "@/types/responses";
 import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { KeyboardAvoidingView, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import Animated, { ZoomIn } from "react-native-reanimated";
 import { Toast } from "toastify-react-native";
 
@@ -23,6 +23,14 @@ const REASON_LABELS: Record<ReportReason, string> = {
 
 /** Limite du serveur (`contentReportService`) : coupee ici pour ne pas sortir en 422. */
 const COMMENT_MAX_LENGTH = 500;
+
+/**
+ * Decalage du header natif, meme valeur que `app/new/setup-users.tsx` (seul ecran
+ * de l'app dont le clavier est valide sur device). `KeyboardAvoidingView` mesure sa
+ * frame par rapport a son parent, pas a l'ecran : sans ce decalage il se croit plus
+ * haut qu'il n'est et sous-estime l'espace a reserver.
+ */
+const KEYBOARD_OFFSET = 64;
 
 // Tuile de motif : choix unique, donc role bouton + etat selected (convention du projet).
 const ReasonTile = ({ reason, active, disabled, onSelect }: {
@@ -61,10 +69,13 @@ const ReasonTile = ({ reason, active, disabled, onSelect }: {
 
 /**
  * Signalement d'un contenu du voyage, en page presentee en modal (pattern
- * `links/new`). Une page plutot qu'un `Modal` RN : la presentation native garde
- * le header et la safe area a sa charge, et surtout le `KeyboardAvoidingView`
- * fonctionne — dans un `Modal` Android, la fenetre `Dialog` fausse les
- * coordonnees du clavier et le bouton d'envoi reste sous le clavier.
+ * `links/new`). Une page plutot qu'un `Modal` RN : la presentation native prend
+ * la safe area et le header a sa charge.
+ *
+ * Clavier : `behavior="padding"` (jamais `"height"`, qui decale un enfant au lieu
+ * de reduire la zone et casse sur Android) + `keyboardVerticalOffset`, exactement
+ * la configuration de `app/new/setup-users.tsx`. Le bouton vit dans le contenu
+ * defilant, donc il reste atteignable meme si le decalage est imparfait.
  *
  * Cible passee en params par les ecrans appelants :
  * `/(id)/report?subjectType=message&subjectId=<id>&preview=<texte>[&eventId=<id>]`
@@ -125,12 +136,12 @@ export default function ReportSubject() {
     return (
         <Screen className="flex-1 bg-mist dark:bg-ink">
             <KeyboardAvoidingView
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                behavior="padding"
+                keyboardVerticalOffset={KEYBOARD_OFFSET}
                 className="flex-1">
-
                 <ScrollView
                     className="flex-1"
-                    contentContainerClassName="gap-5 p-5 pb-4"
+                    contentContainerClassName="gap-5 p-5"
                     keyboardShouldPersistTaps="handled">
 
                     <View className="rounded-2xl border border-mist dark:border-white/10 bg-white dark:bg-night p-4">
@@ -182,9 +193,7 @@ export default function ReportSubject() {
                     <Text className="text-xs text-night/50 dark:text-white/50">
                         {"L'auteur ne sera pas notifié et ne saura pas qui l'a signalé."}
                     </Text>
-                </ScrollView>
 
-                <View className="px-5 pb-4 pt-2">
                     <Button
                         variant="contained"
                         title="Envoyer le signalement"
@@ -193,7 +202,7 @@ export default function ReportSubject() {
                         isLoading={isPending}
                         onPress={handleSubmit}
                     />
-                </View>
+                </ScrollView>
             </KeyboardAvoidingView>
         </Screen>
     );
